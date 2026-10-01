@@ -1,0 +1,84 @@
+import { z } from 'zod';
+import type { Env } from './env';
+import { api } from './api';
+import { webhook } from './intake';
+import { reconcile } from './store';
+export { EvaluationWorkflow } from './workflow';
+export default {
+  async fetch(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<Response> {
+    const start = Date.now();
+    const traceId = crypto.randomUUID();
+    const url = new URL(request.url);
+    let response: Response;
+    try {
+      if (url.pathname === '/health')
+        response = Response.json({
+          status: 'ok',
+          environment: env.ENVIRONMENT,
+          mode: env.DEMO_MODE === 'true' ? 'synthetic-review' : 'live',
+        });
+      else if (url.pathname === '/webhooks/github' && request.method === 'POST')
+        response = await webhook(request, env, ctx);
+      else if (url.pathname.startsWith('/api/'))
+        response = await api(request, env);
+      else response = await env.ASSETS.fetch(request);
+    } catch (error) {
+      const status =
+        error instanceof z.ZodError || error instanceof SyntaxError
+          ? 400
+          : error instanceof Error && error.message === 'BODY_LIMIT'
+            ? 413
+            : 503;
+      response = Response.json(
+        {
+          error:
+            status === 400
+              ? 'INVALID_INPUT'
+              : status === 413
+                ? 'BODY_LIMIT'
+                : 'SERVICE_UNAVAILABLE',
+          traceId,
+        },
+        { status },
+      );
+      console.error(
+        JSON.stringify({ event: 'request_failed', traceId, status }),
+      );
+    }
+    response = new Response(response.body, response);
+    response.headers.set('x-trace-id', traceId);
+    response.headers.set('x-content-type-options', 'nosniff');
+    response.headers.set('referrer-policy', 'same-origin');
+    response.headers.set(
+      'content-security-policy',
+      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+    );
+    response.headers.set(
+      'permissions-policy',
+      'camera=(), microphone=(), geolocation=()',
+    );
+    if (url.pathname.startsWith('/api/'))
+      response.headers.set('cache-control', 'no-store');
+    console.log(
+      JSON.stringify({
+        event: 'http',
+        traceId,
+        path: url.pathname.replace(/[a-f0-9]{64}/g, ':id'),
+        status: response.status,
+        durationMs: Date.now() - start,
+      }),
+    );
+    return response;
+  },
+  async scheduled(
+    _event: ScheduledController,
+    env: Env,
+    ctx: ExecutionContext,
+  ) {
+    if (env.DEMO_MODE !== 'true') ctx.waitUntil(reconcile(env));
+  },
+} satisfies ExportedHandler<Env>;

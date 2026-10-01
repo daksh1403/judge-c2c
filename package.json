@@ -1,0 +1,39 @@
+{
+  "name": "judge-c2c",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && tsc -p tests/browser/tsconfig.json",
+    "check": "npm run typecheck && npm test && wrangler deploy --dry-run --env review",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "deploy:review": "wrangler deploy --env review",
+    "deploy": "node scripts/production-config.mjs && wrangler deploy --config .wrangler/production.json",
+    "test:browser": "playwright test",
+    "format:check": "prettier --check src tests public scripts docs examples *.json *.ts .github/workflows"
+  },
+  "dependencies": {
+    "jose": "6.2.12",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261001.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.6.3",
+    "miniflare": "4.20260730.0",
+    "prettier": "3.9.9",
+    "typescript": "7.0.2",
+    "vite": "8.3.2",
+    "vitest": "5.0.3",
+    "wrangler": "4.146.0"
+  },
+  "overrides": {
+    "undici": "7.29.1",
+    "sharp": "0.35.4"
+  }
+}

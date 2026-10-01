@@ -1,0 +1,7 @@
+# Local test credentials only. Default development uses synthetic read-only mode.
+DEMO_MODE=false
+ADMIN_TOKEN=replace-with-random-secret-at-least-32-characters
+GITHUB_WEBHOOK_SECRET=replace-with-a-separate-random-secret
+GITHUB_APP_ID=
+# PKCS8 PEM with escaped newlines; never commit real keys.
+GITHUB_APP_PRIVATE_KEY=

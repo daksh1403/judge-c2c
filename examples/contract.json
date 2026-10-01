@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "evaluationVersion": "docs-v1",
+  "challengeVersion": "onboarding-v1",
+  "repository": {
+    "id": 1,
+    "fullName": "hackathon/example",
+    "installationId": 1
+  },
+  "department": "Operations",
+  "category": "Documentation",
+  "baseline": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "issueNumbers": [1],
+  "requirements": [
+    {
+      "id": "onboarding",
+      "title": "Document local setup",
+      "mandatory": true,
+      "criteria": [
+        {
+          "id": "setup-heading",
+          "description": "README includes a Local development heading.",
+          "kind": "documentation",
+          "verification": {
+            "type": "file_contains",
+            "path": "README.md",
+            "text": "## Local development"
+          }
+        }
+      ]
+    }
+  ],
+  "constraints": ["Preserve the public API."],
+  "forbiddenPaths": [".github/workflows"],
+  "additionalCategories": ["testing", "documentation"],
+  "execution": {
+    "environment": "node22-v1",
+    "network": "deny",
+    "timeoutSeconds": 60,
+    "memoryMiB": 512,
+    "maxFiles": 50,
+    "maxFileBytes": 50000
+  }
+}
