@@ -85,11 +85,16 @@ export async function api(request: Request, env: Env) {
         : json({ error: 'NOT_FOUND' }, 404);
     const run = await getRun(env, runMatch[1]!);
     if (!run) return json({ error: 'NOT_FOUND' }, 404);
-    const [timeline, artifacts] = await Promise.all([
+    const [timeline, artifacts, execution] = await Promise.all([
       env.DB.prepare('SELECT * FROM timeline WHERE run_id=? ORDER BY id')
         .bind(run.id)
         .all(),
       env.DB.prepare('SELECT * FROM artifacts WHERE run_id=?')
+        .bind(run.id)
+        .all(),
+      env.DB.prepare(
+        'SELECT commit_sha,request_hash,result_hash,result,created_at FROM execution_results WHERE run_id=? ORDER BY created_at',
+      )
         .bind(run.id)
         .all(),
     ]);
@@ -97,6 +102,7 @@ export async function api(request: Request, env: Env) {
       ...run,
       timeline: timeline.results,
       artifacts: artifacts.results,
+      execution: execution.results,
     });
   }
   if (request.method === 'GET' && path === '/api/artifact') {

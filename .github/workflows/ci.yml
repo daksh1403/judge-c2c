@@ -20,6 +20,9 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm audit --audit-level=high
+      - run: npm audit --prefix runner --audit-level=high
+      - name: Build trusted runner image (no participant code)
+        run: docker build --tag judge-c2c-runner-check runner
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - uses: actions/upload-artifact@v4

@@ -121,8 +121,8 @@ configuring assignments concurrently.
 Unassigned PRs fail explicitly instead of guessing a team or using participant judging
 policy. Redeliver an event rejected before assignment registration.
 
-`file_contains` is permitted for source/documentation criteria only. `runner` declares
-a future isolated check and currently returns UNVERIFIED; `human` needs future audited
+`file_contains` is permitted for source/documentation criteria only. `runner` references an authoritative trusted acceptance case. The adapter is
+implemented but deployment is disabled, so runtime results remain UNVERIFIED; `human` needs future audited
 adjudication. AI cannot waive requirements, mint evidence or override objective failures.
 
 ## PR review and deployment
@@ -203,6 +203,16 @@ PR events use that assignment. Unconfigured PRs fail explicitly. GitHub Check de
 links open the protected organization report. The public workspace cannot read it.
 
 This slice performs immutable baseline/head comparison and configured source checks.
-Runtime tests, performance and functional correctness remain UNVERIFIED. AI is optional
-and cannot turn those into passes. Individual organizer identities, isolated execution
+Execution deployment is explicitly disabled. The implemented Node microVM adapter
+compares trusted baseline/head HTTP acceptance and supplemental syntax/tests/lint,
+but no deployed participant execution has been validated. Runtime functionality stays
+UNVERIFIED. The internal review host has bounded Workers AI requirement review enabled;
+it cannot turn unavailable checks into passes. Individual organizer identities, isolated execution
 and audited human adjudication remain production readiness work.
+
+The organization console shows execution/reviewer configuration and offers an authenticated,
+rate-limited synthetic reviewer diagnostic. Select the payment retry test profile only after
+approving its exact requirements. The [reference fixture](examples/payment-retry/README.md)
+is organizer-authored, not participant work. Stored execution logs and hashes appear under
+Isolated execution in authorized reports. See [runner operation](docs/runner-boundary.md)
+for supported limits and explicit future enablement. No additional public URL is created.

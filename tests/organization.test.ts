@@ -17,6 +17,8 @@ import {
   organizationEnv,
 } from '../src/organization';
 import { GitHub } from '../src/github';
+import { EvaluationWorkflow } from '../src/workflow';
+import type { WorkflowStep, WorkflowEvent } from 'cloudflare:workers';
 import type { Env } from '../src/env';
 let mf: Miniflare, env: Env, cookie: string;
 const pending: Promise<unknown>[] = [];
@@ -70,6 +72,7 @@ beforeAll(async () => {
     '0001_foundation.sql',
     '0004_organization.sql',
     '0005_assignment_contract.sql',
+    '0006_execution.sql',
   ]) {
     const sql = readFileSync('migrations/' + file, 'utf8');
     const split = sql.indexOf('CREATE TRIGGER');
@@ -363,9 +366,13 @@ describe('protected organization setup', () => {
           updated_at: '2026-10-02T00:00:00Z',
         } as never;
       if (path.includes('/issues/')) return { number: 3 } as never;
+      if (path.includes('/check-runs?')) return { check_runs: [] } as never;
+      if (path.endsWith('/check-runs')) return { id: 9001 } as never;
       if (path.includes('/commits/')) return { sha: base } as never;
       if (path.includes('/compare/'))
         return { merge_base_commit: { sha: base }, files: [] } as never;
+      if (path.includes('/check-runs?')) return { check_runs: [] } as never;
+      if (path.endsWith('/check-runs')) return { id: 9001 } as never;
       throw new Error('UNEXPECTED_TEST_PATH');
     });
     const response = await organization(
@@ -413,6 +420,37 @@ describe('protected organization setup', () => {
         .bind(head, run!.id)
         .run(),
     ).rejects.toThrow('immutable');
+    const orgenv = await organizationEnv(env);
+    const step = {
+      do: async (_name: string, options: unknown, callback?: () => unknown) =>
+        typeof options === 'function' ? options() : callback!(),
+    } as unknown as WorkflowStep;
+    await new EvaluationWorkflow(ctx, orgenv).run(
+      { payload: { runId: run!.id } } as WorkflowEvent<{ runId: string }>,
+      step,
+    );
+    const completed = await env
+      .ORG_DB!.prepare(
+        'SELECT state,publication_status,report FROM evaluations WHERE id=?',
+      )
+      .bind(run!.id)
+      .first<{ state: string; publication_status: string; report: string }>();
+    expect(completed).toMatchObject({
+      state: 'COMPLETED',
+      publication_status: 'PUBLISHED',
+    });
+    expect(JSON.parse(completed!.report).assessments[0].status).toBe(
+      'UNVERIFIED',
+    );
+    const calls = vi.mocked(GitHub.prototype.api).mock.calls;
+    const published = calls.find(
+      ([path, init]) => path.endsWith('/check-runs') && init?.method === 'POST',
+    );
+    const check = JSON.parse(String(published![1]!.body));
+    expect(check.details_url).toBe(
+      env.ORG_PUBLIC_ORIGIN + '/?organization=1&evaluation=' + run!.id,
+    );
+    expect(check.conclusion).toBe('action_required');
   });
 
   it('deduplicates installation suspension and reconciles a delayed suspend after restoration', async () => {
@@ -496,6 +534,33 @@ describe('protected organization setup', () => {
         .first<{ accessible: number }>())!.accessible,
     ).toBe(1);
     expect((await hook('deleted', 'suspend-once')).status).toBe(409);
+  });
+  it('protects and throttles synthetic reviewer diagnostics', async () => {
+    const first = await organization(
+      request('/api/organization/reviewer-check', 'POST', {}),
+      env,
+      ctx,
+    );
+    expect(first.status).toBe(200);
+    expect((await body(first)).status).toBe('NOT_CONFIGURED');
+    expect(
+      (
+        await organization(
+          request('/api/organization/reviewer-check', 'POST', {}),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await organization(
+          request('/api/organization/reviewer-check', 'POST', {}),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(429);
   });
   it('rejects unselected repositories, secrets in policy and signed-hook forgery; logout revokes access', async () => {
     const data = {

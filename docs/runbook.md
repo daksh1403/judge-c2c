@@ -147,3 +147,31 @@ Check the actual App webhook deliveries and Check publication on an assigned rea
 before claiming the end-to-end integration is proven. App registration, installation,
 and a real assigned submission must be tested with owner approval; mock fixtures do
 not prove these external steps.
+
+## Disabled isolated runner and reviewer checks
+
+Migration `0006_execution.sql` adds append-only execution records. Apply it to both review
+and organization D1 before deploying this host version. Baseline/head results use separate
+request hashes, immutable image identity and bounded redacted outputs. Retrying creates
+new records; do not edit historical results. Large artifact/R2 operation remains a follow-up.
+
+`RUNNER_ENABLED=false` is deliberate. The account does not have paid Containers access and
+the owner declined enablement for now. Normal `npm run deploy:review` does not provision
+containers. The public native preview has no runner or AI binding; it forwards only
+session-protected organization operations to the internal host. AI runs through Workers AI
+on that host with bounded prompts, two attempts and validated output. Provider failure
+retains the deterministic report. The Test AI reviewer button runs a clearly labeled
+synthetic diagnostic, limited to two invocations per minute, and records the attempt in audit.
+
+Future enablement requires paid access and deployed adversarial validation. Build the trusted
+`runner/Dockerfile` image, upload to the account managed registry, and record its digest URI.
+The dedicated lockfile pins evaluator ESLint. After approval, set `JUDGE_RUNNER_ENABLE=true`
+and `JUDGE_RUNNER_IMAGE` to that immutable URI, run `node scripts/runner-config.mjs`, review
+the generated `.wrangler/runner.json`, then deploy that configuration to the existing internal
+host. It allows four instances. Freeze new contracts with this exact image; an old
+UNCONFIGURED contract stays non-executable. Updating ordinary review configuration disables
+execution again. Do not rotate image content underneath a recorded contract.
+
+Still unproven: prepared image boot, actual guest teardown, network/resource protections,
+private-container HTTP behavior, and real baseline/PR execution. Docker is not running on
+this development machine; no actual participant workload was used to test those claims.

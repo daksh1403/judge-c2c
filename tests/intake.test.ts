@@ -116,6 +116,9 @@ beforeAll(async () => {
   await DB.prepare(
     'ALTER TABLE assignments ADD COLUMN contract_hash TEXT REFERENCES contracts(hash)',
   ).run();
+  await DB.prepare(
+    'CREATE TABLE execution_results(run_id TEXT,commit_sha TEXT,request_hash TEXT,result_hash TEXT,result TEXT,created_at TEXT)',
+  ).run();
   env = {
     DB: DB as unknown as D1Database,
     ENVIRONMENT: 'local',

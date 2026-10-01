@@ -56,6 +56,7 @@
         "PREVIEW_TESTING": "true",
         "ORG_NAME": "Daksh-Codebase",
         "ORG_PUBLIC_ORIGIN": "http://127.0.0.1:8787",
+        "RUNNER_ENABLED": "false",
       },
       "d1_databases": [
         {
@@ -98,6 +99,8 @@
         "PREVIEW_TESTING": "true",
         "ORG_NAME": "Daksh-Codebase",
         "ORG_PUBLIC_ORIGIN": "https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev",
+        "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "RUNNER_ENABLED": "false",
       },
       "d1_databases": [
         {
@@ -136,6 +139,9 @@
         "crons": ["*/2 * * * *"],
       },
       "services": [],
+      "ai": {
+        "binding": "AI",
+      },
     },
   },
   "d1_databases": [

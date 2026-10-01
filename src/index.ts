@@ -8,6 +8,7 @@ import { reconcile } from './store';
 import { previewEnabled, previewApi, reconcilePreview } from './preview';
 export { PublicPreviewWorkflow } from './preview-workflow';
 export { EvaluationWorkflow } from './workflow';
+export { IsolatedRunner } from './runner-container';
 export default {
   async fetch(
     request: Request,

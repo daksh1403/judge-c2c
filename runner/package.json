@@ -1,0 +1,8 @@
+{
+  "name": "judge-c2c-runner-tools",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "eslint": "9.39.1"
+  }
+}

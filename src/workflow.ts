@@ -15,6 +15,7 @@ import { GitHub } from './github';
 import { classifyRisk, objective, aiReview, type Context } from './evaluate';
 import { canonical, digest, type Evidence } from './domain';
 import { redact } from './security';
+import { runObjective } from './runner';
 
 export class EvaluationWorkflow extends WorkflowEntrypoint<
   Env,
@@ -130,8 +131,30 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           'CHECKING',
           'Baseline source assertions and policy checks recorded',
         );
-        if (this.env.ARTIFACTS && run.evidence) {
-          const content = run.evidence;
+        const contract = parseContract(run);
+        let evidence = JSON.parse(run.evidence!) as Evidence[];
+        try {
+          evidence = await runObjective(this.env, run, contract, evidence);
+        } catch (error) {
+          const code =
+            error instanceof Error && /^[A-Z_0-9]+$/.test(error.message)
+              ? error.message
+              : 'RUNNER_UNAVAILABLE';
+          evidence.push({
+            id: 'runner-stage',
+            kind: 'execution',
+            status: 'UNVERIFIED',
+            claim: `Execution stage unavailable: ${code}. Earlier evidence is preserved.`,
+          });
+        }
+        if (!(await isCurrent(this.env, run))) return;
+        await this.env.DB.prepare(
+          "UPDATE evaluations SET evidence=? WHERE id=? AND state='CHECKING'",
+        )
+          .bind(redact(canonical(evidence)), id)
+          .run();
+        if (this.env.ARTIFACTS) {
+          const content = redact(canonical(evidence));
           const key = `evaluations/${id}/objective.json`;
           const hash = await digest(content);
           await this.env.ARTIFACTS.put(key, content, {
@@ -185,7 +208,7 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           id,
           'SYNTHESIZING',
           'COMPLETED',
-          'Evidence-backed report; runtime checks unavailable',
+          'Evidence-backed report; inspect execution availability per criterion',
         );
       });
     } catch (error) {
@@ -249,10 +272,25 @@ export async function publish(env: Env, run: Run) {
   const c = parseContract(run);
   const github = await GitHub.installation(env, c);
   const evidence = run.evidence ? (JSON.parse(run.evidence) as Evidence[]) : [];
-  const hasFailure = evidence.some((e) => e.status === 'FAIL');
+  const hasFailure = evidence.some(
+    (e) =>
+      e.status === 'FAIL' &&
+      (e.criterionId || e.kind === 'policy' || e.baselineStatus === 'PASS'),
+  );
   const uncertain =
     evidence.some((e) => e.status === 'UNVERIFIED') ||
-    c.requirements.some((r) => r.criteria.some((a) => a.kind === 'functional'));
+    c.requirements.some((r) =>
+      r.criteria.some(
+        (a) =>
+          a.kind === 'functional' &&
+          !evidence.some(
+            (e) =>
+              e.criterionId === a.id &&
+              e.kind === 'execution' &&
+              e.status !== 'UNVERIFIED',
+          ),
+      ),
+    );
   const report = run.report
     ? (JSON.parse(run.report) as { summary: string })
     : null;
@@ -282,7 +320,7 @@ export async function publish(env: Env, run: Run) {
         run.state === 'COMPLETED'
           ? 'Evidence review complete — human judging remains required'
           : `Evaluation ${run.state.toLowerCase()}`,
-      summary: `${report?.summary ?? run.failure_code ?? 'Evaluation superseded.'}\n\nBaseline: ${run.baseline_sha}\nHead: ${run.head_sha}\nContract: ${run.contract_hash}\nObjective evidence: ${evidence.filter((e) => e.status === 'PASS').length} pass, ${evidence.filter((e) => e.status === 'FAIL').length} fail, ${evidence.filter((e) => e.status === 'UNVERIFIED').length} unverified.\nNo runtime build or tests executed.`,
+      summary: `${report?.summary ?? run.failure_code ?? 'Evaluation superseded.'}\n\nBaseline: ${run.baseline_sha}\nHead: ${run.head_sha}\nContract: ${run.contract_hash}\nObjective evidence: ${evidence.filter((e) => e.status === 'PASS').length} pass, ${evidence.filter((e) => e.status === 'FAIL').length} fail, ${evidence.filter((e) => e.status === 'UNVERIFIED').length} unverified.\n${evidence.some((e) => e.kind === 'execution' && e.baselineStatus) ? 'Baseline and submission execution evidence is available; inspect trusted acceptance versus supplemental repository commands.' : 'No verified runtime results are available.'}`,
     },
   };
   try {

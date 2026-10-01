@@ -1,4 +1,7 @@
 export interface Env {
+  RUNNER?: DurableObjectNamespace;
+  RUNNER_ENABLED?: string;
+  RUNNER_IMAGE_URI?: string;
   ORG_DB?: D1Database;
   ORG_SERVICE?: Fetcher;
   ORG_EVALUATOR?: Workflow<{ runId: string }>;

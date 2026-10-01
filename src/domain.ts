@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { runnerPolicySchema } from './runner-policy';
 
 export const sha = z.string().regex(/^[a-f0-9]{40}$/);
 const id = z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,79}$/);
@@ -66,6 +67,7 @@ export const contractSchema = z
     additionalCategories: z.array(z.string().min(1).max(80)).max(20),
     execution: z
       .object({
+        runner: runnerPolicySchema.optional(),
         environment: id,
         network: z.literal('deny'),
         timeoutSeconds: z.number().int().min(1).max(600),
@@ -77,6 +79,25 @@ export const contractSchema = z
   })
   .strict()
   .superRefine((c, ctx) => {
+    if (c.execution.runner) {
+      if (c.execution.memoryMiB !== 256)
+        ctx.addIssue({
+          code: 'custom',
+          message: 'node-http-v1 requires the fixed 256 MiB microVM profile',
+        });
+      const checks = new Set(c.execution.runner.cases.map((t) => t.id));
+      for (const r of c.requirements)
+        for (const a of r.criteria)
+          if (
+            a.verification.type === 'runner' &&
+            !checks.has(a.verification.checkId)
+          )
+            ctx.addIssue({
+              code: 'custom',
+              message:
+                'Functional runner criteria must reference a trusted acceptance case',
+            });
+    }
     const keys = c.requirements.flatMap((r) => [
       r.id,
       ...r.criteria.map((a) => a.id),
@@ -230,7 +251,10 @@ export function validateReview(
     if (
       criterion.kind === 'functional' &&
       !evidence.some(
-        (e) => e.criterionId === criterion.id && e.kind === 'execution',
+        (e) =>
+          e.criterionId === criterion.id &&
+          e.kind === 'execution' &&
+          e.status !== 'UNVERIFIED',
       ) &&
       a.status !== 'UNVERIFIED'
     )

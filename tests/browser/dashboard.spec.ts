@@ -325,6 +325,7 @@ test('organization console authenticates and submits an authoritative challenge'
       'Verify payment receipts against the required format.',
     );
     expect(body.teamName).toBe('Team Mercury');
+    expect(body.executionProfile).toBe('payment-retry-v1');
     return route.fulfill({ status: 202, json: { status: 'queued' } });
   });
   await page.goto('/?organization=1');
@@ -338,6 +339,10 @@ test('organization console authenticates and submits an authoritative challenge'
   await page
     .getByRole('button', { name: 'Configure issue and evaluation' })
     .click();
+  await expect(page.getByText('Isolated execution: disabled')).toBeVisible();
+  await page
+    .getByLabel('Trusted execution profile')
+    .selectOption('payment-retry-v1');
   await page.getByLabel('Team name').fill('Team Mercury');
   await page
     .getByLabel('Authoritative expected behavior and acceptance criteria')
