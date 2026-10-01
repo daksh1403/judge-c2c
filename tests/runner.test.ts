@@ -285,7 +285,10 @@ describe('trusted isolated execution', () => {
       .fn()
       .mockResolvedValueOnce({ response: JSON.stringify(bad) })
       .mockResolvedValueOnce({
-        response: JSON.stringify(valid),
+        response: JSON.stringify({
+          ...valid,
+          summary: 'All features work perfectly.',
+        }),
         usage: { total_tokens: 100 },
       });
     const reviewed = await aiReview(
@@ -295,6 +298,8 @@ describe('trusted isolated execution', () => {
       evidence,
     );
     expect(reviewed.status).toBe('COMPLETED');
+    expect(reviewed.review.summary).toBe(valid.summary);
+    expect(reviewed.review.summary).not.toContain('work perfectly');
     expect(reviewed.trace.attempts).toBe(2);
     expect(
       reviewed.review.assessments.every((a) => a.status === 'UNVERIFIED'),

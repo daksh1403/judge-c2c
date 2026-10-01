@@ -67,7 +67,9 @@ completion endpoint or guest-uploaded self-attestation. Validate exact request h
 commit, contract hash, immutable image, tool-policy version, check IDs/kinds and exit
 semantics before persisting. Baseline/head outputs are append-only D1 records with
 SHA-256 integrity metadata, bounded redacted logs, timestamps, tool versions and duration.
-A failed later stage cannot erase a successful earlier result. Requirement evidence
+A failed later stage cannot erase a successful earlier result. Overall report headlines
+come from deterministic evidence policy; free-form model summaries cannot establish a
+functional verdict. Requirement evidence
 compares each trusted check against its baseline to distinguish new failures from
 pre-existing behavior. AI cannot elevate unavailable execution into PASS or PARTIAL.
 
