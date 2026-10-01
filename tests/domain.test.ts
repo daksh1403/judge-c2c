@@ -185,6 +185,9 @@ describe('security boundaries', () => {
     expect(redact('password="longpassword123"')).not.toContain(
       'longpassword123',
     );
+    expect(JSON.parse(redact('{"apiKey":"longsecret123"}'))).toEqual({
+      apiKey: '[REDACTED]',
+    });
   });
   it('fails closed on weak or missing admin credentials', async () => {
     expect(await equalSecret('abc', 'abc')).toBe(false);

@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "judge-c2c-local",
+  "name": "judge-c2c",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-01",
   "compatibility_flags": ["nodejs_compat"],
@@ -10,23 +10,28 @@
     "run_worker_first": ["/api/*", "/health", "/webhooks/*"],
   },
   "observability": { "enabled": true },
-  "vars": { "ENVIRONMENT": "local", "DEMO_MODE": "true" },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "judge-c2c-review",
-      "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
-      "migrations_dir": "migrations",
-    },
-  ],
-  "workflows": [
-    {
-      "binding": "EVALUATOR",
-      "name": "judge-c2c-local-evaluator",
-      "class_name": "EvaluationWorkflow",
-    },
-  ],
+  "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" },
+  "previews": { "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" } },
   "env": {
+    "local": {
+      "name": "judge-c2c-local",
+      "vars": { "ENVIRONMENT": "local", "DEMO_MODE": "true" },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "judge-c2c-local",
+          "database_id": "local-only",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "workflows": [
+        {
+          "binding": "EVALUATOR",
+          "name": "judge-c2c-local-evaluator",
+          "class_name": "EvaluationWorkflow",
+        },
+      ],
+    },
     "review": {
       "name": "judge-c2c-review",
       "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" },

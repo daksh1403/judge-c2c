@@ -37,9 +37,13 @@ redaction policy is pending. Never put sensitive data in public challenges/model
 
 On 2026-10-02 the review Worker was deployed and its separate D1 database migrated.
 Local D1 integration tests validate the SQL. R2 creation was rejected because R2 is
-disabled. Existing OAuth can deploy Workers but Workers Builds APIs returned 403. No
-scoped CI token or evaluation GitHub App credentials were available. Deployment workflows
-exist but are disabled pending environment setup. Production has not been deployed.
+disabled. Existing OAuth can deploy Workers but Workers Builds administration/log APIs
+returned 403. The PR discovered an existing native Builds connection for `judge-c2c`;
+its initial build failed, and root Worker naming/build configuration was corrected.
+No scoped Actions deployment token or evaluation GitHub App credentials were available.
+GitHub also rejected required-reviewer environment protection with a billing-plan error.
+Actions deployments stay disabled pending a supported approval gate and credentials.
+No production version was deployed by this work.
 
 ## Real-event gates
 

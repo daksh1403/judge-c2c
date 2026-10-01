@@ -47,7 +47,7 @@ export function redact(text: string) {
       '[REDACTED PRIVATE KEY]',
     )
     .replace(
-      /((?:password|secret|api[_-]?key|token)\s*[:=]\s*["']?)[^\s"',;]{8,}/gi,
+      /(["']?(?:password|secret|api[_-]?key|token)["']?\s*[:=]\s*["']?)[^\s"',;}\]]{8,}/gi,
       '$1[REDACTED]',
     );
 }
