@@ -40,9 +40,15 @@ Local D1 integration tests validate the SQL. R2 creation was rejected because R2
 disabled. Existing OAuth can deploy Workers but Workers Builds administration/log APIs
 returned 403. The PR discovered an existing native Builds connection for `judge-c2c`;
 its initial build failed, and root Worker naming/build configuration was corrected.
+The next native build passed. Preview URL routing was enabled (production route remains
+disabled), and the automatic branch Preview at
+`https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev` returned HTTP 200.
+The root preview configuration has no state or execution bindings; the connected Worker
+has no configured secrets. Native Previews are active and update on branch commits.
 No scoped Actions deployment token or evaluation GitHub App credentials were available.
 GitHub also rejected required-reviewer environment protection with a billing-plan error.
-Actions deployments stay disabled pending a supported approval gate and credentials.
+Only the alternative Actions deployments stay disabled pending a supported approval gate
+and credentials. Keep production judging secrets out of native preview parent/base config.
 No production version was deployed by this work.
 
 ## Real-event gates

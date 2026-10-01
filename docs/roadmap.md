@@ -3,8 +3,9 @@
 The complete product is not finished by the deployed foundation PR.
 
 1. **Current PR:** authoritative contracts/assignments, signed intake, immutable history,
-   outbox/workflows, baseline source checks, optional AI, judge evidence UI and deployed review.
-2. **Genuine staging loop:** App installation, authorized automated previews, approved
+   outbox/workflows, baseline source checks, optional AI, judge evidence UI and passing
+   CI/native automatic Cloudflare PR Preview.
+2. **Genuine staging loop:** App installation, approved
    challenges/teams, real PR → workflow → Check → judge view; running Checks and publication recovery.
 3. **Functional checks:** microVM runner, trusted test packs, reproducible baseline/head
    build/tests/security evidence, regression normalization, R2 artifacts and attestation.

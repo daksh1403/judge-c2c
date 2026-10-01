@@ -3,7 +3,7 @@
 GitHub engineering evaluation with immutable contracts, baseline comparison and
 evidence-backed human review. AI interprets evidence; it does not establish facts.
 
-**[Cloudflare review](https://judge-c2c-review.dakshx.workers.dev)** — read-only,
+**[Automatic PR Preview](https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev)** — read-only,
 explicitly synthetic data. This foundation is not ready to judge a real event.
 
 ## Delivered foundation
@@ -21,8 +21,8 @@ explicitly synthetic data. This foundation is not ready to judge a real event.
   schema/evidence references, rejection of unsupported PASS and waived criteria.
 - Durable evaluation stages, partial evidence, concise GitHub Check publication,
   protected R2 artifact support and correlated structured logs.
-- CI and isolated per-PR Cloudflare deployment definitions. Automated deployments remain
-  disabled until scoped environment credentials are configured.
+- Passing GitHub CI and native Cloudflare branch Previews that update on PR commits.
+  Optional Actions deployment definitions remain disabled pending credentials/approval gates.
 
 **Participant execution is not implemented in this slice.** Build/tests/scanners/coverage/
 benchmarks do not run. Functional criteria remain UNVERIFIED. A passing literal assertion
@@ -106,9 +106,16 @@ Worker privileges, so application read-only mode alone cannot secure a token fro
 malicious PR code. The workflow tests the deployed URL and records it in the Actions
 summary. Remove closed PR Workers/Workflows manually in this slice.
 
-Alternatively authorize Cloudflare's GitHub App and configure native
-[Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). This PR uses
-separate Workers rather than depending on beta Preview access.
+The repository already has a native [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
+connection, now verified on this PR. Root `judge-c2c` naming matches that connection;
+`previews` explicitly sets synthetic review mode and root contains no state/execution
+bindings. Native branch Previews automatically update on commits. Preview URL routing
+was enabled without enabling the production route. The connected Worker has no secrets.
+Keep judging credentials out of this preview parent/base configuration; use separate
+production resources and trusted build access before enabling live judging.
+The Actions deployment above is an optional alternative, currently disabled. GitHub's
+current billing plan rejected required-reviewer environment protection, so that approval
+gate must be made available before enabling the privileged Actions path.
 
 Production remains disabled until `CLOUDFLARE_PRODUCTION_ENABLED=true`. It runs only on
 human-merged main pushes through `cloudflare-production`, with its own token/account,
