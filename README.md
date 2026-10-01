@@ -9,21 +9,33 @@ This foundation is not ready to judge a real event.
 ## Try the real review flow
 
 1. Open the existing bot-managed PR Preview above.
-2. Paste a public GitHub PR URL and describe the expected behavior.
+2. Select **Use prepared public example**, or paste a public GitHub PR URL and describe the expected behavior.
 3. Optionally provide a frozen baseline SHA, a literal source assertion and protected paths.
 4. Select **Evaluate PR**. Inspect exact commits, changed files, baseline-relative evidence,
    requirement assessments and the timeline. Download the complete review JSON.
 
 For a small reproducible example, use `https://github.com/octocat/Hello-World/pull/1`,
-expected behavior “Document the project greeting in README”, and a source assertion
-for `README` containing `Hello World!`. This tests real GitHub reads, not runtime behavior.
+expected behavior “Document the Git initialization steps in README”, and a source assertion
+for `README` containing `$ git init`. This tests real GitHub reads, not runtime behavior.
 
-The preview uses public GitHub APIs without credentials and never publishes to external
+The preview uses public GitHub metadata APIs and exact-commit raw files without credentials and never publishes to external
 PRs. It persists each attempt in a separate review database. Your HttpOnly session lasts
 24 hours; runs are retained for seven days and are visible only to that session. A new
 Evaluate action captures a new head without overwriting earlier attempts. Without an
 explicit baseline, it captures the PR merge base rather than an organizer-frozen baseline.
 Public API rate limits and a 100-file diff limit can cause a review to fail explicitly.
+The prepared example is a real public PR snapshot fetched by a trusted preparation script,
+not synthetic data. When live metadata reads are blocked, it is labeled **Frozen GitHub
+snapshot** with its capture time; the latest PR head remains UNVERIFIED. Source assertions
+still fetch real files at the frozen commits. Snapshots expire from fallback use after 24 hours.
+Operators can prepare another public PR without credentials:
+
+```sh
+node --experimental-strip-types scripts/prepare-public-pr.mjs https://github.com/owner/repo/pull/123 --remote
+```
+
+Use Node 24+. Omit `--remote` for local D1. Only operator deployment access can populate
+this immutable, integrity-checked cache; no browser API accepts participant snapshots.
 Build/tests/benchmarks/security scans and AI review are not run here. Functional behavior
 remains **UNVERIFIED**. Do not enter sensitive information into this review environment.
 

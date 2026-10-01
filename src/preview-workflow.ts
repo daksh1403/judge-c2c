@@ -6,10 +6,13 @@ import {
 import type { Env } from './env';
 import { canonical, digest, type Evidence } from './domain';
 import { GitHub } from './github';
-import { deterministicReport } from './evaluate';
+import { deterministicReport, objective } from './evaluate';
 import {
-  preparePublicSnapshot,
+  preparePublicReview,
   collectPublicEvidence,
+  publicDiffContext,
+  cachedPublicReview,
+  publicResolutionEvidence,
 } from './preview-evaluate';
 import {
   previewEnabled,
@@ -65,16 +68,33 @@ export class PublicPreviewWorkflow extends WorkflowEntrypoint<
             'FETCHING',
             'Reading real public PR metadata and capturing exact commits',
           );
-          const snapshot = await preparePublicSnapshot(
-            new GitHub(),
-            previewRequestSchema.parse(JSON.parse(run.request)),
-          );
+          const input = previewRequestSchema.parse(JSON.parse(run.request));
+          let prepared;
+          try {
+            prepared = await preparePublicReview(new GitHub(), input);
+          } catch (error) {
+            if (
+              !(error instanceof Error) ||
+              !/^GITHUB_HTTP_(403|429|5[0-9]{2})$/.test(error.message)
+            )
+              throw error;
+            prepared = await cachedPublicReview(this.env.DB, input);
+            if (!prepared) throw error;
+          }
+          const context = publicDiffContext(prepared.files);
           await this.env.DB.prepare(
-            "UPDATE preview_runs SET snapshot=?,snapshot_hash=? WHERE id=? AND snapshot IS NULL AND state='FETCHING'",
+            "UPDATE preview_runs SET snapshot=?,snapshot_hash=?,context=?,evidence=? WHERE id=? AND snapshot IS NULL AND state='FETCHING'",
           )
             .bind(
-              redact(canonical(snapshot)),
-              await digest(canonical(snapshot)),
+              redact(canonical(prepared.snapshot)),
+              await digest(canonical(prepared.snapshot)),
+              redact(canonical(context)),
+              redact(
+                canonical([
+                  ...objective(prepared.snapshot, context),
+                  ...publicResolutionEvidence(prepared.snapshot),
+                ]),
+              ),
               id,
             )
             .run();
@@ -85,7 +105,11 @@ export class PublicPreviewWorkflow extends WorkflowEntrypoint<
         { retries: { limit: 1, delay: '10 seconds' }, timeout: '3 minutes' },
         async () => {
           const run = await this.get(id);
-          if (run.evidence) return;
+          if (
+            run.context &&
+            JSON.parse(run.context).evidenceStage === 'objective'
+          )
+            return;
           await this.transition(
             id,
             'FETCHING',
@@ -93,7 +117,11 @@ export class PublicPreviewWorkflow extends WorkflowEntrypoint<
             'Comparing the frozen baseline and head; checking source assertions and protected paths',
           );
           const snapshot = JSON.parse(run.snapshot!) as PreviewSnapshot;
-          const result = await collectPublicEvidence(new GitHub(), snapshot);
+          const result = await collectPublicEvidence(
+            new GitHub(),
+            snapshot,
+            run.context ? JSON.parse(run.context).files : undefined,
+          );
           await this.env.DB.prepare(
             "UPDATE preview_runs SET context=?,evidence=? WHERE id=? AND state='CHECKING'",
           )
@@ -118,6 +146,10 @@ export class PublicPreviewWorkflow extends WorkflowEntrypoint<
           JSON.parse(run.snapshot!) as PreviewSnapshot,
           JSON.parse(run.evidence!) as Evidence[],
         );
+        const snapshot = JSON.parse(run.snapshot!) as PreviewSnapshot;
+        if (snapshot.resolution)
+          report.summary +=
+            ' Latest PR head could not be refreshed. The report uses an explicitly frozen real GitHub snapshot.';
         await this.env.DB.prepare(
           "UPDATE preview_runs SET report=? WHERE id=? AND state='SYNTHESIZING'",
         )

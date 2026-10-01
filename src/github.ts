@@ -1,5 +1,5 @@
 import { importPKCS8, SignJWT } from 'jose';
-import type { Contract } from './domain';
+import { pathSchema, sha, type Contract } from './domain';
 import { boundedBody } from './security';
 import type { Env } from './env';
 export type ChangedFile = {
@@ -9,6 +9,7 @@ export type ChangedFile = {
   additions: number;
   deletions: number;
   patch?: string;
+  patchTruncated?: boolean;
 };
 export class GitHub {
   constructor(private token?: string) {}
@@ -86,6 +87,43 @@ export class GitHub {
     )
       throw new Error('DIFF_LIMIT');
     return result.files;
+  }
+  async publicFile(repo: string, commit: string, path: string, max: number) {
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo))
+      throw new Error('INVALID_PUBLIC_REPOSITORY');
+    sha.parse(commit);
+    pathSchema.parse(path);
+    const escaped = path.split('/').map(encodeURIComponent).join('/');
+    const response = await fetch(
+      `https://raw.githubusercontent.com/${repo}/${commit}/${escaped}`,
+      {
+        redirect: 'manual',
+        signal: AbortSignal.timeout(25000),
+        headers: { 'user-agent': 'Judge-C2C' },
+      },
+    );
+    if (response.status === 404) return '';
+    if (!response.ok) throw new Error(`GITHUB_RAW_HTTP_${response.status}`);
+    try {
+      const bytes = await boundedBody(
+        new Request('https://internal/', {
+          method: 'POST',
+          body: response.body,
+          duplex: 'half',
+        } as RequestInit),
+        max,
+      );
+      return new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(
+        bytes,
+      );
+    } catch (error) {
+      if (
+        error instanceof TypeError ||
+        (error instanceof Error && error.message === 'BODY_LIMIT')
+      )
+        return null;
+      throw error;
+    }
   }
   async file(repo: string, commit: string, path: string, max: number) {
     const escaped = path.split('/').map(encodeURIComponent).join('/');

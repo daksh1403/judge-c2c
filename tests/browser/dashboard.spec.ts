@@ -220,6 +220,15 @@ test('a public PR can be submitted, polled and inspected without fabricated func
     page.getByRole('heading', { name: 'Evaluate a real public PR' }),
   ).toBeVisible();
   await page
+    .getByRole('button', { name: 'Use prepared public example' })
+    .click();
+  await expect(page.getByLabel('Public GitHub pull request URL')).toHaveValue(
+    'https://github.com/octocat/Hello-World/pull/1',
+  );
+  await page
+    .getByText('Baseline and objective assertions (optional)', { exact: true })
+    .click();
+  await page
     .getByLabel('Public GitHub pull request URL')
     .fill('https://github.com/example/project/pull/12');
   await page

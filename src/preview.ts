@@ -28,6 +28,11 @@ export const previewRequestSchema = z
   .strict();
 export type PreviewRequest = z.infer<typeof previewRequestSchema>;
 export type PreviewSnapshot = {
+  resolution?: {
+    source: 'frozen-github-cache';
+    capturedAt: string;
+    headRefresh: 'UNVERIFIED';
+  };
   schemaVersion: 1;
   evaluationVersion: string;
   challengeVersion: string;

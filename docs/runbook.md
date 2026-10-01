@@ -72,7 +72,8 @@ No production version was deployed by this work.
 `PREVIEW_TESTING=true` is honored only in `local`/`review`. Browser sessions use random
 256-bit HttpOnly SameSite=Strict cookies, hashed database identities and owner-scoped reads.
 Mutations require an exact same-origin header. URL validation restricts input to GitHub
-PRs; all outbound reads use fixed `api.github.com` endpoints, exact SHAs, bounded bodies,
+PRs; all outbound reads use fixed `api.github.com` and `raw.githubusercontent.com` endpoints,
+exact SHAs, bounded bodies,
 timeouts and no redirects. GitHub authorization headers are absent. No code is executed.
 Expectations, request keys and captured commit snapshots are immutable; a new submission
 action makes a new attempt. Source content is hashed rather than retained, and recognized
@@ -93,3 +94,19 @@ Root/main public routes remain disabled; updating the host does not deploy live 
 After pushing, inspect native Builds and test the **existing** branch URL. Verify an
 actual public PR completes and another browser cannot read its run. A browser fixture
 test alone is not evidence of a deployed GitHub-to-Workflow-to-D1 evaluation.
+
+PR preparation persists the baseline-relative file comparison once; objective checks reuse
+it rather than requesting the same diff again. Public source assertions read bounded UTF-8
+files at exact SHAs from GitHub raw storage without credentials. This reduces REST API
+usage while keeping immutable attribution. It does not remove metadata API rate limits.
+
+A trusted operator can prepare public PR metadata using
+`node --experimental-strip-types scripts/prepare-public-pr.mjs <public-PR-URL> --remote`.
+The script uses unauthenticated GitHub reads on the operator's network and stores normalized
+public PR/compare metadata with capture time and a SHA-256 digest. No participant code runs.
+There is no HTTP write endpoint for this immutable cache. On GitHub 403/429/5xx only,
+preparation may reuse a matching cache captured within 24 hours. It validates repository,
+PR, public visibility, exact commits and digest, then marks latest-head refresh UNVERIFIED
+and displays its provenance. Missing, mismatched or corrupt cache entries cannot produce
+a silently fabricated current submission. Prepared caches are a review testing aid, not a
+replacement for the installed GitHub App required for live hackathon evaluation.
