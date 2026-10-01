@@ -3,6 +3,8 @@ export interface Env {
   ARTIFACTS?: R2Bucket;
   ASSETS: Fetcher;
   EVALUATOR: Workflow<{ runId: string }>;
+  PREVIEW_EVALUATOR?: Workflow<{ runId: string }>;
+  PREVIEW_TESTING?: string;
   AI?: Ai;
   ENVIRONMENT: 'local' | 'review' | 'production';
   DEMO_MODE?: string;

@@ -53,7 +53,22 @@ describe('bounded GitHub evidence retrieval', () => {
     expect(fetcher.mock.calls[0]?.[0]).toContain(
       '/docs/some%20file.md?ref=' + 'b'.repeat(40),
     );
-    expect(fetcher.mock.calls[0]?.[1]?.redirect).toBe('error');
+    expect(fetcher.mock.calls[0]?.[1]?.redirect).toBe('manual');
+  });
+  it('rejects redirects without forwarding credentials or trusting redirect bodies', async () => {
+    const fetcher = vi.fn(
+      async () =>
+        new Response('hostile redirect', {
+          status: 302,
+          headers: { location: 'https://attacker.example/' },
+        }),
+    );
+    vi.stubGlobal('fetch', fetcher);
+    await expect(new GitHub('fake').api('/repos/org/repo')).rejects.toThrow(
+      'GITHUB_HTTP_302',
+    );
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher.mock.calls[0]).toBeDefined();
   });
   it('fails closed for huge files and rate limits without including response secrets', async () => {
     vi.stubGlobal(

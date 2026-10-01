@@ -38,7 +38,10 @@ export function classifyRisk(files: ChangedFile[]) {
   }
   return [...signals].sort();
 }
-export function objective(contract: Contract, context: Context): Evidence[] {
+export function objective(
+  contract: Pick<Contract, 'requirements' | 'forbiddenPaths'>,
+  context: Context,
+): Evidence[] {
   const evidence: Evidence[] = [
     {
       id: 'diff',
@@ -107,7 +110,7 @@ export function objective(contract: Contract, context: Context): Evidence[] {
   return evidence;
 }
 export function deterministicReport(
-  contract: Contract,
+  contract: Pick<Contract, 'requirements'>,
   evidence: Evidence[],
 ): Review {
   return {

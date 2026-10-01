@@ -12,7 +12,9 @@ current head. Keep delivery identities throughout the event. See
 
 Preview builds require approval of the exact commit and a separate account token because
 malicious application PRs can exfiltrate build credentials. No `pull_request_target`
-workflow runs PR code. Preview runtime data is synthetic and writes are disabled.
+workflow runs PR code. Preview runtime data comes from public GitHub PRs and reviewer-authored expectations.
+Only per-session test evaluations can be created; privileged organizer writes are disabled.
+Review D1 is separate from production and contains no production secrets.
 
 ## Recovery
 
@@ -43,8 +45,9 @@ its initial build failed, and root Worker naming/build configuration was correct
 The next native build passed. Preview URL routing was enabled (production route remains
 disabled), and the automatic branch Preview at
 `https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev` returned HTTP 200.
-The root preview configuration has no state or execution bindings; the connected Worker
-has no configured secrets. Native Previews are active and update on branch commits.
+The root preview configuration now binds the separate review D1 and the existing public
+review Workflow. The internal `judge-c2c-review` host has no public routes and no judging
+secrets. Its Workflow stages must be deployed before pushing changes to the PR preview. Native Previews are active and update on branch commits.
 No scoped Actions deployment token or evaluation GitHub App credentials were available.
 GitHub also rejected required-reviewer environment protection with a billing-plan error.
 Only the alternative Actions deployments stay disabled pending a supported approval gate
@@ -63,3 +66,30 @@ No production version was deployed by this work.
 - Measure deadline-burst queue delay, latency and resource capacity; add budgets/alerts,
   backup/retention/recovery and rollback.
 - Review CI and the preview. Human decides merges; production stays disabled until ready.
+
+## Public PR review workspace
+
+`PREVIEW_TESTING=true` is honored only in `local`/`review`. Browser sessions use random
+256-bit HttpOnly SameSite=Strict cookies, hashed database identities and owner-scoped reads.
+Mutations require an exact same-origin header. URL validation restricts input to GitHub
+PRs; all outbound reads use fixed `api.github.com` endpoints, exact SHAs, bounded bodies,
+timeouts and no redirects. GitHub authorization headers are absent. No code is executed.
+Expectations, request keys and captured commit snapshots are immutable; a new submission
+action makes a new attempt. Source content is hashed rather than retained, and recognized
+credentials are redacted from patches. Do not treat this as a complete secret scanner.
+
+Limits: ten requests per IP/session per hour, twenty global reviews per hour, ten active
+runs, 100 changed files, 100 KB source reads, 5,000 characters per displayed patch. A
+two-minute cron on the existing internal host redispatches undelivered work and fails
+runs older than fifteen minutes without erasing evidence. Session access expires in
+24 hours; test runs are removed after seven days. Review cleanup never touches the
+production evaluation tables. Unauthenticated GitHub API rate limits may be shared by
+Cloudflare egress; GITHUB_HTTP_403/429 remains an explicit failed review.
+
+Apply review migrations with `npx wrangler d1 migrations apply DB --env review --remote`,
+then update the existing internal host with `npm run deploy:review`. Native Previews bind
+this deployed Workflow, so they do not each run independently versioned Workflow code.
+Root/main public routes remain disabled; updating the host does not deploy live judging.
+After pushing, inspect native Builds and test the **existing** branch URL. Verify an
+actual public PR completes and another browser cannot read its run. A browser fixture
+test alone is not evidence of a deployed GitHub-to-Workflow-to-D1 evaluation.

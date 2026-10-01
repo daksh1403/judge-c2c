@@ -3,6 +3,8 @@ import type { Env } from './env';
 import { api } from './api';
 import { webhook } from './intake';
 import { reconcile } from './store';
+import { previewEnabled, previewApi, reconcilePreview } from './preview';
+export { PublicPreviewWorkflow } from './preview-workflow';
 export { EvaluationWorkflow } from './workflow';
 export default {
   async fetch(
@@ -19,12 +21,18 @@ export default {
         response = Response.json({
           status: 'ok',
           environment: env.ENVIRONMENT,
-          mode: env.DEMO_MODE === 'true' ? 'synthetic-review' : 'live',
+          mode: previewEnabled(env)
+            ? 'public-pr-review'
+            : env.DEMO_MODE === 'true'
+              ? 'synthetic-review'
+              : 'live',
         });
       else if (url.pathname === '/webhooks/github' && request.method === 'POST')
         response = await webhook(request, env, ctx);
       else if (url.pathname.startsWith('/api/'))
-        response = await api(request, env);
+        response = previewEnabled(env)
+          ? await previewApi(request, env, ctx)
+          : await api(request, env);
       else response = await env.ASSETS.fetch(request);
     } catch (error) {
       const status =
@@ -79,6 +87,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ) {
-    if (env.DEMO_MODE !== 'true') ctx.waitUntil(reconcile(env));
+    if (previewEnabled(env)) ctx.waitUntil(reconcilePreview(env));
+    else if (env.DEMO_MODE !== 'true') ctx.waitUntil(reconcile(env));
   },
 } satisfies ExportedHandler<Env>;

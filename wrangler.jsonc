@@ -10,13 +10,45 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*", "/health", "/webhooks/*"],
   },
-  "observability": { "enabled": true },
-  "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" },
-  "previews": { "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" } },
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "ENVIRONMENT": "review",
+    "DEMO_MODE": "true",
+    "PREVIEW_TESTING": "true",
+  },
+  "previews": {
+    "vars": {
+      "ENVIRONMENT": "review",
+      "DEMO_MODE": "true",
+      "PREVIEW_TESTING": "true",
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "judge-c2c-review",
+        "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+        "migrations_dir": "migrations",
+      },
+    ],
+    "workflows": [
+      {
+        "binding": "PREVIEW_EVALUATOR",
+        "name": "judge-c2c-public-preview-evaluator",
+        "class_name": "PublicPreviewWorkflow",
+        "script_name": "judge-c2c-review",
+      },
+    ],
+  },
   "env": {
     "local": {
       "name": "judge-c2c-local",
-      "vars": { "ENVIRONMENT": "local", "DEMO_MODE": "true" },
+      "vars": {
+        "ENVIRONMENT": "local",
+        "DEMO_MODE": "true",
+        "PREVIEW_TESTING": "true",
+      },
       "d1_databases": [
         {
           "binding": "DB",
@@ -31,11 +63,20 @@
           "name": "judge-c2c-local-evaluator",
           "class_name": "EvaluationWorkflow",
         },
+        {
+          "binding": "PREVIEW_EVALUATOR",
+          "name": "judge-c2c-local-preview-evaluator",
+          "class_name": "PublicPreviewWorkflow",
+        },
       ],
     },
     "review": {
       "name": "judge-c2c-review",
-      "vars": { "ENVIRONMENT": "review", "DEMO_MODE": "true" },
+      "vars": {
+        "ENVIRONMENT": "review",
+        "DEMO_MODE": "true",
+        "PREVIEW_TESTING": "true",
+      },
       "d1_databases": [
         {
           "binding": "DB",
@@ -50,7 +91,33 @@
           "name": "judge-c2c-review-evaluator",
           "class_name": "EvaluationWorkflow",
         },
+        {
+          "binding": "PREVIEW_EVALUATOR",
+          "name": "judge-c2c-public-preview-evaluator",
+          "class_name": "PublicPreviewWorkflow",
+        },
       ],
+      "workers_dev": false,
+      "preview_urls": false,
+      "triggers": {
+        "crons": ["*/2 * * * *"],
+      },
     },
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "judge-c2c-review",
+      "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "workflows": [
+    {
+      "binding": "PREVIEW_EVALUATOR",
+      "name": "judge-c2c-public-preview-evaluator",
+      "class_name": "PublicPreviewWorkflow",
+      "script_name": "judge-c2c-review",
+    },
+  ],
 }

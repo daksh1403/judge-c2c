@@ -13,7 +13,7 @@ export default defineConfig({
   webServer: process.env.REVIEW_URL
     ? undefined
     : {
-        command: 'npm run dev -- --port 8787',
+        command: 'npm run db:local && npm run dev -- --port 8787',
         url: 'http://127.0.0.1:8787/health',
         reuseExistingServer: !process.env.CI,
       },

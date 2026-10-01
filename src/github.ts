@@ -11,7 +11,7 @@ export type ChangedFile = {
   patch?: string;
 };
 export class GitHub {
-  constructor(private token: string) {}
+  constructor(private token?: string) {}
   static async installation(env: Env, contract: Contract) {
     if (!env.GITHUB_APP_ID || !env.GITHUB_APP_PRIVATE_KEY)
       throw new Error('GITHUB_APP_NOT_CONFIGURED');
@@ -48,11 +48,11 @@ export class GitHub {
       throw new Error('Invalid GitHub path');
     const response = await fetch('https://api.github.com' + path, {
       ...init,
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(25_000),
       headers: {
         accept: 'application/vnd.github+json',
-        authorization: 'Bearer ' + this.token,
+        ...(this.token ? { authorization: 'Bearer ' + this.token } : {}),
         'user-agent': 'Judge-C2C',
         'x-github-api-version': '2022-11-28',
         'content-type': 'application/json',
