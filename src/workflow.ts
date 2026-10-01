@@ -273,7 +273,9 @@ export async function publish(env: Env, run: Run) {
     status: 'completed',
     conclusion,
     ...(env.PUBLIC_ORIGIN
-      ? { details_url: `${env.PUBLIC_ORIGIN}/?run=${run.id}` }
+      ? {
+          details_url: `${env.PUBLIC_ORIGIN}/${env.EVALUATION_DETAILS_KIND === 'organization' ? '?organization=1&evaluation=' : '?run='}${run.id}`,
+        }
       : {}),
     output: {
       title:

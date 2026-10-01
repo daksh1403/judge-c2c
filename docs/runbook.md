@@ -110,3 +110,40 @@ PR, public visibility, exact commits and digest, then marks latest-head refresh 
 and displays its provenance. Missing, mismatched or corrupt cache entries cannot produce
 a silently fabricated current submission. Prepared caches are a review testing aid, not a
 replacement for the installed GitHub App required for live hackathon evaluation.
+
+## Organization test integration
+
+The existing internal `judge-c2c-review` host also serves the authenticated organization
+console through `ORG_SERVICE`; no additional public URL is provisioned. `ORG_DB` is
+`judge-c2c-organization`, separate from synthetic and public-review sessions.
+
+Apply both databases' migrations before updating the host:
+
+```sh
+npx wrangler d1 migrations apply DB --env review --remote
+npx wrangler d1 migrations apply ORG_DB --env review --remote
+node scripts/bootstrap-organization.mjs --remote
+npm run deploy:review
+```
+
+Bootstrap saves private access/vault files under ignored `.wrangler/` with mode 0600,
+and uploads only to the internal host. It reuses existing valid values; do not delete
+or rotate the vault key without decrypting/re-encrypting the stored App credentials.
+Back it up privately. Never bind these secrets or ORG_DB to the public preview Worker.
+The script repairs a trailing literal newline left by an earlier bootstrap version.
+For local integration, bootstrap without `--remote` and migrate ORG_DB with `--local`.
+Local registration needs a reachable HTTPS callback and should use a separate test App.
+
+Login creates an eight-hour HttpOnly session; logout revokes it. Registration state
+expires after one hour. Ten login attempts per minute per IP are permitted. Only the
+configured exact origin may invoke the console. The single organizer access code is a
+test bootstrap credential; rotate it and revoke all sessions if compromised. Separate
+organizer identities and roles are required before broader hackathon use.
+
+After owner approval, installation-repository events refresh selected access; deletion
+or suspension revokes repository visibility and supersedes active work. Token minting
+also enforces GitHub's current access. Repository sync can be retried from the console.
+Check the actual App webhook deliveries and Check publication on an assigned real PR
+before claiming the end-to-end integration is proven. App registration, installation,
+and a real assigned submission must be tested with owner approval; mock fixtures do
+not prove these external steps.

@@ -16,9 +16,11 @@ objective failure, claim confirmed evidence, invent criteria, or mint evidence I
 Authoritative contracts and team/PR assignments are registered through an
 authenticated administrative API, outside participant repositories. Each run
 snapshots the contract and assignment. Configuration changes get distinct hashes.
-All admin data requires an explicit bearer credential in this foundation; a future
-identity layer can replace it. Public review mode shows only synthetic fixture data,
-rejects writes and receives no production bindings or secrets.
+Each assignment pins its contract hash, so multiple PR challenges in one repository
+remain independent. Core administrative APIs require a bearer credential. The
+organization console uses expiring HttpOnly organizer sessions and same-origin
+mutations. Public reviews use a separate browser-session scope and database.
+Neither workspace receives production bindings.
 
 Participant execution is a separate boundary, not a shell in the Worker. This PR
 does not deploy an execution fleet. It publishes a precise runner protocol and
@@ -39,3 +41,19 @@ Main deploys only following human merge, never automatically merged by this agen
 Remaining production gates: GitHub App installation, approved contracts and teams,
 Cloudflare production resources, judge identity/roles, sandbox fleet, execution
 attestation, baseline build/test evidence, and operational load/adversarial drills.
+
+The Daksh-Codebase test console runs behind the existing internal Workflow host.
+The public branch Worker forwards only organization routes through a service binding;
+the internal handler enforces its configured exact public origin and organizer session.
+A separate organization D1 stores AES-GCM encrypted App credentials and private
+immutable evaluations. A random vault key and bootstrap access code are Worker
+secrets available only on the internal host. Test credentials belong to the dedicated
+organization App; production integration requires its own host, resources and secrets.
+
+GitHub manifest registration requires owner approval. Callback state is session-bound,
+expiring and single-use. Returned organization and permissions are validated before
+storing the key. Installation callbacks validate the App and organization via App JWT;
+repository selection is fetched from GitHub. Read operations mint restricted short-lived
+tokens; evaluation tokens additionally allow Checks publication on one selected repo.
+Lifecycle deliveries have identity/hash replay protection. A suspension event checks
+current installation state before revoking access, preserving newer unsuspensions.

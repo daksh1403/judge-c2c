@@ -13,7 +13,7 @@ export type ChangedFile = {
 };
 export class GitHub {
   constructor(private token?: string) {}
-  static async installation(env: Env, contract: Contract) {
+  static async application(env: Env) {
     if (!env.GITHUB_APP_ID || !env.GITHUB_APP_PRIVATE_KEY)
       throw new Error('GITHUB_APP_NOT_CONFIGURED');
     const key = await importPKCS8(
@@ -27,7 +27,10 @@ export class GitHub {
       .setIssuedAt(now - 60)
       .setExpirationTime(now + 540)
       .sign(key);
-    const client = new GitHub(jwt);
+    return new GitHub(jwt);
+  }
+  static async installation(env: Env, contract: Contract) {
+    const client = await GitHub.application(env);
     const response = await client.api<{ token: string }>(
       `/app/installations/${contract.repository.installationId}/access_tokens`,
       {
@@ -37,6 +40,7 @@ export class GitHub {
           permissions: {
             contents: 'read',
             pull_requests: 'read',
+            issues: 'read',
             checks: 'write',
           },
         }),

@@ -39,6 +39,10 @@ async function load() {
       await detail(currentRun);
       return;
     }
+    if (page === 'organization') {
+      await window.organizationWorkspace.load();
+      return;
+    }
     if (page === 'repositories') {
       await repositories();
       return;
@@ -367,12 +371,16 @@ async function repositories() {
 }
 $('#refresh').addEventListener('click', load);
 $('#nav-overview').addEventListener('click', () => {
+  window.organizationWorkspace.stop();
+  $('#nav-organization').classList.remove('active');
   page = 'overview';
   $('#nav-overview').classList.add('active');
   $('#nav-repos').classList.remove('active');
   back();
 });
 $('#nav-repos').addEventListener('click', () => {
+  window.organizationWorkspace.stop();
+  $('#nav-organization').classList.remove('active');
   page = 'repositories';
   currentRun = null;
   history.replaceState(null, '', '/');
@@ -395,7 +403,21 @@ $('#signout').addEventListener('click', () => {
   $('#signout').hidden = true;
   load();
 });
+$('#nav-organization').addEventListener('click', () => {
+  page = 'organization';
+  currentRun = null;
+  $('#nav-organization').classList.add('active');
+  $('#nav-overview').classList.remove('active');
+  $('#nav-repos').classList.remove('active');
+  history.replaceState(null, '', '/?organization=1');
+  load();
+});
 async function init() {
+  if (new URL(location.href).searchParams.get('organization')) {
+    page = 'organization';
+    $('#nav-organization').classList.add('active');
+    $('#nav-overview').classList.remove('active');
+  }
   const id = new URL(location.href).searchParams.get('run');
   await load();
   if (id && overview) await openRun(id);

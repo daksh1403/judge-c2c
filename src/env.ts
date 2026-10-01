@@ -1,4 +1,11 @@
 export interface Env {
+  ORG_DB?: D1Database;
+  ORG_SERVICE?: Fetcher;
+  ORG_EVALUATOR?: Workflow<{ runId: string }>;
+  ORG_NAME?: string;
+  ORG_PUBLIC_ORIGIN?: string;
+  ORG_ADMIN_TOKEN?: string;
+  ORG_VAULT_KEY?: string;
   DB: D1Database;
   ARTIFACTS?: R2Bucket;
   ASSETS: Fetcher;
@@ -13,5 +20,6 @@ export interface Env {
   GITHUB_APP_ID?: string;
   GITHUB_APP_PRIVATE_KEY?: string;
   PUBLIC_ORIGIN?: string;
+  EVALUATION_DETAILS_KIND?: 'organization';
   AI_MODEL?: string;
 }

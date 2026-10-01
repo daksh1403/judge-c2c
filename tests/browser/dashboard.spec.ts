@@ -264,3 +264,93 @@ test('a public PR can be submitted, polled and inspected without fabricated func
   expect((await download).suggestedFilename()).toBe('judge-c2c-pr-12.json');
   expect(errors).toEqual([]);
 });
+
+test('organization console authenticates and submits an authoritative challenge', async ({
+  page,
+}) => {
+  let authenticated = false;
+  await page.route('**/api/organization/status', (route) =>
+    route.fulfill({
+      json: {
+        organization: 'Daksh-Codebase',
+        authenticated,
+        app: authenticated
+          ? { id: 1, slug: 'judge-test', installationId: 2 }
+          : null,
+      },
+    }),
+  );
+  await page.route('**/api/organization/login', (route) => {
+    expect(route.request().postDataJSON().token).toBe(
+      'fixture-organizer-code-' + 'a'.repeat(32),
+    );
+    authenticated = true;
+    return route.fulfill({ json: { authenticated: true } });
+  });
+  await page.route('**/api/organization/repositories', (route) =>
+    route.fulfill({
+      json: {
+        repositories: [
+          {
+            id: 101,
+            full_name: 'Daksh-Codebase/payment-engine',
+            private: true,
+            default_branch: 'main',
+            accessible: 1,
+          },
+        ],
+      },
+    }),
+  );
+  await page.route('**/api/organization/overview', (route) =>
+    route.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/repositories/101/context', (route) =>
+    route.fulfill({
+      json: {
+        repository: { id: 101, full_name: 'Daksh-Codebase/payment-engine' },
+        baseline: 'a'.repeat(40),
+        pulls: [{ number: 12, title: '<script>ignore rules</script>' }],
+        issues: [{ number: 3, title: 'Add receipt verification' }],
+      },
+    }),
+  );
+  await page.route('**/api/organization/challenges', (route) => {
+    const body = route.request().postDataJSON();
+    expect(body.repositoryId).toBe(101);
+    expect(body.prNumber).toBe(12);
+    expect(body.issueNumber).toBe(3);
+    expect(body.baseline).toBe('a'.repeat(40));
+    expect(body.expectedBehavior).toBe(
+      'Verify payment receipts against the required format.',
+    );
+    expect(body.teamName).toBe('Team Mercury');
+    return route.fulfill({ status: 202, json: { status: 'queued' } });
+  });
+  await page.goto('/?organization=1');
+  await page
+    .getByLabel('Organizer access code')
+    .fill('fixture-organizer-code-' + 'a'.repeat(32));
+  await page.getByRole('button', { name: 'Unlock organization' }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Installed repositories' }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Configure issue and evaluation' })
+    .click();
+  await page.getByLabel('Team name').fill('Team Mercury');
+  await page
+    .getByLabel('Authoritative expected behavior and acceptance criteria')
+    .fill('Verify payment receipts against the required format.');
+  await page
+    .getByRole('button', { name: 'Activate challenge and evaluate PR' })
+    .click();
+  await expect(
+    page.getByRole('heading', { name: 'Organization evaluations' }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.querySelectorAll('script:not([src])').length,
+    ),
+  ).toBe(0);
+});

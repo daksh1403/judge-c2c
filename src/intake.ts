@@ -105,13 +105,28 @@ export async function webhook(
   if (pr.state !== 'open')
     return Response.json({ error: 'INCONSISTENT_EVENT' }, { status: 400 });
   const assignment = await env.DB.prepare(
-    'SELECT a.team_id,t.name AS team_name,a.issue_numbers FROM assignments a JOIN teams t ON t.id=a.team_id WHERE repository_id=? AND pr_number=?',
+    'SELECT a.team_id,t.name AS team_name,a.issue_numbers,a.contract_hash FROM assignments a JOIN teams t ON t.id=a.team_id WHERE repository_id=? AND pr_number=?',
   )
     .bind(p.repository.id, pr.number)
-    .first<{ team_id: string; team_name: string; issue_numbers: string }>();
+    .first<{
+      team_id: string;
+      team_name: string;
+      issue_numbers: string;
+      contract_hash: string | null;
+    }>();
   if (!assignment)
     return Response.json({ error: 'ASSIGNMENT_REQUIRED' }, { status: 422 });
-  const contract = JSON.parse(repo.document) as Contract;
+  const selected = await env.DB.prepare(
+    'SELECT hash,document FROM contracts WHERE hash=? AND repository_id=?',
+  )
+    .bind(
+      assignment.contract_hash ?? repo.active_contract_hash,
+      p.repository.id,
+    )
+    .first<{ hash: string; document: string }>();
+  if (!selected)
+    return Response.json({ error: 'CONTRACT_NOT_FOUND' }, { status: 422 });
+  const contract = JSON.parse(selected.document) as Contract;
   const issues = JSON.parse(assignment.issue_numbers) as number[];
   if (
     issues.length !== contract.issueNumbers.length ||
@@ -126,7 +141,7 @@ export async function webhook(
     p.repository.id,
     pr.number,
     pr.head.sha,
-    repo.active_contract_hash,
+    selected.hash,
     await digest(snapshot),
   );
   const prior = await env.DB.prepare('SELECT state FROM evaluations WHERE id=?')
@@ -150,8 +165,8 @@ export async function webhook(
       pr.number,
       pr.head.sha,
       contract.baseline,
-      repo.active_contract_hash,
-      repo.document,
+      selected.hash,
+      selected.document,
       snapshot,
     ),
     env.DB.prepare(

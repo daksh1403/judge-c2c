@@ -8,7 +8,7 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/health", "/webhooks/*"],
+    "run_worker_first": ["/api/*", "/health", "/webhooks/*", "/auth/github/*"],
   },
   "observability": {
     "enabled": true,
@@ -40,6 +40,12 @@
         "script_name": "judge-c2c-review",
       },
     ],
+    "services": [
+      {
+        "binding": "ORG_SERVICE",
+        "service": "judge-c2c-review",
+      },
+    ],
   },
   "env": {
     "local": {
@@ -48,12 +54,20 @@
         "ENVIRONMENT": "local",
         "DEMO_MODE": "true",
         "PREVIEW_TESTING": "true",
+        "ORG_NAME": "Daksh-Codebase",
+        "ORG_PUBLIC_ORIGIN": "http://127.0.0.1:8787",
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "judge-c2c-local",
           "database_id": "local-only",
+          "migrations_dir": "migrations",
+        },
+        {
+          "binding": "ORG_DB",
+          "database_name": "judge-c2c-organization-local",
+          "database_id": "organization-local",
           "migrations_dir": "migrations",
         },
       ],
@@ -68,7 +82,13 @@
           "name": "judge-c2c-local-preview-evaluator",
           "class_name": "PublicPreviewWorkflow",
         },
+        {
+          "binding": "ORG_EVALUATOR",
+          "name": "judge-c2c-organization-local-evaluator",
+          "class_name": "OrganizationEvaluationWorkflow",
+        },
       ],
+      "services": [],
     },
     "review": {
       "name": "judge-c2c-review",
@@ -76,12 +96,20 @@
         "ENVIRONMENT": "review",
         "DEMO_MODE": "true",
         "PREVIEW_TESTING": "true",
+        "ORG_NAME": "Daksh-Codebase",
+        "ORG_PUBLIC_ORIGIN": "https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev",
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "judge-c2c-review",
           "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+          "migrations_dir": "migrations",
+        },
+        {
+          "binding": "ORG_DB",
+          "database_name": "judge-c2c-organization",
+          "database_id": "35f5053d-1fa5-49a7-89b9-4751e1c7a895",
           "migrations_dir": "migrations",
         },
       ],
@@ -96,12 +124,18 @@
           "name": "judge-c2c-public-preview-evaluator",
           "class_name": "PublicPreviewWorkflow",
         },
+        {
+          "binding": "ORG_EVALUATOR",
+          "name": "judge-c2c-organization-evaluator",
+          "class_name": "OrganizationEvaluationWorkflow",
+        },
       ],
       "workers_dev": false,
       "preview_urls": false,
       "triggers": {
         "crons": ["*/2 * * * *"],
       },
+      "services": [],
     },
   },
   "d1_databases": [
@@ -118,6 +152,12 @@
       "name": "judge-c2c-public-preview-evaluator",
       "class_name": "PublicPreviewWorkflow",
       "script_name": "judge-c2c-review",
+    },
+  ],
+  "services": [
+    {
+      "binding": "ORG_SERVICE",
+      "service": "judge-c2c-review",
     },
   ],
 }

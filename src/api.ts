@@ -12,6 +12,10 @@ const assignmentSchema = z
     prNumber: z.number().int().positive(),
     teamId: z.string().regex(/^[\w.-]{1,80}$/),
     teamName: z.string().min(1).max(100),
+    contractHash: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
     issueNumbers: z.array(z.number().int().positive()).min(1).max(30),
   })
   .strict();
@@ -143,10 +147,10 @@ export async function api(request: Request, env: Env) {
     const raw = await boundedBody(request, 20_000);
     const a = assignmentSchema.parse(JSON.parse(new TextDecoder().decode(raw)));
     const repo = await env.DB.prepare(
-      'SELECT c.document FROM repositories r JOIN contracts c ON c.hash=r.active_contract_hash WHERE r.id=?',
+      'SELECT c.document,c.hash FROM repositories r JOIN contracts c ON c.hash=COALESCE(?,r.active_contract_hash) AND c.repository_id=r.id WHERE r.id=?',
     )
-      .bind(a.repositoryId)
-      .first<{ document: string }>();
+      .bind(a.contractHash ?? null, a.repositoryId)
+      .first<{ document: string; hash: string }>();
     if (!repo) return json({ error: 'REPOSITORY_NOT_REGISTERED' }, 422);
     const contract = contractSchema.parse(JSON.parse(repo.document));
     if (
@@ -159,8 +163,14 @@ export async function api(request: Request, env: Env) {
         'INSERT INTO teams(id,name) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name',
       ).bind(a.teamId, a.teamName),
       env.DB.prepare(
-        'INSERT INTO assignments(repository_id,pr_number,team_id,issue_numbers) VALUES(?,?,?,?) ON CONFLICT(repository_id,pr_number) DO UPDATE SET team_id=excluded.team_id,issue_numbers=excluded.issue_numbers',
-      ).bind(a.repositoryId, a.prNumber, a.teamId, canonical(a.issueNumbers)),
+        'INSERT INTO assignments(repository_id,pr_number,team_id,issue_numbers,contract_hash) VALUES(?,?,?,?,?) ON CONFLICT(repository_id,pr_number) DO UPDATE SET team_id=excluded.team_id,issue_numbers=excluded.issue_numbers,contract_hash=excluded.contract_hash',
+      ).bind(
+        a.repositoryId,
+        a.prNumber,
+        a.teamId,
+        canonical(a.issueNumbers),
+        repo.hash,
+      ),
       env.DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)').bind(
         'assignment.registered',
         `${a.repositoryId}:${a.prNumber}`,

@@ -115,8 +115,9 @@ curl -X POST "$JUDGE_ORIGIN/api/assignments" \
   --data '{"repositoryId":123,"prNumber":24,"teamId":"northstar","teamName":"Northstar","issueNumbers":[12]}'
 ```
 
-Assignments cover the contract's entire issue set. There is one active challenge contract
-per repository in this foundation; multiple simultaneous challenges are a follow-up.
+Assignments cover the contract's entire issue set. Each assignment pins its immutable contract hash; registering a different PR's
+challenge does not change existing assignments. Pass `contractHash` explicitly when
+configuring assignments concurrently.
 Unassigned PRs fail explicitly instead of guessing a team or using participant judging
 policy. Redeliver an event rejected before assignment registration.
 
@@ -140,8 +141,10 @@ the code of the deployed Workflow host, not the application branch Preview. When
 its stages, first migrate review D1 and run `npm run deploy:review` to update this existing
 internal host, then push the PR. Changes shared by several simultaneous branch previews
 would require versioned Workflow hosts; this slice serves the current coherent PR.
-No production resources, GitHub App secrets or AI credentials are bound to this workspace.
-The preview uses real public repository data; it is not a live hackathon evaluation.
+The public Worker has no App secrets. A protected organization console proxies to the
+internal host, which uses its own organization D1 and encrypted test-App credentials.
+Only the configured branch origin can reach that console. These are isolated test
+resources, not production bindings. The public workspace stays credential-free.
 
 The parent `judge-c2c` production route stays disabled. Optional Actions deployment
 workflows remain disabled and require scoped credentials and a supported approval gate.
@@ -178,3 +181,28 @@ a production-readiness gate. `/health` is liveness, not a readiness attestation.
 See [design](docs/design.md), [product baseline](docs/product-requirements.md),
 [operations](docs/runbook.md), [runner boundary](docs/runner-boundary.md),
 and [roadmap](docs/roadmap.md).
+
+## Connect Daksh-Codebase
+
+Use **GitHub organization** on the existing branch Preview. Unlock using the private
+code in `.wrangler/organization-access.txt`, then select **Register GitHub App**.
+GitHub requires an organization owner to approve registration and installation.
+Choose Daksh-Codebase and only the repositories you want to test. No private key
+or personal GitHub token needs to be pasted into the browser.
+
+The [GitHub manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
+registers an organization-owned private App with contents, issues and PR read access,
+and Checks write access. Registration callbacks use expiring, session-bound, one-use
+state. Installation IDs are validated server-side against the App and organization.
+App keys and webhook secrets are encrypted in the separate organization database;
+short-lived installation tokens are scoped to the selected repository.
+
+Choose a repository, PR and issue, enter team and authoritative acceptance criteria,
+confirm the frozen baseline SHA, and start evaluation. Future opened/synchronize/reopened
+PR events use that assignment. Unconfigured PRs fail explicitly. GitHub Check detail
+links open the protected organization report. The public workspace cannot read it.
+
+This slice performs immutable baseline/head comparison and configured source checks.
+Runtime tests, performance and functional correctness remain UNVERIFIED. AI is optional
+and cannot turn those into passes. Individual organizer identities, isolated execution
+and audited human adjudication remain production readiness work.

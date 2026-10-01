@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import type { Env } from './env';
+import { organization, maintainOrganization } from './organization';
+export { OrganizationEvaluationWorkflow } from './organization-workflow';
 import { api } from './api';
 import { webhook } from './intake';
 import { reconcile } from './store';
@@ -17,7 +19,20 @@ export default {
     const url = new URL(request.url);
     let response: Response;
     try {
-      if (url.pathname === '/health')
+      if (
+        url.pathname.startsWith('/api/organization/') ||
+        url.pathname.startsWith('/auth/github/') ||
+        url.pathname === '/webhooks/organization'
+      )
+        response = env.ORG_DB
+          ? await organization(request, env, ctx)
+          : env.ORG_SERVICE
+            ? await env.ORG_SERVICE.fetch(request)
+            : Response.json(
+                { error: 'ORGANIZATION_NOT_CONFIGURED' },
+                { status: 503 },
+              );
+      else if (url.pathname === '/health')
         response = Response.json({
           status: 'ok',
           environment: env.ENVIRONMENT,
@@ -63,7 +78,7 @@ export default {
     response.headers.set('referrer-policy', 'same-origin');
     response.headers.set(
       'content-security-policy',
-      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self' https://github.com",
     );
     response.headers.set(
       'permissions-policy',
@@ -87,6 +102,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ) {
+    if (env.ORG_DB) ctx.waitUntil(maintainOrganization(env));
     if (previewEnabled(env)) ctx.waitUntil(reconcilePreview(env));
     else if (env.DEMO_MODE !== 'true') ctx.waitUntil(reconcile(env));
   },

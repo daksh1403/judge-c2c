@@ -113,6 +113,9 @@ beforeAll(async () => {
   await DB.prepare(
     "CREATE TRIGGER immutable_evaluation_inputs BEFORE UPDATE OF repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot ON evaluations BEGIN SELECT RAISE(ABORT,'Evaluation inputs are immutable'); END",
   ).run();
+  await DB.prepare(
+    'ALTER TABLE assignments ADD COLUMN contract_hash TEXT REFERENCES contracts(hash)',
+  ).run();
   env = {
     DB: DB as unknown as D1Database,
     ENVIRONMENT: 'local',
@@ -351,5 +354,57 @@ describe('signed GitHub delivery to real D1', () => {
     expect(((await repeated.json()) as { runId: string }).runId).toBe(
       result.runId,
     );
+  });
+  it('pins each PR to its contract when another challenge becomes active', async () => {
+    await register();
+    const original = await digest(canonical(demoContract));
+    const second = {
+      ...demoContract,
+      issueNumbers: [13],
+      baseline: 'c'.repeat(40),
+    };
+    const registered = await api(
+      new Request('https://test/api/contracts', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + admin },
+        body: canonical(second),
+      }),
+      env,
+    );
+    expect(registered.status).toBe(201);
+    const hash = ((await registered.json()) as { hash: string }).hash;
+    expect(
+      (
+        await api(
+          new Request('https://test/api/assignments', {
+            method: 'POST',
+            headers: { authorization: 'Bearer ' + admin },
+            body: canonical({
+              repositoryId: 1,
+              prNumber: 25,
+              teamId: 'second',
+              teamName: 'Second',
+              issueNumbers: [13],
+              contractHash: hash,
+            }),
+          }),
+          env,
+        )
+      ).status,
+    ).toBe(201);
+    const result = await webhook(
+      await signed('d'.repeat(40), undefined, '2026-10-01T12:05:00Z'),
+      env,
+      ctx,
+    );
+    expect(result.status).toBe(202);
+    const runId = ((await result.json()) as { runId: string }).runId;
+    const run = await env.DB.prepare(
+      'SELECT contract_hash,baseline_sha FROM evaluations WHERE id=?',
+    )
+      .bind(runId)
+      .first<{ contract_hash: string; baseline_sha: string }>();
+    expect(run?.contract_hash).toBe(original);
+    expect(run?.baseline_sha).toBe(demoContract.baseline);
   });
 });
