@@ -159,3 +159,23 @@ describe('AI provider isolation and recovery', () => {
     expect(run).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('bounded binary repository context', () => {
+  it('does not fail a review when a binary file cannot be decoded', async () => {
+    vi.spyOn(GitHub.prototype, 'api').mockResolvedValueOnce({
+      type: 'file',
+      encoding: 'base64',
+      content: '/w==',
+      size: 1,
+    });
+    expect(
+      await new GitHub('fake').file(
+        'demo/repo',
+        'a'.repeat(40),
+        'font.woff2',
+        100,
+      ),
+    ).toBeNull();
+    vi.restoreAllMocks();
+  });
+});

@@ -1,3 +1,4 @@
+import { migrate } from './database';
 import {
   beforeAll,
   afterAll,
@@ -68,28 +69,7 @@ beforeAll(async () => {
     compatibilityDate: '2026-08-01',
   });
   const db = await mf.getD1Database('ORG_DB');
-  for (const file of [
-    '0001_foundation.sql',
-    '0004_organization.sql',
-    '0005_assignment_contract.sql',
-    '0006_execution.sql',
-  ]) {
-    const sql = readFileSync('migrations/' + file, 'utf8');
-    const split = sql.indexOf('CREATE TRIGGER');
-    const tables = split < 0 ? sql : sql.slice(0, split);
-    for (const statement of tables
-      .split(';')
-      .map((s) => s.trim())
-      .filter(Boolean))
-      await db.prepare(statement).run();
-    if (split >= 0)
-      for (const trigger of sql
-        .slice(split)
-        .split('END;')
-        .map((s) => s.trim())
-        .filter(Boolean))
-        await db.prepare(trigger + 'END;').run();
-  }
+  await migrate(db as unknown as D1Database);
   env = {
     ORG_DB: db,
     ORG_ADMIN_TOKEN: token,
@@ -196,7 +176,7 @@ describe('protected organization setup', () => {
     expect(manifest.default_permissions).toEqual({
       contents: 'read',
       pull_requests: 'read',
-      issues: 'read',
+      issues: 'write',
       checks: 'write',
     });
     expect(manifest.redirect_url).toBe(origin + '/auth/github/manifest');
@@ -227,7 +207,7 @@ describe('protected organization setup', () => {
       permissions: {
         contents: 'read',
         pull_requests: 'read',
-        issues: 'read',
+        issues: 'write',
         checks: 'write',
         metadata: 'read',
       },
@@ -357,6 +337,10 @@ describe('protected organization setup', () => {
       head = 'b'.repeat(40);
     vi.spyOn(GitHub.prototype, 'api').mockImplementation(async (path) => {
       if (path.endsWith('/access_tokens')) return { token: 'test' } as never;
+      if (path.includes('/pulls/') && path.includes('/commits?'))
+        return [
+          { sha: head, commit: { message: 'Add implementation' } },
+        ] as never;
       if (path.includes('/pulls/'))
         return {
           number: 11,

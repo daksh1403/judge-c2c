@@ -103,7 +103,7 @@ export default {
     env: Env,
     ctx: ExecutionContext,
   ) {
-    if (env.ORG_DB) ctx.waitUntil(maintainOrganization(env));
+    if (env.ORG_DB) ctx.waitUntil(maintainOrganization(env, ctx));
     if (previewEnabled(env)) ctx.waitUntil(reconcilePreview(env));
     else if (env.DEMO_MODE !== 'true') ctx.waitUntil(reconcile(env));
   },

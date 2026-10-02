@@ -48,16 +48,30 @@ export async function webhook(
   if (event === 'ping') return Response.json({ status: 'ok' });
   if (event !== 'pull_request')
     return Response.json({ status: 'ignored' }, { status: 202 });
-  const parsed = eventSchema.safeParse(
+  return acceptPullRequest(
     JSON.parse(new TextDecoder().decode(body)),
+    env,
+    ctx,
+    delivery,
+    await digest(new TextDecoder().decode(body)),
   );
+}
+export async function acceptPullRequest(
+  raw: unknown,
+  env: Env,
+  ctx: ExecutionContext,
+  delivery: string,
+  payloadHash: string,
+) {
+  const event = 'pull_request';
+  const parsed = eventSchema.safeParse(raw);
   if (!parsed.success)
     return Response.json({ error: 'INVALID_PAYLOAD' }, { status: 400 });
   const p = parsed.data;
   if (!['opened', 'synchronize', 'reopened', 'closed'].includes(p.action))
     return Response.json({ status: 'ignored' }, { status: 202 });
   const repo = await env.DB.prepare(
-    'SELECT r.*,c.document FROM repositories r JOIN contracts c ON c.hash=r.active_contract_hash WHERE r.id=?',
+    'SELECT r.* FROM repositories r WHERE r.id=?',
   )
     .bind(p.repository.id)
     .first<{
@@ -73,7 +87,6 @@ export async function webhook(
     p.pull_request.base.repo.id !== p.repository.id
   )
     return Response.json({ error: 'UNREGISTERED_REPOSITORY' }, { status: 403 });
-  const payloadHash = await digest(new TextDecoder().decode(body));
   const old = await env.DB.prepare(
     'SELECT payload_hash FROM deliveries WHERE id=?',
   )
@@ -105,7 +118,7 @@ export async function webhook(
   if (pr.state !== 'open')
     return Response.json({ error: 'INCONSISTENT_EVENT' }, { status: 400 });
   const assignment = await env.DB.prepare(
-    'SELECT a.team_id,t.name AS team_name,a.issue_numbers,a.contract_hash FROM assignments a JOIN teams t ON t.id=a.team_id WHERE repository_id=? AND pr_number=?',
+    "SELECT a.team_id,t.name AS team_name,a.issue_numbers,a.contract_hash,a.resolution_snapshot FROM assignments a JOIN teams t ON t.id=a.team_id WHERE repository_id=? AND pr_number=? AND t.status='ACTIVE'",
   )
     .bind(p.repository.id, pr.number)
     .first<{
@@ -113,6 +126,7 @@ export async function webhook(
       team_name: string;
       issue_numbers: string;
       contract_hash: string | null;
+      resolution_snapshot: string | null;
     }>();
   if (!assignment)
     return Response.json({ error: 'ASSIGNMENT_REQUIRED' }, { status: 422 });
@@ -136,7 +150,24 @@ export async function webhook(
       { error: 'ASSIGNMENT_CONTRACT_MISMATCH' },
       { status: 422 },
     );
-  const snapshot = canonical({ ...assignment, issue_numbers: issues });
+  const resolution = assignment.resolution_snapshot
+    ? JSON.parse(assignment.resolution_snapshot)
+    : null;
+  const semanticResolution = resolution
+    ? Object.fromEntries(
+        Object.entries(resolution).filter(
+          ([key]) => key !== 'resolutionRevision',
+        ),
+      )
+    : null;
+  // A database concurrency revision is not a change to the submission being judged.
+  const snapshot = canonical({
+    ...assignment,
+    issue_numbers: issues,
+    resolution_snapshot: semanticResolution
+      ? canonical(semanticResolution)
+      : null,
+  });
   const identity = await evaluationIdentity(
     p.repository.id,
     pr.number,
@@ -153,7 +184,23 @@ export async function webhook(
     prior?.state === 'SUPERSEDED'
       ? await digest(canonical({ identity, resubmittedAt: pr.updated_at }))
       : identity;
+  const assignedIds = resolution ? canonical(resolution.assignmentIds) : null;
   await env.DB.batch([
+    env.DB.prepare(
+      "INSERT INTO audit(action,entity,actor) VALUES('intake.eligibility',CASE WHEN EXISTS(SELECT 1 FROM teams WHERE id=? AND status='ACTIVE') AND (? IS NULL OR (EXISTS(SELECT 1 FROM team_repositories WHERE team_id=? AND repository_id=? AND active=1) AND NOT EXISTS(SELECT 1 FROM json_each(?) j LEFT JOIN issue_assignments a ON a.id=j.value WHERE a.id IS NULL OR a.status<>'ACTIVE' OR (a.expires_at IS NOT NULL AND datetime(a.expires_at)<=CURRENT_TIMESTAMP)) AND EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND head_sha=? AND status='VALID' AND github_updated_at=? AND resolution_revision=?))) THEN ? ELSE NULL END,'github')",
+    ).bind(
+      assignment.team_id,
+      assignedIds,
+      assignment.team_id,
+      p.repository.id,
+      assignedIds,
+      p.repository.id,
+      pr.number,
+      pr.head.sha,
+      pr.updated_at,
+      resolution?.resolutionRevision ?? null,
+      runId,
+    ),
     env.DB.prepare(
       'INSERT OR IGNORE INTO deliveries(id,payload_hash,event) VALUES(?,?,?)',
     ).bind(delivery, payloadHash, event),

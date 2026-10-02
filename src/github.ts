@@ -64,6 +64,7 @@ export class GitHub {
       },
     });
     if (!response.ok) throw new Error(`GITHUB_HTTP_${response.status}`);
+    if (response.status === 204) return undefined as T;
     const bytes = await boundedBody(
       new Request('https://internal/', {
         method: 'POST',
@@ -154,6 +155,7 @@ export class GitHub {
         bytes,
       );
     } catch (error) {
+      if (error instanceof TypeError) return null;
       if (error instanceof Error && error.message === 'GITHUB_HTTP_404')
         return '';
       throw error;

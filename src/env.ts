@@ -9,6 +9,7 @@ export interface Env {
   ORG_EVALUATOR?: Workflow<{ runId: string }>;
   ORG_NAME?: string;
   ORG_PUBLIC_ORIGIN?: string;
+  ORG_REVIEW_ORIGINS?: string;
   ORG_ADMIN_TOKEN?: string;
   ORG_VAULT_KEY?: string;
   DB: D1Database;

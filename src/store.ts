@@ -48,7 +48,25 @@ export async function isCurrent(env: Env, run: Run) {
   )
     .bind(run.repository_id, run.pr_number)
     .first<{ latest_run_id: string; closed: number }>();
-  return s?.latest_run_id === run.id && !s.closed && run.state !== 'SUPERSEDED';
+  if (s?.latest_run_id !== run.id || s.closed || run.state === 'SUPERSEDED')
+    return false;
+  const snapshot = JSON.parse(run.assignment_snapshot);
+  const resolution = snapshot.resolution_snapshot
+    ? JSON.parse(snapshot.resolution_snapshot)
+    : null;
+  if (!resolution) return true; // Explicit legacy organizer mapping remains historical.
+  const eligible = await env.DB.prepare(
+    "SELECT t.id FROM teams t JOIN team_repositories r ON r.team_id=t.id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1 AND NOT EXISTS(SELECT 1 FROM json_each(?) j LEFT JOIN issue_assignments a ON a.id=j.value WHERE a.id IS NULL OR a.status<>'ACTIVE' OR (a.expires_at IS NOT NULL AND datetime(a.expires_at)<=CURRENT_TIMESTAMP)) AND (?=1 OR EXISTS(SELECT 1 FROM team_members WHERE team_id=t.id AND github_id=? AND active=1))",
+  )
+    .bind(
+      snapshot.team_id,
+      run.repository_id,
+      JSON.stringify(resolution.assignmentIds),
+      Number(!!resolution.override),
+      resolution.githubAuthor.id,
+    )
+    .first();
+  return !!eligible;
 }
 export async function dispatch(env: Env, runId: string) {
   const run = await getRun(env, runId);

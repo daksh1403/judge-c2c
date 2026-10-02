@@ -199,3 +199,69 @@ describe('security boundaries', () => {
     expect(canTransition('QUEUED', 'COMPLETED')).toBe(false);
   });
 });
+
+describe('observable solution approach validation', () => {
+  const evidence = objective(demoContract, {
+    files: [],
+    sources: {},
+    risk: [],
+    environment: 'test',
+    toolVersion: 'test',
+  });
+  it('requires all eleven structured fields and rejects invented citations', () => {
+    const report = deterministicReport(demoContract, evidence);
+    expect(Object.keys(report.solution_approach)).toHaveLength(11);
+    report.solution_approach.approach_summary = {
+      text: 'This design appears to isolate scheduling.',
+      evidenceIds: ['invented'],
+      verification: 'INFERENCE',
+    };
+    expect(() => validateReview(report, demoContract, evidence)).toThrow(
+      'Unknown or unlisted approach evidence',
+    );
+  });
+  it('keeps supplemental participant tests from proving solution correctness', () => {
+    const checks = [
+      ...evidence,
+      {
+        id: 'participant-tests',
+        kind: 'execution' as const,
+        status: 'PASS' as const,
+        claim: 'Participant script exits zero.',
+      },
+    ];
+    const report = deterministicReport(demoContract, checks);
+    report.solution_approach.evidence = ['participant-tests'];
+    report.solution_approach.correctness = {
+      text: 'Functionality works.',
+      evidenceIds: ['participant-tests'],
+      verification: 'OBSERVED',
+    };
+    expect(() => validateReview(report, demoContract, checks)).toThrow(
+      'Observed correctness requires execution evidence',
+    );
+  });
+  it('allows cited design inference while keeping assumptions unverified', () => {
+    const report = deterministicReport(demoContract, evidence);
+    report.solution_approach.evidence = ['diff'];
+    report.solution_approach.approach_summary = {
+      text: 'The diff suggests a targeted approach; broader repository context is unavailable.',
+      evidenceIds: ['diff'],
+      verification: 'INFERENCE',
+    };
+    expect(
+      validateReview(report, demoContract, evidence).solution_approach
+        .approach_summary.verification,
+    ).toBe('INFERENCE');
+    report.solution_approach.unverified_assumptions = [
+      {
+        text: 'Assumes existing API compatibility.',
+        evidenceIds: ['diff'],
+        verification: 'OBSERVED',
+      },
+    ];
+    expect(() => validateReview(report, demoContract, evidence)).toThrow(
+      'Assumptions must remain explicitly unverified',
+    );
+  });
+});

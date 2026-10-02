@@ -99,6 +99,7 @@
         "PREVIEW_TESTING": "true",
         "ORG_NAME": "Daksh-Codebase",
         "ORG_PUBLIC_ORIGIN": "https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev",
+        "ORG_REVIEW_ORIGINS": "https://feat-team-issue-workflow-judge-c2c.dakshx.workers.dev",
         "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
         "RUNNER_ENABLED": "false",
       },
