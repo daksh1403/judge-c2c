@@ -1146,6 +1146,18 @@
       "evidence": "docs/qa/dashboard-live-evidence.json",
       "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
       "defect": null
+    },
+    {
+      "feature": "CallMissed review",
+      "scenario": "Real PR review with missing execution and separate diagnostic failure",
+      "actor": "Real daksh1403 QA account",
+      "action": "Configure separate backend key; evaluate controlled GitHub PR head through CallMissed",
+      "expected": "Validated approach cites evidence; missing execution stays UNVERIFIED; malformed output is rejected",
+      "actual": "Real PR review COMPLETED on first attempt, 44.9 seconds, four criteria UNVERIFIED due unavailable tunnel; independent diagnostic FAILED honestly",
+      "status": "PARTIAL",
+      "evidence": "docs/qa/callmissed-pr-evidence.json; docs/qa/callmissed-live-evidence.json",
+      "mode": "REAL_GITHUB_INTEGRATION",
+      "defect": null
     }
   ]
 }

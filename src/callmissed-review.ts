@@ -24,7 +24,11 @@ export async function callMissedReview(
       model: env.CALLMISSED_MODEL,
       store: false,
       instructions: policy,
-      input: JSON.stringify({ untrustedContext: prompt, attempt }),
+      input: JSON.stringify({
+        schema: reviewSchema.toJSONSchema(),
+        untrustedContext: prompt,
+        attempt,
+      }),
       reasoning: { effort: 'none' },
       max_output_tokens: 6000,
       text: {

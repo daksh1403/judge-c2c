@@ -283,7 +283,11 @@ export async function aiReview(
               error instanceof Error &&
               ['TimeoutError', 'AbortError'].includes(error.name)
             ? 'CALLMISSED_TIMEOUT'
-            : 'AI_OUTPUT_INVALID';
+            : error instanceof Error && error.name === 'ZodError'
+              ? 'AI_SCHEMA_INVALID'
+              : error instanceof SyntaxError
+                ? 'AI_JSON_INVALID'
+                : 'AI_OUTPUT_INVALID';
       /* Bounded recovery. Invalid/provider output never becomes evidence. */
     }
   }

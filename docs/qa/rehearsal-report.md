@@ -29,21 +29,21 @@ publication, audited completion and live desktop/mobile dashboard inspection.
 
 ## Feature coverage
 
-| Subsystem                     | Result                        | Evidence and limits                                                                                                                               |
-| ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Team identity and import      | PASS                          | Stable IDs, verified numeric members, duplicate rejection, atomic imports; participant registration absent                                        |
-| Repository/issue assignment   | PASS                          | Exclusive races, inactive/wrong-repository denial, immutable versions; rejection guards repaired                                                  |
-| PR mapping and history        | PASS                          | Twelve-team integrated state, unknown/wrong mappings, multi-issue/alternate PRs, head supersession, real signed PR events                         |
-| Issue labeling and claims     | BLOCKED live                  | Rule/outbox fixtures pass; existing App lacks Issues write and issue/comment subscriptions                                                        |
-| Objective Node HTTP checks    | PASS within supported profile | Real 4/4 reference, 3/4 partial, 1/4 hardcoded; baseline comparison and failure isolation                                                         |
-| AI approach review            | PARTIAL                       | Eleven fields and evidence validation; actual Cloudflare reviews intermittently failed; OpenAI key configured; live diagnostic blocked by HTTP429 |
-| Security/quality/architecture | PARTIAL                       | Routing and contextual reasoning; no full SAST/dependency/architecture analysis pipeline                                                          |
-| Benchmarks/coverage           | NOT IMPLEMENTED               | No corresponding execution/report adapters                                                                                                        |
-| Additional contributions      | PARTIAL                       | Categories and evidence-backed findings; no dedicated functional contribution verification model                                                  |
-| Dashboard                     | PARTIAL                       | Core team/issue/submission/evidence/mobile views work; requested overview metrics, filters and sorting incomplete                                 |
-| Authorization                 | PARTIAL                       | Organizer session, same-origin and isolated anonymous previews; distinct judge/participant roles absent                                           |
-| Audit/reproducibility         | PARTIAL                       | Inputs/versions/heads/execution/AI traces retained; evaluator release is not fully part of cache identity                                         |
-| Burst handling                | PARTIAL                       | Three real simultaneous PRs exposed capacity loss; durable busy retry restores verification; event-scale capacity unproven                        |
+| Subsystem                     | Result                        | Evidence and limits                                                                                                                            |
+| ----------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Team identity and import      | PASS                          | Stable IDs, verified numeric members, duplicate rejection, atomic imports; participant registration absent                                     |
+| Repository/issue assignment   | PASS                          | Exclusive races, inactive/wrong-repository denial, immutable versions; rejection guards repaired                                               |
+| PR mapping and history        | PASS                          | Twelve-team integrated state, unknown/wrong mappings, multi-issue/alternate PRs, head supersession, real signed PR events                      |
+| Issue labeling and claims     | BLOCKED live                  | Rule/outbox fixtures pass; existing App lacks Issues write and issue/comment subscriptions                                                     |
+| Objective Node HTTP checks    | PASS within supported profile | Real 4/4 reference, 3/4 partial, 1/4 hardcoded; baseline comparison and failure isolation                                                      |
+| AI approach review            | PARTIAL                       | Eleven fields and evidence validation; real CallMissed PR review completed; provider/schema failures remain visible and calibration incomplete |
+| Security/quality/architecture | PARTIAL                       | Routing and contextual reasoning; no full SAST/dependency/architecture analysis pipeline                                                       |
+| Benchmarks/coverage           | NOT IMPLEMENTED               | No corresponding execution/report adapters                                                                                                     |
+| Additional contributions      | PARTIAL                       | Categories and evidence-backed findings; no dedicated functional contribution verification model                                               |
+| Dashboard                     | PARTIAL                       | Core team/issue/submission/evidence/mobile views work; requested overview metrics, filters and sorting incomplete                              |
+| Authorization                 | PARTIAL                       | Organizer session, same-origin and isolated anonymous previews; distinct judge/participant roles absent                                        |
+| Audit/reproducibility         | PARTIAL                       | Inputs/versions/heads/execution/AI traces retained; evaluator release is not fully part of cache identity                                      |
+| Burst handling                | PARTIAL                       | Three real simultaneous PRs exposed capacity loss; durable busy retry restores verification; event-scale capacity unproven                     |
 
 ## Participant scenarios
 
@@ -232,3 +232,16 @@ https://test-hackathon-rehearsal-judge-c2c.dakshx.workers.dev. Seven browser tes
 passed against that deployment. The first CI run exposed the integrated twelve-team
 scenario exceeding Vitest's default five-second budget on the slower CI host; its
 explicit integration timeout is now thirty seconds with unchanged assertions.
+
+## CallMissed real PR review
+
+The actual QA repository PR #2 at head `53c8d6f3980eec4cf78757917f123c286468ab55`
+received a validated CallMissed/Kimi K2.6 review on the first attempt in 44.9 seconds,
+with all eleven approach fields and known evidence citations. The response ID and
+4,803-token usage are retained in [the live PR evidence](callmissed-pr-evidence.json).
+Functional criteria remained UNVERIFIED because the development tunnel was unavailable,
+which demonstrates that successful AI does not fabricate successful execution.
+The local service and tunnel were restarted and a fresh exact head is being evaluated.
+The separate synthetic diagnostic did not validate; its provider history is retained
+in [diagnostic evidence](callmissed-live-evidence.json). A real success is not a claim
+that every adversarial scenario or model response is reliable.
