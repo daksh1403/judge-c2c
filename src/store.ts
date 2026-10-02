@@ -56,7 +56,7 @@ export async function isCurrent(env: Env, run: Run) {
     : null;
   if (!resolution) return true; // Explicit legacy organizer mapping remains historical.
   const eligible = await env.DB.prepare(
-    "SELECT t.id FROM teams t JOIN team_repositories r ON r.team_id=t.id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1 AND NOT EXISTS(SELECT 1 FROM json_each(?) j LEFT JOIN issue_assignments a ON a.id=j.value WHERE a.id IS NULL OR a.status<>'ACTIVE' OR (a.expires_at IS NOT NULL AND datetime(a.expires_at)<=CURRENT_TIMESTAMP)) AND (?=1 OR EXISTS(SELECT 1 FROM team_members WHERE team_id=t.id AND github_id=? AND active=1))",
+    "SELECT t.id FROM teams t JOIN team_repositories r ON r.team_id=t.id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1 AND NOT EXISTS(SELECT 1 FROM json_each(?) j LEFT JOIN issue_assignments a ON a.id=j.value LEFT JOIN github_issues i ON i.repository_id=a.repository_id AND i.number=a.issue_number WHERE a.id IS NULL OR a.status<>'ACTIVE' OR i.review_status IS NULL OR i.review_status<>'APPROVED' OR (a.expires_at IS NOT NULL AND datetime(a.expires_at)<=CURRENT_TIMESTAMP)) AND (?=1 OR EXISTS(SELECT 1 FROM team_members WHERE team_id=t.id AND github_id=? AND active=1))",
   )
     .bind(
       snapshot.team_id,

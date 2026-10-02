@@ -63,6 +63,7 @@ export async function tunnelEvaluate(env: Env, request: RunnerRequest) {
     },
     body,
   });
+  if (response.status === 429) throw new Error('RUNNER_BUSY');
   if (!response.ok) throw new Error('RUNNER_TUNNEL_UNAVAILABLE');
   const bytes = await boundedBody(
     new Request('https://internal/', {

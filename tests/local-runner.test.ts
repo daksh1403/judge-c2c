@@ -9,11 +9,59 @@ import {
 } from '../src/runner-tunnel';
 import { canonical, digest } from '../src/domain';
 import { verifyWebhook } from '../src/security';
-import { containerArguments, removeContainer } from '../src/local-docker';
+import {
+  containerArguments,
+  removeContainer,
+  reapOrphanContainers,
+} from '../src/local-docker';
 import type { RunnerResult, RunnerRequest } from '../src/runner';
 import type { Env } from '../src/env';
 const key = 'e'.repeat(64);
 describe('development Docker bridge', () => {
+  it('distinguishes busy capacity from unavailable execution for durable retries', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('{}', { status: 429 })),
+    );
+    try {
+      await expect(
+        tunnelEvaluate(
+          {
+            RUNNER_ENDPOINT: 'https://bridge.trycloudflare.com',
+            RUNNER_TUNNEL_KEY: key,
+          } as Env,
+          {} as RunnerRequest,
+        ),
+      ).rejects.toThrow('RUNNER_BUSY');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+  it('discovers crash-orphan guests before startup and refuses unconfirmed cleanup', async () => {
+    const id = 'a'.repeat(64);
+    const run = vi
+      .fn()
+      .mockResolvedValueOnce({ exitCode: 0, stdout: id + '\n', stderr: '' })
+      .mockResolvedValue({ exitCode: 0, stdout: '', stderr: '' });
+    await reapOrphanContainers(run);
+    expect(run.mock.calls[0]![0]).toContain('label=judge-c2c.local-runner=1');
+    expect(run.mock.calls[1]![0]).toEqual(['rm', '--force', id]);
+    const broken = vi
+      .fn()
+      .mockResolvedValueOnce({ exitCode: 0, stdout: id, stderr: '' })
+      .mockResolvedValue({
+        exitCode: 1,
+        stdout: '',
+        stderr: 'daemon unavailable',
+      });
+    await expect(reapOrphanContainers(broken)).rejects.toThrow(
+      'CLEANUP_UNCONFIRMED',
+    );
+    expect(containerArguments('bounded', 'image').slice(-2)).toEqual([
+      'sleep',
+      '120',
+    ]);
+  });
   it('isolates containers without host mounts, network, privileges or secrets', () => {
     const args = containerArguments(
       'judge-c2c-test',

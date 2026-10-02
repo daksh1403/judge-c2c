@@ -681,7 +681,17 @@ export async function organization(
               : 'Available'
             : 'Isolated execution deployment is disabled.',
       },
-      ai: { enabled: !!env.AI && !!env.AI_MODEL },
+      ai: {
+        provider: env.AI_PROVIDER ?? 'cloudflare',
+        model:
+          env.AI_PROVIDER === 'callmissed'
+            ? env.CALLMISSED_MODEL
+            : env.AI_MODEL,
+        enabled:
+          env.AI_PROVIDER === 'callmissed'
+            ? !!env.CALLMISSED_API_KEY && !!env.CALLMISSED_MODEL
+            : !!env.AI && !!env.AI_MODEL,
+      },
       app: row
         ? {
             id: row.app_id,

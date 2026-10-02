@@ -195,3 +195,30 @@ or checks. Never print token/secret values, invent GitHub state, or merge withou
 an explicit instruction. Owner permission updates and sensitive repository governance
 changes require their appropriate authorized workflow; development CLI credentials
 never replace the backend's short-lived GitHub App credentials.
+
+## OpenAI reviewer
+
+The isolated review backend uses `AI_PROVIDER=callmissed` and
+`CALLMISSED_MODEL=kimi-k2.6`. This catalog ID is not an immutable snapshot;
+traces retain the actual returned model, and reproducibility is limited by the provider.
+Set `CALLMISSED_API_KEY` with
+`npx wrangler secret put CALLMISSED_API_KEY --env review`, using a CallMissed key
+with only the `llm` permission. Never put it in Wrangler vars, public assets,
+GitHub issue text or participant containers. Local development can use ignored
+`.dev.vars`. Production needs its own explicit key and configuration. The existing
+organization service binding keeps the key on the internal backend. The earlier
+OpenAI key is unused; this integration never calls api.openai.com.
+
+The [CallMissed Responses API reference](https://docs.callmissed.com/docs/chat-completion)
+documents structured output. Strict schema output still goes
+through local criterion/evidence validation. Requests have no tools, no redirects,
+bounded output and timeouts and `store:false`. The chosen free-plan model is not
+advertised as a zero-data-retention route. `store:false` disables Responses storage,
+not upstream retention; review data is sent to CallMissed and its model backend. Traces record provider/model/response ID/usage;
+errors contain only allowlisted codes, never arbitrary provider prose. Credits,
+model access, and rate limits must be available for a real review. Failed AI review
+retains deterministic evidence and requires honest human attention.
+
+The QA report and capability matrix are in `docs/qa/`. Run `npm run qa:docker`
+only with the trusted development Docker image present; it executes bounded
+controlled fixtures inside guests, never participant code on the host.

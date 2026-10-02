@@ -6,3 +6,7 @@ GITHUB_WEBHOOK_SECRET=replace-with-a-separate-random-secret
 GITHUB_APP_ID=
 # PKCS8 PEM with escaped newlines; never commit real keys.
 GITHUB_APP_PRIVATE_KEY=
+# Backend only. Configure through Wrangler secrets; never expose in browser assets.
+AI_PROVIDER=callmissed
+CALLMISSED_MODEL=kimi-k2.6
+CALLMISSED_API_KEY=

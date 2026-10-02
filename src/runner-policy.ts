@@ -141,4 +141,4 @@ export const paymentRetryDescriptions: Record<string, string> = {
   'retry-permanent': 'Do not retry a permanent payment failure.',
   'retry-invalid': 'Reject a non-positive maximum attempt count.',
 };
-export const RUNNER_VERSION = 'node-http-v1.0.0';
+export const RUNNER_VERSION = 'node-http-v1.0.1';

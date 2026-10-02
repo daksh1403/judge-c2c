@@ -94,3 +94,10 @@ Inspect it with `launchctl print gui/$(id -u)/com.judge-c2c.local-runner`.
 Stop it with `launchctl bootout gui/$(id -u)/com.judge-c2c.local-runner`.
 This is local development operation, not a production deployment or a guarantee
 of availability after logout/reboot.
+
+Crash containment: each guest has an independent 120-second PID1 lifetime. On
+startup the single local runner reaps all containers with its dedicated
+`judge-c2c.local-runner=1` label before accepting jobs; cleanup failure refuses
+startup. Do not run competing local runner instances against the same Docker
+daemon. Busy responses receive bounded durable workflow backoff. This is still
+Mac-dependent development execution, not production isolation or event-scale capacity.
