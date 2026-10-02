@@ -115,7 +115,7 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
             })),
             risk: classifyRisk(files),
             environment: c.execution.environment,
-            toolVersion: 'judge-c2c-0.1.0',
+            toolVersion: 'judge-c2c-0.1.1',
           };
           const size = canonical(result).length;
           if (size > 750_000) throw new Error('CONTEXT_LIMIT');
@@ -150,59 +150,70 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         },
       );
       if (!context) return { status: 'superseded' };
-      await step.do('objective', async () => {
-        const run = await this.requireCurrent(id);
-        if (!run) return;
-        await transition(
-          this.env,
-          id,
-          'FETCHING',
-          'CHECKING',
-          'Baseline source assertions and policy checks recorded',
-        );
-        const contract = parseContract(run);
-        let evidence = JSON.parse(run.evidence!) as Evidence[];
-        try {
-          evidence = await runObjective(this.env, run, contract, evidence);
-        } catch (error) {
-          const code =
-            error instanceof Error && /^[A-Z_0-9]+$/.test(error.message)
-              ? error.message
-              : 'RUNNER_UNAVAILABLE';
-          evidence.push({
-            id: 'runner-stage',
-            kind: 'execution',
-            status: 'UNVERIFIED',
-            claim: `Execution stage unavailable: ${code}. Earlier evidence is preserved.`,
-          });
-        }
-        if (!(await isCurrent(this.env, run))) return;
-        await this.env.DB.prepare(
-          "UPDATE evaluations SET evidence=? WHERE id=? AND state='CHECKING'",
-        )
-          .bind(redact(canonical(evidence)), id)
-          .run();
-        if (this.env.ARTIFACTS) {
-          const content = redact(canonical(evidence));
-          const key = `evaluations/${id}/objective.json`;
-          const hash = await digest(content);
-          await this.env.ARTIFACTS.put(key, content, {
-            httpMetadata: { contentType: 'application/json' },
-            customMetadata: { sha256: hash },
-          });
+      await step.do(
+        'objective',
+        {
+          retries: { limit: 8, delay: '15 seconds', backoff: 'constant' },
+          timeout: '4 minutes',
+        },
+        async () => {
+          const run = await this.requireCurrent(id);
+          if (!run) return;
+          await transition(
+            this.env,
+            id,
+            'FETCHING',
+            'CHECKING',
+            'Baseline source assertions and policy checks recorded',
+          );
+          const contract = parseContract(run);
+          let evidence = JSON.parse(run.evidence!) as Evidence[];
+          try {
+            evidence = await runObjective(this.env, run, contract, evidence);
+          } catch (error) {
+            // Capacity is backpressure, not missing verification. Durable retries
+            // re-check current head/eligibility before spending more compute.
+            if (error instanceof Error && error.message === 'RUNNER_BUSY')
+              throw error;
+            const code =
+              error instanceof Error && /^[A-Z_0-9]+$/.test(error.message)
+                ? error.message
+                : 'RUNNER_UNAVAILABLE';
+            evidence.push({
+              id: 'runner-stage',
+              kind: 'execution',
+              status: 'UNVERIFIED',
+              claim: `Execution stage unavailable: ${code}. Earlier evidence is preserved.`,
+            });
+          }
+          if (!(await isCurrent(this.env, run))) return;
           await this.env.DB.prepare(
-            'INSERT OR IGNORE INTO artifacts(key,run_id,sha256,bytes,content_type) VALUES(?,?,?,?,?)',
+            "UPDATE evaluations SET evidence=? WHERE id=? AND state='CHECKING'",
           )
-            .bind(
-              key,
-              id,
-              hash,
-              new TextEncoder().encode(content).length,
-              'application/json',
-            )
+            .bind(redact(canonical(evidence)), id)
             .run();
-        }
-      });
+          if (this.env.ARTIFACTS) {
+            const content = redact(canonical(evidence));
+            const key = `evaluations/${id}/objective.json`;
+            const hash = await digest(content);
+            await this.env.ARTIFACTS.put(key, content, {
+              httpMetadata: { contentType: 'application/json' },
+              customMetadata: { sha256: hash },
+            });
+            await this.env.DB.prepare(
+              'INSERT OR IGNORE INTO artifacts(key,run_id,sha256,bytes,content_type) VALUES(?,?,?,?,?)',
+            )
+              .bind(
+                key,
+                id,
+                hash,
+                new TextEncoder().encode(content).length,
+                'application/json',
+              )
+              .run();
+          }
+        },
+      );
       await step.do(
         'reasoning',
         { retries: { limit: 0, delay: '1 second' }, timeout: '3 minutes' },

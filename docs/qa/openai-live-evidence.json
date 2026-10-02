@@ -1,0 +1,16 @@
+{
+  "mode": "REAL_OPENAI_API_DIAGNOSTIC",
+  "at": "2026-10-02T11:47:51.808Z",
+  "synthetic": true,
+  "status": "FAILED",
+  "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+  "trace": {
+    "policy": "requirements-and-approach-v4",
+    "provider": "openai",
+    "model": "gpt-5.4-mini-2026-03-17",
+    "inputHash": "f8b12da879f4b2a68893f5bf0c53b7a49555c012f57b1c8a6a76c6465af5ab2a",
+    "durationMs": 2041,
+    "attempts": 2,
+    "failureCode": "OPENAI_HTTP_429"
+  }
+}

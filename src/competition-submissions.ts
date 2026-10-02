@@ -11,6 +11,7 @@ import {
   type CompetitionServices,
 } from './competition-store';
 import { acceptPullRequest } from './intake';
+import { updateAssignmentProgress } from './competition-completion';
 import type { Env } from './env';
 const nativePR = z.object({
   number: z.number().int().positive(),
@@ -164,6 +165,7 @@ export async function resolveSubmission(
       issue_number: number;
       contract_hash: string;
       progress: string;
+      review_status: string;
     }[] = [];
   if (!team) {
     status = 'NEEDS_TEAM_MAPPING';
@@ -185,7 +187,7 @@ export async function resolveSubmission(
   } else {
     const rows = await db
       .prepare(
-        "SELECT id,issue_number,contract_hash,progress FROM issue_assignments WHERE team_id=? AND repository_id=? AND status='ACTIVE' AND (expires_at IS NULL OR datetime(expires_at)>CURRENT_TIMESTAMP)",
+        "SELECT a.id,a.issue_number,a.contract_hash,a.progress,i.review_status FROM issue_assignments a JOIN github_issues i ON i.repository_id=a.repository_id AND i.number=a.issue_number WHERE a.team_id=? AND a.repository_id=? AND a.status='ACTIVE' AND (a.expires_at IS NULL OR datetime(a.expires_at)>CURRENT_TIMESTAMP)",
       )
       .bind(team.id, repo.id)
       .all<{
@@ -193,6 +195,7 @@ export async function resolveSubmission(
         issue_number: number;
         contract_hash: string;
         progress: string;
+        review_status: string;
       }>();
     assigned = override
       ? rows.results.filter((a) => override.assignmentIds.includes(a.id))
@@ -212,6 +215,9 @@ export async function resolveSubmission(
       status = 'ISSUE_LINK_CONFLICT';
       reason =
         'Native or closing-keyword links include issues outside the team assignment.';
+    } else if (assigned.some((a) => a.review_status !== 'APPROVED')) {
+      status = 'CHALLENGE_REVIEW_REQUIRED';
+      reason = 'An assigned official challenge is no longer approved.';
     } else if (assigned.some((a) => a.progress === 'BLOCKED')) {
       status = 'BLOCKED_ASSIGNMENT';
       reason = 'An assigned challenge is blocked.';
@@ -248,6 +254,13 @@ export async function resolveSubmission(
     reason =
       'GitHub PR is closed; this does not establish successful completion.';
   }
+  if (settings.status !== 'ACTIVE' && pr.state !== 'closed') {
+    status = 'EVENT_INACTIVE';
+    reason =
+      'Hackathon is ' +
+      settings.status +
+      '; new evaluation waits for an active event.';
+  }
   const snapshot = redact(
     canonical({
       ...pr,
@@ -271,9 +284,10 @@ export async function resolveSubmission(
   const updates = [
     db
       .prepare(
-        "INSERT INTO audit(action,entity,actor) VALUES('submission.fence',CASE WHEN NOT EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND resolution_revision<>?) AND NOT EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND (github_updated_at>? OR (github_updated_at=? AND head_sha<>?))) AND (?=1 OR ?<>'VALID' OR NOT EXISTS(SELECT 1 FROM submissions s JOIN json_each(s.assignment_ids) j WHERE s.repository_id=? AND s.pr_number<>? AND s.status='VALID' AND j.value IN (SELECT value FROM json_each(?)))) THEN ? ELSE NULL END,?)",
+        "INSERT INTO audit(action,entity,actor) VALUES('submission.fence',CASE WHEN (?<>'VALID' OR EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE')) AND NOT EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND resolution_revision<>?) AND NOT EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND (github_updated_at>? OR (github_updated_at=? AND head_sha<>?))) AND (?=1 OR ?<>'VALID' OR NOT EXISTS(SELECT 1 FROM submissions s JOIN json_each(s.assignment_ids) j WHERE s.repository_id=? AND s.pr_number<>? AND s.status='VALID' AND j.value IN (SELECT value FROM json_each(?)))) THEN ? ELSE NULL END,?)",
       )
       .bind(
+        status,
         repo.id,
         pr.number,
         before?.resolution_revision ?? 0,
@@ -362,9 +376,9 @@ export async function resolveSubmission(
       updates.push(
         db
           .prepare(
-            "UPDATE issue_assignments SET progress=CASE WHEN progress='COMPLETED' THEN progress ELSE 'EVALUATING' END WHERE id=? AND status='ACTIVE'",
+            "UPDATE issue_assignments SET progress=CASE WHEN progress='COMPLETED' AND EXISTS(SELECT 1 FROM completion_decisions d JOIN evaluations e ON e.id=d.run_id WHERE d.assignment_id=issue_assignments.id AND d.decision='ACCEPTED' AND e.head_sha=? AND e.contract_hash=? AND NOT EXISTS(SELECT 1 FROM completion_decisions newer WHERE newer.assignment_id=d.assignment_id AND newer.sequence>d.sequence)) THEN progress ELSE 'EVALUATING' END WHERE id=? AND status='ACTIVE'",
           )
-          .bind(assignment.id),
+          .bind(pr.head.sha, registered.hash, assignment.id),
       );
   }
   await db.batch(updates);
@@ -382,5 +396,8 @@ export async function resolveSubmission(
     delivery,
     payloadHash,
   );
-  return { status, reason, evaluation: await result.json() };
+  const evaluation = (await result.json()) as { runId?: string };
+  if (evaluation.runId)
+    await updateAssignmentProgress(orgenv, evaluation.runId);
+  return { status, reason, evaluation };
 }

@@ -12,7 +12,12 @@ import {
   responseMessage,
 } from '../src/runner-tunnel';
 import { verifyWebhook } from '../src/security';
-import { evaluateDocker, docker, cleanupDocker } from '../src/local-docker';
+import {
+  evaluateDocker,
+  docker,
+  cleanupDocker,
+  reapOrphanContainers,
+} from '../src/local-docker';
 const key = (await readFile('.wrangler/local-runner-key.txt', 'utf8')).trim();
 const image = (
   await readFile('.wrangler/local-runner-image.txt', 'utf8')
@@ -31,6 +36,7 @@ const inspected = await docker([
 ]);
 if (inspected.exitCode !== 0 || inspected.stdout.trim() !== image)
   throw new Error('RUNNER_IMAGE_NOT_AVAILABLE');
+await reapOrphanContainers();
 const server = createRunnerServer(key, (body) => evaluateDocker(body, image));
 server.requestTimeout = 10000;
 server.headersTimeout = 5000;

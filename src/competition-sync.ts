@@ -430,6 +430,12 @@ export async function maintainCompetition(
   const db = competitionDB(env);
   await db
     .prepare(
+      "UPDATE management_inbox SET status='FAILED',last_error='RETRY_EXHAUSTED_AFTER_CRASH',lease_until=NULL WHERE attempts>=5 AND (status='PENDING' OR (status='PROCESSING' AND lease_until<?))",
+    )
+    .bind(Date.now())
+    .run();
+  await db
+    .prepare(
       "UPDATE issue_assignments SET status='EXPIRED',revoked_at=CURRENT_TIMESTAMP WHERE status IN('ACTIVE','RESERVED') AND expires_at IS NOT NULL AND datetime(expires_at)<=CURRENT_TIMESTAMP",
     )
     .run();

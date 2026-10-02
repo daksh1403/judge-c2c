@@ -1,0 +1,1731 @@
+{
+  "mode": "REAL_GITHUB_INTEGRATION_SINGLE_ACCOUNT",
+  "date": "2026-10-02T11:46:43.654Z",
+  "identity": "daksh1403; no claim of multiple independent accounts",
+  "before": [
+    {
+      "persona": "ideal",
+      "pr": 2,
+      "runId": "6c685ccea5d42bf9874845c116e771f0d909971f0465071086a176850aa0c1b5",
+      "head": "d0363f1cc513b10eeb4d1d9ae2b46a61890d6606",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "COMPLETED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "execution",
+          "status": "PASS"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution implements a retry function that takes an array of outcomes and a maximum number of attempts as input, and returns an object with the number of attempts and a status indicating success or failure.",
+          "verification": "OBSERVED"
+        },
+        "architecture_fit": {
+          "evidenceIds": [
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-invalid"
+          ],
+          "text": "The solution fits the architecture of the system, as it is designed to handle retries in a specific context.",
+          "verification": "OBSERVED"
+        },
+        "correctness": {
+          "evidenceIds": [
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-invalid"
+          ],
+          "text": "The solution is correct in that it implements the retry mechanism as specified, handling different outcomes and returning the number of attempts and a status indicating success or failure.",
+          "verification": "OBSERVED"
+        },
+        "evidence": [
+          "criterion-retry-transient",
+          "criterion-retry-bounded",
+          "criterion-retry-permanent",
+          "criterion-retry-invalid",
+          "diff",
+          "context-source-1",
+          "context-source-2"
+        ],
+        "maintainability": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution is maintainable due to its clear and concise structure, making it easy to understand and modify.",
+          "verification": "OBSERVED"
+        },
+        "problem_understanding": {
+          "evidenceIds": [
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-invalid"
+          ],
+          "text": "The problem requires implementing a retry mechanism with a specified maximum number of attempts, handling different outcomes, and returning the number of attempts and a status indicating success or failure.",
+          "verification": "OBSERVED"
+        },
+        "solution_design": {
+          "evidenceIds": [
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-invalid"
+          ],
+          "text": "The retry function iterates over the outcomes array, checking each outcome and returning the number of attempts and a status indicating success or failure. The function also includes input validation and error handling.",
+          "verification": "OBSERVED"
+        },
+        "strengths": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution is well-structured and readable, with clear and concise variable names and comments.",
+            "verification": "OBSERVED"
+          },
+          {
+            "evidenceIds": [
+              "criterion-retry-transient",
+              "criterion-retry-bounded",
+              "criterion-retry-permanent",
+              "criterion-retry-invalid"
+            ],
+            "text": "The solution includes input validation and error handling, making it more robust.",
+            "verification": "OBSERVED"
+          }
+        ],
+        "tradeoffs": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution prioritizes readability and simplicity over performance, which may not be suitable for all use cases.",
+            "verification": "INFERENCE"
+          },
+          {
+            "evidenceIds": [
+              "criterion-retry-transient",
+              "criterion-retry-bounded",
+              "criterion-retry-permanent",
+              "criterion-retry-invalid"
+            ],
+            "text": "The solution includes input validation and error handling, which may add overhead but improves robustness.",
+            "verification": "INFERENCE"
+          }
+        ],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": [
+              "criterion-retry-transient",
+              "criterion-retry-bounded",
+              "criterion-retry-permanent",
+              "criterion-retry-invalid"
+            ],
+            "text": "The solution assumes that the input will always be valid, which may not be the case in all scenarios.",
+            "verification": "UNVERIFIED"
+          },
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution assumes that the maximum number of attempts will always be a positive integer, which may not be the case in all scenarios.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": [
+          {
+            "evidenceIds": [
+              "criterion-retry-transient",
+              "criterion-retry-bounded",
+              "criterion-retry-permanent",
+              "criterion-retry-invalid"
+            ],
+            "text": "The solution could benefit from more comprehensive error handling, such as handling unexpected input or edge cases.",
+            "verification": "INFERENCE"
+          },
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution could be improved by considering additional edge cases, such as an empty outcomes array or a maximum number of attempts that is not a positive integer.",
+            "verification": "INFERENCE"
+          }
+        ]
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 72033,
+        "inputHash": "bc54e13f5f783564f7dee3096c067e580d78c20b5cc3621bf2ec5187751aeab2",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4",
+        "usage": {
+          "completion_tokens": 1465,
+          "neurons": 422.3110656738281,
+          "prompt_tokens": 4585,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 6050
+        }
+      },
+      "execution": [
+        {
+          "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+          "requestHash": "3c38f683c5768276a4df4d90ea63b728c391429f1b6275c14b4f75a38d45c735",
+          "resultHash": "e80512930b991988966b0c5cb663010e682888c23ef17f334ee2055ad11202d7",
+          "result": {
+            "checks": [
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured build command failed.",
+                "durationMs": 90,
+                "exitCode": 1,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "stderr": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/work/server.mjs'\n    at node:internal/modules/cjs/loader:1564:15\n    at node:internal/main/check_syntax:33:20 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.21.0\n",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 116,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 7.294167\n"
+              }
+            ],
+            "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:31:14.904Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "3c38f683c5768276a4df4d90ea63b728c391429f1b6275c14b4f75a38d45c735",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:31:13.119Z",
+            "version": "node-http-v1.0.0"
+          }
+        },
+        {
+          "commit": "d0363f1cc513b10eeb4d1d9ae2b46a61890d6606",
+          "requestHash": "979883bc7e8f1b54d05b4ff543b4e831fdb1317d421ac69158ac2acb62aa1a7d",
+          "resultHash": "3636df890111fb0f36458fd25770d7a3da4d3692432e5993d6c13c6901f25a57",
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 205,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 199,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 188,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 88,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 110,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.789833\n"
+              }
+            ],
+            "commit": "d0363f1cc513b10eeb4d1d9ae2b46a61890d6606",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:31:18.343Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "979883bc7e8f1b54d05b4ff543b4e831fdb1317d421ac69158ac2acb62aa1a7d",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:31:16.093Z",
+            "version": "node-http-v1.0.0"
+          }
+        }
+      ],
+      "check": [
+        {
+          "id": 110784918940,
+          "head": "d0363f1cc513b10eeb4d1d9ae2b46a61890d6606",
+          "status": "completed",
+          "conclusion": "neutral"
+        }
+      ]
+    },
+    {
+      "persona": "partial",
+      "pr": 3,
+      "runId": "c3308fdd1f465cd4c060771f3ee1cf56accf2a4d930d421a13a2730edb4939b9",
+      "head": "f29ca125b5640959678b7ebfc2b40bbc32aa7780",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "COMPLETED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "claim": "Execution check retry-transient has not run. Isolated runner is not configured.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution implements a retry function that takes an array of outcomes and a maximum number of attempts as input, and returns an object with a status and the number of attempts made. The function checks if the maximum number of attempts is valid and if the outcomes array is valid. If the outcomes array contains a 'success' outcome, the function returns a 'success' status. If the maximum number of attempts is reached without a 'success' outcome, the function returns a 'failed' status.",
+          "verification": "INFERENCE"
+        },
+        "architecture_fit": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution fits the architecture of the system in that it implements the retry mechanism as specified. However, it may not handle all possible edge cases.",
+          "verification": "INFERENCE"
+        },
+        "correctness": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution is correct in that it implements the retry mechanism as specified. However, it may not handle all possible edge cases.",
+          "verification": "INFERENCE"
+        },
+        "evidence": [
+          "diff",
+          "context-source-1",
+          "context-source-2",
+          "policy-3",
+          "criterion-retry-transient",
+          "criterion-retry-bounded",
+          "criterion-retry-permanent",
+          "criterion-retry-invalid",
+          "runner-stage"
+        ],
+        "maintainability": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution is maintainable in that it is simple and easy to understand. However, it may require additional error checking and handling to make it more robust.",
+          "verification": "INFERENCE"
+        },
+        "problem_understanding": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The problem requires implementing a retry mechanism with a limited number of attempts. The mechanism should take an array of outcomes and a maximum number of attempts as input, and return an object with a status and the number of attempts made.",
+          "verification": "INFERENCE"
+        },
+        "solution_design": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The solution uses a for loop to iterate over the outcomes array and check if each outcome is 'success'. If an outcome is 'success', the function returns a 'success' status. If the loop completes without finding a 'success' outcome, the function returns a 'failed' status.",
+          "verification": "INFERENCE"
+        },
+        "strengths": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution is simple and easy to understand.",
+            "verification": "INFERENCE"
+          },
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution checks for valid input and handles errors correctly.",
+            "verification": "INFERENCE"
+          }
+        ],
+        "tradeoffs": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution trades off simplicity for robustness. The solution is simple and easy to understand, but it may not handle all possible edge cases.",
+            "verification": "INFERENCE"
+          }
+        ],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution assumes that the outcomes array is not empty and that the maximum number of attempts is greater than 0.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": [
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution does not handle the case where the outcomes array is empty.",
+            "verification": "INFERENCE"
+          },
+          {
+            "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+            "text": "The solution does not handle the case where the maximum number of attempts is 0.",
+            "verification": "INFERENCE"
+          }
+        ]
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 77074,
+        "inputHash": "62e8aeaf0c54d921abf5eed449cc0bdbfcc44936041da086cecb53a00f6c1a8c",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4",
+        "usage": {
+          "completion_tokens": 1419,
+          "neurons": 407.6365051269531,
+          "prompt_tokens": 4388,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 5807
+        }
+      },
+      "execution": [],
+      "check": [
+        {
+          "id": 110784925498,
+          "head": "f29ca125b5640959678b7ebfc2b40bbc32aa7780",
+          "status": "completed",
+          "conclusion": "action_required"
+        }
+      ]
+    },
+    {
+      "persona": "hardcoded",
+      "pr": 4,
+      "runId": "1770d400c7b8be9f25a10dc7b7c4dbd4e61ae203881883e8cd8a58f50457b147",
+      "head": "3355b7550cdbac1b316c05e0b226ab6dcffc2d8f",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "FAILED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "claim": "Execution check retry-transient has not run. Isolated runner is not configured.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "architecture_fit": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "correctness": {
+          "evidenceIds": [],
+          "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+          "verification": "UNVERIFIED"
+        },
+        "evidence": [],
+        "maintainability": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "problem_understanding": {
+          "evidenceIds": [],
+          "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+          "verification": "UNVERIFIED"
+        },
+        "solution_design": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "strengths": [],
+        "tradeoffs": [],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": []
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 58001,
+        "inputHash": "70beb7e9dbc3afa9ff7dde961e0dc9b2d983013b996aa6af5f8679dc140546e0",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4"
+      },
+      "execution": [],
+      "check": [
+        {
+          "id": 110784839828,
+          "head": "3355b7550cdbac1b316c05e0b226ab6dcffc2d8f",
+          "status": "completed",
+          "conclusion": "action_required"
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "persona": "ideal",
+      "pr": 2,
+      "runId": "75a22f0d8d81d62e17d36c90ad6b0aec6e8fc0c1c76d04668818862b99d9830c",
+      "head": "1455eca194c67e46197dc1f010a74644d1e338a0",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "FAILED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "execution",
+          "status": "PASS"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "architecture_fit": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "correctness": {
+          "evidenceIds": [],
+          "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+          "verification": "UNVERIFIED"
+        },
+        "evidence": [],
+        "maintainability": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "problem_understanding": {
+          "evidenceIds": [],
+          "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+          "verification": "UNVERIFIED"
+        },
+        "solution_design": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "strengths": [],
+        "tradeoffs": [],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": []
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 55104,
+        "inputHash": "70e043f1c9adcd67ca9a14f6879e77b00bc3a9fe68770012a71542255cec0374",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4"
+      },
+      "execution": [
+        {
+          "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+          "requestHash": "f0d757f0455ae63bdbf17669853e1835c54c8180fd83c0fd50fd3b021d1809ef",
+          "resultHash": "ffad497d4915ebeb1415b35bb1f1dc42002d2a00646ddd478eea91ff686eee6c",
+          "result": {
+            "checks": [
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured build command failed.",
+                "durationMs": 93,
+                "exitCode": 1,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "stderr": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/work/server.mjs'\n    at node:internal/modules/cjs/loader:1564:15\n    at node:internal/main/check_syntax:33:20 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.21.0\n",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 108,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 7.337667\n"
+              }
+            ],
+            "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:38:36.724Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "f0d757f0455ae63bdbf17669853e1835c54c8180fd83c0fd50fd3b021d1809ef",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:38:34.895Z",
+            "version": "node-http-v1.0.1"
+          }
+        },
+        {
+          "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+          "requestHash": "f0d757f0455ae63bdbf17669853e1835c54c8180fd83c0fd50fd3b021d1809ef",
+          "resultHash": "4ca606f952ae140880efb24d5a2cd88ecb31e8968753963031f88d41c473f726",
+          "result": {
+            "checks": [
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured build command failed.",
+                "durationMs": 84,
+                "exitCode": 1,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "stderr": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/work/server.mjs'\n    at node:internal/modules/cjs/loader:1564:15\n    at node:internal/main/check_syntax:33:20 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.21.0\n",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 99,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.560291\n"
+              }
+            ],
+            "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:39:13.620Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "f0d757f0455ae63bdbf17669853e1835c54c8180fd83c0fd50fd3b021d1809ef",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:39:11.916Z",
+            "version": "node-http-v1.0.1"
+          }
+        },
+        {
+          "commit": "1455eca194c67e46197dc1f010a74644d1e338a0",
+          "requestHash": "565c18fdbdd735013d8b619c25eae7f116023a9b7945783486012069f2eaf189",
+          "resultHash": "c27c479b9a8092f34d6f48587aca399b2d4fb514561a2a252b2320a212982b84",
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 240,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200.",
+                "durationMs": 208,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 195,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 204,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 85,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 102,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.868333\n"
+              }
+            ],
+            "commit": "1455eca194c67e46197dc1f010a74644d1e338a0",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:39:17.376Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "565c18fdbdd735013d8b619c25eae7f116023a9b7945783486012069f2eaf189",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:39:14.854Z",
+            "version": "node-http-v1.0.1"
+          }
+        }
+      ],
+      "check": [
+        {
+          "id": 110787320493,
+          "head": "1455eca194c67e46197dc1f010a74644d1e338a0",
+          "status": "completed",
+          "conclusion": "action_required"
+        }
+      ]
+    },
+    {
+      "persona": "partial",
+      "pr": 3,
+      "runId": "6fdc74353be0cd510c3ecb438b3ce7e3e7ae6f853c143fda5f21c779d266c8a0",
+      "head": "72e8da2c3dbd28f8ddd29072dcf3ae65e42942e7",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "FAILED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200. Baseline FAIL → submission FAIL.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "execution",
+          "status": "PASS"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "architecture_fit": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "correctness": {
+          "evidenceIds": [],
+          "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+          "verification": "UNVERIFIED"
+        },
+        "evidence": [],
+        "maintainability": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "problem_understanding": {
+          "evidenceIds": [],
+          "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+          "verification": "UNVERIFIED"
+        },
+        "solution_design": {
+          "evidenceIds": [],
+          "text": "UNVERIFIED: contextual solution approach has not been established.",
+          "verification": "UNVERIFIED"
+        },
+        "strengths": [],
+        "tradeoffs": [],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": []
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 64257,
+        "inputHash": "0fc16e471c8b29cb30061cf09f2ce544b8a0d86bc7054204b4f7fc6fc92aa927",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4"
+      },
+      "execution": [
+        {
+          "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+          "requestHash": "116486d94a65d332142fb6864fe835d0c44c153ff445ae2c86b3369efe3a0834",
+          "resultHash": "ee95721163294eeb351df4e0dbfdfa213cc12738503a77b31880a40ef20d6c17",
+          "result": {
+            "checks": [
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured build command failed.",
+                "durationMs": 94,
+                "exitCode": 1,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "stderr": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/work/server.mjs'\n    at node:internal/modules/cjs/loader:1564:15\n    at node:internal/main/check_syntax:33:20 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.21.0\n",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 195,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.7855\n"
+              }
+            ],
+            "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:38:54.946Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "116486d94a65d332142fb6864fe835d0c44c153ff445ae2c86b3369efe3a0834",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:38:53.073Z",
+            "version": "node-http-v1.0.1"
+          }
+        },
+        {
+          "commit": "72e8da2c3dbd28f8ddd29072dcf3ae65e42942e7",
+          "requestHash": "28b27c99d5d25f2a27c9e5ab046f2e07baa658634a79d386fa771b26d84dcce0",
+          "resultHash": "2118edadf05b5c3e454533366af382b97a3cf2ef9853f738d14f7073f8e9fc55",
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 193,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200.",
+                "durationMs": 199,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200.",
+                "durationMs": 194,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 203,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 81,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 97,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.892875\n"
+              }
+            ],
+            "commit": "72e8da2c3dbd28f8ddd29072dcf3ae65e42942e7",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:38:58.716Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "28b27c99d5d25f2a27c9e5ab046f2e07baa658634a79d386fa771b26d84dcce0",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:38:56.204Z",
+            "version": "node-http-v1.0.1"
+          }
+        }
+      ],
+      "check": [
+        {
+          "id": 110787266031,
+          "head": "72e8da2c3dbd28f8ddd29072dcf3ae65e42942e7",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    },
+    {
+      "persona": "hardcoded",
+      "pr": 4,
+      "runId": "19a0aea9e7ffbbfdecd2a14feb9802e52f54f1559ee5e6b5c41d8095fa3efb2e",
+      "head": "ceb12c4d38f581fb23e8f2f112aee7fa17859eb8",
+      "baseline": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+      "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+      "state": "COMPLETED",
+      "aiStatus": "COMPLETED",
+      "publication": "PUBLISHED",
+      "criteria": [
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200. Baseline FAIL → submission FAIL.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200. Baseline FAIL → submission FAIL.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-invalid: FAIL. Expected status 400; observed 200. Baseline FAIL → submission FAIL.",
+          "criterionId": "retry-invalid",
+          "id": "criterion-retry-invalid",
+          "kind": "execution",
+          "status": "FAIL"
+        }
+      ],
+      "approach": {
+        "approach_summary": {
+          "evidenceIds": ["diff", "context-source-1"],
+          "text": "The solution approach involves implementing a simple HTTP server to handle retry requests.",
+          "verification": "INFERENCE"
+        },
+        "architecture_fit": {
+          "evidenceIds": ["context-source-1", "context-source-2"],
+          "text": "The architecture fit of the solution is not ideal, as it does not follow standard professional guidelines.",
+          "verification": "INFERENCE"
+        },
+        "correctness": {
+          "evidenceIds": [
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-invalid"
+          ],
+          "text": "The correctness of the solution is verified through the execution of the provided test cases.",
+          "verification": "OBSERVED"
+        },
+        "evidence": [
+          "diff",
+          "context-source-1",
+          "context-source-2",
+          "criterion-retry-transient",
+          "criterion-retry-bounded",
+          "criterion-retry-permanent",
+          "criterion-retry-invalid"
+        ],
+        "maintainability": {
+          "evidenceIds": ["context-source-1", "context-source-2"],
+          "text": "The maintainability of the solution is a concern due to the hardcoded nature of the implementation.",
+          "verification": "INFERENCE"
+        },
+        "problem_understanding": {
+          "evidenceIds": ["diff", "context-source-1", "context-source-2"],
+          "text": "The problem requires implementing a controlled retry mechanism for a given set of test cases.",
+          "verification": "INFERENCE"
+        },
+        "solution_design": {
+          "evidenceIds": ["context-source-1", "context-source-2"],
+          "text": "The solution design involves creating an HTTP server that listens for incoming requests and responds with a JSON object containing the status and attempts.",
+          "verification": "INFERENCE"
+        },
+        "strengths": [
+          {
+            "evidenceIds": ["diff", "context-source-1"],
+            "text": "The solution is simple and easy to implement.",
+            "verification": "INFERENCE"
+          }
+        ],
+        "tradeoffs": [
+          {
+            "evidenceIds": ["diff", "context-source-1"],
+            "text": "The use of a hardcoded solution may not be suitable for production environments.",
+            "verification": "INFERENCE"
+          }
+        ],
+        "unverified_assumptions": [
+          {
+            "evidenceIds": ["diff", "context-source-1"],
+            "text": "The hardcoded solution will work in all scenarios.",
+            "verification": "UNVERIFIED"
+          }
+        ],
+        "weaknesses": [
+          {
+            "evidenceIds": ["context-source-1", "context-source-2"],
+            "text": "The solution lacks robustness and scalability.",
+            "verification": "INFERENCE"
+          }
+        ]
+      },
+      "aiTrace": {
+        "attempts": 2,
+        "durationMs": 46085,
+        "inputHash": "f420c397e19acd8506b62ee8a749b14bae9835c976cd1f6316c2b7279cbac3b8",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "policy": "requirements-and-approach-v4",
+        "usage": {
+          "completion_tokens": 975,
+          "neurons": 300.1956481933594,
+          "prompt_tokens": 3769,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_tokens": 4744
+        }
+      },
+      "execution": [
+        {
+          "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+          "requestHash": "6354a92f64f63a246106e00e6d4155e7877fc215560f9702ec2feeaa27bad673",
+          "resultHash": "77f1df23696e8ee8694726e3891682442a995d2ec4e00a36f68d9ba2bc3dc8ad",
+          "result": {
+            "checks": [
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Required service entrypoint is missing.",
+                "durationMs": 0,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured build command failed.",
+                "durationMs": 96,
+                "exitCode": 1,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "stderr": "node:internal/modules/cjs/loader:1568\n  throw err;\n  ^\n\nError: Cannot find module '/work/server.mjs'\n    at node:internal/modules/cjs/loader:1564:15\n    at node:internal/main/check_syntax:33:20 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v24.21.0\n",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 106,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.583875\n"
+              }
+            ],
+            "commit": "9faaa76aa5acd8c83102877a5f9dc3da817a1313",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:38:39.524Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "6354a92f64f63a246106e00e6d4155e7877fc215560f9702ec2feeaa27bad673",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:38:37.716Z",
+            "version": "node-http-v1.0.1"
+          }
+        },
+        {
+          "commit": "ceb12c4d38f581fb23e8f2f112aee7fa17859eb8",
+          "requestHash": "2a0f738312cb6b5a47c08316055999c21fb3b7c9e1f0cdf57d4bbe651a0f831d",
+          "resultHash": "2a41afb6cf30e3be092351ebbef069196566b716b15c85d6331cfe61a7f28053",
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 217,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200.",
+                "durationMs": 183,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200.",
+                "durationMs": 205,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid: FAIL. Expected status 400; observed 200.",
+                "durationMs": 203,
+                "exitCode": null,
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 94,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 112,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 6.9935\n"
+              }
+            ],
+            "commit": "ceb12c4d38f581fb23e8f2f112aee7fa17859eb8",
+            "contractHash": "341056cd05e95b26379285f4d95cc409650ef355c9a599bf461e4afc84898581",
+            "finishedAt": "2026-10-02T09:38:43.678Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "requestHash": "2a0f738312cb6b5a47c08316055999c21fb3b7c9e1f0cdf57d4bbe651a0f831d",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-02T09:38:40.988Z",
+            "version": "node-http-v1.0.1"
+          }
+        }
+      ],
+      "check": [
+        {
+          "id": 110787104461,
+          "head": "ceb12c4d38f581fb23e8f2f112aee7fa17859eb8",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    }
+  ],
+  "signedEvents": [
+    {
+      "id": "0221b3a0-be45-11f1-895d-911b6a11d133",
+      "event": "pull_request",
+      "status": "COMPLETED",
+      "attempts": 1,
+      "last_error": null,
+      "received_at": "2026-10-02 09:38:24"
+    },
+    {
+      "id": "00cb7270-be45-11f1-8946-c0781b616b29",
+      "event": "pull_request",
+      "status": "COMPLETED",
+      "attempts": 1,
+      "last_error": null,
+      "received_at": "2026-10-02 09:38:22"
+    },
+    {
+      "id": "ffac46d0-be44-11f1-99c4-cdcd1c0291e7",
+      "event": "pull_request",
+      "status": "COMPLETED",
+      "attempts": 1,
+      "last_error": null,
+      "received_at": "2026-10-02 09:38:20"
+    }
+  ],
+  "completion": {
+    "at": "2026-10-02T11:39:50.598Z",
+    "partialRefused": true,
+    "accepted": {
+      "id": "decision-ee015566-ce64-47b2-99f1-0719131a1e72",
+      "eligibility": {
+        "eligible": true,
+        "mandatoryCriteria": [
+          "retry-transient",
+          "retry-bounded",
+          "retry-permanent",
+          "retry-invalid"
+        ],
+        "unverifiedOrFailed": [],
+        "regressionOrPolicyFailure": false
+      },
+      "progress": "COMPLETED"
+    },
+    "decisions": [
+      {
+        "sequence": 1,
+        "id": "decision-ee015566-ce64-47b2-99f1-0719131a1e72",
+        "assignment_id": "assignment-abc841c0-7cec-4de8-a1be-54b3610959c3",
+        "run_id": "75a22f0d8d81d62e17d36c90ad6b0aec6e8fc0c1c76d04668818862b99d9830c",
+        "decision": "ACCEPTED",
+        "reason": "QA operator verified four trusted HTTP cases for this exact head. AI failure is visible and not treated as objective truth.",
+        "actor": "organizer:5fb7a00347d16f48bfce489bb82f0b1344c8d9c984a9dd6e9bd665d77e2382f0",
+        "evidence_snapshot": {
+          "eligibility": {
+            "eligible": true,
+            "mandatoryCriteria": [
+              "retry-transient",
+              "retry-bounded",
+              "retry-permanent",
+              "retry-invalid"
+            ],
+            "regressionOrPolicyFailure": false,
+            "unverifiedOrFailed": []
+          },
+          "evidence": [
+            {
+              "claim": "Exact baseline-to-head comparison: 2 changed files. This confirms change metadata, not functionality.",
+              "id": "diff",
+              "kind": "diff",
+              "status": "PASS"
+            },
+            {
+              "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+              "id": "context-source-1",
+              "kind": "source",
+              "path": "server.mjs",
+              "status": "PASS"
+            },
+            {
+              "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+              "id": "context-source-2",
+              "kind": "source",
+              "path": "README.md",
+              "status": "PASS"
+            },
+            {
+              "claim": "Protected path unchanged: .github",
+              "id": "policy-3",
+              "kind": "policy",
+              "path": ".github",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "FAIL",
+              "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+              "criterionId": "retry-transient",
+              "id": "criterion-retry-transient",
+              "kind": "execution",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "FAIL",
+              "claim": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+              "criterionId": "retry-bounded",
+              "id": "criterion-retry-bounded",
+              "kind": "execution",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "FAIL",
+              "claim": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+              "criterionId": "retry-permanent",
+              "id": "criterion-retry-permanent",
+              "kind": "execution",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "FAIL",
+              "claim": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400. Baseline FAIL → submission PASS.",
+              "criterionId": "retry-invalid",
+              "id": "criterion-retry-invalid",
+              "kind": "execution",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "FAIL",
+              "claim": "build: Configured build command passed. Baseline FAIL → submission PASS. Repository commands are supplemental evidence.",
+              "id": "execution-build",
+              "kind": "execution",
+              "status": "PASS"
+            },
+            {
+              "baselineStatus": "PASS",
+              "claim": "test: Configured test command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+              "id": "execution-repository-tests",
+              "kind": "execution",
+              "status": "PASS"
+            }
+          ],
+          "override": false,
+          "report": {
+            "aiTrace": {
+              "attempts": 2,
+              "durationMs": 55104,
+              "inputHash": "70e043f1c9adcd67ca9a14f6879e77b00bc3a9fe68770012a71542255cec0374",
+              "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+              "policy": "requirements-and-approach-v4"
+            },
+            "assessments": [
+              {
+                "criterionId": "retry-transient",
+                "evidenceIds": ["criterion-retry-transient"],
+                "explanation": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+                "status": "PASS"
+              },
+              {
+                "criterionId": "retry-bounded",
+                "evidenceIds": ["criterion-retry-bounded"],
+                "explanation": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+                "status": "PASS"
+              },
+              {
+                "criterionId": "retry-permanent",
+                "evidenceIds": ["criterion-retry-permanent"],
+                "explanation": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+                "status": "PASS"
+              },
+              {
+                "criterionId": "retry-invalid",
+                "evidenceIds": ["criterion-retry-invalid"],
+                "explanation": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400. Baseline FAIL → submission PASS.",
+                "status": "PASS"
+              }
+            ],
+            "findings": [],
+            "solution_approach": {
+              "approach_summary": {
+                "evidenceIds": [],
+                "text": "UNVERIFIED: contextual solution approach has not been established.",
+                "verification": "UNVERIFIED"
+              },
+              "architecture_fit": {
+                "evidenceIds": [],
+                "text": "UNVERIFIED: contextual solution approach has not been established.",
+                "verification": "UNVERIFIED"
+              },
+              "correctness": {
+                "evidenceIds": [],
+                "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+                "verification": "UNVERIFIED"
+              },
+              "evidence": [],
+              "maintainability": {
+                "evidenceIds": [],
+                "text": "UNVERIFIED: contextual solution approach has not been established.",
+                "verification": "UNVERIFIED"
+              },
+              "problem_understanding": {
+                "evidenceIds": [],
+                "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+                "verification": "UNVERIFIED"
+              },
+              "solution_design": {
+                "evidenceIds": [],
+                "text": "UNVERIFIED: contextual solution approach has not been established.",
+                "verification": "UNVERIFIED"
+              },
+              "strengths": [],
+              "tradeoffs": [],
+              "unverified_assumptions": [
+                {
+                  "evidenceIds": [],
+                  "text": "UNVERIFIED: contextual solution approach has not been established.",
+                  "verification": "UNVERIFIED"
+                }
+              ],
+              "weaknesses": []
+            },
+            "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+          }
+        },
+        "created_at": "2026-10-02 11:39:50"
+      }
+    ],
+    "assignmentId": "assignment-abc841c0-7cec-4de8-a1be-54b3610959c3"
+  }
+}

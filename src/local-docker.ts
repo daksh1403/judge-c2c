@@ -49,7 +49,8 @@ export function containerArguments(name: string, image: string) {
     'none',
     image,
     'sleep',
-    'infinity',
+    // Independent lifetime bound survives runner SIGKILL and lost JS timers.
+    '120',
   ];
 }
 export async function docker(
@@ -132,6 +133,21 @@ export async function cleanupDocker() {
   );
   if (results.some((r) => r.status === 'rejected'))
     throw new Error('DOCKER_CLEANUP_UNCONFIRMED');
+}
+export async function reapOrphanContainers(run = docker) {
+  const result = await run([
+    'ps',
+    '--all',
+    '--quiet',
+    '--no-trunc',
+    '--filter',
+    'label=judge-c2c.local-runner=1',
+  ]);
+  if (result.exitCode !== 0) throw new Error('DOCKER_ORPHAN_DISCOVERY_FAILED');
+  const ids = result.stdout.trim().split(/\s+/).filter(Boolean);
+  if (ids.some((id) => !/^[a-f0-9]{64}$/.test(id)))
+    throw new Error('DOCKER_ORPHAN_ID_INVALID');
+  for (const id of ids) await removeContainer(id, run);
 }
 export async function evaluateDocker(
   raw: unknown,

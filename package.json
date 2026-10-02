@@ -20,7 +20,8 @@
     "runner:build": "docker build --tag judge-c2c-runner-local runner",
     "runner:start": "node scripts/local-runner-start.mjs",
     "runner:connect": "node scripts/local-runner-connect.mjs",
-    "runner:smoke": "node scripts/local-runner-smoke.mjs"
+    "runner:smoke": "node scripts/local-runner-smoke.mjs",
+    "qa:docker": "node scripts/hackathon-docker-rehearsal.mjs"
   },
   "dependencies": {
     "jose": "6.2.12",

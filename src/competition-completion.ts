@@ -69,6 +69,7 @@ export async function decideCompletion(
       .parse(raw),
     db = competitionDB(env),
     settings = await eventSettings(env);
+  if (settings.status !== 'ACTIVE') throw new Error('EVENT_INACTIVE');
   const assignment = await db
     .prepare(
       "SELECT * FROM issue_assignments WHERE id=? AND status='ACTIVE' AND (expires_at IS NULL OR datetime(expires_at)>CURRENT_TIMESTAMP)",
@@ -146,7 +147,7 @@ export async function decideCompletion(
   await db.batch([
     db
       .prepare(
-        "INSERT INTO audit(action,entity,actor) VALUES('completion.fence',CASE WHEN EXISTS(SELECT 1 FROM issue_assignments a JOIN teams t ON t.id=a.team_id JOIN team_repositories tr ON tr.team_id=t.id AND tr.repository_id=a.repository_id WHERE a.id=? AND a.status='ACTIVE' AND (a.expires_at IS NULL OR datetime(a.expires_at)>CURRENT_TIMESTAMP) AND t.status='ACTIVE' AND tr.active=1) AND (?<>'ACCEPTED' OR EXISTS(SELECT 1 FROM evaluations e JOIN submissions s ON s.latest_run_id=e.id WHERE e.id=? AND e.state='COMPLETED' AND e.head_sha=s.head_sha AND s.team_id=? AND json_extract(e.assignment_snapshot,'$.team_id')=s.team_id AND EXISTS(SELECT 1 FROM json_each(json_extract(json_extract(e.assignment_snapshot,'$.resolution_snapshot'),'$.assignmentIds')) WHERE value=?) AND EXISTS(SELECT 1 FROM json_each(s.assignment_ids) WHERE value=?))) THEN ? ELSE NULL END,?)",
+        "INSERT INTO audit(action,entity,actor) VALUES('completion.fence',CASE WHEN EXISTS(SELECT 1 FROM issue_assignments a JOIN teams t ON t.id=a.team_id JOIN team_repositories tr ON tr.team_id=t.id AND tr.repository_id=a.repository_id WHERE a.id=? AND a.status='ACTIVE' AND (a.expires_at IS NULL OR datetime(a.expires_at)>CURRENT_TIMESTAMP) AND t.status='ACTIVE' AND tr.active=1 AND EXISTS(SELECT 1 FROM github_issues i WHERE i.repository_id=a.repository_id AND i.number=a.issue_number AND i.review_status='APPROVED')) AND (?<>'ACCEPTED' OR EXISTS(SELECT 1 FROM evaluations e JOIN submissions s ON s.latest_run_id=e.id WHERE e.id=? AND e.state='COMPLETED' AND e.head_sha=s.head_sha AND s.team_id=? AND json_extract(e.assignment_snapshot,'$.team_id')=s.team_id AND EXISTS(SELECT 1 FROM json_each(json_extract(json_extract(e.assignment_snapshot,'$.resolution_snapshot'),'$.assignmentIds')) WHERE value=?) AND EXISTS(SELECT 1 FROM json_each(s.assignment_ids) WHERE value=?) AND (?=1 OR EXISTS(SELECT 1 FROM team_members m WHERE m.team_id=s.team_id AND m.github_id=? AND m.active=1)))) AND EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE') THEN ? ELSE NULL END,?)",
       )
       .bind(
         assignmentId,
@@ -155,6 +156,8 @@ export async function decideCompletion(
         assignment.team_id,
         assignmentId,
         assignmentId,
+        Number(!!frozenResolution?.override),
+        frozenResolution?.githubAuthor?.id ?? -1,
         id,
         actor,
       ),
@@ -223,10 +226,11 @@ export async function updateAssignmentProgress(env: Env, runId: string) {
     if (!assignment) continue;
     const accepted = await db
       .prepare(
-        'SELECT d.decision,e.head_sha,s.head_sha AS current_head,s.latest_run_id,d.run_id FROM completion_decisions d LEFT JOIN evaluations e ON e.id=d.run_id LEFT JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE d.assignment_id=? ORDER BY d.sequence DESC LIMIT 1',
+        'SELECT d.sequence,d.decision,e.head_sha,s.head_sha AS current_head,s.latest_run_id,d.run_id FROM completion_decisions d LEFT JOIN evaluations e ON e.id=d.run_id LEFT JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE d.assignment_id=? ORDER BY d.sequence DESC LIMIT 1',
       )
       .bind(id)
       .first<{
+        sequence: number;
         decision: string;
         head_sha: string;
         current_head: string;
@@ -244,9 +248,9 @@ export async function updateAssignmentProgress(env: Env, runId: string) {
         : 'EVALUATING';
     await db
       .prepare(
-        "UPDATE issue_assignments SET progress=? WHERE id=? AND status='ACTIVE'",
+        "UPDATE issue_assignments SET progress=? WHERE id=? AND status='ACTIVE' AND EXISTS(SELECT 1 FROM evaluations e JOIN submissions s ON s.latest_run_id=e.id WHERE e.id=? AND e.head_sha=s.head_sha AND e.state=?) AND COALESCE((SELECT max(sequence) FROM completion_decisions WHERE assignment_id=issue_assignments.id),0)=?",
       )
-      .bind(progress, id)
+      .bind(progress, id, runId, run.state, accepted?.sequence ?? 0)
       .run();
     await queueIssueLabels(
       env,

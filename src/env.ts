@@ -28,4 +28,7 @@ export interface Env {
   PUBLIC_ORIGIN?: string;
   EVALUATION_DETAILS_KIND?: 'organization';
   AI_MODEL?: string;
+  AI_PROVIDER?: 'cloudflare' | 'callmissed';
+  CALLMISSED_API_KEY?: string;
+  CALLMISSED_MODEL?: string;
 }

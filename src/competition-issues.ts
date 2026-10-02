@@ -334,13 +334,14 @@ export async function prepareAssignment(
   const data = assignmentInput.parse(raw),
     db = competitionDB(env),
     settings = await eventSettings(env);
+  if (settings.status !== 'ACTIVE') throw new Error('EVENT_INACTIVE');
   if (source === 'CLAIM' && !settings.policy.claimingEnabled)
     throw new Error('CLAIMING_DISABLED');
   if (data.expiresAt && Date.parse(data.expiresAt) <= Date.now())
     throw new Error('RESERVATION_EXPIRATION_INVALID');
   const definition = await db
     .prepare(
-      'SELECT * FROM challenge_definitions WHERE repository_id=? AND issue_number=?',
+      "SELECT d.* FROM challenge_definitions d JOIN github_issues i ON i.repository_id=d.repository_id AND i.number=d.issue_number WHERE d.repository_id=? AND d.issue_number=? AND i.official=1 AND i.review_status='APPROVED'",
     )
     .bind(data.repositoryId, data.issueNumber)
     .first<{
@@ -368,7 +369,7 @@ export async function prepareAssignment(
     ),
     db
       .prepare(
-        "INSERT INTO issue_assignments(id,team_id,repository_id,issue_number,contract_hash,exclusive,source,status,policy_snapshot,actor,expires_at) SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM teams t JOIN team_repositories r ON t.id=r.team_id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1) AND EXISTS(SELECT 1 FROM challenge_definitions WHERE repository_id=? AND issue_number=? AND current_contract_hash=? AND availability='AVAILABLE') AND (SELECT count(*) FROM issue_assignments WHERE repository_id=? AND issue_number=? AND status IN('ACTIVE','RESERVED'))<?",
+        "INSERT INTO issue_assignments(id,team_id,repository_id,issue_number,contract_hash,exclusive,source,status,policy_snapshot,actor,expires_at) SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM teams t JOIN team_repositories r ON t.id=r.team_id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1) AND EXISTS(SELECT 1 FROM challenge_definitions WHERE repository_id=? AND issue_number=? AND current_contract_hash=? AND availability='AVAILABLE' AND EXISTS(SELECT 1 FROM github_issues i WHERE i.repository_id=challenge_definitions.repository_id AND i.number=challenge_definitions.issue_number AND i.official=1 AND i.review_status='APPROVED')) AND EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE') AND (SELECT count(*) FROM issue_assignments WHERE repository_id=? AND issue_number=? AND status IN('ACTIVE','RESERVED'))<?",
       )
       .bind(
         id,
@@ -483,7 +484,7 @@ export async function queueIssueLabels(
     .bind(repositoryId, number)
     .all<{ progress: string }>();
   let status = issue.review_status.toLowerCase().replaceAll('_', '-');
-  if (issue.official) {
+  if (issue.official && issue.review_status === 'APPROVED') {
     status = assignments.results.length
       ? assignments.results.every((a) => a.progress === 'COMPLETED')
         ? 'completed'
@@ -500,10 +501,12 @@ export async function queueIssueLabels(
     'judge:source:' + issue.source.toLowerCase(),
     'judge:status:' + status,
     'judge:evaluation:' +
-      (issue.official
+      (issue.official && issue.review_status === 'APPROVED'
         ? definition?.evaluation_kind.toLowerCase().replaceAll('_', '-')
         : 'not-scored'),
-    ...(issue.official ? ['judge:evaluation:approved-challenge'] : []),
+    ...(issue.official && issue.review_status === 'APPROVED'
+      ? ['judge:evaluation:approved-challenge']
+      : []),
     ...(classification.type ? ['judge:type:' + classification.type] : []),
     ...classification.flags
       .filter((f: string) =>

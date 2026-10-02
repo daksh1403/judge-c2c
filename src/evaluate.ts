@@ -10,6 +10,7 @@ import {
 import type { ChangedFile } from './github';
 import { redact } from './security';
 import type { Env } from './env';
+import { callMissedReview } from './callmissed-review';
 
 export type Context = {
   files: ChangedFile[];
@@ -183,11 +184,13 @@ export async function aiReview(
   context: Context,
   evidence: Evidence[],
 ) {
-  if (!env.AI || !env.AI_MODEL)
+  const provider = env.AI_PROVIDER ?? 'cloudflare';
+  const model = provider === 'callmissed' ? env.CALLMISSED_MODEL : env.AI_MODEL;
+  if (!model || (provider === 'callmissed' ? !env.CALLMISSED_API_KEY : !env.AI))
     return {
       review: deterministicReport(contract, evidence),
       status: 'NOT_CONFIGURED',
-      trace: { policy: AI_POLICY_VERSION, model: null },
+      trace: { policy: AI_POLICY_VERSION, provider, model: null },
     };
   // Deliberately no shell, repository tools, URLs, or privileged capabilities.
   const compact = {
@@ -216,31 +219,41 @@ export async function aiReview(
       status: 'SKIPPED_CONTEXT_LIMIT',
       trace: {
         policy: AI_POLICY_VERSION,
-        model: env.AI_MODEL,
+        provider,
+        model,
         inputHash: await digest(prompt),
       },
     };
   const started = Date.now();
+  let failureCode = 'AI_OUTPUT_INVALID';
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = (await env.AI.run(
-        env.AI_MODEL as Parameters<Ai['run']>[0],
-        {
-          messages: [
-            { role: 'system', content: AI_POLICY },
-            {
-              role: 'user',
-              content: JSON.stringify({
-                schema: reviewSchema.toJSONSchema(),
-                untrustedContext: prompt,
-                attempt,
-              }),
-            },
-          ],
-          max_tokens: 4096,
-          response_format: { type: 'json_object' },
-        } as never,
-      )) as { response?: unknown; usage?: unknown };
+      const response =
+        provider === 'callmissed'
+          ? await callMissedReview(env, AI_POLICY, prompt, attempt)
+          : ((await env.AI!.run(
+              env.AI_MODEL as Parameters<Ai['run']>[0],
+              {
+                messages: [
+                  { role: 'system', content: AI_POLICY },
+                  {
+                    role: 'user',
+                    content: JSON.stringify({
+                      schema: reviewSchema.toJSONSchema(),
+                      untrustedContext: prompt,
+                      attempt,
+                    }),
+                  },
+                ],
+                max_tokens: 4096,
+                response_format: { type: 'json_object' },
+              } as never,
+            )) as {
+              response?: unknown;
+              usage?: unknown;
+              model?: string;
+              responseId?: string | null;
+            });
       const data =
         typeof response.response === 'string'
           ? JSON.parse(response.response)
@@ -253,14 +266,28 @@ export async function aiReview(
         status: 'COMPLETED',
         trace: {
           policy: AI_POLICY_VERSION,
-          model: env.AI_MODEL,
+          provider,
+          model: response.model ?? model,
+          responseId: response.responseId ?? null,
           inputHash: await digest(prompt),
           durationMs: Date.now() - started,
           attempts: attempt + 1,
           usage: response.usage ?? null,
         },
       };
-    } catch {
+    } catch (error) {
+      failureCode =
+        error instanceof Error && /^CALLMISSED_[A-Z0-9_]+$/.test(error.message)
+          ? error.message
+          : provider === 'callmissed' &&
+              error instanceof Error &&
+              ['TimeoutError', 'AbortError'].includes(error.name)
+            ? 'CALLMISSED_TIMEOUT'
+            : error instanceof Error && error.name === 'ZodError'
+              ? 'AI_SCHEMA_INVALID'
+              : error instanceof SyntaxError
+                ? 'AI_JSON_INVALID'
+                : 'AI_OUTPUT_INVALID';
       /* Bounded recovery. Invalid/provider output never becomes evidence. */
     }
   }
@@ -269,10 +296,12 @@ export async function aiReview(
     status: 'FAILED',
     trace: {
       policy: AI_POLICY_VERSION,
-      model: env.AI_MODEL,
+      provider,
+      model,
       inputHash: await digest(prompt),
       durationMs: Date.now() - started,
       attempts: 2,
+      failureCode,
     },
   };
 }
