@@ -1,3 +1,4 @@
+import { updateAssignmentProgress } from './competition-completion';
 import {
   WorkflowEntrypoint,
   type WorkflowEvent,
@@ -36,24 +37,43 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           await transition(this.env, id, 'QUEUED', 'FETCHING');
           const c = parseContract(run);
           const github = await GitHub.installation(this.env, c);
-          const pr = await github.api<{ head: { sha: string }; state: string }>(
-            `/repos/${c.repository.fullName}/pulls/${run.pr_number}`,
-          );
+          const pr = await github.api<{
+            title: string;
+            body: string | null;
+            head: { sha: string };
+            state: string;
+          }>(`/repos/${c.repository.fullName}/pulls/${run.pr_number}`);
           if (pr.head.sha !== run.head_sha || pr.state !== 'open') {
             await this.supersede(run);
             return null;
           }
           const files = await github.compare(c, run.head_sha);
+          const commitContext = await github.api<{
+            commits?: { sha: string; commit: { message: string } }[];
+          }>(
+            `/repos/${c.repository.fullName}/compare/${c.baseline}...${run.head_sha}?per_page=100`,
+          );
+          const commits = commitContext.commits ?? [];
+          // Native PR head was verified separately. Commit context is bounded and may be partial.
           const paths = [
-            ...new Set(
-              c.requirements.flatMap((r) =>
+            ...new Set([
+              ...files
+                .filter(
+                  (f) =>
+                    !/lock|generated|\.min\.|\.(png|jpg|pdf|zip)$/.test(
+                      f.filename,
+                    ),
+                )
+                .slice(0, 8)
+                .map((f) => f.filename),
+              ...c.requirements.flatMap((r) =>
                 r.criteria.flatMap((a) =>
                   a.verification.type === 'file_contains'
                     ? [a.verification.path]
                     : [],
                 ),
               ),
-            ),
+            ]),
           ];
           if (paths.length > 30) throw new Error('CONTEXT_LIMIT');
           const sources: Context['sources'] = {};
@@ -84,6 +104,15 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
               patch: f.patch ? redact(f.patch).slice(0, 5000) : undefined,
             })),
             sources,
+            pullRequest: {
+              title: redact(pr.title ?? '').slice(0, 1000),
+              description: redact(pr.body ?? '').slice(0, 6000),
+              head: run.head_sha,
+            },
+            commits: commits.map((commit) => ({
+              sha: commit.sha,
+              message: redact(commit.commit.message).slice(0, 500),
+            })),
             risk: classifyRisk(files),
             environment: c.execution.environment,
             toolVersion: 'judge-c2c-0.1.0',
@@ -229,6 +258,9 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         JSON.stringify({ event: 'evaluation_failed', runId: id, code }),
       );
     }
+    await step.do('assignment-progress', () =>
+      updateAssignmentProgress(this.env, id),
+    );
     // Publication is its own retryable stage; failures cannot erase completed evidence.
     await step.do(
       'publish',

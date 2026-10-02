@@ -192,9 +192,33 @@ export const assessmentSchema = z
     evidenceIds: z.array(z.string().min(1).max(100)).max(20),
   })
   .strict();
+// Every interpretation carries citations and an explicit epistemic status.
+export const approachObservationSchema = z
+  .object({
+    text: z.string().min(1).max(2000),
+    evidenceIds: z.array(z.string().min(1).max(100)).max(20),
+    verification: z.enum(['OBSERVED', 'INFERENCE', 'UNVERIFIED']),
+  })
+  .strict();
+export const solutionApproachSchema = z
+  .object({
+    problem_understanding: approachObservationSchema,
+    approach_summary: approachObservationSchema,
+    solution_design: approachObservationSchema,
+    strengths: z.array(approachObservationSchema).max(10),
+    weaknesses: z.array(approachObservationSchema).max(10),
+    tradeoffs: z.array(approachObservationSchema).max(10),
+    correctness: approachObservationSchema,
+    maintainability: approachObservationSchema,
+    architecture_fit: approachObservationSchema,
+    evidence: z.array(z.string().min(1).max(100)).max(100),
+    unverified_assumptions: z.array(approachObservationSchema).max(20),
+  })
+  .strict();
 export const reviewSchema = z
   .object({
     summary: z.string().min(1).max(3000),
+    solution_approach: solutionApproachSchema,
     assessments: z.array(assessmentSchema).max(900),
     findings: z
       .array(
@@ -262,5 +286,55 @@ export function validateReview(
   }
   if (review.findings.some((f) => f.evidenceIds.some((e) => !known.has(e))))
     throw new Error('Unknown finding evidence');
+  const approach = review.solution_approach;
+  const observations = [
+    approach.problem_understanding,
+    approach.approach_summary,
+    approach.solution_design,
+    ...approach.strengths,
+    ...approach.weaknesses,
+    ...approach.tradeoffs,
+    approach.correctness,
+    approach.maintainability,
+    approach.architecture_fit,
+    ...approach.unverified_assumptions,
+  ];
+  if (approach.evidence.some((id) => !known.has(id)))
+    throw new Error('Unknown approach evidence');
+  for (const observation of observations) {
+    if (
+      observation.evidenceIds.some(
+        (id) => !known.has(id) || !approach.evidence.includes(id),
+      )
+    )
+      throw new Error('Unknown or unlisted approach evidence');
+    if (
+      observation.verification !== 'UNVERIFIED' &&
+      !observation.evidenceIds.length
+    )
+      throw new Error('Approach claims require evidence');
+    if (
+      observation.verification === 'OBSERVED' &&
+      observation.evidenceIds.some(
+        (id) => known.get(id)?.status === 'UNVERIFIED',
+      )
+    )
+      throw new Error('Unverified evidence cannot establish an observed claim');
+  }
+  if (
+    approach.unverified_assumptions.some((a) => a.verification !== 'UNVERIFIED')
+  )
+    throw new Error('Assumptions must remain explicitly unverified');
+  // Correctness is interpreted separately from design and cannot become proof from source alone.
+  if (
+    approach.correctness.verification === 'OBSERVED' &&
+    !approach.correctness.evidenceIds.some(
+      (id) =>
+        known.get(id)?.kind === 'execution' &&
+        !!known.get(id)?.criterionId &&
+        known.get(id)?.status !== 'UNVERIFIED',
+    )
+  )
+    throw new Error('Observed correctness requires execution evidence');
   return review;
 }

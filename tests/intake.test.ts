@@ -1,3 +1,4 @@
+import { migrate } from './database';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Miniflare } from 'miniflare';
 import { readFileSync } from 'node:fs';
@@ -96,29 +97,7 @@ beforeAll(async () => {
     compatibilityDate: '2026-08-01',
   });
   const DB = await mf.getD1Database('DB');
-  // D1 exec does not parse multiline statements. Migration contains no embedded semicolons.
-  const sql = readFileSync(
-    new NodeURL('../migrations/0001_foundation.sql', import.meta.url),
-    'utf8',
-  );
-  const tables = sql
-    .slice(0, sql.indexOf('CREATE TRIGGER'))
-    .split(';')
-    .map((s) => s.trim())
-    .filter(Boolean);
-  for (const statement of tables) await DB.prepare(statement).run();
-  await DB.prepare(
-    "CREATE TRIGGER immutable_contract BEFORE UPDATE ON contracts BEGIN SELECT RAISE(ABORT,'Contracts are immutable'); END",
-  ).run();
-  await DB.prepare(
-    "CREATE TRIGGER immutable_evaluation_inputs BEFORE UPDATE OF repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot ON evaluations BEGIN SELECT RAISE(ABORT,'Evaluation inputs are immutable'); END",
-  ).run();
-  await DB.prepare(
-    'ALTER TABLE assignments ADD COLUMN contract_hash TEXT REFERENCES contracts(hash)',
-  ).run();
-  await DB.prepare(
-    'CREATE TABLE execution_results(run_id TEXT,commit_sha TEXT,request_hash TEXT,result_hash TEXT,result TEXT,created_at TEXT)',
-  ).run();
+  await migrate(DB as unknown as D1Database);
   env = {
     DB: DB as unknown as D1Database,
     ENVIRONMENT: 'local',

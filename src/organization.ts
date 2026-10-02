@@ -8,13 +8,19 @@ import { aiReview, objective } from './evaluate';
 import { demoContract } from './demo';
 import { runnerDiagnostic } from './runner-diagnostic';
 import { webhook } from './intake';
+import { competition } from './competition';
+import {
+  receiveCompetitionEvent,
+  maintainCompetition,
+} from './competition-sync';
+import type { CompetitionServices } from './competition-store';
 import type { Env } from './env';
 import { paymentRetryPolicy, paymentRetryDescriptions } from './runner-policy';
 
 export const permissions = {
   contents: 'read',
   pull_requests: 'read',
-  issues: 'read',
+  issues: 'write',
   checks: 'write',
 } as const;
 const hex = z.string().regex(/^[a-f0-9]{64}$/);
@@ -107,7 +113,7 @@ export async function organizationEnv(env: Env): Promise<Env> {
 async function appClient(env: Env) {
   return GitHub.application(await organizationEnv(env));
 }
-async function installedClient(env: Env, repositoryId?: number) {
+async function installedClient(env: Env, repositoryId?: number, write = false) {
   const row = await connection(env);
   if (!row?.installation_id) throw new Error('APP_NOT_INSTALLED');
   const app = await appClient(env);
@@ -119,7 +125,7 @@ async function installedClient(env: Env, repositoryId?: number) {
         permissions: {
           contents: 'read',
           pull_requests: 'read',
-          issues: 'read',
+          issues: write ? 'write' : 'read',
         },
         ...(repositoryId ? { repository_ids: [repositoryId] } : {}),
       }),
@@ -127,8 +133,47 @@ async function installedClient(env: Env, repositoryId?: number) {
   );
   return new GitHub(token.token);
 }
-function manifest(env: Env, state: string) {
-  const origin = new URL(env.ORG_PUBLIC_ORIGIN!).origin;
+function competitionServices(env: Env): CompetitionServices {
+  return {
+    client: (repositoryId, write) => installedClient(env, repositoryId, write),
+    evaluationEnv: () => organizationEnv(env),
+    installationId: async () => {
+      const row = await connection(env);
+      if (!row?.installation_id) throw new Error('APP_NOT_INSTALLED');
+      return row.installation_id;
+    },
+    appSlug: async () => {
+      const row = await connection(env);
+      if (!row) throw new Error('APP_NOT_CONNECTED');
+      return row.slug;
+    },
+    capabilities: async () => {
+      const row = await connection(env);
+      if (!row?.installation_id)
+        return { issuesWrite: false, events: [], reason: 'APP_NOT_INSTALLED' };
+      const app = await appClient(env);
+      const [installation, details] = await Promise.all([
+        app.api<{ permissions: Record<string, string> }>(
+          `/app/installations/${row.installation_id}`,
+        ),
+        app.api<{ events: string[] }>('/app'),
+      ]);
+      return {
+        issuesWrite: installation.permissions.issues === 'write',
+        events: details.events,
+        reason:
+          installation.permissions.issues === 'write'
+            ? undefined
+            : 'Organization owner must approve Issues read and write permission.',
+      };
+    },
+  };
+}
+function manifest(
+  env: Env,
+  state: string,
+  origin = new URL(env.ORG_PUBLIC_ORIGIN!).origin,
+) {
   return {
     action: `https://github.com/organizations/${env.ORG_NAME}/settings/apps/new?state=${state}`,
     manifest: {
@@ -143,7 +188,7 @@ function manifest(env: Env, state: string) {
       setup_on_update: true,
       default_permissions: permissions,
       // GitHub automatically delivers installation lifecycle events.
-      default_events: ['pull_request'],
+      default_events: ['pull_request', 'issues', 'issue_comment'],
     },
   };
 }
@@ -455,10 +500,16 @@ export async function organization(
       { status: 503 },
     );
   const url = new URL(request.url),
-    origin = new URL(env.ORG_PUBLIC_ORIGIN).origin;
+    origin = url.origin;
   const json = (data: unknown, status = 200) =>
     Response.json(data, { status, headers: { 'cache-control': 'no-store' } });
-  if (url.origin !== origin) return json({ error: 'ORIGIN_NOT_ALLOWED' }, 403);
+  if (
+    ![
+      new URL(env.ORG_PUBLIC_ORIGIN).origin,
+      ...(env.ORG_REVIEW_ORIGINS?.split(',').filter(Boolean) ?? []),
+    ].includes(url.origin)
+  )
+    return json({ error: 'ORIGIN_NOT_ALLOWED' }, 403);
   if (url.pathname === '/webhooks/organization') {
     if (request.method !== 'POST')
       return json({ error: 'METHOD_NOT_ALLOWED' }, 405);
@@ -537,6 +588,26 @@ export async function organization(
         .bind(delivery, payloadHash, event)
         .run();
       return json({ status: 'synchronized' });
+    }
+    if (
+      event === 'issues' ||
+      event === 'issue_comment' ||
+      (event === 'pull_request' &&
+        (await env.ORG_DB.prepare(
+          "SELECT id FROM teams WHERE registration_source <> 'legacy-manual' LIMIT 1",
+        ).first()))
+    ) {
+      return json(
+        await receiveCompetitionEvent(
+          env,
+          competitionServices(env),
+          ctx,
+          event,
+          JSON.parse(new TextDecoder().decode(body)),
+          delivery,
+          await digest(new TextDecoder().decode(body)),
+        ),
+      );
     }
     if (event === 'pull_request') {
       const payload = z
@@ -622,6 +693,14 @@ export async function organization(
     });
   }
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
+  if (url.pathname.startsWith('/api/organization/manage/'))
+    return competition(
+      request,
+      env,
+      ctx,
+      competitionServices(env),
+      'organizer:' + session.hash,
+    );
   if (
     url.pathname === '/api/organization/runner-check' &&
     request.method === 'POST'
@@ -727,7 +806,7 @@ export async function organization(
     )
       .bind(await digest(state), session.hash, Date.now() + 3600000)
       .run();
-    return json(manifest(env, state));
+    return json(manifest(env, state, origin));
   }
   if (url.pathname === '/auth/github/manifest' && request.method === 'GET') {
     const state = hex.parse(url.searchParams.get('state')),
@@ -876,7 +955,7 @@ export async function organization(
   return json({ error: 'NOT_FOUND' }, 404);
 }
 
-export async function maintainOrganization(env: Env) {
+export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
   if (!env.ORG_DB) return;
   await env.ORG_DB.batch([
     env.ORG_DB.prepare(
@@ -893,4 +972,5 @@ export async function maintainOrganization(env: Env) {
   if (!row?.installation_id) return;
   const { reconcile } = await import('./store');
   await reconcile(await organizationEnv(env));
+  if (ctx) await maintainCompetition(env, competitionServices(env), ctx);
 }

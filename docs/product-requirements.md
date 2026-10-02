@@ -140,3 +140,13 @@ reliability, maintainability, usability, performance, cost.
 Success means a real participant PR automatically produces a technically useful evaluation
 that accelerates defensible human review. Until sandboxed functional checks and a real App
 installation have been exercised, the deployed foundation must not claim event readiness.
+
+## Teams and solution approach extension
+
+The coherent team → member → repository → official issue → frozen assignment → PR
+→ submission → immutable evaluation → organizer completion workflow is specified
+in [team-issue-workflow.md](team-issue-workflow.md).
+
+Every meaningful engineering evaluation must also include the evidence-backed
+observable [solution approach review](solution-approach-review.md). Private intent
+is unknown; AI interpretation cannot replace objective acceptance evidence.

@@ -269,6 +269,24 @@ test('organization console authenticates and submits an authoritative challenge'
   page,
 }) => {
   let authenticated = false;
+  await page.route('**/api/organization/manage/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    return route.fulfill({
+      json: path.endsWith('/settings')
+        ? {
+            settings: {
+              name: 'Fixture',
+              status: 'ACTIVE',
+              policy: {},
+              taxonomy: [],
+            },
+            capabilities: { issuesWrite: false, events: [] },
+          }
+        : path.endsWith('/overview')
+          ? { counts: { teams: 0, notSubmitted: 0 } }
+          : { teams: [] },
+    });
+  });
   await page.route('**/api/organization/status', (route) =>
     route.fulfill({
       json: {
@@ -343,7 +361,10 @@ test('organization console authenticates and submits an authoritative challenge'
   await page
     .getByLabel('Trusted execution profile')
     .selectOption('payment-retry-v1');
-  await page.getByLabel('Team name').fill('Team Mercury');
+  await page
+    .getByLabel('Team name', { exact: true })
+    .last()
+    .fill('Team Mercury');
   await page
     .getByLabel('Authoritative expected behavior and acceptance criteria')
     .fill('Verify payment receipts against the required format.');
@@ -358,4 +379,229 @@ test('organization console authenticates and submits an authoritative challenge'
       () => document.querySelectorAll('script:not([src])').length,
     ),
   ).toBe(0);
+});
+
+test('organizers see not-submitted teams, member identity and issue provenance together', async ({
+  page,
+}) => {
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Daksh-Codebase',
+        authenticated: true,
+        app: { slug: 'judge-fixture', installationId: 1 },
+        runner: { enabled: false },
+        ai: { enabled: false },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({
+      json: {
+        repositories: [
+          {
+            id: 101,
+            full_name: 'fixture/challenge',
+            accessible: 1,
+            default_branch: 'main',
+          },
+        ],
+      },
+    }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  const team = {
+    id: 'team-stable',
+    name: 'Alpha <script>alert(1)</script>',
+    status: 'ACTIVE',
+    github_members: 'alice, bob',
+    submission_count: 0,
+  };
+  await page.route('**/api/organization/manage/**', (route) => {
+    const url = new URL(route.request().url());
+    const p = url.pathname.split('/manage/')[1];
+    const data =
+      p === 'settings'
+        ? {
+            settings: {
+              name: 'Fixture',
+              status: 'ACTIVE',
+              policy: { claimingEnabled: false },
+              taxonomy: [],
+            },
+            capabilities: { issuesWrite: false, events: ['pull_request'] },
+          }
+        : p === 'overview'
+          ? { counts: { teams: 1, notSubmitted: 1, needsTriage: 1 } }
+          : p === 'teams/team-stable'
+            ? {
+                team,
+                members: [
+                  {
+                    id: 'm1',
+                    display_name: 'Alice',
+                    github_login: 'alice',
+                    github_id: 101,
+                    active: 1,
+                  },
+                ],
+                repositories: [
+                  {
+                    repository_id: 101,
+                    full_name: 'fixture/challenge',
+                    active: 1,
+                  },
+                ],
+                assignments: [],
+                submissions: [],
+                raisedIssues: [
+                  {
+                    number: 12,
+                    title: 'Missing validation',
+                    review_status: 'NEEDS_TRIAGE',
+                  },
+                ],
+                evaluations: [],
+              }
+            : p === 'issues'
+              ? {
+                  issues: [
+                    {
+                      repository_id: 101,
+                      number: 12,
+                      title: 'Missing validation',
+                      full_name: 'fixture/challenge',
+                      source: 'PARTICIPANT',
+                      review_status: 'NEEDS_TRIAGE',
+                      official: 0,
+                    },
+                  ],
+                }
+              : p === 'submissions'
+                ? { teams: [team] }
+                : { teams: [team] };
+    return route.fulfill({ json: data });
+  });
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/?organization=1');
+  await expect(
+    page.getByRole('heading', { name: 'Hackathon workflow' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Owner setup needed:', { exact: false }),
+  ).toBeVisible();
+  await page
+    .getByRole('button', {
+      name: 'Alpha <script>alert(1)</script>',
+      exact: false,
+    })
+    .click();
+  await expect(
+    page.getByText('Alice · @alice · GitHub ID 101', { exact: false }),
+  ).toBeVisible();
+  await expect(page.getByText('NOT SUBMITTED', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Issues', exact: true }).click();
+  await expect(
+    page.getByText('PARTICIPANT · NEEDS_TRIAGE · Not scored'),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Submissions', exact: true }).click();
+  await page
+    .getByLabel('Status', { exact: true })
+    .selectOption('NOT_SUBMITTED');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect(
+    page.getByRole('button', {
+      name: 'Alpha <script>alert(1)</script>',
+      exact: false,
+    }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('approach review exposes separate evidence-backed observations and uncertainty', async ({
+  page,
+}) => {
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Daksh-Codebase',
+        authenticated: true,
+        app: { slug: 'fixture', installationId: 1 },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({
+      json: r.request().url().endsWith('settings')
+        ? {
+            settings: {
+              name: 'Fixture',
+              status: 'ACTIVE',
+              policy: {},
+              taxonomy: [],
+            },
+          }
+        : r.request().url().endsWith('overview')
+          ? { counts: {} }
+          : { teams: [] },
+    }),
+  );
+  const unavailable = {
+    text: 'Repository-wide behavior remains unverified.',
+    evidenceIds: [],
+    verification: 'UNVERIFIED',
+  };
+  const approach = {
+    problem_understanding: unavailable,
+    approach_summary: {
+      text: 'A scheduling path appears to have been added.',
+      evidenceIds: ['diff'],
+      verification: 'INFERENCE',
+    },
+    solution_design: unavailable,
+    strengths: [],
+    weaknesses: [],
+    tradeoffs: [],
+    correctness: unavailable,
+    maintainability: unavailable,
+    architecture_fit: unavailable,
+    evidence: ['diff'],
+    unverified_assumptions: [unavailable],
+  };
+  const detail = {
+    ...demoDetail,
+    report: JSON.stringify({
+      ...JSON.parse(demoDetail.report),
+      solution_approach: approach,
+    }),
+    execution: [],
+    artifacts: [],
+  };
+  await page.route('**/api/organization/evaluations/*', (r) =>
+    r.fulfill({ json: detail }),
+  );
+  await page.goto('/?organization=1&evaluation=' + demoRun.id);
+  await expect(
+    page.getByRole('heading', { name: 'Observable solution approach' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('A scheduling path appears to have been added.', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'unverified assumptions' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Private reasoning is unknown.', { exact: false }),
+  ).toBeVisible();
 });
