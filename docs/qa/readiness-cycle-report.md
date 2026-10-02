@@ -35,7 +35,7 @@ Objective criteria control functional statuses. CallMissed output is locally val
 
 Trusted HTTP latency checks validate response behavior before measuring, retain samples/p95/warmup/budget and compare both commits through the existing execution evidence model. Measurements include evaluator transport overhead and are environment-specific, not production throughput claims. The real Docker benchmark fixture completed ten validated samples; no latency credit is awarded for fast wrong responses.
 
-The first actual partial/manipulated CallMissed attempts both failed local semantic validation. Their completed evaluations retain objective failures and expose AI failure instead of fabricated analysis. Policy v5 adds static validation repair feedback and failure categories; retries create new historical attempts. Successful calibration is still pending until those real retries complete.
+The first actual partial/manipulated CallMissed attempts both failed local semantic validation. Their completed evaluations retain objective failures and expose AI failure instead of fabricated analysis. Policy v5 adds static validation repair feedback and failure categories; retries create new historical attempts. The new real retries also retained evidence and failed honestly: both encountered CALLMISSED_TIMEOUT followed by CALLMISSED_HTTP_502. These attempts demonstrate provider failure recovery, not successful adversarial AI calibration. Wider calibration remains blocked by current provider availability.
 
 ## Dashboard validation
 

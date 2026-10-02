@@ -3,7 +3,7 @@
   "team": true,
   "submission": true,
   "exactCurrentHead": true,
-  "history": "UNVERIFIED by this browser scenario; history covered separately in fixture tests",
+  "history": "UNVERIFIED_IN_THIS_BROWSER_SCENARIO",
   "mobileFits": true,
   "errors": []
 }

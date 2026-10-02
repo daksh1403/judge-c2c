@@ -1,6 +1,6 @@
 {
   "mode": "REAL_DEPLOYED_API_NO_FIXTURES",
-  "at": "2026-10-02T13:18:35.945Z",
+  "at": "2026-10-02T17:53:10.882Z",
   "role": "judge",
   "overviewStatus": 200,
   "counts": {
@@ -17,14 +17,14 @@
     "needsTriage": 1,
     "activeAssignments": 2,
     "openSubmissions": 7,
-    "needsMapping": 3,
+    "needsMapping": 1,
     "submissions": 7,
     "queuedRuns": 0,
     "runningRuns": 0,
-    "completedRuns": 9,
+    "completedRuns": 13,
     "failedRuns": 0,
     "supersededRuns": 0,
-    "currentCompleted": 4,
+    "currentCompleted": 6,
     "needsAttention": 5,
     "pendingEvents": 0,
     "blockedSync": 0

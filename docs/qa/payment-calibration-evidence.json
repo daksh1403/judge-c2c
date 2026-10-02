@@ -1,7 +1,7 @@
 {
   "mode": "REAL_GITHUB_APP_DOCKER_CALLMISSED",
   "identity": "One authenticated QA operator; code personas are controlled fixtures, not independent GitHub accounts",
-  "at": "2026-10-02T17:43:37.432Z",
+  "at": "2026-10-02T17:52:19.774Z",
   "rows": [
     {
       "persona": "partial",
@@ -741,6 +741,735 @@
             "evidenceIds": ["criterion-payment-invalid"],
             "explanation": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
             "status": "PASS"
+          }
+        ],
+        "findings": [
+          {
+            "category": "evaluation-integrity",
+            "claim": "Protected path changed: server.test.mjs",
+            "evidenceIds": ["policy-6"],
+            "severity": "high",
+            "verification": "inference"
+          }
+        ],
+        "solution_approach": {
+          "approach_summary": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "architecture_fit": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "correctness": {
+            "evidenceIds": [],
+            "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+            "verification": "UNVERIFIED"
+          },
+          "evidence": [],
+          "maintainability": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "problem_understanding": {
+            "evidenceIds": [],
+            "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+            "verification": "UNVERIFIED"
+          },
+          "solution_design": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "strengths": [],
+          "tradeoffs": [],
+          "unverified_assumptions": [
+            {
+              "evidenceIds": [],
+              "text": "UNVERIFIED: contextual solution approach has not been established.",
+              "verification": "UNVERIFIED"
+            }
+          ],
+          "weaknesses": []
+        },
+        "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      }
+    }
+  ],
+  "retries": [
+    {
+      "previous": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+      "runId": "fb355c70e4f1e300ad2acaae3ad28906f758e98842be3c2e5cf9fa8976d6abc5",
+      "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+      "state": "COMPLETED",
+      "aiStatus": "FAILED",
+      "publication": "PUBLISHED",
+      "checkId": 110958493460,
+      "evidence": [
+        {
+          "claim": "Exact baseline-to-head comparison: 3 changed files. This confirms change metadata, not functionality.",
+          "id": "diff",
+          "kind": "diff",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-1",
+          "kind": "source",
+          "path": "retry.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-2",
+          "kind": "source",
+          "path": "README.md",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-3",
+          "kind": "source",
+          "path": "server.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: .github",
+          "id": "policy-4",
+          "kind": "policy",
+          "path": ".github",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: server.test.mjs",
+          "id": "policy-5",
+          "kind": "policy",
+          "path": "server.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Execution check retry-transient has not run. Isolated runner is not configured.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-immediate has not run. Isolated runner is not configured.",
+          "criterionId": "retry-immediate",
+          "id": "criterion-retry-immediate",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-exhausted has not run. Isolated runner is not configured.",
+          "criterionId": "retry-exhausted",
+          "id": "criterion-retry-exhausted",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-zero has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-zero",
+          "id": "criterion-retry-invalid-zero",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-large has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-large",
+          "id": "criterion-retry-invalid-large",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-fraction has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-fraction",
+          "id": "criterion-retry-invalid-fraction",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-string has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-string",
+          "id": "criterion-retry-invalid-string",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-empty has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-empty",
+          "id": "criterion-retry-outcomes-empty",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-unknown has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-unknown",
+          "id": "criterion-retry-outcomes-unknown",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-null has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-null",
+          "id": "criterion-retry-outcomes-null",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check health-preserved has not run. Isolated runner is not configured.",
+          "criterionId": "health-preserved",
+          "id": "criterion-health-preserved",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-created has not run. Isolated runner is not configured.",
+          "criterionId": "payment-created",
+          "id": "criterion-payment-created",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-idempotency has not run. Isolated runner is not configured.",
+          "criterionId": "payment-idempotency",
+          "id": "criterion-payment-idempotency",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-read has not run. Isolated runner is not configured.",
+          "criterionId": "payment-read",
+          "id": "criterion-payment-read",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-conflict has not run. Isolated runner is not configured.",
+          "criterionId": "payment-conflict",
+          "id": "criterion-payment-conflict",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-invalid has not run. Isolated runner is not configured.",
+          "criterionId": "payment-invalid",
+          "id": "criterion-payment-invalid",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution stage unavailable: RUNNER_TUNNEL_UNAVAILABLE. Earlier evidence is preserved.",
+          "id": "runner-stage",
+          "kind": "execution",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "report": {
+        "aiTrace": {
+          "attemptFailures": ["CALLMISSED_TIMEOUT", "CALLMISSED_HTTP_502"],
+          "attempts": 2,
+          "durationMs": 92357,
+          "failureCode": "CALLMISSED_HTTP_502",
+          "inputHash": "d0fc409ebdae9f4450f716ffa9ced28e60f476950d7d3356888dbe3d7ab46cff",
+          "model": "kimi-k2.6",
+          "policy": "requirements-and-approach-v5",
+          "provider": "callmissed"
+        },
+        "assessments": [
+          {
+            "criterionId": "retry-transient",
+            "evidenceIds": ["criterion-retry-transient"],
+            "explanation": "Execution check retry-transient has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-bounded",
+            "evidenceIds": ["criterion-retry-bounded"],
+            "explanation": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-permanent",
+            "evidenceIds": ["criterion-retry-permanent"],
+            "explanation": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-immediate",
+            "evidenceIds": ["criterion-retry-immediate"],
+            "explanation": "Execution check retry-immediate has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-exhausted",
+            "evidenceIds": ["criterion-retry-exhausted"],
+            "explanation": "Execution check retry-exhausted has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-zero",
+            "evidenceIds": ["criterion-retry-invalid-zero"],
+            "explanation": "Execution check retry-invalid-zero has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-large",
+            "evidenceIds": ["criterion-retry-invalid-large"],
+            "explanation": "Execution check retry-invalid-large has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-fraction",
+            "evidenceIds": ["criterion-retry-invalid-fraction"],
+            "explanation": "Execution check retry-invalid-fraction has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-string",
+            "evidenceIds": ["criterion-retry-invalid-string"],
+            "explanation": "Execution check retry-invalid-string has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-empty",
+            "evidenceIds": ["criterion-retry-outcomes-empty"],
+            "explanation": "Execution check retry-outcomes-empty has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-unknown",
+            "evidenceIds": ["criterion-retry-outcomes-unknown"],
+            "explanation": "Execution check retry-outcomes-unknown has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-null",
+            "evidenceIds": ["criterion-retry-outcomes-null"],
+            "explanation": "Execution check retry-outcomes-null has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "health-preserved",
+            "evidenceIds": ["criterion-health-preserved"],
+            "explanation": "Execution check health-preserved has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-created",
+            "evidenceIds": ["criterion-payment-created"],
+            "explanation": "Execution check payment-created has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-idempotency",
+            "evidenceIds": ["criterion-payment-idempotency"],
+            "explanation": "Execution check payment-idempotency has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-read",
+            "evidenceIds": ["criterion-payment-read"],
+            "explanation": "Execution check payment-read has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-conflict",
+            "evidenceIds": ["criterion-payment-conflict"],
+            "explanation": "Execution check payment-conflict has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-invalid",
+            "evidenceIds": ["criterion-payment-invalid"],
+            "explanation": "Execution check payment-invalid has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "findings": [],
+        "solution_approach": {
+          "approach_summary": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "architecture_fit": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "correctness": {
+            "evidenceIds": [],
+            "text": "Consult criterion-specific objective evidence. No overall solution correctness is established by this fallback.",
+            "verification": "UNVERIFIED"
+          },
+          "evidence": [],
+          "maintainability": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "problem_understanding": {
+            "evidenceIds": [],
+            "text": "Expected problem is defined by the frozen authoritative requirements; participant problem understanding remains unverified.",
+            "verification": "UNVERIFIED"
+          },
+          "solution_design": {
+            "evidenceIds": [],
+            "text": "UNVERIFIED: contextual solution approach has not been established.",
+            "verification": "UNVERIFIED"
+          },
+          "strengths": [],
+          "tradeoffs": [],
+          "unverified_assumptions": [
+            {
+              "evidenceIds": [],
+              "text": "UNVERIFIED: contextual solution approach has not been established.",
+              "verification": "UNVERIFIED"
+            }
+          ],
+          "weaknesses": []
+        },
+        "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      }
+    },
+    {
+      "previous": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+      "runId": "c076bac6c4d96cc5a7c30cdb766cd38998ced1772496c56c26c56dabe3be7ef1",
+      "head": "628436f51c897930e2c902c2051c185259ef95c8",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+      "state": "COMPLETED",
+      "aiStatus": "FAILED",
+      "publication": "PUBLISHED",
+      "checkId": 110958514203,
+      "evidence": [
+        {
+          "claim": "Exact baseline-to-head comparison: 4 changed files. This confirms change metadata, not functionality.",
+          "id": "diff",
+          "kind": "diff",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-1",
+          "kind": "source",
+          "path": "README.md",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-2",
+          "kind": "source",
+          "path": "server.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-3",
+          "kind": "source",
+          "path": "retry.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-4",
+          "kind": "source",
+          "path": "server.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: .github",
+          "id": "policy-5",
+          "kind": "policy",
+          "path": ".github",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path changed: server.test.mjs",
+          "id": "policy-6",
+          "kind": "policy",
+          "path": "server.test.mjs",
+          "status": "FAIL"
+        },
+        {
+          "claim": "Execution check retry-transient has not run. Isolated runner is not configured.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-immediate has not run. Isolated runner is not configured.",
+          "criterionId": "retry-immediate",
+          "id": "criterion-retry-immediate",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-exhausted has not run. Isolated runner is not configured.",
+          "criterionId": "retry-exhausted",
+          "id": "criterion-retry-exhausted",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-zero has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-zero",
+          "id": "criterion-retry-invalid-zero",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-large has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-large",
+          "id": "criterion-retry-invalid-large",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-fraction has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-fraction",
+          "id": "criterion-retry-invalid-fraction",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-invalid-string has not run. Isolated runner is not configured.",
+          "criterionId": "retry-invalid-string",
+          "id": "criterion-retry-invalid-string",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-empty has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-empty",
+          "id": "criterion-retry-outcomes-empty",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-unknown has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-unknown",
+          "id": "criterion-retry-outcomes-unknown",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check retry-outcomes-null has not run. Isolated runner is not configured.",
+          "criterionId": "retry-outcomes-null",
+          "id": "criterion-retry-outcomes-null",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check health-preserved has not run. Isolated runner is not configured.",
+          "criterionId": "health-preserved",
+          "id": "criterion-health-preserved",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-created has not run. Isolated runner is not configured.",
+          "criterionId": "payment-created",
+          "id": "criterion-payment-created",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-idempotency has not run. Isolated runner is not configured.",
+          "criterionId": "payment-idempotency",
+          "id": "criterion-payment-idempotency",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-read has not run. Isolated runner is not configured.",
+          "criterionId": "payment-read",
+          "id": "criterion-payment-read",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-conflict has not run. Isolated runner is not configured.",
+          "criterionId": "payment-conflict",
+          "id": "criterion-payment-conflict",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution check payment-invalid has not run. Isolated runner is not configured.",
+          "criterionId": "payment-invalid",
+          "id": "criterion-payment-invalid",
+          "kind": "policy",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Review signal: test-removal-review. This is a routing signal, not a confirmed defect.",
+          "id": "risk-test-removal-review",
+          "kind": "diff",
+          "status": "UNVERIFIED"
+        },
+        {
+          "claim": "Execution stage unavailable: RUNNER_TUNNEL_UNAVAILABLE. Earlier evidence is preserved.",
+          "id": "runner-stage",
+          "kind": "execution",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "report": {
+        "aiTrace": {
+          "attemptFailures": ["CALLMISSED_TIMEOUT", "CALLMISSED_HTTP_502"],
+          "attempts": 2,
+          "durationMs": 91995,
+          "failureCode": "CALLMISSED_HTTP_502",
+          "inputHash": "f804dae5b3e8ed2c37665b93958b49e7eba5e585271e661e887b9d6ec0358a9e",
+          "model": "kimi-k2.6",
+          "policy": "requirements-and-approach-v5",
+          "provider": "callmissed"
+        },
+        "assessments": [
+          {
+            "criterionId": "retry-transient",
+            "evidenceIds": ["criterion-retry-transient"],
+            "explanation": "Execution check retry-transient has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-bounded",
+            "evidenceIds": ["criterion-retry-bounded"],
+            "explanation": "Execution check retry-bounded has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-permanent",
+            "evidenceIds": ["criterion-retry-permanent"],
+            "explanation": "Execution check retry-permanent has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-immediate",
+            "evidenceIds": ["criterion-retry-immediate"],
+            "explanation": "Execution check retry-immediate has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-exhausted",
+            "evidenceIds": ["criterion-retry-exhausted"],
+            "explanation": "Execution check retry-exhausted has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-zero",
+            "evidenceIds": ["criterion-retry-invalid-zero"],
+            "explanation": "Execution check retry-invalid-zero has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-large",
+            "evidenceIds": ["criterion-retry-invalid-large"],
+            "explanation": "Execution check retry-invalid-large has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-fraction",
+            "evidenceIds": ["criterion-retry-invalid-fraction"],
+            "explanation": "Execution check retry-invalid-fraction has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-invalid-string",
+            "evidenceIds": ["criterion-retry-invalid-string"],
+            "explanation": "Execution check retry-invalid-string has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-empty",
+            "evidenceIds": ["criterion-retry-outcomes-empty"],
+            "explanation": "Execution check retry-outcomes-empty has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-unknown",
+            "evidenceIds": ["criterion-retry-outcomes-unknown"],
+            "explanation": "Execution check retry-outcomes-unknown has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "retry-outcomes-null",
+            "evidenceIds": ["criterion-retry-outcomes-null"],
+            "explanation": "Execution check retry-outcomes-null has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "health-preserved",
+            "evidenceIds": ["criterion-health-preserved"],
+            "explanation": "Execution check health-preserved has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-created",
+            "evidenceIds": ["criterion-payment-created"],
+            "explanation": "Execution check payment-created has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-idempotency",
+            "evidenceIds": ["criterion-payment-idempotency"],
+            "explanation": "Execution check payment-idempotency has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-read",
+            "evidenceIds": ["criterion-payment-read"],
+            "explanation": "Execution check payment-read has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-conflict",
+            "evidenceIds": ["criterion-payment-conflict"],
+            "explanation": "Execution check payment-conflict has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
+          },
+          {
+            "criterionId": "payment-invalid",
+            "evidenceIds": ["criterion-payment-invalid"],
+            "explanation": "Execution check payment-invalid has not run. Isolated runner is not configured.",
+            "status": "UNVERIFIED"
           }
         ],
         "findings": [
