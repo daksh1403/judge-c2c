@@ -18,3 +18,7 @@ Authenticated GitHub API confirms installation 167005353 now grants Issues write
 ## Pending release gates
 
 CallMissed Kimi K2.6 completed structured requirements and observable approach review; all eighteen criteria are PASS with known evidence IDs. GitHub Check 110840780853 is completed/neutral on the exact submission head, with publication PUBLISHED. Detailed normalized evidence is in `docs/qa/payment-live-evidence.json`. Live GitHub issue #6 now has `judge:source:participant`, `judge:status:assigned`, `judge:evaluation:not-scored` and `judge:evaluation:approved-challenge` labels applied by the App. Type classification remains uncertain. The deployed organizer browser check without API mocks confirms the correct QA team, PR #7 and exact current head, with no browser errors and a fitting mobile viewport; evidence is in `docs/qa/payment-dashboard-evidence.json`. This report does not assert launch readiness. Production isolated capacity, broader scans/benchmarks, role-specific authorization and the full master acceptance audit remain separate gates. The development Docker VM is not a production hostile-code execution service.
+
+## Review corrections
+
+Standards review found development-workflow PASS items incorrectly citing browser fixtures; they now cite actual open PRs or remain UNVERIFIED. Spec review found pending/running GitHub Checks are not implemented; the master checklist now explicitly records that gap. Completed Check publication is verified separately.

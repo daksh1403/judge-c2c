@@ -8,20 +8,20 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 01. Project foundation & development workflow
 
-- [x] **01.01 Repository initialized** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
+- [x] **01.01 Repository initialized** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
 - [x] **01.02 Local application runs** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
 - [ ] **01.03 Production deployment verified** — BLOCKED. Production deployment awaits explicit approved merges and separate production provisioning; review deployment is not production.
 - [ ] **01.04 Main is production branch** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **01.05 No normal feature work on main** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [x] **01.06 Feature branches for changes** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
-- [x] **01.07 PR created or updated** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
-- [x] **01.08 No automatic merge** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
-- [x] **01.09 Useful PR descriptions** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
-- [x] **01.10 Validation in PR descriptions** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
-- [x] **01.11 Reuse coherent PRs** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
+- [x] **01.06 Feature branches for changes** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
+- [x] **01.07 PR created or updated** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
+- [x] **01.08 No automatic merge** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
+- [x] **01.09 Useful PR descriptions** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
+- [x] **01.10 Validation in PR descriptions** — PASS. Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee. Evidence: `https://github.com/daksh1403/judge-c2c/pull/4`, `https://github.com/Daksh-Codebase/payment-engine/pull/5`, `https://github.com/Daksh-Codebase/payment-engine/pull/7`.
+- [ ] **01.11 Reuse coherent PRs** — UNVERIFIED. Existing coherent PR reuse and clean independent engineer setup have not been verified in this checkpoint.
 - [ ] **01.12 Local preview production separation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **01.13 No committed secrets** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [x] **01.14 Reproducible engineer setup** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/browser/dashboard.spec.ts`.
+- [ ] **01.14 Reproducible engineer setup** — UNVERIFIED. Existing coherent PR reuse and clean independent engineer setup have not been verified in this checkpoint.
 
 ## 02. Cloudflare PR Preview workflow
 
@@ -40,7 +40,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 03. GitHub integration
 
-- [x] **03.01 GitHub App production credentials** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
+- [ ] **03.01 GitHub App production credentials** — PARTIAL. Real organization review evaluations use short-lived GitHub App tokens, not a personal production token. Separate production deployment remains blocked; no production credential validation claim. Evidence: `src/github.ts`, `src/organization.ts`, `docs/qa/payment-live-evidence.json`.
 - [x] **03.02 Organization installation** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
 - [ ] **03.03 Least privilege** — PARTIAL. GitHub App permissions were broadened during owner setup; tokens are downscoped, but App-level grants need reconciliation. Evidence: `src/organization.ts`.
 - [x] **03.04 Repository metadata** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
@@ -678,7 +678,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 42. GitHub Check output
 
-- [x] **42.01 Pending and running** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [ ] **42.01 Pending and running** — NOT_IMPLEMENTED. Current workflow publishes a completed Check only; queued and in-progress GitHub Check publication still needs implementation and testing. Evidence: `src/workflow.ts`.
 - [x] **42.02 Requirement summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **42.03 Check summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **42.04 Important findings** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.

@@ -11,8 +11,12 @@
           "id": "01.01",
           "requirement": "Repository initialized",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.02",
@@ -46,43 +50,63 @@
           "id": "01.06",
           "requirement": "Feature branches for changes",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.07",
           "requirement": "PR created or updated",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.08",
           "requirement": "No automatic merge",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.09",
           "requirement": "Useful PR descriptions",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.10",
           "requirement": "Validation in PR descriptions",
           "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/5",
+            "https://github.com/Daksh-Codebase/payment-engine/pull/7"
+          ],
+          "note": "Observed feature branches and open, unmerged PRs with descriptions and validation details in this readiness workstream. This is an observed workflow, not a branch-protection guarantee."
         },
         {
           "id": "01.11",
           "requirement": "Reuse coherent PRs",
-          "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "Existing coherent PR reuse and clean independent engineer setup have not been verified in this checkpoint."
         },
         {
           "id": "01.12",
@@ -101,9 +125,9 @@
         {
           "id": "01.14",
           "requirement": "Reproducible engineer setup",
-          "status": "PASS",
-          "evidence": ["tests/browser/dashboard.spec.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "Existing coherent PR reuse and clean independent engineer setup have not been verified in this checkpoint."
         }
       ]
     },
@@ -204,9 +228,13 @@
         {
           "id": "03.01",
           "requirement": "GitHub App production credentials",
-          "status": "PASS",
-          "evidence": ["docs/qa/callmissed-pr-evidence.json"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "status": "PARTIAL",
+          "evidence": [
+            "src/github.ts",
+            "src/organization.ts",
+            "docs/qa/payment-live-evidence.json"
+          ],
+          "note": "Real organization review evaluations use short-lived GitHub App tokens, not a personal production token. Separate production deployment remains blocked; no production credential validation claim."
         },
         {
           "id": "03.02",
@@ -4117,9 +4145,9 @@
         {
           "id": "42.01",
           "requirement": "Pending and running",
-          "status": "PASS",
-          "evidence": ["docs/qa/payment-live-evidence.json"],
-          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/workflow.ts"],
+          "note": "Current workflow publishes a completed Check only; queued and in-progress GitHub Check publication still needs implementation and testing."
         },
         {
           "id": "42.02",
