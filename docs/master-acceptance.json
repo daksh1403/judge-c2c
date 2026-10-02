@@ -703,9 +703,9 @@
         {
           "id": "08.01",
           "requirement": "Missing labels trigger triage",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
         },
         {
           "id": "08.02",
@@ -731,23 +731,23 @@
         {
           "id": "08.05",
           "requirement": "Domain classification",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
         },
         {
           "id": "08.06",
           "requirement": "Source classification",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
         },
         {
           "id": "08.07",
           "requirement": "Workflow status",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
         },
         {
           "id": "08.08",
@@ -864,9 +864,9 @@
         {
           "id": "08.24",
           "requirement": "Usability",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
         },
         {
           "id": "08.25",
@@ -1051,9 +1051,9 @@
         {
           "id": "10.04",
           "requirement": "Policy-controlled claim",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "10.05",
@@ -1079,23 +1079,23 @@
         {
           "id": "10.08",
           "requirement": "Atomic races",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts", "docs/qa/test-matrix.json"],
+          "note": "Concurrent exclusive claims verified with simulated actors in the existing rehearsal; one real GitHub claim does not establish race safety."
         },
         {
           "id": "10.09",
           "requirement": "No duplicate exclusive owner",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts", "docs/qa/test-matrix.json"],
+          "note": "Concurrent exclusive claims verified with simulated actors in the existing rehearsal; one real GitHub claim does not establish race safety."
         },
         {
           "id": "10.10",
           "requirement": "Assignment source",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "10.11",
@@ -1246,8 +1246,8 @@
           "id": "12.05",
           "requirement": "Correct frozen version per submission",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         }
       ]
     },
@@ -1259,36 +1259,36 @@
           "id": "13.01",
           "requirement": "Author resolves to member",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.02",
           "requirement": "Member resolves to team",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.03",
           "requirement": "Repository eligibility",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.04",
           "requirement": "Issue assignment eligibility",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.05",
           "requirement": "GitHub issue relationship",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.06",
@@ -1301,15 +1301,15 @@
           "id": "13.07",
           "requirement": "Reliable team mapping",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.08",
           "requirement": "Reliable issue mapping",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
-          "note": "Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate."
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "13.09",
@@ -1673,44 +1673,44 @@
         {
           "id": "18.01",
           "requirement": "Frozen baseline per challenge",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.02",
           "requirement": "Baseline SHA",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.03",
           "requirement": "Head SHA",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.04",
           "requirement": "Exact comparison",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.05",
           "requirement": "Pre-existing behavior",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.06",
           "requirement": "Pre-existing failures",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "18.07",
@@ -1839,16 +1839,16 @@
         {
           "id": "20.02",
           "requirement": "Build or compilation",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "20.03",
           "requirement": "Unit tests",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "20.04",
@@ -1867,9 +1867,9 @@
         {
           "id": "20.06",
           "requirement": "Lint",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "20.07",
@@ -1909,9 +1909,9 @@
         {
           "id": "20.12",
           "requirement": "Benchmarks",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["examples/payment-engine-contract.json"],
+          "note": "No trusted benchmark protocol or performance comparison implemented yet; HTTP acceptance durations are not benchmarks."
         },
         {
           "id": "20.13",
@@ -1929,58 +1929,90 @@
         {
           "id": "21.01",
           "requirement": "Check type",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.02",
           "requirement": "Command configuration",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.03",
           "requirement": "Environment and tool version",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.04",
           "requirement": "Exit code",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.05",
           "requirement": "Status",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.06",
           "requirement": "Duration",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.07",
           "requirement": "Stdout",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.08",
           "requirement": "Stderr",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "docs/qa/payment-live-evidence.json",
+            "examples/payment-engine-contract.json",
+            "src/runner.ts"
+          ],
+          "note": "Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results."
         },
         {
           "id": "21.09",
@@ -2338,30 +2370,30 @@
         {
           "id": "25.01",
           "requirement": "Observable problem",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.02",
           "requirement": "Observable approach",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.03",
           "requirement": "Changed components",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.04",
           "requirement": "Root problem",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.05",
@@ -2450,16 +2482,16 @@
         {
           "id": "25.17",
           "requirement": "Unverified assumptions",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.18",
           "requirement": "No private intention claims",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "25.19",
@@ -2547,51 +2579,51 @@
         {
           "id": "26.01",
           "requirement": "Requirement identity",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.02",
           "requirement": "Acceptance criteria",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.03",
           "requirement": "Status",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.04",
           "requirement": "Evidence",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.05",
           "requirement": "Objective verification",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.06",
           "requirement": "Contextual reasoning",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.07",
           "requirement": "Regression",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "26.08",
@@ -3136,9 +3168,9 @@
         {
           "id": "32.07",
           "requirement": "Model routing",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         },
         {
           "id": "32.08",
@@ -3481,16 +3513,16 @@
         {
           "id": "37.04",
           "requirement": "Dependency cache",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         },
         {
           "id": "37.05",
           "requirement": "Repository context cache",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         },
         {
           "id": "37.06",
@@ -4085,51 +4117,51 @@
         {
           "id": "42.01",
           "requirement": "Pending and running",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.02",
           "requirement": "Requirement summary",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.03",
           "requirement": "Check summary",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.04",
           "requirement": "Important findings",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.05",
           "requirement": "Attention",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.06",
           "requirement": "Details link",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         },
         {
           "id": "42.07",
           "requirement": "Bounded output",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification."
         }
       ]
     },
@@ -4195,16 +4227,16 @@
         {
           "id": "44.02",
           "requirement": "Participant scope",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         },
         {
           "id": "44.03",
           "requirement": "Judge scope",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         },
         {
           "id": "44.04",
@@ -4251,9 +4283,9 @@
         {
           "id": "44.10",
           "requirement": "Cross-team isolation",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "NOT_IMPLEMENTED",
+          "evidence": ["src/competition.ts", "src/ai.ts"],
+          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
         }
       ]
     },

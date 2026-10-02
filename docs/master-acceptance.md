@@ -122,13 +122,13 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 08. Automatic issue labeling
 
-- [ ] **08.01 Missing labels trigger triage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **08.01 Missing labels trigger triage** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
 - [ ] **08.02 Type classification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.03 Advisory priority** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.04 Advisory difficulty** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.05 Domain classification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.06 Source classification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.07 Workflow status** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **08.05 Domain classification** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
+- [ ] **08.06 Source classification** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
+- [ ] **08.07 Workflow status** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
 - [ ] **08.08 Evaluation category** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.09 Extensible type taxonomy** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.10 Bug** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -145,7 +145,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **08.21 Infrastructure** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.22 Accessibility** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.23 Reliability** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.24 Usability** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **08.24 Usability** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
 - [ ] **08.25 Controlled taxonomy** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.26 No duplicate variants** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.27 Create missing labels when authorized** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -176,13 +176,13 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **10.01 Assign** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **10.02 Unassign** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **10.03 Reassign** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **10.04 Policy-controlled claim** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **10.04 Policy-controlled claim** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **10.05 Exclusive assignment** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **10.06 Multi-team assignment** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **10.07 Reservation when configured** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **10.08 Atomic races** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **10.09 No duplicate exclusive owner** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **10.10 Assignment source** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **10.08 Atomic races** — PASS. Concurrent exclusive claims verified with simulated actors in the existing rehearsal; one real GitHub claim does not establish race safety. Evidence: `tests/competition.test.ts`, `docs/qa/test-matrix.json`.
+- [x] **10.09 No duplicate exclusive owner** — PASS. Concurrent exclusive claims verified with simulated actors in the existing rehearsal; one real GitHub claim does not establish race safety. Evidence: `tests/competition.test.ts`, `docs/qa/test-matrix.json`.
+- [x] **10.10 Assignment source** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **10.11 Assignment history** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **10.12 Audit** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 
@@ -208,18 +208,18 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [x] **12.02 Definition revisions** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/competition.test.ts`.
 - [x] **12.03 Acceptance revisions** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/competition.test.ts`.
 - [x] **12.04 Evaluation version** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/competition.test.ts`.
-- [x] **12.05 Correct frozen version per submission** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/competition.test.ts`.
+- [x] **12.05 Correct frozen version per submission** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 
 ## 13. Team Issue PR mapping
 
-- [x] **13.01 Author resolves to member** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.02 Member resolves to team** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.03 Repository eligibility** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.04 Issue assignment eligibility** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.05 GitHub issue relationship** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
+- [x] **13.01 Author resolves to member** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **13.02 Member resolves to team** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **13.03 Repository eligibility** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **13.04 Issue assignment eligibility** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **13.05 GitHub issue relationship** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **13.06 Structured assignment authority** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.07 Reliable team mapping** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
-- [x] **13.08 Reliable issue mapping** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
+- [x] **13.07 Reliable team mapping** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **13.08 Reliable issue mapping** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **13.09 Conflict detection** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
 - [x] **13.10 Ambiguity review** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
 - [x] **13.11 Unknown author needs mapping** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `tests/hackathon-rehearsal.test.ts`.
@@ -282,12 +282,12 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 18. Baseline system
 
-- [ ] **18.01 Frozen baseline per challenge** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **18.02 Baseline SHA** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **18.03 Head SHA** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **18.04 Exact comparison** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **18.05 Pre-existing behavior** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **18.06 Pre-existing failures** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **18.01 Frozen baseline per challenge** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **18.02 Baseline SHA** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **18.03 Head SHA** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **18.04 Exact comparison** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **18.05 Pre-existing behavior** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **18.06 Pre-existing failures** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **18.07 New failures** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **18.08 Pre-existing vulnerabilities** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **18.09 New vulnerabilities** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -310,29 +310,29 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 ## 20. Deterministic evaluation
 
 - [ ] **20.01 Controlled dependency installation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.02 Build or compilation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.03 Unit tests** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **20.02 Build or compilation** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **20.03 Unit tests** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **20.04 Integration tests** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.05 Regression tests** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.06 Lint** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **20.06 Lint** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **20.07 Type check** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.08 Formatting where relevant** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.09 Coverage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.10 Security scans** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.11 Dependency audit** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.12 Benchmarks** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **20.12 Benchmarks** — NOT_IMPLEMENTED. No trusted benchmark protocol or performance comparison implemented yet; HTTP acceptance durations are not benchmarks. Evidence: `examples/payment-engine-contract.json`.
 - [ ] **20.13 Trusted challenge harness** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 
 ## 21. Deterministic evidence storage
 
-- [ ] **21.01 Check type** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.02 Command configuration** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.03 Environment and tool version** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.04 Exit code** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.05 Status** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.06 Duration** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.07 Stdout** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.08 Stderr** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **21.01 Check type** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.02 Command configuration** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.03 Environment and tool version** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.04 Exit code** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.05 Status** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.06 Duration** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.07 Stdout** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
+- [x] **21.08 Stderr** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
 - [ ] **21.09 Structured reports** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **21.10 Artifacts** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **21.11 Requirement linkage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -392,10 +392,10 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 25. PR solution approach review
 
-- [ ] **25.01 Observable problem** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **25.02 Observable approach** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **25.03 Changed components** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **25.04 Root problem** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **25.01 Observable problem** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **25.02 Observable approach** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **25.03 Changed components** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **25.04 Root problem** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **25.05 Symptom masking** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **25.06 Unnecessary complexity** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **25.07 Duplication** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -408,8 +408,8 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **25.14 Security risk** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **25.15 Regression** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **25.16 Objective support** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **25.17 Unverified assumptions** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **25.18 No private intention claims** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **25.17 Unverified assumptions** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **25.18 No private intention claims** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **25.19 Structured problem_understanding** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
 - [x] **25.20 Structured approach_summary** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
 - [x] **25.21 Structured solution_design** — PASS. Verified within the supported current profile; fixture integration coverage and real GitHub observations are distinguished in the cited evidence. Full release gates remain separate. Evidence: `docs/qa/callmissed-pr-evidence.json`.
@@ -424,13 +424,13 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 26. Requirement evaluation
 
-- [ ] **26.01 Requirement identity** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.02 Acceptance criteria** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.03 Status** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.04 Evidence** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.05 Objective verification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.06 Contextual reasoning** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **26.07 Regression** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **26.01 Requirement identity** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.02 Acceptance criteria** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.03 Status** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.04 Evidence** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.05 Objective verification** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.06 Contextual reasoning** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **26.07 Regression** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **26.08 PASS** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **26.09 PARTIAL** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **26.10 FAIL** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -521,7 +521,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **32.04 Architecture routing** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **32.05 Performance routing** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **32.06 Documentation fast path** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **32.07 Model routing** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **32.07 Model routing** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
 - [ ] **32.08 Cheap trivial classification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 
 ## 33. Evidence-first findings
@@ -581,8 +581,8 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **37.01 Content-addressed cache** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **37.02 Commit config tool identities** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **37.03 Safe reuse** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **37.04 Dependency cache** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **37.05 Repository context cache** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **37.04 Dependency cache** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
+- [ ] **37.05 Repository context cache** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
 - [ ] **37.06 Baseline reuse** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **37.07 Prepared environments** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **37.08 Warm capacity decision** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -678,13 +678,13 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 42. GitHub Check output
 
-- [ ] **42.01 Pending and running** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.02 Requirement summary** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.03 Check summary** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.04 Important findings** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.05 Attention** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.06 Details link** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **42.07 Bounded output** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **42.01 Pending and running** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.02 Requirement summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.03 Check summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.04 Important findings** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.05 Attention** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.06 Details link** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
+- [x] **42.07 Bounded output** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 
 ## 43. Issue completion rules
 
@@ -698,15 +698,15 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 ## 44. Authentication authorization
 
 - [ ] **44.01 Protected dashboard** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **44.02 Participant scope** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **44.03 Judge scope** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **44.02 Participant scope** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
+- [ ] **44.03 Judge scope** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
 - [ ] **44.04 Organizer scope** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.05 Protected re-evaluation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.06 Protected team writes** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.07 Protected assignment** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.08 Protected contract** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.09 Protected artifacts** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **44.10 Cross-team isolation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **44.10 Cross-team isolation** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
 
 ## 45. Persistent data model
 

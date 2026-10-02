@@ -1,0 +1,9 @@
+{
+  "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "team": true,
+  "submission": true,
+  "exactCurrentHead": true,
+  "history": "UNVERIFIED by this browser scenario; history covered separately in fixture tests",
+  "mobileFits": true,
+  "errors": []
+}
