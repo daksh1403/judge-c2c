@@ -381,6 +381,24 @@
         )
           ? 'GitHub issue synchronization permissions and subscriptions confirmed.'
           : 'Owner setup needed: in GitHub App settings enable Issues read and write, subscribe to Issues and Issue comment events, then approve updated installation permissions. PR evaluation access remains available.';
+      if (settings.capabilities?.app) {
+        const app = settings.capabilities.app;
+        const panel = root.querySelector('#workflow-capabilities');
+        panel.append(
+          document.createTextNode(` App: ${app.name} · owner: ${app.owner}. `),
+        );
+        for (const [label, url] of [
+          ['Open App settings', app.settingsUrl],
+          ['Open installation', app.installationUrl],
+        ]) {
+          if (!url.startsWith('https://github.com/')) continue;
+          const link = document.createElement('a');
+          link.href = url;
+          link.textContent = label;
+          panel.append(link, document.createTextNode(' '));
+        }
+      }
+
       const config = settings.settings;
       root.querySelector('#event-policy textarea').value = JSON.stringify(
         {

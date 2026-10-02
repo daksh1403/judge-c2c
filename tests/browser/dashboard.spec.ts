@@ -440,7 +440,18 @@ test('organizers see not-submitted teams, member identity and issue provenance t
               policy: { claimingEnabled: false },
               taxonomy: [],
             },
-            capabilities: { issuesWrite: false, events: ['pull_request'] },
+            capabilities: {
+              issuesWrite: false,
+              events: ['pull_request'],
+              app: {
+                name: 'Judge-C2C Daksh-Codebase',
+                owner: 'Daksh-Codebase',
+                settingsUrl:
+                  'https://github.com/organizations/Daksh-Codebase/settings/apps/judge-c2c-daksh-codebase',
+                installationUrl:
+                  'https://github.com/organizations/Daksh-Codebase/settings/installations/167005353',
+              },
+            },
           }
         : p === 'overview'
           ? { counts: { teams: 1, notSubmitted: 1, needsTriage: 1 } }
@@ -502,6 +513,18 @@ test('organizers see not-submitted teams, member identity and issue provenance t
   await expect(
     page.getByText('Owner setup needed:', { exact: false }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open App settings' }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/organizations/Daksh-Codebase/settings/apps/judge-c2c-daksh-codebase',
+  );
+  await expect(
+    page.getByRole('link', { name: 'Open installation' }),
+  ).toHaveAttribute(
+    'href',
+    'https://github.com/organizations/Daksh-Codebase/settings/installations/167005353',
+  );
   await page
     .getByRole('button', {
       name: 'Alpha <script>alert(1)</script>',

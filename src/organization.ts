@@ -1,3 +1,4 @@
+import { appAccess } from './github-app-access';
 import { z } from 'zod';
 import { createPrivateKey } from 'node:crypto';
 import { GitHub } from './github';
@@ -156,9 +157,16 @@ function competitionServices(env: Env): CompetitionServices {
         app.api<{ permissions: Record<string, string> }>(
           `/app/installations/${row.installation_id}`,
         ),
-        app.api<{ events: string[] }>('/app'),
+        app.api<{
+          id: number;
+          name: string;
+          slug: string;
+          owner: { login: string; type: 'Organization' | 'User' };
+          events: string[];
+        }>('/app'),
       ]);
       return {
+        app: appAccess(details, env.ORG_NAME!, row.installation_id),
         issuesWrite: installation.permissions.issues === 'write',
         events: details.events,
         reason:
