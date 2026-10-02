@@ -25,7 +25,7 @@ export async function callMissedReview(
       store: false,
       instructions: policy,
       input: JSON.stringify({ untrustedContext: prompt, attempt }),
-      reasoning: { effort: 'low' },
+      reasoning: { effort: 'none' },
       max_output_tokens: 6000,
       text: {
         format: {

@@ -103,3 +103,16 @@ it('does not silently fall back to another provider when the CallMissed key is a
   expect(result.status).toBe('NOT_CONFIGURED');
   expect(run).not.toHaveBeenCalled();
 });
+
+it('reports provider timeout separately from invalid structured output', async () => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockRejectedValue(new DOMException('timed out', 'TimeoutError')),
+  );
+  const result = await aiReview(env, demoContract, context, evidence);
+  expect(result.status).toBe('FAILED');
+  expect(result.trace).toMatchObject({
+    failureCode: 'CALLMISSED_TIMEOUT',
+    attempts: 2,
+  });
+});

@@ -279,7 +279,11 @@ export async function aiReview(
       failureCode =
         error instanceof Error && /^CALLMISSED_[A-Z0-9_]+$/.test(error.message)
           ? error.message
-          : 'AI_OUTPUT_INVALID';
+          : provider === 'callmissed' &&
+              error instanceof Error &&
+              ['TimeoutError', 'AbortError'].includes(error.name)
+            ? 'CALLMISSED_TIMEOUT'
+            : 'AI_OUTPUT_INVALID';
       /* Bounded recovery. Invalid/provider output never becomes evidence. */
     }
   }

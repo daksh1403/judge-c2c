@@ -23,7 +23,7 @@ They distinguish real GitHub integration, simulated actors, real Docker executio
 of controlled code, and capability audits. Unsupported or untested behavior is
 not recorded as PASS.
 
-Verification in this cycle: 109 unit/integration tests, seven browser tests, real
+Verification in this cycle: 110 unit/integration tests, seven browser tests, real
 Docker containment/solution fixtures, three signed live PR events, real Check
 publication, audited completion and live desktop/mobile dashboard inspection.
 
@@ -223,3 +223,12 @@ result, not a CallMissed test. Its separate backend key is now configured. The f
 which the public catalog marks free-plan eligible. Provider/schema validation is
 being tested separately and is not implied by local green tests. The model catalog
 does not advertise zero-data retention; `store:false` is not an upstream retention guarantee. No OpenAI endpoint is used by the current implementation.
+
+## Pull request and preview
+
+[QA and provider PR #3](https://github.com/daksh1403/judge-c2c/pull/3) is stacked on
+#2 and remains unmerged. The native Cloudflare bot preview is
+https://test-hackathon-rehearsal-judge-c2c.dakshx.workers.dev. Seven browser tests
+passed against that deployment. The first CI run exposed the integrated twelve-team
+scenario exceeding Vitest's default five-second budget on the slower CI host; its
+explicit integration timeout is now thirty seconds with unchanged assertions.

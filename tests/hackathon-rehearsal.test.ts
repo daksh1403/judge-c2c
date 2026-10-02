@@ -252,7 +252,7 @@ it('rehearses twelve teams together: attribution, conflicts, multiple issues, al
     ).first())!.team_id,
   ).toBeNull();
   expect(await count('audit')).toBeGreaterThan(30);
-});
+}, 30000);
 
 it('preserves team attribution for another member and refuses withdrawn/disqualified submitters', async () => {
   const teams = await setupTeams();
