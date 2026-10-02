@@ -2,7 +2,7 @@
   "at": "2026-10-02T18:51:42.234486+00:00",
   "scope": "Local D1/GitHub API fixtures plus controlled real Docker; live organizer configuration separately identified; not event-scale launch validation",
   "unitIntegration": {
-    "passed": 163,
+    "passed": 164,
     "files": 21
   },
   "browser": {
@@ -29,8 +29,8 @@
   "acceptanceCounts": {
     "PASS": 463,
     "BLOCKED": 2,
-    "PARTIAL": 179,
-    "UNVERIFIED": 6,
+    "PARTIAL": 180,
+    "UNVERIFIED": 5,
     "NOT_APPLICABLE": 2,
     "NOT_IMPLEMENTED": 61,
     "FAIL": 1
@@ -57,7 +57,8 @@
     "docs/qa/acceptance-live-reconciliation.json",
     "docs/qa/acceptance-issue-browser.json",
     "docs/qa/readiness-live-access.json",
-    "docs/qa/payment-dashboard-evidence.json"
+    "docs/qa/payment-dashboard-evidence.json",
+    "docs/qa/acceptance-judge-browser.json"
   ],
   "preview": "https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev"
 }

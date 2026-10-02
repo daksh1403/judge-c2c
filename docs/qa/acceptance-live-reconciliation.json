@@ -1,6 +1,6 @@
 {
   "mode": "REAL_GITHUB_APP_AND_DEPLOYED_STATE",
-  "at": "2026-10-02T18:57:56.277Z",
+  "at": "2026-10-02T19:03:04.925Z",
   "capabilities": {
     "app": {
       "id": 5154942,
@@ -60,6 +60,28 @@
     "blockedSync": 0
   },
   "issues": [
+    {
+      "number": 2,
+      "githubState": "open",
+      "source": "ORGANIZER",
+      "workflow": "needs-triage",
+      "labels": [
+        "category:feature",
+        "judge:source:organizer",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "nativeLabels": [
+        "category:feature",
+        "judge:source:organizer",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "stateMatches": true,
+      "labelsMatch": true
+    },
     {
       "number": 3,
       "githubState": "open",
@@ -129,16 +151,6 @@
       "labelsMatch": true
     },
     {
-      "number": 2,
-      "githubState": "open",
-      "source": "ORGANIZER",
-      "workflow": "needs-triage",
-      "labels": ["category:feature"],
-      "nativeLabels": ["category:feature"],
-      "stateMatches": true,
-      "labelsMatch": true
-    },
-    {
       "number": 10,
       "githubState": "open",
       "source": "PARTICIPANT",
@@ -162,5 +174,6 @@
     }
   ],
   "pendingOperations": [],
-  "failedSync": []
+  "failedSync": [],
+  "pendingLabelActions": []
 }

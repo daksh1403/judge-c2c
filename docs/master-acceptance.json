@@ -9369,12 +9369,12 @@
         {
           "id": "49.20",
           "requirement": "Database fail",
-          "status": "UNVERIFIED",
-          "evidence": ["src/workflow.ts", "src/competition-sync.ts"],
-          "note": "Database fail: The relevant boundaries/failure paths were inspected, but this exact external failure scenario lacks an executed fault-injection test.",
+          "status": "PARTIAL",
+          "evidence": ["tests/intake.test.ts", "src/index.ts"],
+          "note": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed intake failure injection with real migrated D1 for recovery; not a live D1 outage or mid-evaluation failure drill."
           }
         },
         {

@@ -35,6 +35,8 @@ AI narrative accuracy remains a confirmed defect: a partial report claimed a bou
 
 The complete backlog is the generated master ledger, including scoped PARTIAL entries. A smaller UNVERIFIED count reflects classification of known gaps, not their implementation.
 
+An additional signed-webhook database-outage drill verifies a 503 response, no delivery acknowledgment or dispatch, redacted errors, successful retry after restoration and duplicate suppression. This narrows the database-failure item to PARTIAL; live and mid-workflow recovery remain untested.
+
 ## Verification
 
 Final test counts, real GitHub observations and deployment state are recorded in the accompanying evidence JSON and the new audit PR. No PR is merged by this work.

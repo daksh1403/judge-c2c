@@ -506,3 +506,38 @@ describe('signed GitHub delivery to real D1', () => {
     expect(run?.baseline_sha).toBe(demoContract.baseline);
   });
 });
+
+it('does not acknowledge a signed event during database outage and safely retries its delivery', async () => {
+  const handler = (await import('../src/index')).default;
+  const delivery = crypto.randomUUID();
+  const beforeJobs = jobs.size;
+  const failing = {
+    ...env,
+    DB: {
+      prepare: () => {
+        throw Error('private database credential detail');
+      },
+    } as unknown as D1Database,
+  };
+  const request = () =>
+    signed('e'.repeat(40), delivery, '2026-10-02T12:01:00Z');
+  const failed = await handler.fetch(await request(), failing, ctx);
+  expect(failed.status).toBe(503);
+  expect(await failed.text()).not.toContain('credential');
+  expect(jobs.size).toBe(beforeJobs);
+  expect(
+    await env.DB.prepare('SELECT id FROM deliveries WHERE id=?')
+      .bind(delivery)
+      .first(),
+  ).toBeNull();
+  const recovered = await handler.fetch(await request(), env, ctx);
+  expect(recovered.status).toBe(202);
+  const retried = await handler.fetch(await request(), env, ctx);
+  expect(retried.status).toBe(200);
+  expect(await retried.json()).toMatchObject({ status: 'duplicate' });
+  expect(
+    (await env.DB.prepare('SELECT count(*) AS n FROM deliveries WHERE id=?')
+      .bind(delivery)
+      .first())!.n,
+  ).toBe(1);
+});
