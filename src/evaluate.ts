@@ -111,7 +111,7 @@ export function objective(
           status: 'UNVERIFIED',
           claim:
             c.verification.type === 'runner'
-              ? `Execution check ${c.verification.checkId} has not run. Isolated runner is not configured.`
+              ? `Execution check ${c.verification.checkId} has no verified result for this attempt. Runner configuration or availability must be checked.`
               : 'Requires human verification.',
         });
     }

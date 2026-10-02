@@ -1,3 +1,8 @@
+import {
+  acquireReviewer,
+  releaseReviewer,
+  renewReviewer,
+} from './reviewer-capacity';
 import { updateAssignmentProgress } from './competition-completion';
 import {
   WorkflowEntrypoint,
@@ -250,29 +255,56 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           }
         },
       );
+      const reviewerSlot = await step.do(
+        'reviewer-capacity',
+        { retries: { limit: 16, delay: '15 seconds', backoff: 'constant' } },
+        async () => {
+          if (
+            !(await this.requireCurrent(id)) ||
+            this.env.AI_PROVIDER !== 'callmissed' ||
+            !this.env.CALLMISSED_API_KEY
+          )
+            return null;
+          const slot = await acquireReviewer(this.env.DB, 'callmissed');
+          if (!slot) throw new Error('REVIEWER_CAPACITY_BUSY');
+          return slot;
+        },
+      );
       await step.do(
         'reasoning',
-        { retries: { limit: 0, delay: '1 second' }, timeout: '3 minutes' },
+        {
+          retries: { limit: 0, delay: '1 second' },
+          timeout: '3 minutes',
+        },
         async () => {
-          const run = await this.requireCurrent(id);
-          if (!run) return;
-          await transition(this.env, id, 'CHECKING', 'REVIEWING');
-          const evidence = JSON.parse(run.evidence!) as Evidence[];
-          const result = await aiReview(
-            this.env,
-            parseContract(run),
-            context,
-            evidence,
-          );
-          await this.env.DB.prepare(
-            "UPDATE evaluations SET report=?,ai_status=? WHERE id=? AND state='REVIEWING'",
-          )
-            .bind(
-              redact(canonical({ ...result.review, aiTrace: result.trace })),
-              result.status,
-              id,
+          try {
+            const run = await this.requireCurrent(id);
+            if (!run) return;
+            if (
+              reviewerSlot &&
+              !(await renewReviewer(this.env.DB, reviewerSlot))
             )
-            .run();
+              throw new Error('REVIEWER_LEASE_EXPIRED');
+            await transition(this.env, id, 'CHECKING', 'REVIEWING');
+            const evidence = JSON.parse(run.evidence!) as Evidence[];
+            const result = await aiReview(
+              this.env,
+              parseContract(run),
+              context,
+              evidence,
+            );
+            await this.env.DB.prepare(
+              "UPDATE evaluations SET report=?,ai_status=? WHERE id=? AND state='REVIEWING'",
+            )
+              .bind(
+                redact(canonical({ ...result.review, aiTrace: result.trace })),
+                result.status,
+                id,
+              )
+              .run();
+          } finally {
+            if (reviewerSlot) await releaseReviewer(this.env.DB, reviewerSlot);
+          }
         },
       );
       await step.do('synthesize', async () => {

@@ -35,7 +35,7 @@ Objective criteria control functional statuses. CallMissed output is locally val
 
 Trusted HTTP latency checks validate response behavior before measuring, retain samples/p95/warmup/budget and compare both commits through the existing execution evidence model. Measurements include evaluator transport overhead and are environment-specific, not production throughput claims. The real Docker benchmark fixture completed ten validated samples; no latency credit is awarded for fast wrong responses.
 
-The first actual partial/manipulated CallMissed attempts both failed local semantic validation. Their completed evaluations retain objective failures and expose AI failure instead of fabricated analysis. Policy v5 adds static validation repair feedback and failure categories; retries create new historical attempts. The new real retries also retained evidence and failed honestly: both encountered CALLMISSED_TIMEOUT followed by CALLMISSED_HTTP_502. These attempts demonstrate provider failure recovery, not successful adversarial AI calibration. Wider calibration remains blocked by current provider availability.
+The first actual partial/manipulated CallMissed attempts both failed local semantic validation. Their completed evaluations retain objective failures and expose AI failure instead of fabricated analysis. Policy v5 adds static validation repair feedback and failure categories; retries create new historical attempts. During those retries Docker Desktop was stopped and the tunnel unavailable, so current runtime criteria correctly became UNVERIFIED while earlier verified runs remained in history. The new real retries also retained evidence and failed honestly: both encountered CALLMISSED_TIMEOUT followed by CALLMISSED_HTTP_502. These attempts demonstrate provider failure recovery, not successful adversarial AI calibration. Wider calibration remains blocked by current provider availability.
 
 ## Dashboard validation
 
@@ -51,7 +51,7 @@ Assignments preserve the contract version existing when assigned. Unknown/confli
 
 ## Performance
 
-Recovery processes bounded outbox/publication batches and prioritizes recent queued heads. Benchmarks are configurable and bounded. Current development runner capacity is intentionally small; twelve fixture actors are not a production load test. Prepared dependency caches, warm multi-host execution and comprehensive queue/cost telemetry remain incomplete.
+Recovery processes bounded outbox/publication batches and prioritizes recent queued heads. Benchmarks are configurable and bounded. CallMissed review capacity is serialized independently with a three-minute expiring, ownership-fenced database lease. Capacity waiting uses bounded workflow retries; paid calls retain the original two-attempt limit. Worker-crash expiry and stale release/renewal are tested. Current development runner capacity is intentionally small; twelve fixture actors are not a production load test. Prepared dependency caches, warm multi-host execution and comprehensive queue/cost telemetry remain incomplete.
 
 ## Defects repaired in this cycle
 
@@ -80,4 +80,6 @@ Critical: provision appropriate production execution and authorization before ar
 
 ## Verification
 
-Current code passed `npm run check` (143 tests), eight Playwright browser tests, formatting and the real controlled Docker rehearsal. PR checks and native Cloudflare preview are inspected after pushing this work; see the PR for the exact checked revision. Existing historical rehearsal reports remain historical snapshots and are superseded for current capability status by this cycle and the acceptance ledger.
+Hosted CI exposed two multi-team integration scenarios exceeding Vitest’s default five-second timeout (observed5.7/6.3seconds). The scenario-only budget is now15seconds; assertions and unit-test budgets are unchanged.
+
+Current code passed `npm run check` (145 tests), eight Playwright browser tests, formatting and the real controlled Docker rehearsal. PR checks and native Cloudflare preview are inspected after pushing this work; see the PR for the exact checked revision. Existing historical rehearsal reports remain historical snapshots and are superseded for current capability status by this cycle and the acceptance ledger.

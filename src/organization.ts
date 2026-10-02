@@ -1,3 +1,4 @@
+import { acquireReviewer, releaseReviewer } from './reviewer-capacity';
 import { appAccess } from './github-app-access';
 import { z } from 'zod';
 import { createPrivateKey } from 'node:crypto';
@@ -800,7 +801,17 @@ export async function organization(
       toolVersion: 'judge-c2c-0.2.0',
     };
     const evidence = objective(demoContract, context);
-    const reviewed = await aiReview(env, demoContract, context, evidence);
+    const slot =
+      env.AI_PROVIDER === 'callmissed' && env.CALLMISSED_API_KEY
+        ? await acquireReviewer(env.ORG_DB, 'callmissed')
+        : undefined;
+    if (slot === null) return json({ error: 'REVIEWER_CAPACITY_BUSY' }, 429);
+    let reviewed;
+    try {
+      reviewed = await aiReview(env, demoContract, context, evidence);
+    } finally {
+      if (slot) await releaseReviewer(env.ORG_DB, slot);
+    }
     await env.ORG_DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)')
       .bind('reviewer.diagnostic', reviewed.status)
       .run();

@@ -1,7 +1,7 @@
 {
   "mode": "REAL_GITHUB_APP_DOCKER_CALLMISSED",
   "identity": "One authenticated QA operator; code personas are controlled fixtures, not independent GitHub accounts",
-  "at": "2026-10-02T17:52:19.774Z",
+  "at": "2026-10-02T18:02:07.214Z",
   "rows": [
     {
       "persona": "partial",
@@ -388,6 +388,14 @@
           "weaknesses": []
         },
         "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      },
+      "githubCheck": {
+        "id": 110854616871,
+        "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "status": "completed",
+        "conclusion": "failure",
+        "externalId": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+        "htmlUrl": "https://github.com/Daksh-Codebase/payment-engine/runs/110854616871"
       }
     },
     {
@@ -796,6 +804,14 @@
           "weaknesses": []
         },
         "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      },
+      "githubCheck": {
+        "id": 110854631191,
+        "head": "628436f51c897930e2c902c2051c185259ef95c8",
+        "status": "completed",
+        "conclusion": "failure",
+        "externalId": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+        "htmlUrl": "https://github.com/Daksh-Codebase/payment-engine/runs/110854631191"
       }
     }
   ],
@@ -1151,6 +1167,14 @@
           "weaknesses": []
         },
         "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      },
+      "githubCheck": {
+        "id": 110958493460,
+        "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "status": "completed",
+        "conclusion": "action_required",
+        "externalId": "fb355c70e4f1e300ad2acaae3ad28906f758e98842be3c2e5cf9fa8976d6abc5",
+        "htmlUrl": "https://github.com/Daksh-Codebase/payment-engine/runs/110958493460"
       }
     },
     {
@@ -1525,7 +1549,470 @@
           "weaknesses": []
         },
         "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof."
+      },
+      "githubCheck": {
+        "id": 110958514203,
+        "head": "628436f51c897930e2c902c2051c185259ef95c8",
+        "status": "completed",
+        "conclusion": "failure",
+        "externalId": "c076bac6c4d96cc5a7c30cdb766cd38998ced1772496c56c26c56dabe3be7ef1",
+        "htmlUrl": "https://github.com/Daksh-Codebase/payment-engine/runs/110958514203"
       }
+    }
+  ],
+  "restoredAttempts": [
+    {
+      "previous": "fb355c70e4f1e300ad2acaae3ad28906f758e98842be3c2e5cf9fa8976d6abc5",
+      "runId": "9273b681fffa36c66f12d9fbc8f2db3990a2cfbd1d9e22f6c782f9331f59738b",
+      "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+      "state": "REVIEWING",
+      "aiStatus": null,
+      "publication": "PUBLISHED",
+      "checkId": 110962256932,
+      "evidence": [
+        {
+          "claim": "Exact baseline-to-head comparison: 3 changed files. This confirms change metadata, not functionality.",
+          "id": "diff",
+          "kind": "diff",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-1",
+          "kind": "source",
+          "path": "retry.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-2",
+          "kind": "source",
+          "path": "server.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-3",
+          "kind": "source",
+          "path": "README.md",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: .github",
+          "id": "policy-4",
+          "kind": "policy",
+          "path": ".github",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: server.test.mjs",
+          "id": "policy-5",
+          "kind": "policy",
+          "path": "server.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200. Baseline FAIL → submission FAIL.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-immediate",
+          "id": "criterion-retry-immediate",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-exhausted",
+          "id": "criterion-retry-exhausted",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-zero",
+          "id": "criterion-retry-invalid-zero",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-large",
+          "id": "criterion-retry-invalid-large",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-fraction",
+          "id": "criterion-retry-invalid-fraction",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-string",
+          "id": "criterion-retry-invalid-string",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-empty",
+          "id": "criterion-retry-outcomes-empty",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-unknown",
+          "id": "criterion-retry-outcomes-unknown",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-null",
+          "id": "criterion-retry-outcomes-null",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "health-preserved",
+          "id": "criterion-health-preserved",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201. Baseline PASS → submission PASS.",
+          "criterionId": "payment-created",
+          "id": "criterion-payment-created",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "payment-idempotency",
+          "id": "criterion-payment-idempotency",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "payment-read",
+          "id": "criterion-payment-read",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409. Baseline PASS → submission PASS.",
+          "criterionId": "payment-conflict",
+          "id": "criterion-payment-conflict",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "payment-invalid",
+          "id": "criterion-payment-invalid",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "build: Configured build command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+          "id": "execution-build",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "test: Configured test command failed. Baseline PASS → submission FAIL. Repository commands are supplemental evidence.",
+          "id": "execution-repository-tests",
+          "kind": "execution",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "lint: Configured lint command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+          "id": "execution-lint",
+          "kind": "execution",
+          "status": "PASS"
+        }
+      ],
+      "report": null
+    },
+    {
+      "previous": "c076bac6c4d96cc5a7c30cdb766cd38998ced1772496c56c26c56dabe3be7ef1",
+      "runId": "41b69d99d1d9c93957ae3ff6176e8b0482b744b0e0cfca1cad31af9e8314a668",
+      "head": "628436f51c897930e2c902c2051c185259ef95c8",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+      "state": "CHECKING",
+      "aiStatus": null,
+      "publication": "PUBLISHED",
+      "checkId": 110962277783,
+      "evidence": [
+        {
+          "claim": "Exact baseline-to-head comparison: 4 changed files. This confirms change metadata, not functionality.",
+          "id": "diff",
+          "kind": "diff",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-1",
+          "kind": "source",
+          "path": "README.md",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-2",
+          "kind": "source",
+          "path": "server.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-3",
+          "kind": "source",
+          "path": "retry.test.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Exact baseline/head source retrieved for contextual inspection only; presence is not functional proof.",
+          "id": "context-source-4",
+          "kind": "source",
+          "path": "server.mjs",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path unchanged: .github",
+          "id": "policy-5",
+          "kind": "policy",
+          "path": ".github",
+          "status": "PASS"
+        },
+        {
+          "claim": "Protected path changed: server.test.mjs",
+          "id": "policy-6",
+          "kind": "policy",
+          "path": "server.test.mjs",
+          "status": "FAIL"
+        },
+        {
+          "claim": "Review signal: test-removal-review. This is a routing signal, not a confirmed defect.",
+          "id": "risk-test-removal-review",
+          "kind": "diff",
+          "status": "UNVERIFIED"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-transient",
+          "id": "criterion-retry-transient",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "claim": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200. Baseline FAIL → submission PASS.",
+          "criterionId": "retry-bounded",
+          "id": "criterion-retry-bounded",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-permanent",
+          "id": "criterion-retry-permanent",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-immediate",
+          "id": "criterion-retry-immediate",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "retry-exhausted",
+          "id": "criterion-retry-exhausted",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-zero",
+          "id": "criterion-retry-invalid-zero",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-large",
+          "id": "criterion-retry-invalid-large",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-fraction",
+          "id": "criterion-retry-invalid-fraction",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-invalid-string",
+          "id": "criterion-retry-invalid-string",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-empty",
+          "id": "criterion-retry-outcomes-empty",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-unknown",
+          "id": "criterion-retry-outcomes-unknown",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "retry-outcomes-null",
+          "id": "criterion-retry-outcomes-null",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "health-preserved",
+          "id": "criterion-health-preserved",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201. Baseline PASS → submission PASS.",
+          "criterionId": "payment-created",
+          "id": "criterion-payment-created",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "payment-idempotency",
+          "id": "criterion-payment-idempotency",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200. Baseline PASS → submission PASS.",
+          "criterionId": "payment-read",
+          "id": "criterion-payment-read",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409. Baseline PASS → submission PASS.",
+          "criterionId": "payment-conflict",
+          "id": "criterion-payment-conflict",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400. Baseline PASS → submission PASS.",
+          "criterionId": "payment-invalid",
+          "id": "criterion-payment-invalid",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "build: Configured build command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+          "id": "execution-build",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "test: Configured test command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+          "id": "execution-repository-tests",
+          "kind": "execution",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "claim": "lint: Configured lint command passed. Baseline PASS → submission PASS. Repository commands are supplemental evidence.",
+          "id": "execution-lint",
+          "kind": "execution",
+          "status": "PASS"
+        }
+      ],
+      "report": null
     }
   ]
 }
