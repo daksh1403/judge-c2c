@@ -35,7 +35,7 @@ export type RunnerRequest = z.infer<typeof runnerRequestSchema>;
 export const checkResultSchema = z
   .object({
     id: z.string().max(80),
-    kind: z.enum(['build', 'test', 'lint', 'acceptance']),
+    kind: z.enum(['build', 'test', 'lint', 'acceptance', 'benchmark']),
     status: z.enum(['PASS', 'FAIL', 'UNVERIFIED']),
     exitCode: z.number().int().nullable(),
     durationMs: z.number().int().nonnegative(),
@@ -54,7 +54,7 @@ export const runnerResultSchema = z
     runtime: z.string().max(100),
     startedAt: z.string().datetime(),
     finishedAt: z.string().datetime(),
-    checks: z.array(checkResultSchema).max(38),
+    checks: z.array(checkResultSchema).max(41),
   })
   .strict();
 export type RunnerResult = z.infer<typeof runnerResultSchema>;
@@ -76,9 +76,11 @@ export function validateRunnerResult(
     throw new Error('RUNNER_INPUT_MISMATCH');
   if (Date.parse(result.finishedAt) < Date.parse(result.startedAt))
     throw new Error('RUNNER_TIME_MISMATCH');
-  const expected = [...request.policy.commands, ...request.policy.cases].map(
-    (c) => c.id,
-  );
+  const expected = [
+    ...request.policy.commands,
+    ...request.policy.cases,
+    ...(request.policy.benchmarks ?? []),
+  ].map((c) => c.id);
   if (
     result.checks.length !== expected.length ||
     new Set(result.checks.map((c) => c.id)).size !== expected.length ||
@@ -87,7 +89,13 @@ export function validateRunnerResult(
     throw new Error('RUNNER_CHECK_MISMATCH');
   for (const check of result.checks) {
     const command = request.policy.commands.find((c) => c.id === check.id);
-    if (check.kind !== (command?.kind ?? 'acceptance'))
+    if (
+      check.kind !==
+      (command?.kind ??
+        (request.policy.benchmarks?.some((b) => b.id === check.id)
+          ? 'benchmark'
+          : 'acceptance'))
+    )
       throw new Error('RUNNER_CHECK_KIND_MISMATCH');
     if (command && check.status === 'PASS' && check.exitCode !== 0)
       throw new Error('RUNNER_FALSE_PASS');
@@ -141,7 +149,8 @@ export function executionEvidence(
       const result = head.checks.find((x) => x.id === id),
         before = baseline.checks.find((x) => x.id === id);
       // Participant-authored test commands are supplemental, never acceptance proof.
-      const trusted = result?.kind === 'acceptance';
+      const trusted =
+        result?.kind === 'acceptance' || result?.kind === 'benchmark';
       return [
         {
           id: 'criterion-' + criterion.id,
@@ -149,7 +158,7 @@ export function executionEvidence(
           criterionId: criterion.id,
           status: trusted ? result.status : ('UNVERIFIED' as const),
           baselineStatus:
-            before?.kind === 'acceptance'
+            before?.kind === 'acceptance' || before?.kind === 'benchmark'
               ? before.status
               : ('UNVERIFIED' as const),
           claim: trusted
@@ -247,7 +256,7 @@ export async function runObjective(
       kind: 'execution',
       status: check.status,
       baselineStatus: before?.status,
-      claim: `${check.kind}: ${check.detail} Baseline ${before?.status ?? 'UNVERIFIED'} → submission ${check.status}. Repository commands are supplemental evidence.`,
+      claim: `${check.kind}: ${check.detail} Baseline ${before?.status ?? 'UNVERIFIED'} → submission ${check.status}. ${check.kind === 'benchmark' ? 'Trusted, environment-specific HTTP benchmark.' : 'Repository commands are supplemental evidence.'}`,
     });
   }
   return all;

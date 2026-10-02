@@ -1,0 +1,493 @@
+{
+  "schemaVersion": 1,
+  "evaluationVersion": "payment-retry-v3",
+  "challengeVersion": "payment-starter-v2",
+  "repository": {
+    "id": 1371407339,
+    "fullName": "Daksh-Codebase/payment-engine",
+    "installationId": 167005353
+  },
+  "department": "Finance",
+  "category": "Reliability",
+  "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+  "issueNumbers": [6],
+  "requirements": [
+    {
+      "id": "bounded-retry",
+      "title": "Bounded temporary-failure retries and edge cases",
+      "mandatory": true,
+      "criteria": [
+        {
+          "id": "retry-transient",
+          "description": "POST /payments/retry with {\"outcomes\":[\"temporary\",\"success\"],\"maxAttempts\":3} must return HTTP 200 and {\"status\":\"success\",\"attempts\":2}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-transient"
+          }
+        },
+        {
+          "id": "retry-bounded",
+          "description": "POST /payments/retry with {\"outcomes\":[\"temporary\",\"temporary\",\"temporary\"],\"maxAttempts\":2} must return HTTP 200 and {\"status\":\"failed\",\"attempts\":2}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-bounded"
+          }
+        },
+        {
+          "id": "retry-permanent",
+          "description": "POST /payments/retry with {\"outcomes\":[\"permanent\",\"success\"],\"maxAttempts\":3} must return HTTP 200 and {\"status\":\"failed\",\"attempts\":1}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-permanent"
+          }
+        },
+        {
+          "id": "retry-immediate",
+          "description": "POST /payments/retry with {\"outcomes\":[\"success\",\"temporary\"],\"maxAttempts\":3} must return HTTP 200 and {\"status\":\"success\",\"attempts\":1}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-immediate"
+          }
+        },
+        {
+          "id": "retry-exhausted",
+          "description": "POST /payments/retry with {\"outcomes\":[\"temporary\"],\"maxAttempts\":3} must return HTTP 200 and {\"status\":\"failed\",\"attempts\":1}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-exhausted"
+          }
+        },
+        {
+          "id": "retry-invalid-zero",
+          "description": "POST /payments/retry with {\"outcomes\":[\"success\"],\"maxAttempts\":0} must return HTTP 400 and {\"error\":\"INVALID_ATTEMPTS\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-invalid-zero"
+          }
+        },
+        {
+          "id": "retry-invalid-large",
+          "description": "POST /payments/retry with {\"outcomes\":[\"success\"],\"maxAttempts\":11} must return HTTP 400 and {\"error\":\"INVALID_ATTEMPTS\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-invalid-large"
+          }
+        },
+        {
+          "id": "retry-invalid-fraction",
+          "description": "POST /payments/retry with {\"outcomes\":[\"success\"],\"maxAttempts\":1.5} must return HTTP 400 and {\"error\":\"INVALID_ATTEMPTS\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-invalid-fraction"
+          }
+        },
+        {
+          "id": "retry-invalid-string",
+          "description": "POST /payments/retry with {\"outcomes\":[\"success\"],\"maxAttempts\":\"3\"} must return HTTP 400 and {\"error\":\"INVALID_ATTEMPTS\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-invalid-string"
+          }
+        },
+        {
+          "id": "retry-outcomes-empty",
+          "description": "POST /payments/retry with {\"outcomes\":[],\"maxAttempts\":2} must return HTTP 400 and {\"error\":\"INVALID_OUTCOMES\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-outcomes-empty"
+          }
+        },
+        {
+          "id": "retry-outcomes-unknown",
+          "description": "POST /payments/retry with {\"outcomes\":[\"anything\"],\"maxAttempts\":2} must return HTTP 400 and {\"error\":\"INVALID_OUTCOMES\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-outcomes-unknown"
+          }
+        },
+        {
+          "id": "retry-outcomes-null",
+          "description": "POST /payments/retry with {\"outcomes\":null,\"maxAttempts\":2} must return HTTP 400 and {\"error\":\"INVALID_OUTCOMES\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "retry-outcomes-null"
+          }
+        }
+      ]
+    },
+    {
+      "id": "payment-regression",
+      "title": "Preserve existing payment behavior",
+      "mandatory": true,
+      "criteria": [
+        {
+          "id": "health-preserved",
+          "description": "GET /health with {} must return HTTP 200 and {\"ok\":true}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "health-preserved"
+          }
+        },
+        {
+          "id": "payment-created",
+          "description": "POST /payments with {\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\"} must return HTTP 201 and {\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "payment-created"
+          }
+        },
+        {
+          "id": "payment-idempotency",
+          "description": "POST /payments with {\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\"} must return HTTP 200 and {\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "payment-idempotency"
+          }
+        },
+        {
+          "id": "payment-read",
+          "description": "GET /payments/pay_1 with {} must return HTTP 200 and {\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "payment-read"
+          }
+        },
+        {
+          "id": "payment-conflict",
+          "description": "POST /payments with {\"clientReference\":\"frozen-order\",\"amountMinor\":2000,\"currency\":\"INR\"} must return HTTP 409 and {\"error\":\"REFERENCE_CONFLICT\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "payment-conflict"
+          }
+        },
+        {
+          "id": "payment-invalid",
+          "description": "POST /payments with {\"clientReference\":\"frozen-order\",\"amountMinor\":-1,\"currency\":\"INR\"} must return HTTP 400 and {\"error\":\"INVALID_PAYMENT\"}.",
+          "kind": "functional",
+          "verification": {
+            "type": "runner",
+            "checkId": "payment-invalid"
+          }
+        }
+      ]
+    }
+  ],
+  "constraints": [
+    "Pre-launch rehearsal only; no automatic points.",
+    "Preserve payment APIs and baseline tests.",
+    "Do not use credentials or external payment providers.",
+    "Additional work requires functional evidence and organizer review."
+  ],
+  "forbiddenPaths": [".github", "server.test.mjs"],
+  "additionalCategories": [
+    "testing",
+    "documentation",
+    "security",
+    "performance"
+  ],
+  "execution": {
+    "environment": "node-http-v1",
+    "network": "deny",
+    "timeoutSeconds": 60,
+    "memoryMiB": 256,
+    "maxFiles": 100,
+    "maxFileBytes": 100000,
+    "runner": {
+      "version": "node-http-v1",
+      "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+      "entrypoint": "server.mjs",
+      "commands": [
+        {
+          "id": "build",
+          "kind": "build",
+          "argv": ["node", "--check", "server.mjs"]
+        },
+        {
+          "id": "repository-tests",
+          "kind": "test",
+          "argv": ["node", "--test"]
+        },
+        {
+          "id": "lint",
+          "kind": "lint",
+          "argv": [
+            "/opt/judge/node_modules/.bin/eslint",
+            "--no-config-lookup",
+            "--no-inline-config",
+            "--rule",
+            "no-unreachable:error",
+            "--rule",
+            "no-constant-condition:error",
+            "server.mjs"
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "id": "retry-transient",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["temporary", "success"],
+            "maxAttempts": 3
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "status": "success",
+            "attempts": 2
+          }
+        },
+        {
+          "id": "retry-bounded",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["temporary", "temporary", "temporary"],
+            "maxAttempts": 2
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "status": "failed",
+            "attempts": 2
+          }
+        },
+        {
+          "id": "retry-permanent",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["permanent", "success"],
+            "maxAttempts": 3
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "status": "failed",
+            "attempts": 1
+          }
+        },
+        {
+          "id": "retry-immediate",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["success", "temporary"],
+            "maxAttempts": 3
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "status": "success",
+            "attempts": 1
+          }
+        },
+        {
+          "id": "retry-exhausted",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["temporary"],
+            "maxAttempts": 3
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "status": "failed",
+            "attempts": 1
+          }
+        },
+        {
+          "id": "retry-invalid-zero",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["success"],
+            "maxAttempts": 0
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_ATTEMPTS"
+          }
+        },
+        {
+          "id": "retry-invalid-large",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["success"],
+            "maxAttempts": 11
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_ATTEMPTS"
+          }
+        },
+        {
+          "id": "retry-invalid-fraction",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["success"],
+            "maxAttempts": 1.5
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_ATTEMPTS"
+          }
+        },
+        {
+          "id": "retry-invalid-string",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["success"],
+            "maxAttempts": "3"
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_ATTEMPTS"
+          }
+        },
+        {
+          "id": "retry-outcomes-empty",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": [],
+            "maxAttempts": 2
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_OUTCOMES"
+          }
+        },
+        {
+          "id": "retry-outcomes-unknown",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": ["anything"],
+            "maxAttempts": 2
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_OUTCOMES"
+          }
+        },
+        {
+          "id": "retry-outcomes-null",
+          "path": "/payments/retry",
+          "method": "POST",
+          "body": {
+            "outcomes": null,
+            "maxAttempts": 2
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_OUTCOMES"
+          }
+        },
+        {
+          "id": "health-preserved",
+          "method": "GET",
+          "path": "/health",
+          "expectedStatus": 200,
+          "expectedBody": {
+            "ok": true
+          }
+        },
+        {
+          "id": "payment-created",
+          "method": "POST",
+          "path": "/payments",
+          "body": {
+            "clientReference": "frozen-order",
+            "amountMinor": 1000,
+            "currency": "INR"
+          },
+          "expectedStatus": 201,
+          "expectedBody": {
+            "id": "pay_1",
+            "clientReference": "frozen-order",
+            "amountMinor": 1000,
+            "currency": "INR",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "payment-idempotency",
+          "method": "POST",
+          "path": "/payments",
+          "body": {
+            "clientReference": "frozen-order",
+            "amountMinor": 1000,
+            "currency": "INR"
+          },
+          "expectedStatus": 200,
+          "expectedBody": {
+            "id": "pay_1",
+            "clientReference": "frozen-order",
+            "amountMinor": 1000,
+            "currency": "INR",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "payment-read",
+          "method": "GET",
+          "path": "/payments/pay_1",
+          "expectedStatus": 200,
+          "expectedBody": {
+            "id": "pay_1",
+            "clientReference": "frozen-order",
+            "amountMinor": 1000,
+            "currency": "INR",
+            "status": "pending"
+          }
+        },
+        {
+          "id": "payment-conflict",
+          "method": "POST",
+          "path": "/payments",
+          "body": {
+            "clientReference": "frozen-order",
+            "amountMinor": 2000,
+            "currency": "INR"
+          },
+          "expectedStatus": 409,
+          "expectedBody": {
+            "error": "REFERENCE_CONFLICT"
+          }
+        },
+        {
+          "id": "payment-invalid",
+          "method": "POST",
+          "path": "/payments",
+          "body": {
+            "clientReference": "frozen-order",
+            "amountMinor": -1,
+            "currency": "INR"
+          },
+          "expectedStatus": 400,
+          "expectedBody": {
+            "error": "INVALID_PAYMENT"
+          }
+        }
+      ]
+    }
+  }
+}

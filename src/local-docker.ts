@@ -6,7 +6,7 @@ import {
 } from './runner';
 import { canonical, digest } from './domain';
 import { RUNNER_VERSION } from './runner-policy';
-import { acceptance } from './runner-http';
+import { acceptance, benchmark } from './runner-http';
 import { redact } from './security';
 const INITIALIZE = `let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('end',()=>{const fs=require('node:fs'),p=require('node:path');for(const f of JSON.parse(s)){const target='/work/'+f.path;fs.mkdirSync(p.dirname(target),{recursive:true});fs.writeFileSync(target,f.text,{mode:0o644});}console.log(process.version);});`;
 // Trusted probe runs as a different UID, using read-only prepared Node, with no repository imports.
@@ -257,6 +257,15 @@ export async function evaluateDocker(
         await acceptance(
           transport as Pick<Fetcher, 'fetch'>,
           test,
+          paths.has(request.policy.entrypoint),
+          deadline,
+        ),
+      );
+    for (const spec of request.policy.benchmarks ?? [])
+      checks.push(
+        await benchmark(
+          transport as Pick<Fetcher, 'fetch'>,
+          spec,
           paths.has(request.policy.entrypoint),
           deadline,
         ),

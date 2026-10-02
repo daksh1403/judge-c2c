@@ -303,10 +303,10 @@ describe('hostile input and deterministic triage', () => {
   it('recognizes explicit closing references and surfaces cross-repository conflicts', () => {
     expect(
       linkedIssueNumbers(
-        'Fixes #31 and resolves other/repo#99. Related #42.',
+        'Fixes #31 and resolves other/repo#99. References #42. Related #78.',
         'demo/challenge',
       ),
-    ).toEqual({ local: [31], foreign: ['other/repo#99'] });
+    ).toEqual({ local: [31, 42], foreign: ['other/repo#99'] });
   });
   it('parses quoted CSV and rejects malformed rows', () => {
     expect(
@@ -424,6 +424,123 @@ describe('coherent submission lifecycle', () => {
     expect(
       JSON.parse(String(history[1]!.assignment_snapshot)).resolution_snapshot,
     ).toContain(assignment.id);
+    native.mockImplementation(original);
+  });
+  it('keeps current counts and combined attention filters separate from completed history', async () => {
+    const { resolveSubmission } =
+      await import('../src/competition-submissions');
+    const { competitionOverview } = await import('../src/competition-overview');
+    const { competition } = await import('../src/competition');
+    await prepared();
+    let current = pr();
+    const original = native.getMockImplementation()!;
+    native.mockImplementation(async (path) =>
+      path === '/graphql'
+        ? links()
+        : path.includes('/pulls/')
+          ? current
+          : original(path),
+    );
+    await resolveSubmission(
+      env,
+      services,
+      context,
+      1,
+      47,
+      'count-first',
+      'hash-first',
+    );
+    await env.DB.prepare("UPDATE evaluations SET state='COMPLETED'").run();
+    current = pr(47, 'c'.repeat(40), '2026-10-02T02:00:00Z');
+    await resolveSubmission(
+      env,
+      services,
+      context,
+      1,
+      47,
+      'count-second',
+      'hash-second',
+    );
+    const counts = await competitionOverview(env.DB);
+    expect(counts).toMatchObject({
+      completedRuns: 1,
+      currentCompleted: 0,
+      queuedRuns: 1,
+      submissions: 1,
+    });
+    const call = (query: string) =>
+      competition(
+        new Request(
+          'https://review.test/api/organization/manage/submissions?' + query,
+        ),
+        env,
+        context,
+        services,
+        'organizer',
+      );
+    expect(
+      (
+        (await (await call('evaluationState=COMPLETED')).json()) as {
+          submissions: unknown[];
+        }
+      ).submissions,
+    ).toHaveLength(0);
+    await env.DB.prepare(
+      'UPDATE evaluations SET evidence=?,report=? WHERE head_sha=?',
+    )
+      .bind(
+        JSON.stringify([
+          { id: 'dependency-fixture', status: 'FAIL', baselineStatus: 'PASS' },
+        ]),
+        JSON.stringify({
+          findings: [{ category: 'security', severity: 'high' }],
+        }),
+        current.head.sha,
+      )
+      .run();
+    expect(
+      (
+        (await (
+          await call(
+            'attention=1&security=1&regression=1&repository=1&issue=12',
+          )
+        ).json()) as { submissions: unknown[] }
+      ).submissions,
+    ).toHaveLength(1);
+    expect(
+      (
+        (await (await call('attention=1&repository=999')).json()) as {
+          submissions: unknown[];
+        }
+      ).submissions,
+    ).toHaveLength(0);
+    await env.DB.prepare(
+      'UPDATE evaluations SET evidence=?,report=NULL WHERE head_sha=?',
+    )
+      .bind(
+        JSON.stringify([{ id: 'security-fixture', status: 'PASS' }]),
+        current.head.sha,
+      )
+      .run();
+    expect(
+      ((await (await call('security=1')).json()) as { submissions: unknown[] })
+        .submissions,
+    ).toHaveLength(0);
+    await createTeam(env, services, 'organizer', team('Beta', 'bob'));
+    expect(
+      (
+        (await (
+          await call('status=NOT_SUBMITTED&q=Beta&repository=1')
+        ).json()) as { teams: unknown[] }
+      ).teams,
+    ).toHaveLength(1);
+    expect(
+      (
+        (await (await call('status=NOT_SUBMITTED&q=Alpha')).json()) as {
+          teams: unknown[];
+        }
+      ).teams,
+    ).toHaveLength(0);
     native.mockImplementation(original);
   });
   it('preserves an organizer override when an automatic same-head resolver finishes late', async () => {
@@ -632,9 +749,27 @@ describe('coherent submission lifecycle', () => {
     expect(teams).toHaveProperty('teams');
     expect(teams.teams[0]!.id).toBe(a.id);
     const overview = (await (await call('overview')).json()) as {
-      counts: { notSubmitted: number };
+      counts: {
+        notSubmitted: number;
+        repositories: number;
+        teams: number;
+        activeTeams: number;
+        issues: number;
+        officialIssues: number;
+        completedRuns: number;
+        currentCompleted: number;
+      };
     };
     expect(overview.counts.notSubmitted).toBe(1);
+    expect(overview.counts).toMatchObject({
+      repositories: 1,
+      teams: 1,
+      activeTeams: 1,
+      issues: 1,
+      officialIssues: 1,
+      completedRuns: 0,
+      currentCompleted: 0,
+    });
     expect((await call('teams/' + a.id)).status).toBe(200);
     expect((await call('issues/1/12')).status).toBe(200);
     expect((await call('submissions?status=NOT_SUBMITTED')).status).toBe(200);

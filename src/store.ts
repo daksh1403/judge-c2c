@@ -71,6 +71,8 @@ export async function isCurrent(env: Env, run: Run) {
 export async function dispatch(env: Env, runId: string) {
   const run = await getRun(env, runId);
   if (!run || run.state !== 'QUEUED') return;
+  // Status outages cannot prevent asynchronous evaluation dispatch.
+  await (await import('./github-checks')).publish(env, run).catch(() => {});
   try {
     await env.EVALUATOR.create({ id: runId, params: { runId } });
   } catch {
@@ -86,9 +88,17 @@ export async function dispatch(env: Env, runId: string) {
 }
 export async function reconcile(env: Env) {
   const rows = await env.DB.prepare(
-    "SELECT o.run_id FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE o.dispatched_at IS NULL AND e.state='QUEUED' ORDER BY o.created_at LIMIT 20",
+    "SELECT o.run_id FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE o.dispatched_at IS NULL AND e.state='QUEUED' ORDER BY o.created_at DESC,o.run_id LIMIT 5",
   ).all<{ run_id: string }>();
   await Promise.allSettled(rows.results.map((r) => dispatch(env, r.run_id)));
+  const failed = await env.DB.prepare(
+    "SELECT id FROM evaluations WHERE publication_status IN('FAILED','PENDING') AND state IN('COMPLETED','FAILED','SUPERSEDED') ORDER BY publication_attempted_at IS NOT NULL,publication_attempted_at,created_at,id LIMIT 2",
+  ).all<{ id: string }>();
+  const { publish } = await import('./github-checks');
+  for (const row of failed.results) {
+    const run = await getRun(env, row.id);
+    if (run) await publish(env, run).catch(() => {});
+  }
 }
 export function parseContract(run: Run): Contract {
   return JSON.parse(run.contract_snapshot) as Contract;

@@ -105,11 +105,16 @@
       currentRoot = root;
     const query = root.querySelector('#workflow-search')?.value || '';
     const filter = root.querySelector('#workflow-filter')?.value || '';
+    const extra = new URLSearchParams();
+    for (const control of root.querySelectorAll('[data-query]'))
+      if (control.value) extra.set(control.dataset.query, control.value);
     let result = await api(
       selectedTab +
         '?q=' +
         encodeURIComponent(query) +
-        (filter ? '&status=' + encodeURIComponent(filter) : ''),
+        (filter ? '&status=' + encodeURIComponent(filter) : '') +
+        '&' +
+        extra.toString(),
     );
     if (
       generation !== listGeneration ||
@@ -190,7 +195,7 @@
               'NOT_SUBMITTED',
             ];
     root.querySelector('#workflow-body').innerHTML =
-      `<form id="workflow-query" class="review-form"><label>Search ${tab}<input id="workflow-search" type="search"></label><label for="workflow-filter">Status</label><select id="workflow-filter">${filters.map((f) => `<option value="${f}">${f || 'All states'}</option>`).join('')}</select><button class="button">Search</button></form><div id="workflow-list"></div><div id="workflow-detail"></div>` +
+      `<form id="workflow-query" class="review-form"><label>Search ${tab}<input id="workflow-search" type="search"></label><label for="workflow-filter">Status</label><select id="workflow-filter">${filters.map((f) => `<option value="${f}">${f || 'All states'}</option>`).join('')}</select>${tab !== 'teams' ? `<label>Repository filter<select data-query="repository"><option value="">All repositories</option>${options()}</select></label>` : ''}${tab === 'issues' ? `<label>Source filter<select data-query="source"><option value="">All sources</option><option>PARTICIPANT</option><option>ORGANIZER</option><option>UNKNOWN</option></select></label><label>Type filter<input data-query="type" placeholder="bug, reliability, security…"></label><label>Official challenges<select data-query="official"><option value="">All issues</option><option value="1">Official only</option><option value="0">Other issues</option></select></label>` : ''}${tab === 'submissions' ? `<label>Team ID filter<input data-query="team"></label><label>Issue number filter<input data-query="issue" type="number" min="1"></label><label>Evaluation state<select data-query="evaluationState"><option value="">All evaluations</option>${['QUEUED', 'FETCHING', 'CHECKING', 'REVIEWING', 'SYNTHESIZING', 'COMPLETED', 'FAILED', 'SUPERSEDED'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Attention filter<select data-query="attention"><option value="">All submissions</option><option value="1">Needs attention</option></select></label><label>Security filter<select data-query="security"><option value="">All findings</option><option value="1">Security or dependency concerns</option></select></label><label>Regression filter<select data-query="regression"><option value="">All results</option><option value="1">New failures against passing baseline</option></select></label>` : ''}<button class="button">Search</button></form><div id="workflow-list"></div><div id="workflow-detail"></div>` +
       (tab === 'teams'
         ? `<details><summary>Create a team</summary><form id="create-team" class="review-form">${field('name', 'Team name')}${field('displayName', 'First member name')}${field('githubLogin', 'GitHub username')}${select('status', 'Team state', ['PENDING', 'ACTIVE'])}<label>Repositories<select name="repositories" multiple>${options()}</select></label><button class="button primary">Create team</button></form></details><details><summary>Import teams</summary><form id="import-teams" class="review-form"><p>CSV columns: team_name, participant_name, github_username, optional email, external_id, repository, issue_number, team_status. Identity conflicts reject the entire import.</p><label>CSV<textarea name="csv" required rows="8"></textarea></label><label><input type="checkbox" name="commit"> Commit validated import</label><button class="button">Validate / import</button><pre id="import-result"></pre></form></details>`
         : '') +
@@ -381,6 +386,24 @@
         )
           ? 'GitHub issue synchronization permissions and subscriptions confirmed.'
           : 'Owner setup needed: in GitHub App settings enable Issues read and write, subscribe to Issues and Issue comment events, then approve updated installation permissions. PR evaluation access remains available.';
+      if (settings.capabilities?.app) {
+        const app = settings.capabilities.app;
+        const panel = root.querySelector('#workflow-capabilities');
+        panel.append(
+          document.createTextNode(` App: ${app.name} · owner: ${app.owner}. `),
+        );
+        for (const [label, url] of [
+          ['Open App settings', app.settingsUrl],
+          ['Open installation', app.installationUrl],
+        ]) {
+          if (!url.startsWith('https://github.com/')) continue;
+          const link = document.createElement('a');
+          link.href = url;
+          link.textContent = label;
+          panel.append(link, document.createTextNode(' '));
+        }
+      }
+
       const config = settings.settings;
       root.querySelector('#event-policy textarea').value = JSON.stringify(
         {

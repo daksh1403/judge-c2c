@@ -7,7 +7,7 @@ import {
 } from './runner';
 import { RUNNER_VERSION } from './runner-policy';
 import { redact } from './security';
-import { acceptance } from './runner-http';
+import { acceptance, benchmark } from './runner-http';
 import type { Env } from './env';
 const MAX_LOG = 8192;
 const INITIALIZE = `const fs=require('node:fs'); let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('end',()=>{const files=JSON.parse(s);fs.mkdirSync('/work',{recursive:true});fs.chownSync('/work',65534,65534);for(const f of files){const path='/work/'+f.path;fs.mkdirSync(require('node:path').dirname(path),{recursive:true});fs.writeFileSync(path,f.text,{mode:0o644});fs.chownSync(path,65534,65534);}console.log(process.version);});`;
@@ -211,6 +211,15 @@ export class IsolatedRunner extends DurableObject<Env> {
             await acceptance(
               transport,
               test,
+              paths.has(request.policy.entrypoint),
+              deadline,
+            ),
+          );
+        for (const spec of request.policy.benchmarks ?? [])
+          checks.push(
+            await benchmark(
+              transport,
+              spec,
               paths.has(request.policy.entrypoint),
               deadline,
             ),

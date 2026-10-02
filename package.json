@@ -10,7 +10,7 @@
     "dev": "wrangler dev --env local",
     "test": "vitest run",
     "typecheck": "tsc --noEmit && tsc -p tests/browser/tsconfig.json",
-    "check": "npm run typecheck && npm test && wrangler deploy --dry-run --env review",
+    "check": "npm run typecheck && npm test && npm run acceptance:check && wrangler deploy --dry-run --env review",
     "db:local": "wrangler d1 migrations apply DB --env local --local",
     "deploy:review": "wrangler deploy --env review",
     "deploy": "node scripts/production-config.mjs && wrangler deploy --config .wrangler/production.json",
@@ -21,7 +21,9 @@
     "runner:start": "node scripts/local-runner-start.mjs",
     "runner:connect": "node scripts/local-runner-connect.mjs",
     "runner:smoke": "node scripts/local-runner-smoke.mjs",
-    "qa:docker": "node scripts/hackathon-docker-rehearsal.mjs"
+    "qa:docker": "node scripts/hackathon-docker-rehearsal.mjs",
+    "acceptance:update": "node scripts/acceptance-report.mjs",
+    "acceptance:check": "node scripts/acceptance-report.mjs --check"
   },
   "dependencies": {
     "jose": "6.2.12",

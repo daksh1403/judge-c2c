@@ -1,3 +1,5 @@
+import { acquireReviewer, releaseReviewer } from './reviewer-capacity';
+import { appAccess } from './github-app-access';
 import { z } from 'zod';
 import { createPrivateKey } from 'node:crypto';
 import { GitHub } from './github';
@@ -156,9 +158,16 @@ function competitionServices(env: Env): CompetitionServices {
         app.api<{ permissions: Record<string, string> }>(
           `/app/installations/${row.installation_id}`,
         ),
-        app.api<{ events: string[] }>('/app'),
+        app.api<{
+          id: number;
+          name: string;
+          slug: string;
+          owner: { login: string; type: 'Organization' | 'User' };
+          events: string[];
+        }>('/app'),
       ]);
       return {
+        app: appAccess(details, env.ORG_NAME!, row.installation_id),
         issuesWrite: installation.permissions.issues === 'write',
         events: details.events,
         reason:
@@ -203,10 +212,10 @@ async function organizer(request: Request, env: Env) {
   const hash = await digest(token);
   return await env
     .ORG_DB!.prepare(
-      'SELECT hash FROM organizer_sessions WHERE hash=? AND expires_at>?',
+      'SELECT hash,role FROM organizer_sessions WHERE hash=? AND expires_at>?',
     )
     .bind(hash, Date.now())
-    .first<{ hash: string }>();
+    .first<{ hash: string; role: 'organizer' | 'judge' }>();
 }
 function cookie(token: string, origin: string) {
   return `judge_organizer=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800${origin.startsWith('https:') ? '; Secure' : ''}`;
@@ -644,13 +653,18 @@ export async function organization(
       .bind(bucket)
       .first<{ count: number }>();
     if (rate!.count > 10) return json({ error: 'LOGIN_RATE_LIMIT' }, 429);
-    if (!(await equalSecret(data.token, env.ORG_ADMIN_TOKEN)))
-      return json({ error: 'UNAUTHORIZED' }, 401);
+    const role = (await equalSecret(data.token, env.ORG_ADMIN_TOKEN))
+      ? 'organizer'
+      : env.ORG_JUDGE_TOKEN &&
+          (await equalSecret(data.token, env.ORG_JUDGE_TOKEN))
+        ? 'judge'
+        : null;
+    if (!role) return json({ error: 'UNAUTHORIZED' }, 401);
     const token = random();
     await env.ORG_DB.prepare(
-      'INSERT INTO organizer_sessions(hash,expires_at) VALUES(?,?)',
+      'INSERT INTO organizer_sessions(hash,expires_at,role) VALUES(?,?,?)',
     )
-      .bind(await digest(token), Date.now() + 28800000)
+      .bind(await digest(token), Date.now() + 28800000, role)
       .run();
     return Response.json(
       { authenticated: true },
@@ -670,6 +684,7 @@ export async function organization(
     return json({
       organization: env.ORG_NAME,
       authenticated: true,
+      role: session.role,
       runner: {
         enabled:
           env.RUNNER_ENABLED === 'true' &&
@@ -703,13 +718,21 @@ export async function organization(
     });
   }
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
+  if (
+    session.role === 'judge' &&
+    !(
+      request.method === 'GET' && url.pathname.startsWith('/api/organization/')
+    ) &&
+    url.pathname !== '/api/organization/logout'
+  )
+    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
   if (url.pathname.startsWith('/api/organization/manage/'))
     return competition(
       request,
       env,
       ctx,
       competitionServices(env),
-      'organizer:' + session.hash,
+      session.role + ':' + session.hash,
     );
   if (
     url.pathname === '/api/organization/runner-check' &&
@@ -778,7 +801,17 @@ export async function organization(
       toolVersion: 'judge-c2c-0.2.0',
     };
     const evidence = objective(demoContract, context);
-    const reviewed = await aiReview(env, demoContract, context, evidence);
+    const slot =
+      env.AI_PROVIDER === 'callmissed' && env.CALLMISSED_API_KEY
+        ? await acquireReviewer(env.ORG_DB, 'callmissed')
+        : undefined;
+    if (slot === null) return json({ error: 'REVIEWER_CAPACITY_BUSY' }, 429);
+    let reviewed;
+    try {
+      reviewed = await aiReview(env, demoContract, context, evidence);
+    } finally {
+      if (slot) await releaseReviewer(env.ORG_DB, slot);
+    }
     await env.ORG_DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)')
       .bind('reviewer.diagnostic', reviewed.status)
       .run();
@@ -953,13 +986,21 @@ export async function organization(
       await organizationEnv(env),
     );
   const evaluation = url.pathname.match(
-    /^\/api\/organization\/evaluations\/([a-f0-9]{64})$/,
+    /^\/api\/organization\/evaluations\/([a-f0-9]{64})(\/bundle|\/retry)?$/,
   );
-  if (evaluation && request.method === 'GET')
+  if (
+    evaluation &&
+    ((request.method === 'GET' && evaluation[2] !== '/retry') ||
+      (request.method === 'POST' && evaluation[2] === '/retry'))
+  )
     return api(
-      new Request(origin + '/api/evaluations/' + evaluation[1], {
-        headers: { authorization: 'Bearer ' + env.ORG_ADMIN_TOKEN },
-      }),
+      new Request(
+        origin + '/api/evaluations/' + evaluation[1] + (evaluation[2] ?? ''),
+        {
+          method: request.method,
+          headers: { authorization: 'Bearer ' + env.ORG_ADMIN_TOKEN },
+        },
+      ),
       await organizationEnv(env),
     );
   return json({ error: 'NOT_FOUND' }, 404);

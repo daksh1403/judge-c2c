@@ -74,3 +74,51 @@ export async function acceptance(
     detail,
   } satisfies RunnerResult['checks'][number];
 }
+
+// Trusted end-to-end HTTP latency protocol, including transport overhead. This is
+// deliberately not a claim about isolated algorithm time or production capacity.
+export async function benchmark(
+  transport: Pick<Fetcher, 'fetch'>,
+  spec: NonNullable<RunnerPolicy['benchmarks']>[number],
+  implemented: boolean,
+  deadline: number,
+): Promise<RunnerResult['checks'][number]> {
+  const started = Date.now(),
+    samples: number[] = [];
+  let failure: 'FAIL' | 'UNVERIFIED' | null = null;
+  for (let i = 0; i < spec.warmup + spec.samples; i++) {
+    const t = performance.now();
+    const result = await acceptance(transport, spec, implemented, deadline);
+    if (result.status !== 'PASS') {
+      failure = result.status;
+      break;
+    }
+    if (i >= spec.warmup)
+      samples.push(Math.round((performance.now() - t) * 1000) / 1000);
+  }
+  const sorted = [...samples].sort((a, b) => a - b);
+  const p95 =
+    sorted.length === spec.samples
+      ? sorted[Math.ceil(sorted.length * 0.95) - 1]!
+      : null;
+  return {
+    id: spec.id,
+    kind: 'benchmark',
+    status: failure ?? (p95 !== null && p95 <= spec.maxP95Ms ? 'PASS' : 'FAIL'),
+    exitCode: null,
+    durationMs: Date.now() - started,
+    stdout: canonical({
+      protocol: 'http-latency-v1',
+      samplesMs: samples,
+      p95Ms: p95,
+      budgetMs: spec.maxP95Ms,
+      warmup: spec.warmup,
+      scope:
+        'End-to-end HTTP including evaluator transport overhead; development capacity only.',
+    }),
+    stderr: '',
+    detail: failure
+      ? 'Benchmark incomplete or behavior mismatch; no valid latency conclusion.'
+      : `Trusted HTTP latency benchmark: p95 ${p95} ms over ${spec.samples} validated samples, budget ${spec.maxP95Ms} ms. Includes transport overhead; environment-specific.`,
+  };
+}

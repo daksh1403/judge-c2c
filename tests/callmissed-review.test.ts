@@ -58,6 +58,14 @@ it('uses fixed CallMissed Responses endpoint and strict schema with no tools or 
     store: false,
     text: { format: { type: 'json_schema', strict: true } },
   });
+  const compact = JSON.parse(JSON.parse(body.input).untrustedContext);
+  expect(compact.citationGuide.knownEvidenceIds).toEqual(
+    evidence.map((e) => e.id),
+  );
+  expect(compact.citationGuide.criterionEvidence['future-time']).toEqual(
+    evidence.filter((e) => e.criterionId === 'future-time').map((e) => e.id),
+  );
+  expect(body.max_output_tokens).toBe(4500);
   expect(body.tools).toBeUndefined();
   expect(body.input).not.toContain(env.CALLMISSED_API_KEY);
 });
@@ -115,4 +123,36 @@ it('reports provider timeout separately from invalid structured output', async (
     failureCode: 'CALLMISSED_TIMEOUT',
     attempts: 2,
   });
+});
+
+it('repairs invalid citations with trusted static feedback without weakening validation', async () => {
+  const valid = deterministicReport(demoContract, evidence);
+  const invalid = structuredClone(valid);
+  invalid.solution_approach.evidence = ['invented-evidence'];
+  const envelope = (review: unknown) =>
+    Response.json({
+      status: 'completed',
+      output: [
+        {
+          type: 'message',
+          content: [{ type: 'output_text', text: JSON.stringify(review) }],
+        },
+      ],
+    });
+  const f = vi
+    .fn()
+    .mockResolvedValueOnce(envelope(invalid))
+    .mockResolvedValueOnce(envelope(valid));
+  vi.stubGlobal('fetch', f);
+  const result = await aiReview(env, demoContract, context, evidence);
+  expect(result.status).toBe('COMPLETED');
+  expect(result.trace).toMatchObject({
+    attempts: 2,
+    attemptFailures: ['AI_CITATION_UNKNOWN'],
+  });
+  const second = JSON.parse(JSON.parse(f.mock.calls[1]![1].body).input);
+  expect(second.trustedValidationFeedback.code).toBe('AI_CITATION_UNKNOWN');
+  expect(second.trustedValidationFeedback.instruction).not.toContain(
+    'invented-evidence',
+  );
 });

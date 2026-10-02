@@ -9,6 +9,7 @@ import type { Env } from './env';
 import type { GitHub } from './github';
 export interface CompetitionServices {
   capabilities?(): Promise<{
+    app?: ReturnType<typeof import('./github-app-access').appAccess>;
     issuesWrite: boolean;
     events: string[];
     reason?: string;

@@ -7,6 +7,9 @@ export async function migrate(
     '0005_assignment_contract.sql',
     '0006_execution.sql',
     '0007_team_issue_workflow.sql',
+    '0008_console_roles.sql',
+    '0009_publication_recovery.sql',
+    '0010_reviewer_capacity.sql',
   ],
 ) {
   for (const file of files) {

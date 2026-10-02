@@ -65,6 +65,12 @@ export const contractSchema = z
     constraints: z.array(z.string().min(1).max(1000)).max(50),
     forbiddenPaths: z.array(pathSchema).max(50),
     additionalCategories: z.array(z.string().min(1).max(80)).max(20),
+    analysis: z
+      .object({
+        dependencyAudit: z.enum(['NONE', 'OSV_NPM_V1']).default('NONE'),
+      })
+      .strict()
+      .optional(),
     execution: z
       .object({
         runner: runnerPolicySchema.optional(),
@@ -85,7 +91,12 @@ export const contractSchema = z
           code: 'custom',
           message: 'node-http-v1 requires the fixed 256 MiB microVM profile',
         });
-      const checks = new Set(c.execution.runner.cases.map((t) => t.id));
+      const checks = new Set(
+        [
+          ...c.execution.runner.cases,
+          ...(c.execution.runner.benchmarks ?? []),
+        ].map((t) => t.id),
+      );
       for (const r of c.requirements)
         for (const a of r.criteria)
           if (
@@ -257,6 +268,13 @@ export function validateReview(
     if (a.status === 'NOT_APPLICABLE')
       throw new Error('AI cannot waive authoritative criteria');
     const objective = evidence.find((e) => e.criterionId === a.criterionId);
+    if (
+      criterion.kind === 'functional' &&
+      objective?.kind === 'execution' &&
+      objective.status === 'PASS' &&
+      a.status !== 'PASS'
+    )
+      throw new Error('AI cannot override objective functional pass');
     if (objective?.status === 'FAIL' && a.status !== 'FAIL')
       throw new Error('AI cannot override objective failure');
     if (

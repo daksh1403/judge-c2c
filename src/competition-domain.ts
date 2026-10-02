@@ -173,7 +173,7 @@ export function linkedIssueNumbers(description: string, fullName: string) {
   const local = new Set<number>(),
     foreign: string[] = [];
   const pattern =
-    /\b(?:fix(?:es|ed)?|clos(?:e|es|ed)|resolv(?:e|es|ed))\s+(?:https:\/\/github\.com\/([\w.-]+\/[\w.-]+)\/issues\/|([\w.-]+\/[\w.-]+)#|#)([1-9]\d{0,8})/gi;
+    /\b(?:fix(?:es|ed)?|clos(?:e|es|ed)|resolv(?:e|es|ed)|referenc(?:e|es|ed)|address(?:es|ed)?|implement(?:s|ed)?)\s+(?:https:\/\/github\.com\/([\w.-]+\/[\w.-]+)\/issues\/|([\w.-]+\/[\w.-]+)#|#)([1-9]\d{0,8})/gi;
   for (const match of description.matchAll(pattern)) {
     const repository = match[1] ?? match[2];
     if (repository && repository.toLowerCase() !== fullName.toLowerCase())

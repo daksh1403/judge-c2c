@@ -1,5 +1,5 @@
 import { migrate } from './database';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { Miniflare } from 'miniflare';
 import { readFileSync } from 'node:fs';
 import { URL as NodeURL } from 'node:url';
@@ -260,6 +260,122 @@ describe('signed GitHub delivery to real D1', () => {
         "SELECT count(*) AS n FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE dispatched_at IS NULL AND e.state='QUEUED'",
       ).first<{ n: number }>())!.n,
     ).toBe(0);
+  });
+  it('tracks token outages and rotates terminal publication recovery fairly', async () => {
+    const { GitHub } = await import('../src/github');
+    const { publish } = await import('../src/github-checks');
+    const { getRun } = await import('../src/store');
+    await env.DB.prepare(
+      "UPDATE evaluations SET state='SUPERSEDED',publication_status='PENDING',publication_attempted_at=NULL",
+    ).run();
+    const ids = (
+      await env.DB.prepare(
+        'SELECT id FROM evaluations ORDER BY id LIMIT 3',
+      ).all<{ id: string }>()
+    ).results;
+    expect(ids).toHaveLength(3);
+    const unavailable = vi
+      .spyOn(GitHub, 'installation')
+      .mockRejectedValue(Error('TOKEN_UNAVAILABLE'));
+    try {
+      await expect(
+        publish(env, (await getRun(env, ids[0]!.id))!),
+      ).rejects.toThrow('TOKEN_UNAVAILABLE');
+      expect((await getRun(env, ids[0]!.id))!.publication_status).toBe(
+        'FAILED',
+      );
+      await reconcile(env);
+      const first = (await env.DB.prepare(
+        'SELECT count(*) AS n FROM evaluations WHERE publication_attempted_at IS NOT NULL',
+      ).first<{ n: number }>())!.n;
+      await reconcile(env);
+      const second = (await env.DB.prepare(
+        'SELECT count(*) AS n FROM evaluations WHERE publication_attempted_at IS NOT NULL',
+      ).first<{ n: number }>())!.n;
+      expect(first).toBeGreaterThanOrEqual(3);
+      expect(second).toBeGreaterThanOrEqual(first);
+    } finally {
+      unavailable.mockRestore();
+    }
+  });
+  it('retries completed runs with failed AI as new attempts while preserving historical evidence', async () => {
+    const current = await env.DB.prepare(
+      'SELECT latest_run_id FROM submissions WHERE repository_id=1 AND pr_number=24',
+    ).first<{ latest_run_id: string }>();
+    const id = current!.latest_run_id;
+    await env.DB.prepare(
+      "UPDATE evaluations SET state='COMPLETED',ai_status='FAILED',evidence='[]' WHERE id=?",
+    )
+      .bind(id)
+      .run();
+    const response = await api(
+      new Request('https://test/api/evaluations/' + id + '/retry', {
+        method: 'POST',
+        headers: { authorization: 'Bearer ' + admin },
+      }),
+      env,
+    );
+    expect(response.status).toBe(202);
+    const result = (await response.json()) as { runId: string };
+    expect(result.runId).not.toBe(id);
+    expect(
+      await env.DB.prepare(
+        'SELECT state,ai_status,evidence FROM evaluations WHERE id=?',
+      )
+        .bind(id)
+        .first(),
+    ).toMatchObject({
+      state: 'COMPLETED',
+      ai_status: 'FAILED',
+      evidence: '[]',
+    });
+    expect(
+      await env.DB.prepare(
+        'SELECT latest_run_id FROM submissions WHERE repository_id=1 AND pr_number=24',
+      ).first(),
+    ).toMatchObject({ latest_run_id: result.runId });
+    await env.DB.prepare(
+      "UPDATE evaluations SET state='COMPLETED',ai_status='FAILED' WHERE id=?",
+    )
+      .bind(result.runId)
+      .run();
+    await env.DB.prepare(
+      "UPDATE hackathons SET status='PAUSED' WHERE id='initial'",
+    ).run();
+    expect(
+      (
+        await api(
+          new Request(
+            'https://test/api/evaluations/' + result.runId + '/retry',
+            { method: 'POST', headers: { authorization: 'Bearer ' + admin } },
+          ),
+          env,
+        )
+      ).status,
+    ).toBe(409);
+    await env.DB.prepare(
+      "UPDATE hackathons SET status='ACTIVE' WHERE id='initial'",
+    ).run();
+    const concurrent = await Promise.all(
+      [1, 2].map(() =>
+        api(
+          new Request(
+            'https://test/api/evaluations/' + result.runId + '/retry',
+            { method: 'POST', headers: { authorization: 'Bearer ' + admin } },
+          ),
+          env,
+        ),
+      ),
+    );
+    expect(concurrent.map((r) => r.status).sort()).toEqual([202, 409]);
+    for (const response of concurrent.filter((r) => r.status === 202)) {
+      const body = (await response.json()) as { runId: string };
+      expect(
+        await env.DB.prepare('SELECT id FROM evaluations WHERE id=?')
+          .bind(body.runId)
+          .first(),
+      ).toBeTruthy();
+    }
   });
   it('exposes evidence only with admin authorization and disables review writes', async () => {
     expect(
