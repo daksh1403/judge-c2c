@@ -839,3 +839,14 @@ td small {
     padding: 9px 10px;
   }
 }
+
+.judge-summary {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 16px;
+}
+.judge-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}

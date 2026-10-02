@@ -1,0 +1,21 @@
+name: Feature request
+description: Propose a concrete product improvement.
+title: 'Feature request: '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and users affected
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Desired behavior and acceptance criteria
+      description: This proposal is not an authoritative judging contract.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and tradeoffs

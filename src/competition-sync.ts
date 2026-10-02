@@ -7,7 +7,12 @@ import {
   auditStatement,
   type CompetitionServices,
 } from './competition-store';
-import { syncIssue, queueIssueLabels, assignIssue } from './competition-issues';
+import {
+  syncIssue,
+  queueIssueLabels,
+  assignIssue,
+  expirationStatements,
+} from './competition-issues';
 import { resolveSubmission } from './competition-submissions';
 import type { Env } from './env';
 export const managementEventSchema = z
@@ -202,8 +207,34 @@ export async function processCompetitionDelivery(
       const ownBot =
         event.sender.type === 'Bot' &&
         event.sender.login === (await services.appSlug()) + '[bot]';
+      const settings = await eventSettings(env);
+      const trustedOrganizer = settings.policy.organizerGitHubIds.includes(
+        event.sender.id,
+      );
       if (
         !ownBot &&
+        !trustedOrganizer &&
+        event.label?.startsWith('judge:') &&
+        ['labeled', 'unlabeled'].includes(event.action)
+      )
+        await db.batch([
+          auditStatement(
+            env,
+            actor,
+            'issue.label.untrusted-change',
+            event.repositoryId + ':' + event.number,
+            null,
+            {
+              action: event.action,
+              label: event.label,
+              reason:
+                'Native organizer override requires a configured numeric GitHub identity',
+            },
+          ),
+        ]);
+      if (
+        !ownBot &&
+        trustedOrganizer &&
         event.label &&
         ['labeled', 'unlabeled'].includes(event.action) &&
         event.label.startsWith('judge:')
@@ -434,11 +465,12 @@ export async function maintainCompetition(
     )
     .bind(Date.now())
     .run();
-  await db
-    .prepare(
-      "UPDATE issue_assignments SET status='EXPIRED',revoked_at=CURRENT_TIMESTAMP WHERE status IN('ACTIVE','RESERVED') AND expires_at IS NOT NULL AND datetime(expires_at)<=CURRENT_TIMESTAMP",
-    )
-    .run();
+  const expired = await db.batch(expirationStatements(env));
+  for (const row of expired[0]!.results as {
+    repository_id: number;
+    issue_number: number;
+  }[])
+    await queueIssueLabels(env, row.repository_id, row.issue_number);
   // Processing label actions are safe to replay after a host failure: only missing labels are added.
   await db
     .prepare(

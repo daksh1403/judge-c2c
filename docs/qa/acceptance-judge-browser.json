@@ -1,9 +1,10 @@
 {
-  "mode": "REAL_DEPLOYED_API_NO_FIXTURES",
-  "at": "2026-10-02T18:59:17.740Z",
+  "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "at": "2026-10-02T19:02:29.632Z",
+  "origin": "https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev",
   "role": "judge",
-  "overviewStatus": 200,
-  "counts": {
+  "summaryMatchesBackend": true,
+  "summaryCounts": {
     "repositories": 6,
     "teams": 1,
     "activeTeams": 1,
@@ -29,9 +30,7 @@
     "pendingEvents": 0,
     "blockedSync": 0
   },
-  "writeDenied": 403,
-  "bundleStatus": 200,
-  "bundleIntegrity": true,
-  "bundleHead": "749b414d1036a0c1b734af807e681e4894d2345e",
-  "unauthorizedBundle": 401
+  "shortcuts": ["attention", "failed", "mapping", "no-submission", "triage"],
+  "mobileFits": true,
+  "errors": []
 }

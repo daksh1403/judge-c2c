@@ -87,10 +87,37 @@ export const defaultTaxonomy = [
     'blocked',
     'rejected',
     'duplicate',
+    'security-review',
+    'possible-spam',
   ].map((status) => ({
     name: 'judge:status:' + status,
     color: 'fbca04',
     description: 'Judge-C2C workflow: ' + status,
+  })),
+  ...['critical', 'high', 'medium', 'low'].map((value) => ({
+    name: 'judge:priority:' + value,
+    color: 'fbca04',
+    description: 'Advisory priority; organizer decisions take precedence',
+  })),
+  ...['easy', 'medium', 'hard', 'expert'].map((value) => ({
+    name: 'judge:difficulty:' + value,
+    color: 'c2e0c6',
+    description: 'Advisory difficulty; not an objective score',
+  })),
+  ...[
+    'frontend',
+    'backend',
+    'database',
+    'api',
+    'security',
+    'cloud',
+    'devops',
+    'ai',
+    'testing',
+  ].map((value) => ({
+    name: 'judge:domain:' + value,
+    color: 'bfdadc',
+    description: 'Advisory affected component',
   })),
   ...['mandatory', 'optional', 'bonus', 'not-scored', 'approved-challenge'].map(
     (kind) => ({
@@ -202,6 +229,17 @@ export function classifyIssue(
     testing: /\b(test coverage|missing test|unit test)\b/,
     clarification: /\b(clarification|ambiguous|acceptance criteria unclear)\b/,
     feature: /\b(feature request|new feature|enhancement)\b/,
+    analytics: /\b(analytics|reporting dashboard|funnel analysis)\b/,
+    architecture: /\b(architecture|component boundaries|layer bypass)\b/,
+    'ai-ml': /\b(machine learning|model inference|ai pipeline)\b/,
+    'language-conversion':
+      /\b(language conversion|port to python|port to typescript)\b/,
+    refactor: /\b(refactor|duplicated logic)\b/,
+    infrastructure:
+      /\b(devops|deployment pipeline|infrastructure|ci configuration)\b/,
+    accessibility: /\b(accessibility|screen reader|keyboard navigation)\b/,
+    reliability: /\b(reliability|retry policy|fault tolerance)\b/,
+    usability: /\b(usability|user experience|confusing interface)\b/,
   };
   const candidates = Object.entries(rules)
     .filter(([type, rule]) => types.includes(type) && rule.test(text))
@@ -224,15 +262,52 @@ export function classifyIssue(
   if (security) flags.push('security-review');
   if (type === 'bug' && !/\b(reproduc|steps|expected|actual)\b/i.test(body))
     flags.push('needs-information');
+  const explicit = (field: string, allowed: string[]) => {
+    const values = [
+      ...new Set(
+        [
+          ...text.matchAll(
+            new RegExp(
+              '^\\s*' + field + ':\\s*(' + allowed.join('|') + ')\\s*$',
+              'gm',
+            ),
+          ),
+        ].map((m) => m[1]!),
+      ),
+    ];
+    if (values.length > 1) flags.push('needs-triage');
+    return values.length === 1 ? values[0]! : null;
+  };
+  const priority = explicit('priority', ['critical', 'high', 'medium', 'low']);
+  const difficulty = explicit('difficulty', [
+    'easy',
+    'medium',
+    'hard',
+    'expert',
+  ]);
+  const domains = Object.entries({
+    frontend: /\b(frontend|browser|screen reader)\b/,
+    backend: /\b(backend|server|endpoint)\b/,
+    database: /\b(database|sql|migration)\b/,
+    api: /\b(api|endpoint)\b/,
+    security: /\b(security|vulnerability|xss)\b/,
+    cloud: /\b(cloud|cloudflare)\b/,
+    devops: /\b(devops|deployment|ci)\b/,
+    ai: /\b(machine learning|ai pipeline)\b/,
+    testing: /\b(unit test|test coverage)\b/,
+  })
+    .filter(([, rule]) => rule.test(text))
+    .map(([domain]) => domain);
   return {
     type: type ?? null,
-    priority: null,
-    difficulty: null,
+    priority,
+    difficulty,
     severity: null,
-    domains: [] as string[],
+    domains,
+    advisory: true,
     flags: [...new Set(flags)],
     provenance: present.length ? 'github-label' : 'rule',
-    ruleVersion: 'triage-v1',
+    ruleVersion: 'triage-v2',
   };
 }
 export function possibleDuplicates(

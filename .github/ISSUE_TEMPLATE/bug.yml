@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a reproducible Judge-C2C problem.
+title: 'Bug: '
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include the relevant PR or evaluation link without credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and sanitized logs
+      description: Remove tokens, access codes, personal information and sensitive vulnerability details.

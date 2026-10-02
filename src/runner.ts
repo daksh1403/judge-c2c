@@ -8,6 +8,7 @@ import {
 } from './domain';
 import {
   runnerPolicySchema,
+  commandKinds,
   RUNNER_VERSION,
   type RunnerPolicy,
 } from './runner-policy';
@@ -35,7 +36,7 @@ export type RunnerRequest = z.infer<typeof runnerRequestSchema>;
 export const checkResultSchema = z
   .object({
     id: z.string().max(80),
-    kind: z.enum(['build', 'test', 'lint', 'acceptance', 'benchmark']),
+    kind: z.enum([...commandKinds, 'acceptance', 'benchmark']),
     status: z.enum(['PASS', 'FAIL', 'UNVERIFIED']),
     exitCode: z.number().int().nullable(),
     durationMs: z.number().int().nonnegative(),

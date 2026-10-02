@@ -14,7 +14,7 @@ try {
 }
 const image = execFileSync(
   'docker',
-  ['image', 'inspect', 'judge-c2c-runner-local', '--format', '{{.Id}}'],
+  ['image', 'inspect', 'judge-c2c-runner-local:latest', '--format', '{{.Id}}'],
   { encoding: 'utf8' },
 ).trim();
 if (!/^sha256:[a-f0-9]{64}$/.test(image))

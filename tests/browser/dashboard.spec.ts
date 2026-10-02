@@ -419,6 +419,8 @@ test('organizers see not-submitted teams, member identity and issue provenance t
     github_members: 'alice, bob',
     submission_count: 0,
   };
+  let issueQuery = new URLSearchParams();
+  let issueReview: Record<string, string> = {};
   let holdTeam = false,
     releaseTeam: () => void = () => {},
     teamEntered: () => void = () => {};
@@ -427,6 +429,31 @@ test('organizers see not-submitted teams, member identity and issue provenance t
   await page.route('**/api/organization/manage/**', async (route) => {
     const url = new URL(route.request().url());
     const p = url.pathname.split('/manage/')[1];
+    if (p === 'issues') issueQuery = url.searchParams;
+    if (p === 'issues/101/12/review')
+      issueReview = route.request().postDataJSON();
+    if (p === 'issues/101/12')
+      return route.fulfill({
+        json: {
+          issue: {
+            repository_id: 101,
+            number: 12,
+            title: 'Missing validation',
+            source: 'PARTICIPANT',
+            author_login: 'alice',
+            reporter_team_id: 'team-stable',
+            github_state: 'open',
+            review_status: 'NEEDS_TRIAGE',
+            body: 'Expected validation, actual crash.',
+            classification: { flags: [] },
+          },
+          definition: null,
+          versions: [],
+          assignments: [],
+          submissions: [],
+          decisions: [],
+        },
+      });
     if (p === 'teams' && holdTeam) {
       teamEntered();
       await teamGate;
@@ -539,6 +566,39 @@ test('organizers see not-submitted teams, member identity and issue provenance t
   await expect(
     page.getByText('PARTICIPANT · NEEDS_TRIAGE · Not scored'),
   ).toBeVisible();
+  await page.getByLabel('Priority filter').selectOption('high');
+  await page.getByLabel('Difficulty filter').selectOption('hard');
+  await page.getByLabel('Work progress').selectOption('assigned');
+  await page.getByLabel('Label filter').fill('judge:type:bug');
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
+  await expect.poll(() => issueQuery.get('priority')).toBe('high');
+  expect(issueQuery.get('difficulty')).toBe('hard');
+  expect(issueQuery.get('workflow')).toBe('assigned');
+  expect(issueQuery.get('label')).toBe('judge:type:bug');
+  await page
+    .getByRole('button', {
+      name: 'fixture/challenge #12 · Missing validation',
+      exact: false,
+    })
+    .click();
+  await page.getByLabel('Priority override').selectOption('high');
+  await page.getByLabel('Difficulty override').selectOption('hard');
+  await page.getByLabel('Technical severity override').selectOption('medium');
+  await page
+    .getByLabel('Recognition rationale')
+    .fill('Reproducible report independently reviewed by organizer.');
+  await page
+    .getByLabel('Decision reason', { exact: true })
+    .fill('Organizer assessed impact separately from technical severity.');
+  await page
+    .getByRole('button', { name: 'Record review', exact: true })
+    .click();
+  await expect.poll(() => issueReview.priority).toBe('high');
+  expect(issueReview.difficulty).toBe('hard');
+  expect(issueReview.severity).toBe('medium');
+  expect(issueReview.recognition).toBe(
+    'Reproducible report independently reviewed by organizer.',
+  );
   holdTeam = true;
   await page.getByRole('button', { name: 'Teams', exact: true }).click();
   await teamPending;
@@ -690,6 +750,29 @@ test('read-only judges retain navigation and filters while administrative contro
   ).toBeEnabled();
   await page.getByRole('button', { name: 'Submissions', exact: true }).click();
   await expect(page.locator('#workflow-search')).toBeEnabled();
+  await page
+    .getByRole('button', { name: 'Needs attention', exact: true })
+    .click();
+  await expect(page.getByLabel('Attention filter')).toHaveValue('1');
+  await page
+    .getByRole('button', { name: 'Failed evaluations', exact: true })
+    .click();
+  await expect(page.locator('[data-query="evaluationState"]')).toHaveValue(
+    'FAILED',
+  );
+  await page
+    .getByRole('button', { name: 'Missing team mapping', exact: true })
+    .click();
+  await expect(page.locator('#workflow-filter')).toHaveValue(
+    'NEEDS_TEAM_MAPPING',
+  );
+  await page
+    .getByRole('button', { name: 'Not submitted', exact: true })
+    .click();
+  await expect(page.locator('#workflow-filter')).toHaveValue('NOT_SUBMITTED');
+  await page.getByRole('button', { name: 'Issue triage', exact: true }).click();
+  await expect(page.locator('#workflow-filter')).toHaveValue('NEEDS_TRIAGE');
+
   await expect(
     page.getByRole('button', { name: 'Lock organization' }),
   ).toBeEnabled();
