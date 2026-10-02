@@ -163,6 +163,7 @@
       );
   }
   async function view(which) {
+    ++detailGeneration;
     tab = which;
     const filters =
       tab === 'teams'
@@ -300,6 +301,13 @@
     } else if (d.issue) {
       const i = d.issue,
         teams = (await api('teams?status=ACTIVE')).teams;
+      if (
+        generation !== detailGeneration ||
+        currentRoot !== root ||
+        selectedTab !== tab ||
+        !root.isConnected
+      )
+        return;
       target.innerHTML = `<h3>#${i.number} ${esc(i.title)}</h3><p>${esc(i.source)} · reporter @${esc(i.author_login)} · team ${esc(i.reporter_team_id || 'Unknown')} · GitHub ${esc(i.github_state)} / judging ${esc(i.review_status)}</p><p>${i.classification?.flags?.includes('security-review') ? 'Security review required. Do not reproduce exploit details publicly. Use GitHub private vulnerability reporting where enabled.' : ''}</p><pre>${esc(i.body)}</pre><p>Classification: ${esc(JSON.stringify(i.classification))}</p><form id="review-issue" class="review-form">${select('reviewStatus', 'Organizer decision', ['NEEDS_TRIAGE', 'APPROVED', 'REJECTED', 'DUPLICATE', 'NEEDS_INFORMATION', 'RECOGNIZED'])}${field('reason', 'Decision reason')}<label>Canonical duplicate issue<input name="canonicalNumber" type="number"></label><label>Type override<input name="type" placeholder="bug, security, documentation…"></label><button class="button">Record review</button></form>${d.definition ? `<form id="assign-issue" class="review-form"><label>Eligible team<select name="teamId">${teams.map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></label><label><input name="reservation" type="checkbox"> Reserve</label><button class="button">Assign frozen challenge</button></form>` : '<p>Not an official challenge. Publish authoritative requirements to enable assignment.</p>'}<h4>Assignments</h4>${d.assignments.map((a) => `<p>${esc(a.team_name)} · ${esc(a.status)} / ${esc(a.progress)} · <code>${esc(a.id)}</code></p>`).join('')}<form id="assignment-decision" class="review-form">${field('assignmentId', 'Assignment ID')}${select('decision', 'Completion decision', ['CHANGES_REQUESTED', 'ACCEPTED', 'REOPENED'])}<label>Current evaluation run ID<input name="runId"></label>${field('reason', 'Evidence-backed decision reason')}<button class="button">Record completion decision</button></form><h4>Version history</h4>${d.versions.map((v) => `<p><code>${esc(v.contract_hash)}</code> · ${esc(v.created_at)}</p>`).join('')}<h4>Completion history</h4><pre>${esc(JSON.stringify(d.decisions, null, 2))}</pre>`;
       form('review-issue', async (v) => {
         if (!v.canonicalNumber) delete v.canonicalNumber;

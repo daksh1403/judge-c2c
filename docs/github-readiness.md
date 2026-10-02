@@ -16,6 +16,10 @@ automatic label writes and participant `/judge claim` events can work.
 Another installed App, `daksh-codebase-workboard`, already manages some labels and
 starter issues. Judge-C2C uses its own `judge:` taxonomy, preserves unrelated labels,
 and does not interpret that App's labels as authoritative challenge approval.
+Through `gh`, 35 controlled `judge:` label definitions were created in each of the five
+repositories (175 total), preserving all 56 unrelated labels. This provisioned taxonomy
+definitions only: no participant issue was scored, approved, assigned, or closed.
+App-based label application is still blocked until the installation gains Issues write.
 
 ## Repository and baseline observations
 
@@ -41,6 +45,7 @@ mentions payment retries, but its body says it is a label-assignment test. It do
 not define acceptance criteria for payment behavior. No payment implementation
 or tests exist in the repository baseline.
 
+The collaborator lists for all five repositories contain only the organizer account.
 The only organization member returned is `daksh1403` (numeric GitHub ID 166613207).
 Organization membership alone does not create a Judge-C2C team. The live management
 backend currently has no registered teams, official challenges, assignments, or

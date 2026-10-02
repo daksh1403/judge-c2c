@@ -13,7 +13,10 @@ current head. Keep delivery identities throughout the event. See
 Preview builds require approval of the exact commit and a separate account token because
 malicious application PRs can exfiltrate build credentials. No `pull_request_target`
 workflow runs PR code. Preview runtime data comes from public GitHub PRs and reviewer-authored expectations.
-Only per-session test evaluations can be created; privileged organizer writes are disabled.
+The public review API creates only per-session test evaluations; its privileged admin
+writes are disabled. The separate organization service supports authenticated organizer
+management of isolated test-organization state from explicitly allowed review origins.
+Unknown/fork preview origins cannot use that service.
 Review D1 is separate from production and contains no production secrets.
 
 ## Recovery
@@ -148,14 +151,15 @@ before claiming the end-to-end integration is proven. App registration, installa
 and a real assigned submission must be tested with owner approval; mock fixtures do
 not prove these external steps.
 
-## Disabled isolated runner and reviewer checks
+## Isolated runner and reviewer checks
 
 Migration `0006_execution.sql` adds append-only execution records. Apply it to both review
 and organization D1 before deploying this host version. Baseline/head results use separate
 request hashes, immutable image identity and bounded redacted outputs. Retrying creates
 new records; do not edit historical results. Large artifact/R2 operation remains a follow-up.
 
-`RUNNER_ENABLED=false` is deliberate. The account does not have paid Containers access and
+`RUNNER_ENABLED=false` in the checked-in Cloudflare-container configuration is deliberate.
+The account does not have paid Containers access and
 the owner declined enablement for now. Normal `npm run deploy:review` does not provision
 containers. The public native preview has no runner or AI binding; it forwards only
 session-protected organization operations to the internal host. AI runs through Workers AI
@@ -172,6 +176,22 @@ host. It allows four instances. Freeze new contracts with this exact image; an o
 UNCONFIGURED contract stays non-executable. Updating ordinary review configuration disables
 execution again. Do not rotate image content underneath a recorded contract.
 
-Still unproven: prepared image boot, actual guest teardown, network/resource protections,
-private-container HTTP behavior, and real baseline/PR execution. Docker is not running on
-this development machine; no actual participant workload was used to test those claims.
+The development alternative is now the local Docker runner through an authenticated tunnel.
+`npm run runner:connect` deploys its ignored configuration to the existing internal host
+with execution enabled. Trusted image boot, cleanup, resource/network controls, signed
+baseline/head canaries and the deployed protected-console diagnostic have passed.
+See [local Docker operations](local-docker-runner.md). Actual participant behavior remains
+unverified in the README-only challenge repositories. The paid Cloudflare-container path
+and production host-escape resistance remain unproven. Ordinary review deployment disables
+execution; use the explicit local-runner connection command to preserve that configuration.
+
+## GitHub operations
+
+Use authenticated `gh` / `gh api` for live repository, issue, PR, installation,
+label, collaborator and CI state. Verify `gh auth status` first and inspect an
+object before writing it. Reuse a coherent open PR, inspect expected commits and
+checks after each push, and discover the Cloudflare preview from actual PR comments
+or checks. Never print token/secret values, invent GitHub state, or merge without
+an explicit instruction. Owner permission updates and sensitive repository governance
+changes require their appropriate authorized workflow; development CLI credentials
+never replace the backend's short-lived GitHub App credentials.
