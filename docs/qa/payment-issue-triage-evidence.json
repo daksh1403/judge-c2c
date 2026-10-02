@@ -1,0 +1,55 @@
+{
+  "mode": "REAL_GITHUB_ISSUE_WEBHOOK",
+  "at": "2026-10-02T18:05:12.619Z",
+  "issue": {
+    "repository_id": 1371407339,
+    "number": 10,
+    "title": "QA rehearsal: incomplete participant bug report",
+    "body": "app broken pls fix",
+    "github_state": "open",
+    "author_id": 166613207,
+    "author_login": "daksh1403",
+    "reporter_team_id": "team-67b28fd4-8d8a-4920-b861-ae42fc0ae980",
+    "source": "PARTICIPANT",
+    "labels": [
+      "judge:type:bug",
+      "judge:source:participant",
+      "judge:status:needs-triage",
+      "judge:status:needs-information",
+      "judge:evaluation:not-scored"
+    ],
+    "classification": {
+      "appliedLabels": [
+        "judge:source:participant",
+        "judge:status:needs-triage",
+        "judge:evaluation:not-scored",
+        "judge:type:bug",
+        "judge:status:needs-information"
+      ],
+      "difficulty": null,
+      "domains": [],
+      "flags": ["needs-information"],
+      "nativeAssignees": [],
+      "possibleDuplicates": [],
+      "priority": null,
+      "provenance": "github-label",
+      "ruleVersion": "triage-v1",
+      "severity": null,
+      "type": "bug"
+    },
+    "overrides": {},
+    "review_status": "NEEDS_TRIAGE",
+    "official": 0,
+    "canonical_number": null,
+    "recognition": null,
+    "github_updated_at": "2026-10-02T18:04:13Z",
+    "snapshot_hash": "ecb4ddaacc902a66c61d00d6b06fa41a10b5149ea8914335e0f764c133de5045",
+    "created_at": "2026-10-02 18:03:33",
+    "updated_at": "2026-10-02 18:04:19"
+  },
+  "definition": null,
+  "versions": [],
+  "assignments": [],
+  "submissions": [],
+  "decisions": []
+}

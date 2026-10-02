@@ -40,7 +40,7 @@ export async function callMissedReview(
           : {}),
       }),
       reasoning: { effort: 'none' },
-      max_output_tokens: 6000,
+      max_output_tokens: 4500,
       text: {
         format: {
           type: 'json_schema',
