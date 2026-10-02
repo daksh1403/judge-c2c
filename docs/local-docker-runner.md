@@ -28,7 +28,10 @@ in the ignored `.wrangler/local-runner-smoke.json`.
 
 The connection deploys only the existing internal review host with its isolated test
 bindings. It does not provision Cloudflare Containers, enable production, or create a
-new website. Select the trusted payment-retry profile when registering a compatible
+new website. In **GitHub organization**, click **Test Docker runner** to verify the
+actual Worker → authenticated tunnel → Docker path with a synthetic canary. The
+canary compares absent baseline FAIL against prepared service PASS, and records its
+audit result. It does not claim participant functionality. Select the trusted payment-retry profile when registering a compatible
 assigned PR. The contract freezes the exact local Docker image ID; old contracts with
 `UNCONFIGURED` must not be edited or silently upgraded. Register a new assignment
 version instead. The current README-only payment PR does not demonstrate retry logic.

@@ -6,6 +6,7 @@ import { boundedBody, equalSecret, redact, verifyWebhook } from './security';
 import { api } from './api';
 import { aiReview, objective } from './evaluate';
 import { demoContract } from './demo';
+import { runnerDiagnostic } from './runner-diagnostic';
 import { webhook } from './intake';
 import type { Env } from './env';
 import { paymentRetryPolicy, paymentRetryDescriptions } from './runner-policy';
@@ -621,6 +622,40 @@ export async function organization(
     });
   }
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
+  if (
+    url.pathname === '/api/organization/runner-check' &&
+    request.method === 'POST'
+  ) {
+    const bucket = 'runner:' + Math.floor(Date.now() / 60000);
+    await env.ORG_DB.prepare(
+      'INSERT INTO organizer_login_limits(bucket,count) VALUES(?,1) ON CONFLICT(bucket) DO UPDATE SET count=count+1',
+    )
+      .bind(bucket)
+      .run();
+    const limit = await env.ORG_DB.prepare(
+      'SELECT count FROM organizer_login_limits WHERE bucket=?',
+    )
+      .bind(bucket)
+      .first<{ count: number }>();
+    if (limit!.count > 2)
+      return json({ error: 'RUNNER_DIAGNOSTIC_RATE_LIMIT' }, 429);
+    try {
+      const result = await runnerDiagnostic(env);
+      await env.ORG_DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)')
+        .bind('runner.diagnostic', redact(canonical(result)))
+        .run();
+      return json(result);
+    } catch {
+      return json(
+        {
+          synthetic: true,
+          status: 'FAILED',
+          error: 'RUNNER_DIAGNOSTIC_UNAVAILABLE',
+        },
+        502,
+      );
+    }
+  }
   if (
     url.pathname === '/api/organization/reviewer-check' &&
     request.method === 'POST'

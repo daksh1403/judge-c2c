@@ -55,13 +55,34 @@
       }
       const app = status.app;
       $('#content').innerHTML =
-        `<section class="panel"><div class="panel-head"><h2>${esc(status.organization)} · GitHub App</h2><button class="button" id="organization-lock">Lock organization</button></div><div class="inset"><p>${app ? `App <strong>${esc(app.slug)}</strong> · ${app.installationId ? 'Installation #' + app.installationId : 'Awaiting installation'}` : 'Create an organization-owned GitHub App. Contents, PRs and issues: read. Checks: write. No source modification permissions.'}</p>${!app ? '<button class="button primary" id="register-app">Register App on GitHub</button>' : !app.installationId ? `<a class="button primary" href="${esc(app.installUrl)}">Install on ${esc(status.organization)}</a>` : '<button class="button" id="sync-repositories">Sync installed repositories</button>'}<p class="subtle">Only repositories selected during installation are available. Functional behavior remains UNVERIFIED until isolated checks provide execution evidence.</p></div></section><section class="panel inset"><p><strong>Isolated execution: ${status.runner?.enabled ? 'configured' : 'disabled'}</strong> · AI requirement review: ${status.ai?.enabled ? 'configured' : 'disabled'}</p><p class="subtle">${esc(status.runner?.reason || 'Runtime availability has not been verified.')}</p><button class="button" id="test-reviewer">Test AI reviewer</button><p id="reviewer-status" role="status"></p></section><div id="organization-repositories"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
+        `<section class="panel"><div class="panel-head"><h2>${esc(status.organization)} · GitHub App</h2><button class="button" id="organization-lock">Lock organization</button></div><div class="inset"><p>${app ? `App <strong>${esc(app.slug)}</strong> · ${app.installationId ? 'Installation #' + app.installationId : 'Awaiting installation'}` : 'Create an organization-owned GitHub App. Contents, PRs and issues: read. Checks: write. No source modification permissions.'}</p>${!app ? '<button class="button primary" id="register-app">Register App on GitHub</button>' : !app.installationId ? `<a class="button primary" href="${esc(app.installUrl)}">Install on ${esc(status.organization)}</a>` : '<button class="button" id="sync-repositories">Sync installed repositories</button>'}<p class="subtle">Only repositories selected during installation are available. Functional behavior remains UNVERIFIED until isolated checks provide execution evidence.</p></div></section><section class="panel inset"><p><strong>Isolated execution: ${status.runner?.enabled ? 'configured' : 'disabled'}</strong> · AI requirement review: ${status.ai?.enabled ? 'configured' : 'disabled'}</p><p class="subtle">${esc(status.runner?.reason || 'Runtime availability has not been verified.')}</p><button class="button" id="test-runner">Test Docker runner</button><p id="runner-status" role="status"></p><button class="button" id="test-reviewer">Test AI reviewer</button><p id="reviewer-status" role="status"></p></section><div id="organization-repositories"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
       $('#organization-lock').addEventListener('click', async () => {
         try {
           await call('logout', {});
           await load();
         } catch (e) {
           error(e);
+        }
+      });
+      $('#test-runner')?.addEventListener('click', async () => {
+        const button = $('#test-runner');
+        button.disabled = true;
+        $('#runner-status').textContent =
+          'Checking the authenticated tunnel and isolated baseline/submission containers…';
+        try {
+          const result = await call('runner-check', {});
+          $('#runner-status').textContent =
+            result.status === 'COMPLETED'
+              ? 'Docker runner verified: missing baseline FAIL → trusted canary PASS. Synthetic diagnostic, not a participant PR evaluation.'
+              : 'Runner diagnostic: ' +
+                result.status +
+                '. No functional behavior has been verified.';
+        } catch (e) {
+          error(e);
+          $('#runner-status').textContent =
+            'Runner unavailable. Participant checks remain UNVERIFIED.';
+        } finally {
+          button.disabled = false;
         }
       });
       $('#test-reviewer')?.addEventListener('click', async () => {
