@@ -77,7 +77,7 @@ export async function api(request: Request, env: Env) {
       ).results,
     });
   }
-  const runMatch = path.match(/^\/api\/evaluations\/([\w-]{1,80})$/);
+  const runMatch = path.match(/^\/api\/evaluations\/([\w-]{1,80})(\/bundle)?$/);
   if (request.method === 'GET' && runMatch) {
     if (demo)
       return runMatch[1] === demoRun.id
@@ -98,12 +98,31 @@ export async function api(request: Request, env: Env) {
         .bind(run.id)
         .all(),
     ]);
-    return json({
+    const detail = {
       ...run,
       timeline: timeline.results,
       artifacts: artifacts.results,
       execution: execution.results,
-    });
+    };
+    if (runMatch[2]) {
+      const content = canonical({
+        schemaVersion: 1,
+        storage: 'bounded-database-evidence',
+        evaluation: detail,
+      });
+      if (new TextEncoder().encode(content).length > 2_000_000)
+        return json({ error: 'BUNDLE_LIMIT_USE_ARTIFACT_STORAGE' }, 413);
+      return new Response(content, {
+        headers: {
+          'content-type': 'application/json',
+          'content-disposition': `attachment; filename="judge-c2c-${run.id}.json"`,
+          'cache-control': 'no-store',
+          'x-content-type-options': 'nosniff',
+          'x-evidence-sha256': await digest(content),
+        },
+      });
+    }
+    return json(detail);
   }
   if (request.method === 'GET' && path === '/api/artifact') {
     if (demo || !env.ARTIFACTS)
@@ -188,17 +207,29 @@ export async function api(request: Request, env: Env) {
   if (request.method === 'POST' && retryMatch) {
     const run = await getRun(env, retryMatch[1]!);
     if (!run) return json({ error: 'NOT_FOUND' }, 404);
+    if (
+      !(await env.DB.prepare(
+        "SELECT id FROM hackathons WHERE id='initial' AND status='ACTIVE'",
+      ).first())
+    )
+      return json({ error: 'EVENT_NOT_ACTIVE' }, 409);
     if (run.state === 'QUEUED') {
       await dispatch(env, run.id);
       return json({ status: 'dispatch_requested', runId: run.id }, 202);
     }
-    if (run.state !== 'FAILED' || !(await isCurrent(env, run)))
+    if (
+      !(
+        run.state === 'FAILED' ||
+        (run.state === 'COMPLETED' && run.ai_status === 'FAILED')
+      ) ||
+      !(await isCurrent(env, run))
+    )
       return json({ error: 'RUN_NOT_RETRYABLE' }, 409);
     // A retry is a new auditable attempt; the failed report is never overwritten.
     const newId = await digest(run.id + crypto.randomUUID());
-    await env.DB.batch([
+    const retried = await env.DB.batch([
       env.DB.prepare(
-        "INSERT INTO evaluations(id,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,state) SELECT ?,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,'QUEUED' FROM evaluations WHERE id=? AND EXISTS(SELECT 1 FROM submissions WHERE latest_run_id=?)",
+        "INSERT INTO evaluations(id,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,state) SELECT ?,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,'QUEUED' FROM evaluations WHERE id=? AND EXISTS(SELECT 1 FROM submissions WHERE latest_run_id=?) AND EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE')",
       ).bind(newId, run.id, run.id),
       env.DB.prepare(
         'UPDATE submissions SET latest_run_id=? WHERE latest_run_id=? AND EXISTS(SELECT 1 FROM evaluations WHERE id=?)',
@@ -209,11 +240,12 @@ export async function api(request: Request, env: Env) {
       env.DB.prepare(
         'INSERT INTO timeline(run_id,state,detail) SELECT id,state,? FROM evaluations WHERE id=?',
       ).bind('Retry of ' + run.id, newId),
-      env.DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)').bind(
-        'evaluation.retried',
-        run.id + ':' + newId,
-      ),
+      env.DB.prepare(
+        'INSERT INTO audit(action,entity) SELECT ?,? WHERE EXISTS(SELECT 1 FROM evaluations WHERE id=?)',
+      ).bind('evaluation.retried', run.id + ':' + newId, newId),
     ]);
+    if (!retried[0]!.meta.changes)
+      return json({ error: 'RUN_NOT_CURRENT' }, 409);
     await dispatch(env, newId);
     return json({ status: 'retry_requested', runId: newId }, 202);
   }

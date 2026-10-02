@@ -1,5 +1,7 @@
 # Judge-C2C pre-launch hackathon rehearsal
 
+Historical cycle. For current permission, role, benchmark and live payment status, read [the readiness follow-up](readiness-cycle-report.md).
+
 ## Executive summary
 
 **Do not launch an unattended real hackathon yet.** A controlled real GitHub loop

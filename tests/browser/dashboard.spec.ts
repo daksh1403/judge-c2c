@@ -645,3 +645,52 @@ test('approach review exposes separate evidence-backed observations and uncertai
     page.getByText('Private reasoning is unknown.', { exact: false }),
   ).toBeVisible();
 });
+
+test('read-only judges retain navigation and filters while administrative controls are disabled', async ({
+  page,
+}) => {
+  await page.route('**/api/organization/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    const json = path.endsWith('/status')
+      ? {
+          authenticated: true,
+          role: 'judge',
+          organization: 'Fixture',
+          app: { slug: 'fixture', installationId: 1 },
+        }
+      : path.endsWith('/settings')
+        ? {
+            settings: {
+              name: 'Fixture',
+              status: 'ACTIVE',
+              policy: {},
+              taxonomy: [],
+            },
+            capabilities: { events: [] },
+          }
+        : path.endsWith('/overview')
+          ? { counts: { teams: 0, notSubmitted: 0 }, runs: [] }
+          : path.endsWith('/repositories')
+            ? { repositories: [] }
+            : { teams: [], submissions: [], issues: [] };
+    return route.fulfill({ json });
+  });
+  await page.goto('/?organization=1');
+  await expect(
+    page.getByText('JUDGE · READ ONLY', { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Sync installed repositories' }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: 'Test Docker runner' }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole('button', { name: 'Teams', exact: true }),
+  ).toBeEnabled();
+  await page.getByRole('button', { name: 'Submissions', exact: true }).click();
+  await expect(page.locator('#workflow-search')).toBeEnabled();
+  await expect(
+    page.getByRole('button', { name: 'Lock organization' }),
+  ).toBeEnabled();
+});

@@ -44,6 +44,26 @@ export const runnerPolicySchema = z
           .strict(),
       )
       .max(8),
+    benchmarks: z
+      .array(
+        z
+          .object({
+            id: key,
+            path: z
+              .string()
+              .regex(/^\/[a-zA-Z0-9/_-]*$/)
+              .max(200),
+            method: z.literal('GET'),
+            expectedStatus: z.number().int().min(100).max(599),
+            expectedBody: z.json(),
+            samples: z.number().int().min(10).max(30),
+            warmup: z.number().int().min(1).max(5),
+            maxP95Ms: z.number().positive().max(5000),
+          })
+          .strict(),
+      )
+      .max(3)
+      .optional(),
     cases: z
       .array(
         z
@@ -65,7 +85,9 @@ export const runnerPolicySchema = z
   })
   .strict()
   .superRefine((p, ctx) => {
-    const ids = [...p.commands, ...p.cases].map((c) => c.id);
+    const ids = [...p.commands, ...p.cases, ...(p.benchmarks ?? [])].map(
+      (c) => c.id,
+    );
     if (new Set(ids).size !== ids.length)
       ctx.addIssue({
         code: 'custom',
@@ -141,4 +163,4 @@ export const paymentRetryDescriptions: Record<string, string> = {
   'retry-permanent': 'Do not retry a permanent payment failure.',
   'retry-invalid': 'Reject a non-positive maximum attempt count.',
 };
-export const RUNNER_VERSION = 'node-http-v1.0.1';
+export const RUNNER_VERSION = 'node-http-v1.1.0';

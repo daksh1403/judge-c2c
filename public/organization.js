@@ -12,7 +12,8 @@
           "'": '&#39;',
         })[char],
     );
-  let timer = null;
+  let timer = null,
+    roleObserver = null;
   async function call(path, body) {
     const response = await fetch('/api/organization/' + path, {
       headers: body ? { 'content-type': 'application/json' } : {},
@@ -28,6 +29,8 @@
   }
   async function load() {
     clearTimeout(timer);
+    roleObserver?.disconnect();
+    roleObserver = null;
     $('#message').textContent = '';
     $('#login').hidden = true;
     $('#signout').hidden = true;
@@ -54,6 +57,25 @@
         return;
       }
       const app = status.app;
+      if (status.role === 'judge') {
+        const disableAdmin = () => {
+          for (const form of document.querySelectorAll(
+            '#content form:not(#workflow-query)',
+          ))
+            for (const control of form.querySelectorAll(
+              'input,select,textarea,button',
+            ))
+              if (!control.disabled) control.disabled = true;
+          for (const control of document.querySelectorAll(
+            '#sync-repositories,#register-app,#test-runner,#test-reviewer,#retry-labels,#retry-evaluation,[data-configure]',
+          ))
+            if (!control.disabled) control.disabled = true;
+        };
+        roleObserver = new MutationObserver(disableAdmin);
+        roleObserver.observe($('#content'), { childList: true, subtree: true });
+        disableAdmin();
+        $('#mode-label').textContent = 'JUDGE · READ ONLY';
+      }
       $('#content').innerHTML =
         `<section class="panel"><div class="panel-head"><h2>${esc(status.organization)} · GitHub App</h2><button class="button" id="organization-lock">Lock organization</button></div><div class="inset"><p>${app ? `App <strong>${esc(app.slug)}</strong> · ${app.installationId ? 'Installation #' + app.installationId : 'Awaiting installation'}` : 'Create an organization-owned GitHub App. Contents and PRs: read. Issues and checks: write. No source modification permissions.'}</p>${!app ? '<button class="button primary" id="register-app">Register App on GitHub</button>' : !app.installationId ? `<a class="button primary" href="${esc(app.installUrl)}">Install on ${esc(status.organization)}</a>` : '<button class="button" id="sync-repositories">Sync installed repositories</button>'}<p class="subtle">Only repositories selected during installation are available. Functional behavior remains UNVERIFIED until isolated checks provide execution evidence.</p></div></section><section class="panel inset"><p><strong>Isolated execution: ${status.runner?.enabled ? 'configured' : 'disabled'}</strong> · AI requirement review: ${status.ai?.enabled ? 'configured' : 'disabled'}</p><p class="subtle">${esc(status.runner?.reason || 'Runtime availability has not been verified.')}</p><button class="button" id="test-runner">Test Docker runner</button><p id="runner-status" role="status"></p><button class="button" id="test-reviewer">Test AI reviewer</button><p id="reviewer-status" role="status"></p></section><div id="organization-workflow"></div><div id="organization-repositories"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
       $('#organization-lock').addEventListener('click', async () => {
@@ -228,7 +250,7 @@
         '/?organization=1&evaluation=' + encodeURIComponent(id),
       );
       $('#organization-detail').innerHTML =
-        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset"><p>Baseline <code>${esc(run.baseline_sha)}</code><br>Head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)}</p><p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p><p>Functional behavior is verified only by the listed trusted execution results. Missing checks remain UNVERIFIED; benchmarks and full security scans are not available.</p></div><div class="panel-head"><h3>Authoritative requirements</h3></div>${contract.requirements.flatMap((req) => req.criteria.map((criterion) => `<div class="criterion"><strong>${esc(criterion.id)} · ${esc(report?.assessments.find((a) => a.criterionId === criterion.id)?.status || 'UNVERIFIED')}</strong><p>${esc(criterion.description)}</p></div>`)).join('')}${window.JudgeApproach(report)}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Isolated execution</h3></div>${
+        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset"><p>Baseline <code>${esc(run.baseline_sha)}</code><br>Head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)} · AI review: ${esc(run.ai_status || 'pending')}</p>${report?.aiTrace?.failureCode ? `<p class="error">AI review rejected: ${esc(report.aiTrace.failureCode)}. Objective evidence remains available.</p>` : ''}${run.state === 'FAILED' || (run.state === 'COMPLETED' && run.ai_status === 'FAILED') ? `<button class="button" id="retry-evaluation">Retry as a new evaluation attempt</button>` : ''}<p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p><p>Functional behavior is verified only by the listed trusted execution results. Only configured checks are shown; unperformed checks remain UNVERIFIED. Source patterns and advisory matches do not establish exploitability.</p></div><p><a class="button" href="/api/organization/evaluations/${encodeURIComponent(id)}/bundle">Download reproducibility bundle</a></p><div class="panel-head"><h3>Authoritative requirements</h3></div>${contract.requirements.flatMap((req) => req.criteria.map((criterion) => `<div class="criterion"><strong>${esc(criterion.id)} · ${esc(report?.assessments.find((a) => a.criterionId === criterion.id)?.status || 'UNVERIFIED')}</strong><p>${esc(criterion.description)}</p></div>`)).join('')}${window.JudgeApproach(report)}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Isolated execution</h3></div>${
           (run.execution || [])
             .map((row) => {
               const result = JSON.parse(row.result);
@@ -237,6 +259,17 @@
             .join('') ||
           '<div class="empty">No runtime results have been recorded. Isolated execution is disabled or unavailable.</div>'
         }<div class="panel-head"><h3>Evaluation history</h3></div><ol class="timeline">${run.timeline.map((item) => `<li><strong>${esc(item.state)}</strong> ${esc(item.detail)}<small>${esc(item.created_at)}</small></li>`).join('')}</ol></section>`;
+      $('#retry-evaluation')?.addEventListener('click', async () => {
+        try {
+          const next = await call(
+            'evaluations/' + encodeURIComponent(id) + '/retry',
+            {},
+          );
+          await detail(next.runId);
+        } catch (e) {
+          error(e);
+        }
+      });
       if (!['COMPLETED', 'FAILED', 'SUPERSEDED'].includes(run.state))
         timer = setTimeout(() => detail(id), 2500);
     } catch (e) {

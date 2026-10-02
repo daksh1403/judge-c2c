@@ -1888,9 +1888,9 @@
         {
           "id": "20.05",
           "requirement": "Regression tests",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only."
         },
         {
           "id": "20.06",
@@ -1923,30 +1923,36 @@
         {
           "id": "20.10",
           "requirement": "Security scans",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": ["tests/source-security.test.ts"],
+          "note": "Bounded source pattern signals are implemented and tested, but remain UNVERIFIED potential risks; full security scanner adapters and exploitation verification are incomplete."
         },
         {
           "id": "20.11",
           "requirement": "Dependency audit",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": [
+            "tests/dependency-audit.test.ts",
+            "docs/qa/osv-live-evidence.json"
+          ],
+          "note": "Opt-in exact npm declared-version OSV comparison and failure validation tested. Real OSV endpoint timed out; ranges/aliases/workspaces remain unsupported and no installed-package integrity claim is made."
         },
         {
           "id": "20.12",
           "requirement": "Benchmarks",
-          "status": "NOT_IMPLEMENTED",
-          "evidence": ["examples/payment-engine-contract.json"],
-          "note": "No trusted benchmark protocol or performance comparison implemented yet; HTTP acceptance durations are not benchmarks."
+          "status": "PASS",
+          "evidence": [
+            "tests/benchmark.test.ts",
+            "docs/qa/docker-evidence.json"
+          ],
+          "note": "Supported trusted HTTP latency protocol completed ten real development-Docker samples. Behavior validation precedes measurement; includes transport overhead and does not prove production performance or scalability."
         },
         {
           "id": "20.13",
           "requirement": "Trusted challenge harness",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only."
         }
       ]
     },
@@ -2059,9 +2065,9 @@
         {
           "id": "21.11",
           "requirement": "Requirement linkage",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-live-evidence.json"],
+          "note": "Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only."
         }
       ]
     },
@@ -3700,58 +3706,82 @@
         {
           "id": "39.01",
           "requirement": "Repository count",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.02",
           "requirement": "Team count",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.03",
           "requirement": "Issue count",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.04",
           "requirement": "Open submissions",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.05",
           "requirement": "Running evaluations",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.06",
           "requirement": "Completed evaluations",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.07",
           "requirement": "Failed evaluations",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.08",
           "requirement": "Attention count",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/competition.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior."
         },
         {
           "id": "39.09",
@@ -3930,23 +3960,23 @@
         {
           "id": "40.01",
           "requirement": "Team",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.02",
           "requirement": "Repository",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.03",
           "requirement": "Issue",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.04",
@@ -3965,9 +3995,9 @@
         {
           "id": "40.06",
           "requirement": "Completed",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.07",
@@ -3979,23 +4009,23 @@
         {
           "id": "40.08",
           "requirement": "Attention",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.09",
           "requirement": "Security",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.10",
           "requirement": "Regression",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         },
         {
           "id": "40.11",
@@ -4021,9 +4051,9 @@
         {
           "id": "40.14",
           "requirement": "No-submission teams",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["tests/competition.test.ts"],
+          "note": "Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded."
         }
       ]
     },
@@ -4145,9 +4175,13 @@
         {
           "id": "42.01",
           "requirement": "Pending and running",
-          "status": "NOT_IMPLEMENTED",
-          "evidence": ["src/workflow.ts"],
-          "note": "Current workflow publishes a completed Check only; queued and in-progress GitHub Check publication still needs implementation and testing."
+          "status": "PASS",
+          "evidence": [
+            "tests/organization.test.ts",
+            "tests/github-checks.test.ts",
+            "docs/qa/payment-calibration-evidence.json"
+          ],
+          "note": "Queued, in-progress and terminal exact-head Check publication verified in fixture workflow and real payment submission lifecycle."
         },
         {
           "id": "42.02",
@@ -4248,9 +4282,12 @@
         {
           "id": "44.01",
           "requirement": "Protected dashboard",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/organization.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts."
         },
         {
           "id": "44.02",
@@ -4262,9 +4299,13 @@
         {
           "id": "44.03",
           "requirement": "Judge scope",
-          "status": "NOT_IMPLEMENTED",
-          "evidence": ["src/competition.ts", "src/ai.ts"],
-          "note": "Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented."
+          "status": "PASS",
+          "evidence": [
+            "tests/organization.test.ts",
+            "tests/browser/dashboard.spec.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Configured judge role can inspect protected data and cannot mutate competitive state. Actual deployed judge write returned403; read-only shared code, not per-person identity or participant access."
         },
         {
           "id": "44.04",
@@ -4283,9 +4324,12 @@
         {
           "id": "44.06",
           "requirement": "Protected team writes",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/organization.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts."
         },
         {
           "id": "44.07",
@@ -4304,9 +4348,12 @@
         {
           "id": "44.09",
           "requirement": "Protected artifacts",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": [
+            "tests/organization.test.ts",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts."
         },
         {
           "id": "44.10",
@@ -4484,79 +4531,91 @@
         {
           "id": "46.01",
           "requirement": "Large output outside rows",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.02",
           "requirement": "Stdout",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.03",
           "requirement": "Stderr",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.04",
           "requirement": "Test reports",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.05",
           "requirement": "Coverage",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.06",
           "requirement": "Security",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.07",
           "requirement": "Benchmarks",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": [
+            "docs/qa/docker-evidence.json",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked."
         },
         {
           "id": "46.08",
           "requirement": "Diffs",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "BLOCKED",
+          "evidence": ["docs/qa/readiness-cycle-report.md"],
+          "note": "Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage."
         },
         {
           "id": "46.09",
           "requirement": "Generated reports",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": [
+            "docs/qa/docker-evidence.json",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked."
         },
         {
           "id": "46.10",
           "requirement": "Metadata",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": [
+            "docs/qa/docker-evidence.json",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked."
         },
         {
           "id": "46.11",
           "requirement": "Checksums",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PARTIAL",
+          "evidence": [
+            "docs/qa/docker-evidence.json",
+            "docs/qa/readiness-live-access.json"
+          ],
+          "note": "Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked."
         }
       ]
     },

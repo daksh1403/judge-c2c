@@ -11,6 +11,7 @@ export interface Env {
   ORG_PUBLIC_ORIGIN?: string;
   ORG_REVIEW_ORIGINS?: string;
   ORG_ADMIN_TOKEN?: string;
+  ORG_JUDGE_TOKEN?: string;
   ORG_VAULT_KEY?: string;
   DB: D1Database;
   ARTIFACTS?: R2Bucket;

@@ -313,15 +313,15 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [x] **20.02 Build or compilation** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **20.03 Unit tests** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **20.04 Integration tests** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.05 Regression tests** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **20.05 Regression tests** — PASS. Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **20.06 Lint** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [ ] **20.07 Type check** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.08 Formatting where relevant** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **20.09 Coverage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.10 Security scans** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.11 Dependency audit** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **20.12 Benchmarks** — NOT_IMPLEMENTED. No trusted benchmark protocol or performance comparison implemented yet; HTTP acceptance durations are not benchmarks. Evidence: `examples/payment-engine-contract.json`.
-- [ ] **20.13 Trusted challenge harness** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **20.10 Security scans** — PARTIAL. Bounded source pattern signals are implemented and tested, but remain UNVERIFIED potential risks; full security scanner adapters and exploitation verification are incomplete. Evidence: `tests/source-security.test.ts`.
+- [ ] **20.11 Dependency audit** — PARTIAL. Opt-in exact npm declared-version OSV comparison and failure validation tested. Real OSV endpoint timed out; ranges/aliases/workspaces remain unsupported and no installed-package integrity claim is made. Evidence: `tests/dependency-audit.test.ts`, `docs/qa/osv-live-evidence.json`.
+- [x] **20.12 Benchmarks** — PASS. Supported trusted HTTP latency protocol completed ten real development-Docker samples. Behavior validation precedes measurement; includes transport overhead and does not prove production performance or scalability. Evidence: `tests/benchmark.test.ts`, `docs/qa/docker-evidence.json`.
+- [x] **20.13 Trusted challenge harness** — PASS. Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only. Evidence: `docs/qa/payment-live-evidence.json`.
 
 ## 21. Deterministic evidence storage
 
@@ -335,7 +335,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [x] **21.08 Stderr** — PASS. Stored baseline/head execution records include check metadata, bounded stdout/stderr and pinned environment; normalized live evidence summarizes results. Evidence: `docs/qa/payment-live-evidence.json`, `examples/payment-engine-contract.json`, `src/runner.ts`.
 - [ ] **21.09 Structured reports** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **21.10 Artifacts** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **21.11 Requirement linkage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **21.11 Requirement linkage** — PASS. Eighteen trusted payment criteria, including six existing payment regression behaviors, compared at frozen baseline and exact submission head; supported Node HTTP challenge profile only. Evidence: `docs/qa/payment-live-evidence.json`.
 
 ## 22. Secure execution environment
 
@@ -608,14 +608,14 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 39. Administrator dashboard
 
-- [ ] **39.01 Repository count** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.02 Team count** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.03 Issue count** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.04 Open submissions** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.05 Running evaluations** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.06 Completed evaluations** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.07 Failed evaluations** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **39.08 Attention count** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **39.01 Repository count** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.02 Team count** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.03 Issue count** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.04 Open submissions** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.05 Running evaluations** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.06 Completed evaluations** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.07 Failed evaluations** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
+- [x] **39.08 Attention count** — PASS. Authoritative SQL snapshot exposes counts; completed historical runs and exact-head current submissions are distinct. Fixture stale-head and actual API observations support the scoped count behavior. Evidence: `tests/competition.test.ts`, `docs/qa/readiness-live-access.json`.
 - [ ] **39.09 Team name and ID** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **39.10 Members** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **39.11 GitHub identities** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -643,20 +643,20 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 40. Submission sorting filtering
 
-- [ ] **40.01 Team** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.02 Repository** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.03 Issue** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **40.01 Team** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
+- [x] **40.02 Repository** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
+- [x] **40.03 Issue** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
 - [ ] **40.04 Submitted and not submitted** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **40.05 Running** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.06 Completed** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **40.06 Completed** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
 - [ ] **40.07 Failed** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.08 Attention** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.09 Security** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.10 Regression** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **40.08 Attention** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
+- [x] **40.09 Security** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
+- [x] **40.10 Regression** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
 - [ ] **40.11 Missing team mapping** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **40.12 Missing issue mapping** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **40.13 Latest-time sorting** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **40.14 No-submission teams** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **40.14 No-submission teams** — PASS. Combined team/repository/issue/state/attention/security/regression filters and not-submitted search are verified with isolated structured fixtures; clean security PASS is excluded. Evidence: `tests/competition.test.ts`.
 
 ## 41. Issue dashboard
 
@@ -678,7 +678,7 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 42. GitHub Check output
 
-- [ ] **42.01 Pending and running** — NOT_IMPLEMENTED. Current workflow publishes a completed Check only; queued and in-progress GitHub Check publication still needs implementation and testing. Evidence: `src/workflow.ts`.
+- [x] **42.01 Pending and running** — PASS. Queued, in-progress and terminal exact-head Check publication verified in fixture workflow and real payment submission lifecycle. Evidence: `tests/organization.test.ts`, `tests/github-checks.test.ts`, `docs/qa/payment-calibration-evidence.json`.
 - [x] **42.02 Requirement summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **42.03 Check summary** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
 - [x] **42.04 Important findings** — PASS. Real payment-engine PR #7 rehearsal; scope is the frozen Node HTTP challenge and single QA team. Broader language/event policies remain separate verification. Evidence: `docs/qa/payment-live-evidence.json`.
@@ -697,15 +697,15 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 44. Authentication authorization
 
-- [ ] **44.01 Protected dashboard** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **44.01 Protected dashboard** — PASS. Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts. Evidence: `tests/organization.test.ts`, `docs/qa/readiness-live-access.json`.
 - [ ] **44.02 Participant scope** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
-- [ ] **44.03 Judge scope** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
+- [x] **44.03 Judge scope** — PASS. Configured judge role can inspect protected data and cannot mutate competitive state. Actual deployed judge write returned403; read-only shared code, not per-person identity or participant access. Evidence: `tests/organization.test.ts`, `tests/browser/dashboard.spec.ts`, `docs/qa/readiness-live-access.json`.
 - [ ] **44.04 Organizer scope** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.05 Protected re-evaluation** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **44.06 Protected team writes** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **44.06 Protected team writes** — PASS. Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts. Evidence: `tests/organization.test.ts`, `docs/qa/readiness-live-access.json`.
 - [ ] **44.07 Protected assignment** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **44.08 Protected contract** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **44.09 Protected artifacts** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **44.09 Protected artifacts** — PASS. Protected console/bundle requires valid role session; unauthenticated artifact bundle401 and judge team-write403 verified. This covers bounded evidence export, not R2 object artifacts. Evidence: `tests/organization.test.ts`, `docs/qa/readiness-live-access.json`.
 - [ ] **44.10 Cross-team isolation** — NOT_IMPLEMENTED. Current deployment has organizer-only administration and one selected AI model; separate participant/judge roles and dependency/repository-index caching are not implemented. Evidence: `src/competition.ts`, `src/ai.ts`.
 
 ## 45. Persistent data model
@@ -735,17 +735,17 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 
 ## 46. Artifact storage
 
-- [ ] **46.01 Large output outside rows** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.02 Stdout** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.03 Stderr** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.04 Test reports** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.05 Coverage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.06 Security** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.07 Benchmarks** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.08 Diffs** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.09 Generated reports** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.10 Metadata** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **46.11 Checksums** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **46.01 Large output outside rows** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.02 Stdout** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.03 Stderr** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.04 Test reports** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.05 Coverage** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.06 Security** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.07 Benchmarks** — PARTIAL. Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked. Evidence: `docs/qa/docker-evidence.json`, `docs/qa/readiness-live-access.json`.
+- [ ] **46.08 Diffs** — BLOCKED. Large object artifact retention needs Cloudflare R2 account enablement (error10042). Bounded database execution evidence exists but does not satisfy separate large-artifact storage. Evidence: `docs/qa/readiness-cycle-report.md`.
+- [ ] **46.09 Generated reports** — PARTIAL. Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked. Evidence: `docs/qa/docker-evidence.json`, `docs/qa/readiness-live-access.json`.
+- [ ] **46.10 Metadata** — PARTIAL. Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked. Evidence: `docs/qa/docker-evidence.json`, `docs/qa/readiness-live-access.json`.
+- [ ] **46.11 Checksums** — PARTIAL. Benchmark samples and protected bounded evaluation JSON export retain metadata with SHA-256 integrity. Object-storage artifacts and larger bundles remain blocked. Evidence: `docs/qa/docker-evidence.json`, `docs/qa/readiness-live-access.json`.
 
 ## 47. Reproducibility auditability
 

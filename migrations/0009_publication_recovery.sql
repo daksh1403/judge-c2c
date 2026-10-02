@@ -1,0 +1,2 @@
+ALTER TABLE evaluations ADD COLUMN publication_attempted_at TEXT;
+CREATE INDEX evaluations_publication_recovery ON evaluations(publication_status,state,publication_attempted_at);

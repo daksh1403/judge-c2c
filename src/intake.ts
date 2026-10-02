@@ -110,7 +110,7 @@ export async function acceptPullRequest(
         'UPDATE submissions SET closed=1,github_updated_at=? WHERE repository_id=? AND pr_number=? AND github_updated_at<=?',
       ).bind(pr.updated_at, p.repository.id, pr.number, pr.updated_at),
       env.DB.prepare(
-        "UPDATE evaluations SET state='SUPERSEDED',updated_at=CURRENT_TIMESTAMP WHERE repository_id=? AND pr_number=? AND state NOT IN ('COMPLETED','FAILED','SUPERSEDED') AND EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND closed=1)",
+        "UPDATE evaluations SET state='SUPERSEDED',publication_status='PENDING',updated_at=CURRENT_TIMESTAMP WHERE repository_id=? AND pr_number=? AND state NOT IN ('COMPLETED','FAILED','SUPERSEDED') AND EXISTS(SELECT 1 FROM submissions WHERE repository_id=? AND pr_number=? AND closed=1)",
       ).bind(p.repository.id, pr.number, p.repository.id, pr.number),
     ]);
     return Response.json({ status: 'closed' });
@@ -181,7 +181,7 @@ export async function acceptPullRequest(
   // Reopening or returning to a superseded commit creates a fresh attempt without
   // reviving a terminal historical run. Repeated deliveries still resolve the same ID.
   const runId =
-    prior?.state === 'SUPERSEDED'
+    prior?.state === 'SUPERSEDED' || (prior && p.action === 'reopened')
       ? await digest(canonical({ identity, resubmittedAt: pr.updated_at }))
       : identity;
   const assignedIds = resolution ? canonical(resolution.assignmentIds) : null;
@@ -220,7 +220,7 @@ export async function acceptPullRequest(
       'INSERT INTO submissions(repository_id,pr_number,head_sha,latest_run_id,github_updated_at,closed) VALUES(?,?,?,?,?,0) ON CONFLICT(repository_id,pr_number) DO UPDATE SET head_sha=excluded.head_sha,latest_run_id=excluded.latest_run_id,github_updated_at=excluded.github_updated_at,closed=0 WHERE excluded.github_updated_at>=submissions.github_updated_at',
     ).bind(p.repository.id, pr.number, pr.head.sha, runId, pr.updated_at),
     env.DB.prepare(
-      "UPDATE evaluations SET state='SUPERSEDED',updated_at=CURRENT_TIMESTAMP WHERE repository_id=? AND pr_number=? AND state NOT IN ('COMPLETED','FAILED','SUPERSEDED') AND id<>(SELECT latest_run_id FROM submissions WHERE repository_id=? AND pr_number=?)",
+      "UPDATE evaluations SET state='SUPERSEDED',publication_status='PENDING',updated_at=CURRENT_TIMESTAMP WHERE repository_id=? AND pr_number=? AND state NOT IN ('COMPLETED','FAILED','SUPERSEDED') AND id<>(SELECT latest_run_id FROM submissions WHERE repository_id=? AND pr_number=?)",
     ).bind(p.repository.id, pr.number, p.repository.id, pr.number),
     env.DB.prepare(
       "INSERT OR IGNORE INTO timeline(run_id,state,detail) SELECT id,state,'Replaced by a newer submission' FROM evaluations WHERE repository_id=? AND pr_number=? AND state='SUPERSEDED'",

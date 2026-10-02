@@ -351,12 +351,14 @@ describe('protected organization setup', () => {
         } as never;
       if (path.includes('/issues/')) return { number: 3 } as never;
       if (path.includes('/check-runs?')) return { check_runs: [] } as never;
-      if (path.endsWith('/check-runs')) return { id: 9001 } as never;
+      if (path.endsWith('/check-runs') || path.endsWith('/check-runs/9001'))
+        return { id: 9001 } as never;
       if (path.includes('/commits/')) return { sha: base } as never;
       if (path.includes('/compare/'))
         return { merge_base_commit: { sha: base }, files: [] } as never;
       if (path.includes('/check-runs?')) return { check_runs: [] } as never;
-      if (path.endsWith('/check-runs')) return { id: 9001 } as never;
+      if (path.endsWith('/check-runs') || path.endsWith('/check-runs/9001'))
+        return { id: 9001 } as never;
       throw new Error('UNEXPECTED_TEST_PATH');
     });
     const response = await organization(
@@ -427,14 +429,49 @@ describe('protected organization setup', () => {
       'UNVERIFIED',
     );
     const calls = vi.mocked(GitHub.prototype.api).mock.calls;
-    const published = calls.find(
-      ([path, init]) => path.endsWith('/check-runs') && init?.method === 'POST',
-    );
-    const check = JSON.parse(String(published![1]!.body));
+    const checks = calls
+      .filter(
+        ([path, init]) =>
+          /\/check-runs(?:\/9001)?$/.test(path) &&
+          ['POST', 'PATCH'].includes(init?.method ?? ''),
+      )
+      .map(([, init]) => JSON.parse(String(init!.body)));
+    expect(checks.map((c) => c.status)).toEqual([
+      'queued',
+      'in_progress',
+      'completed',
+    ]);
+    expect(checks.slice(0, 2).every((c) => !('conclusion' in c))).toBe(true);
+    const check = checks.at(-1);
     expect(check.details_url).toBe(
       env.ORG_PUBLIC_ORIGIN + '/?organization=1&evaluation=' + run!.id,
     );
     expect(check.conclusion).toBe('action_required');
+    const bundle = await organization(
+      request('/api/organization/evaluations/' + run!.id + '/bundle'),
+      env,
+      ctx,
+    );
+    expect(bundle.status).toBe(200);
+    const text = await bundle.text();
+    expect(JSON.parse(text).evaluation.head_sha).toBe(head);
+    const { digest } = await import('../src/domain');
+    expect(bundle.headers.get('x-evidence-sha256')).toBe(await digest(text));
+    expect(bundle.headers.get('content-disposition')).toContain('attachment');
+    expect(
+      (
+        await organization(
+          request(
+            '/api/organization/evaluations/' + run!.id + '/bundle',
+            'GET',
+            undefined,
+            '',
+          ),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(401);
   });
 
   it('deduplicates installation suspension and reconciles a delayed suspend after restoration', async () => {
@@ -592,5 +629,90 @@ describe('protected organization setup', () => {
       (await organization(request('/api/organization/repositories'), env, ctx))
         .status,
     ).toBe(401);
+  });
+  it('allows judges to inspect results but rejects all administration and App callbacks', async () => {
+    env.ORG_JUDGE_TOKEN = 'judge-test-' + 'b'.repeat(40);
+    const login = request(
+      '/api/organization/login',
+      'POST',
+      { token: env.ORG_JUDGE_TOKEN },
+      '',
+    );
+    login.headers.set('cf-connecting-ip', 'judge-fixture');
+    const response = await organization(login, env, ctx);
+    expect(response.status).toBe(200);
+    const judgeCookie = response.headers.get('set-cookie')!.split(';')[0]!;
+    const status = (await (
+      await organization(
+        request('/api/organization/status', 'GET', undefined, judgeCookie),
+        env,
+        ctx,
+      )
+    ).json()) as { role: string };
+    expect(status.role).toBe('judge');
+    expect(
+      (
+        await organization(
+          request(
+            '/api/organization/repositories',
+            'GET',
+            undefined,
+            judgeCookie,
+          ),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(200);
+    for (const path of [
+      '/api/organization/manage/teams',
+      '/api/organization/manage/settings',
+      '/api/organization/manage/assignments',
+      '/api/organization/manage/challenges',
+      '/api/organization/runner-check',
+      '/api/organization/sync',
+    ])
+      expect(
+        (await organization(request(path, 'POST', {}, judgeCookie), env, ctx))
+          .status,
+      ).toBe(403);
+    expect(
+      (
+        await organization(
+          request(
+            '/auth/github/manifest?state=fake&code=fake',
+            'GET',
+            undefined,
+            judgeCookie,
+          ),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(403);
+    expect(
+      (
+        await organization(
+          request('/api/organization/logout', 'POST', {}, judgeCookie),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await organization(
+          request(
+            '/api/organization/repositories',
+            'GET',
+            undefined,
+            judgeCookie,
+          ),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(401);
+    delete env.ORG_JUDGE_TOKEN;
   });
 });

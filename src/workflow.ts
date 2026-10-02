@@ -17,6 +17,9 @@ import { classifyRisk, objective, aiReview, type Context } from './evaluate';
 import { canonical, digest, type Evidence } from './domain';
 import { redact } from './security';
 import { runObjective } from './runner';
+import { publish } from './github-checks';
+import { dependencyAudit } from './dependency-audit';
+export { publish } from './github-checks';
 
 export class EvaluationWorkflow extends WorkflowEntrypoint<
   Env,
@@ -47,6 +50,10 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
             await this.supersede(run);
             return null;
           }
+          // A status outage must not prevent objective evidence collection.
+          await publish(this.env, (await getRun(this.env, id))!).catch(
+            () => {},
+          );
           const files = await github.compare(c, run.head_sha);
           const commitContext = await github.api<{
             commits?: { sha: string; commit: { message: string } }[];
@@ -66,6 +73,9 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
                 )
                 .slice(0, 8)
                 .map((f) => f.filename),
+              ...(c.analysis?.dependencyAudit === 'OSV_NPM_V1'
+                ? ['package.json', 'package-lock.json']
+                : []),
               ...c.requirements.flatMap((r) =>
                 r.criteria.flatMap((a) =>
                   a.verification.type === 'file_contains'
@@ -122,6 +132,19 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           // Never persist raw source credentials. Source assertions run on the in-memory data;
           // stored context is redacted and includes raw hashes for audit without secret values.
           const evidence = objective(c, result);
+          if (c.analysis?.dependencyAudit === 'OSV_NPM_V1')
+            evidence.push(
+              ...(await dependencyAudit(
+                {
+                  manifest: sources['package.json']?.baseline ?? null,
+                  lock: sources['package-lock.json']?.baseline ?? null,
+                },
+                {
+                  manifest: sources['package.json']?.head ?? null,
+                  lock: sources['package-lock.json']?.head ?? null,
+                },
+              )),
+            );
           const stored = redact(
             canonical({
               ...result,
@@ -149,7 +172,20 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           return JSON.parse(stored) as Context;
         },
       );
-      if (!context) return { status: 'superseded' };
+      if (!context) {
+        await step.do(
+          'publish-superseded',
+          {
+            retries: { limit: 3, delay: '10 seconds', backoff: 'exponential' },
+            timeout: '1 minute',
+          },
+          async () => {
+            const run = await getRun(this.env, id);
+            if (run) await publish(this.env, run);
+          },
+        );
+        return { status: 'superseded' };
+      }
       await step.do(
         'objective',
         {
@@ -309,90 +345,5 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         'SUPERSEDED',
         'New head or closed PR',
       );
-  }
-}
-export async function publish(env: Env, run: Run) {
-  const c = parseContract(run);
-  const github = await GitHub.installation(env, c);
-  const evidence = run.evidence ? (JSON.parse(run.evidence) as Evidence[]) : [];
-  const hasFailure = evidence.some(
-    (e) =>
-      e.status === 'FAIL' &&
-      (e.criterionId || e.kind === 'policy' || e.baselineStatus === 'PASS'),
-  );
-  const uncertain =
-    evidence.some((e) => e.status === 'UNVERIFIED') ||
-    c.requirements.some((r) =>
-      r.criteria.some(
-        (a) =>
-          a.kind === 'functional' &&
-          !evidence.some(
-            (e) =>
-              e.criterionId === a.id &&
-              e.kind === 'execution' &&
-              e.status !== 'UNVERIFIED',
-          ),
-      ),
-    );
-  const report = run.report
-    ? (JSON.parse(run.report) as { summary: string })
-    : null;
-  const conclusion =
-    run.state === 'SUPERSEDED'
-      ? 'cancelled'
-      : run.state === 'FAILED'
-        ? 'action_required'
-        : hasFailure
-          ? 'failure'
-          : uncertain || run.ai_status === 'FAILED'
-            ? 'action_required'
-            : 'neutral';
-  const body = {
-    name: 'Judge-C2C',
-    head_sha: run.head_sha,
-    external_id: run.id,
-    status: 'completed',
-    conclusion,
-    ...(env.PUBLIC_ORIGIN
-      ? {
-          details_url: `${env.PUBLIC_ORIGIN}/${env.EVALUATION_DETAILS_KIND === 'organization' ? '?organization=1&evaluation=' : '?run='}${run.id}`,
-        }
-      : {}),
-    output: {
-      title:
-        run.state === 'COMPLETED'
-          ? 'Evidence review complete — human judging remains required'
-          : `Evaluation ${run.state.toLowerCase()}`,
-      summary: `${report?.summary ?? run.failure_code ?? 'Evaluation superseded.'}\n\nBaseline: ${run.baseline_sha}\nHead: ${run.head_sha}\nContract: ${run.contract_hash}\nObjective evidence: ${evidence.filter((e) => e.status === 'PASS').length} pass, ${evidence.filter((e) => e.status === 'FAIL').length} fail, ${evidence.filter((e) => e.status === 'UNVERIFIED').length} unverified.\n${evidence.some((e) => e.kind === 'execution' && e.baselineStatus) ? 'Baseline and submission execution evidence is available; inspect trusted acceptance versus supplemental repository commands.' : 'No verified runtime results are available.'}`,
-    },
-  };
-  try {
-    let checkId = run.check_run_id;
-    if (!checkId) {
-      // Recover after create succeeded but DB acknowledgement failed.
-      const existing = await github.api<{
-        check_runs: { id: number; external_id: string }[];
-      }>(
-        `/repos/${c.repository.fullName}/commits/${run.head_sha}/check-runs?check_name=Judge-C2C&filter=all&per_page=100`,
-      );
-      checkId =
-        existing.check_runs.find((x) => x.external_id === run.id)?.id ?? null;
-    }
-    const result = await github.api<{ id: number }>(
-      `/repos/${c.repository.fullName}/check-runs${checkId ? '/' + checkId : ''}`,
-      { method: checkId ? 'PATCH' : 'POST', body: JSON.stringify(body) },
-    );
-    await env.DB.prepare(
-      "UPDATE evaluations SET check_run_id=?,publication_status='PUBLISHED' WHERE id=?",
-    )
-      .bind(result.id, run.id)
-      .run();
-  } catch (error) {
-    await env.DB.prepare(
-      "UPDATE evaluations SET publication_status='FAILED' WHERE id=?",
-    )
-      .bind(run.id)
-      .run();
-    throw error;
   }
 }

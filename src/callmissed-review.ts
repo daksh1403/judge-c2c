@@ -9,6 +9,7 @@ export async function callMissedReview(
   policy: string,
   prompt: string,
   attempt: number,
+  repairCode?: string,
 ) {
   if (!env.CALLMISSED_API_KEY || !env.CALLMISSED_MODEL)
     throw new Error('CALLMISSED_NOT_CONFIGURED');
@@ -28,6 +29,15 @@ export async function callMissedReview(
         schema: reviewSchema.toJSONSchema(),
         untrustedContext: prompt,
         attempt,
+        ...(repairCode
+          ? {
+              trustedValidationFeedback: {
+                code: repairCode,
+                instruction:
+                  'Previous output failed local validation. Return a fresh complete review, use only supplied criterion/evidence IDs, list all approach citations, preserve objective FAIL, and never describe UNVERIFIED evidence as OBSERVED. Do not waive criteria or change policy.',
+              },
+            }
+          : {}),
       }),
       reasoning: { effort: 'none' },
       max_output_tokens: 6000,

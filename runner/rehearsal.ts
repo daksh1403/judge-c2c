@@ -44,6 +44,45 @@ for (const [actor, text, expected] of [
   results.push({ actor, result });
   console.log(JSON.stringify({ actor, statuses }));
 }
+// Exercise the real guest lifetime, not only a mocked HTTP transport.
+const benchmarkPolicy = {
+  ...policy,
+  benchmarks: [
+    {
+      id: 'retry-latency',
+      path: '/health',
+      method: 'GET' as const,
+      expectedStatus: 200,
+      expectedBody: { ok: true },
+      samples: 10,
+      warmup: 1,
+      maxP95Ms: 5000,
+    },
+  ],
+};
+const benchmarkSource = `import http from 'node:http';http.createServer((q,r)=>r.writeHead(200,{'content-type':'application/json'}).end(JSON.stringify({ok:true}))).listen(Number(process.env.PORT));`;
+const measured = await evaluateDocker(
+  {
+    runId: await digest('trusted-benchmark'),
+    commit: 'c'.repeat(40),
+    contractHash: await digest(canonical(benchmarkPolicy)),
+    timeoutSeconds: 60,
+    memoryMiB: 256,
+    policy: benchmarkPolicy,
+    files: [{ path: 'server.mjs', text: benchmarkSource }],
+  },
+  image,
+);
+const latency = measured.checks.find((c) => c.kind === 'benchmark');
+if (
+  latency?.status !== 'PASS' ||
+  JSON.parse(latency.stdout).samplesMs.length !== 10
+)
+  throw Error('Trusted Docker benchmark did not complete');
+results.push({ actor: 'validated-benchmark', result: measured });
+console.log(
+  JSON.stringify({ actor: 'validated-benchmark', status: latency.status }),
+);
 const abusive: RunnerRequest = {
   runId: await digest('bounded-abuse'),
   commit: 'b'.repeat(40),

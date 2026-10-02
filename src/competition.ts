@@ -1,3 +1,4 @@
+import { competitionOverview } from './competition-overview';
 import { z } from 'zod';
 import { canonical } from './domain';
 import { boundedBody } from './security';
@@ -141,11 +142,7 @@ export async function competition(
       return json(data);
     }
     if (path === '/overview' && method === 'GET') {
-      const counts = await db
-        .prepare(
-          "SELECT (SELECT count(*) FROM teams) AS teams,(SELECT count(*) FROM teams t WHERE NOT EXISTS(SELECT 1 FROM submissions s WHERE s.team_id=t.id)) AS notSubmitted,(SELECT count(*) FROM github_issues) AS issues,(SELECT count(*) FROM github_issues WHERE review_status IN('NEEDS_TRIAGE','NEEDS_INFORMATION')) AS needsTriage,(SELECT count(*) FROM issue_assignments WHERE status='ACTIVE') AS activeAssignments,(SELECT count(*) FROM submissions WHERE status NOT IN('VALID','CLOSED')) AS needsMapping,(SELECT count(*) FROM submissions) AS submissions,(SELECT count(*) FROM management_inbox WHERE status IN('PENDING','PROCESSING')) AS pendingEvents,(SELECT count(*) FROM github_sync_actions WHERE status IN('BLOCKED','FAILED')) AS blockedSync",
-        )
-        .first();
+      const counts = await competitionOverview(db);
       return json({ counts });
     }
     if (path === '/teams' && method === 'GET') {
@@ -207,7 +204,7 @@ export async function competition(
               .all(),
             db
               .prepare(
-                'SELECT s.*,r.full_name,e.state AS evaluation_state FROM submissions s JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id WHERE s.team_id=? ORDER BY s.github_updated_at DESC LIMIT 100',
+                'SELECT s.*,r.full_name,e.state AS evaluation_state FROM submissions s JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE s.team_id=? ORDER BY s.github_updated_at DESC LIMIT 100',
               )
               .bind(id)
               .all(),
@@ -352,7 +349,7 @@ export async function competition(
             .all(),
           db
             .prepare(
-              'SELECT s.*,t.name AS team_name,e.state AS evaluation_state FROM submissions s LEFT JOIN teams t ON t.id=s.team_id LEFT JOIN evaluations e ON e.id=s.latest_run_id WHERE s.repository_id=? AND EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?) ORDER BY s.github_updated_at DESC',
+              'SELECT s.*,t.name AS team_name,e.state AS evaluation_state FROM submissions s LEFT JOIN teams t ON t.id=s.team_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE s.repository_id=? AND EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?) ORDER BY s.github_updated_at DESC',
             )
             .bind(repositoryId, number)
             .all(),
@@ -435,7 +432,13 @@ export async function competition(
       const team = url.searchParams.get('team'),
         repo = url.searchParams.get('repository'),
         status = url.searchParams.get('status'),
-        issue = url.searchParams.get('issue'),
+        issue = url.searchParams.has('issue')
+          ? z.coerce
+              .number()
+              .int()
+              .positive()
+              .parse(url.searchParams.get('issue'))
+          : null,
         state = url.searchParams.get('evaluationState'),
         notSubmitted = url.searchParams.get('notSubmitted') === '1';
       if (notSubmitted || status === 'NOT_SUBMITTED')
@@ -443,14 +446,15 @@ export async function competition(
           teams: (
             await db
               .prepare(
-                'SELECT t.id,t.name,t.status FROM teams t WHERE NOT EXISTS(SELECT 1 FROM submissions s WHERE s.team_id=t.id) ORDER BY t.name LIMIT 200',
+                "SELECT t.id,t.name,t.status FROM teams t WHERE t.name LIKE ? ESCAPE '!' AND (? IS NULL OR t.id=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM team_repositories r WHERE r.team_id=t.id AND r.repository_id=? AND r.active=1)) AND NOT EXISTS(SELECT 1 FROM submissions s WHERE s.team_id=t.id AND (? IS NULL OR s.repository_id=?)) ORDER BY t.name LIMIT 200",
               )
+              .bind(like, team, team, repo, repo, repo, repo)
               .all()
           ).results,
         });
       const rows = await db
         .prepare(
-          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) ORDER BY s.github_updated_at DESC LIMIT 200",
+          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY s.github_updated_at DESC LIMIT 200",
         )
         .bind(
           like,
@@ -466,6 +470,9 @@ export async function competition(
           state,
           issue,
           issue,
+          Number(url.searchParams.get('attention') === '1'),
+          Number(url.searchParams.get('security') === '1'),
+          Number(url.searchParams.get('regression') === '1'),
         )
         .all<Record<string, unknown>>();
       return json({ submissions: rows.results.map(decode) });

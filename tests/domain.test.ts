@@ -265,3 +265,22 @@ describe('observable solution approach validation', () => {
     );
   });
 });
+
+it('keeps trusted functional PASS separate from unrelated policy failures', () => {
+  const evidence = objective(demoContract, {
+    files: [],
+    sources: {},
+    risk: [],
+    environment: 'fixture',
+    toolVersion: 'fixture',
+  });
+  const c = evidence.find((e) => e.criterionId === 'future-time')!;
+  c.kind = 'execution';
+  c.status = 'PASS';
+  const report = deterministicReport(demoContract, evidence);
+  report.assessments.find((a) => a.criterionId === 'future-time')!.status =
+    'FAIL';
+  expect(() => validateReview(report, demoContract, evidence)).toThrow(
+    'AI cannot override objective functional pass',
+  );
+});
