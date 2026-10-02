@@ -241,7 +241,11 @@ with all eleven approach fields and known evidence citations. The response ID an
 4,803-token usage are retained in [the live PR evidence](callmissed-pr-evidence.json).
 Functional criteria remained UNVERIFIED because the development tunnel was unavailable,
 which demonstrates that successful AI does not fabricate successful execution.
-The local service and tunnel were restarted and a fresh exact head is being evaluated.
+The local service and tunnel were restarted. Fresh head
+`eded69b89a9629df33fe9ec686198ff29f801aeb` completed all four trusted criteria
+(PASS against baseline FAIL) and a validated CallMissed review in two attempts.
+GitHub Check `110831593358` is completed at that exact head with neutral conclusion,
+which preserves human review rather than claiming automatic competition completion.
 The separate synthetic diagnostic did not validate; its provider history is retained
 in [diagnostic evidence](callmissed-live-evidence.json). A real success is not a claim
 that every adversarial scenario or model response is reliable.

@@ -1158,6 +1158,18 @@
       "evidence": "docs/qa/callmissed-pr-evidence.json; docs/qa/callmissed-live-evidence.json",
       "mode": "REAL_GITHUB_INTEGRATION",
       "defect": null
+    },
+    {
+      "feature": "CallMissed end-to-end evaluation",
+      "scenario": "Restored tunnel, fresh real PR head, objective checks and actual AI review",
+      "actor": "Real daksh1403 QA account",
+      "action": "Push controlled new head eded69b89a9629df33fe9ec686198ff29f801aeb and let signed App event evaluate it",
+      "expected": "Four trusted checks pass against baseline failure; structured AI review cites evidence; exact-head GitHub Check and history remain visible",
+      "actual": "Run COMPLETED, four criteria PASS/baseline FAIL, CallMissed Kimi K2.6 review COMPLETED in two attempts, GitHub Check110831593358 completed neutral at exact head; organizer desktop/mobile head and history checked",
+      "status": "PASS",
+      "evidence": "docs/qa/callmissed-pr-evidence.json; docs/qa/dashboard-live-evidence.json",
+      "mode": "REAL_GITHUB_INTEGRATION",
+      "defect": null
     }
   ]
 }
