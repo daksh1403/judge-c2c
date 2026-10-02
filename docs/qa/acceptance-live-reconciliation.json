@@ -1,0 +1,166 @@
+{
+  "mode": "REAL_GITHUB_APP_AND_DEPLOYED_STATE",
+  "at": "2026-10-02T18:57:56.277Z",
+  "capabilities": {
+    "app": {
+      "id": 5154942,
+      "name": "Judge-C2C Daksh-Codebase",
+      "slug": "judge-c2c-daksh-codebase",
+      "owner": "Daksh-Codebase",
+      "ownerType": "Organization",
+      "settingsUrl": "https://github.com/organizations/Daksh-Codebase/settings/apps/judge-c2c-daksh-codebase",
+      "installationUrl": "https://github.com/organizations/Daksh-Codebase/settings/installations/167005353"
+    },
+    "issuesWrite": true,
+    "events": [
+      "check_run",
+      "check_suite",
+      "commit_comment",
+      "create",
+      "delete",
+      "issues",
+      "issue_comment",
+      "issue_dependencies",
+      "issue_relates_to",
+      "label",
+      "pull_request",
+      "pull_request_review",
+      "pull_request_review_comment",
+      "pull_request_review_thread",
+      "push",
+      "release",
+      "repository_dispatch",
+      "sub_issues"
+    ]
+  },
+  "counts": {
+    "repositories": 6,
+    "teams": 1,
+    "activeTeams": 1,
+    "withdrawnTeams": 0,
+    "disqualifiedTeams": 0,
+    "notSubmitted": 0,
+    "noAssignedIssue": 0,
+    "issues": 6,
+    "officialIssues": 2,
+    "participantRaisedIssues": 4,
+    "needsTriage": 4,
+    "activeAssignments": 2,
+    "openSubmissions": 8,
+    "needsMapping": 2,
+    "submissions": 8,
+    "queuedRuns": 0,
+    "runningRuns": 0,
+    "completedRuns": 16,
+    "failedRuns": 0,
+    "supersededRuns": 0,
+    "currentCompleted": 6,
+    "needsAttention": 6,
+    "pendingEvents": 0,
+    "blockedSync": 0
+  },
+  "issues": [
+    {
+      "number": 3,
+      "githubState": "open",
+      "source": "ORGANIZER",
+      "workflow": "needs-triage",
+      "labels": [
+        "judge:source:organizer",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "nativeLabels": [
+        "judge:source:organizer",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "stateMatches": true,
+      "labelsMatch": true
+    },
+    {
+      "number": 6,
+      "githubState": "open",
+      "source": "PARTICIPANT",
+      "workflow": "assigned",
+      "labels": [
+        "judge:type:reliability",
+        "judge:source:participant",
+        "judge:status:assigned",
+        "judge:evaluation:not-scored",
+        "judge:evaluation:approved-challenge",
+        "judge:priority:medium",
+        "judge:difficulty:easy",
+        "judge:domain:api"
+      ],
+      "nativeLabels": [
+        "judge:type:reliability",
+        "judge:source:participant",
+        "judge:status:assigned",
+        "judge:evaluation:not-scored",
+        "judge:evaluation:approved-challenge",
+        "judge:priority:medium",
+        "judge:difficulty:easy",
+        "judge:domain:api"
+      ],
+      "stateMatches": true,
+      "labelsMatch": true
+    },
+    {
+      "number": 1,
+      "githubState": "open",
+      "source": "PARTICIPANT",
+      "workflow": "needs-triage",
+      "labels": [
+        "category:feature",
+        "judge:source:participant",
+        "judge:status:needs-triage",
+        "judge:evaluation:not-scored"
+      ],
+      "nativeLabels": [
+        "category:feature",
+        "judge:source:participant",
+        "judge:status:needs-triage",
+        "judge:evaluation:not-scored"
+      ],
+      "stateMatches": true,
+      "labelsMatch": true
+    },
+    {
+      "number": 2,
+      "githubState": "open",
+      "source": "ORGANIZER",
+      "workflow": "needs-triage",
+      "labels": ["category:feature"],
+      "nativeLabels": ["category:feature"],
+      "stateMatches": true,
+      "labelsMatch": true
+    },
+    {
+      "number": 10,
+      "githubState": "open",
+      "source": "PARTICIPANT",
+      "workflow": "needs-triage",
+      "labels": [
+        "judge:type:bug",
+        "judge:source:participant",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "nativeLabels": [
+        "judge:type:bug",
+        "judge:source:participant",
+        "judge:status:needs-triage",
+        "judge:status:needs-information",
+        "judge:evaluation:not-scored"
+      ],
+      "stateMatches": true,
+      "labelsMatch": true
+    }
+  ],
+  "pendingOperations": [],
+  "failedSync": []
+}

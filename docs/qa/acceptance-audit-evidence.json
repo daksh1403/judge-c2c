@@ -45,5 +45,19 @@
     "taxonomyAfter": 54,
     "preservedExistingLabels": true
   },
-  "knownUnfixedDefect": "CallMissed narrative falsely describes missing bound test despite cited test existing; human evidence review remains required"
+  "knownUnfixedDefect": "CallMissed narrative falsely describes missing bound test despite cited test existing; human evidence review remains required",
+  "authenticatedDevelopmentTunnel": {
+    "at": "2026-10-02T18:55:26.818Z",
+    "runnerVersions": ["node-http-v1.2.0"],
+    "baselineAcceptance": ["FAIL", "FAIL", "FAIL", "FAIL"],
+    "submissionAcceptance": ["PASS", "PASS", "PASS", "PASS"],
+    "scope": "Controlled reference fixture over authenticated tunnel; not a new real participant evaluation"
+  },
+  "liveEvidence": [
+    "docs/qa/acceptance-live-reconciliation.json",
+    "docs/qa/acceptance-issue-browser.json",
+    "docs/qa/readiness-live-access.json",
+    "docs/qa/payment-dashboard-evidence.json"
+  ],
+  "preview": "https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev"
 }

@@ -167,7 +167,7 @@
         (b) => (b.onclick = () => action(() => detail(b.dataset.detail))),
       );
   }
-  async function view(which) {
+  async function view(which, preset = {}) {
     ++detailGeneration;
     tab = which;
     const filters =
@@ -195,7 +195,7 @@
               'NOT_SUBMITTED',
             ];
     root.querySelector('#workflow-body').innerHTML =
-      `<form id="workflow-query" class="review-form"><label>Search ${tab}<input id="workflow-search" type="search"></label><label for="workflow-filter">Status</label><select id="workflow-filter">${filters.map((f) => `<option value="${f}">${f || 'All states'}</option>`).join('')}</select>${tab !== 'teams' ? `<label>Repository filter<select data-query="repository"><option value="">All repositories</option>${options()}</select></label>` : ''}${tab === 'issues' ? `<label>Source filter<select data-query="source"><option value="">All sources</option><option>PARTICIPANT</option><option>ORGANIZER</option><option>UNKNOWN</option></select></label><label>Type filter<input data-query="type" placeholder="bug, reliability, security…"></label><label>Assigned or reporting team<input data-query="team"></label><label>Label filter<input data-query="label" placeholder="judge:status:security-review"></label><label>Work progress<select data-query="workflow"><option value="">All progress</option>${['available', 'assigned', 'in-progress', 'evaluating', 'completed', 'blocked'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Priority filter<select data-query="priority"><option value="">All priorities</option>${['critical', 'high', 'medium', 'low'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Difficulty filter<select data-query="difficulty"><option value="">All difficulties</option>${['easy', 'medium', 'hard', 'expert'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Official challenges<select data-query="official"><option value="">All issues</option><option value="1">Official only</option><option value="0">Other issues</option></select></label>` : ''}${tab === 'submissions' ? `<label>Team ID filter<input data-query="team"></label><label>Issue number filter<input data-query="issue" type="number" min="1"></label><label>Evaluation state<select data-query="evaluationState"><option value="">All evaluations</option>${['QUEUED', 'FETCHING', 'CHECKING', 'REVIEWING', 'SYNTHESIZING', 'COMPLETED', 'FAILED', 'SUPERSEDED'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Attention filter<select data-query="attention"><option value="">All submissions</option><option value="1">Needs attention</option></select></label><label>Security filter<select data-query="security"><option value="">All findings</option><option value="1">Security or dependency concerns</option></select></label><label>Regression filter<select data-query="regression"><option value="">All results</option><option value="1">New failures against passing baseline</option></select></label>` : ''}<button class="button">Search</button></form><div id="workflow-list"></div><div id="workflow-detail"></div>` +
+      `<form id="workflow-query" class="review-form"><label>Search ${tab}<input id="workflow-search" type="search"></label><label for="workflow-filter">Status</label><select id="workflow-filter">${filters.map((f) => `<option value="${f}">${f || 'All states'}</option>`).join('')}</select>${tab !== 'teams' ? `<label>Repository filter<select data-query="repository"><option value="">All repositories</option>${options()}</select></label>` : ''}${tab === 'issues' ? `<label>Source filter<select data-query="source"><option value="">All sources</option><option>PARTICIPANT</option><option>ORGANIZER</option><option>UNKNOWN</option></select></label><label>Type filter<input data-query="type" placeholder="bug, reliability, security…"></label><label>Assigned or reporting team<input data-query="team"></label><label>Label filter<input data-query="label" placeholder="judge:status:security-review"></label><label>Work progress<select data-query="workflow"><option value="">All progress</option>${['available', 'assigned', 'in-progress', 'evaluating', 'completed', 'closed', 'blocked'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Priority filter<select data-query="priority"><option value="">All priorities</option>${['critical', 'high', 'medium', 'low'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Difficulty filter<select data-query="difficulty"><option value="">All difficulties</option>${['easy', 'medium', 'hard', 'expert'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Official challenges<select data-query="official"><option value="">All issues</option><option value="1">Official only</option><option value="0">Other issues</option></select></label>` : ''}${tab === 'submissions' ? `<label>Team ID filter<input data-query="team"></label><label>Issue number filter<input data-query="issue" type="number" min="1"></label><label>Evaluation state<select data-query="evaluationState"><option value="">All evaluations</option>${['QUEUED', 'FETCHING', 'CHECKING', 'REVIEWING', 'SYNTHESIZING', 'COMPLETED', 'FAILED', 'SUPERSEDED'].map((v) => `<option>${v}</option>`).join('')}</select></label><label>Attention filter<select data-query="attention"><option value="">All submissions</option><option value="1">Needs attention</option></select></label><label>Security filter<select data-query="security"><option value="">All findings</option><option value="1">Security or dependency concerns</option></select></label><label>Regression filter<select data-query="regression"><option value="">All results</option><option value="1">New failures against passing baseline</option></select></label>` : ''}<button class="button">Search</button></form><div id="workflow-list"></div><div id="workflow-detail"></div>` +
       (tab === 'teams'
         ? `<details><summary>Create a team</summary><form id="create-team" class="review-form">${field('name', 'Team name')}${field('displayName', 'First member name')}${field('githubLogin', 'GitHub username')}${select('status', 'Team state', ['PENDING', 'ACTIVE'])}<label>Repositories<select name="repositories" multiple>${options()}</select></label><button class="button primary">Create team</button></form></details><details><summary>Import teams</summary><form id="import-teams" class="review-form"><p>CSV columns: team_name, participant_name, github_username, optional email, external_id, repository, issue_number, team_status. Identity conflicts reject the entire import.</p><label>CSV<textarea name="csv" required rows="8"></textarea></label><label><input type="checkbox" name="commit"> Commit validated import</label><button class="button">Validate / import</button><pre id="import-result"></pre></form></details>`
         : '') +
@@ -244,6 +244,13 @@
         'Challenge version published. Assign it to an eligible active team.',
       );
     });
+    for (const [key, value] of Object.entries(preset)) {
+      const control =
+        key === 'status'
+          ? root.querySelector('#workflow-filter')
+          : root.querySelector(`[data-query="${key}"]`);
+      if (control) control.value = value;
+    }
     await list();
   }
   async function detail(path) {
@@ -375,7 +382,7 @@
     async mount(node, repos) {
       root = node;
       repositories = repos;
-      root.innerHTML = `<section class="panel"><div class="panel-head"><h2>Hackathon workflow</h2></div><div class="inset"><p id="workflow-counts"></p><p id="workflow-capabilities"></p><nav aria-label="Hackathon management"><button class="button" data-tab="teams" disabled>Teams</button> <button class="button" data-tab="issues" disabled>Issues</button> <button class="button" data-tab="submissions" disabled>Submissions</button></nav><p role="status"></p><form id="reconcile-repository" class="review-form"><label>Synchronize GitHub issues and PRs<select name="repositoryId">${options()}</select></label><button class="button">Reconcile repository</button></form><button class="button" id="retry-labels">Retry blocked label synchronization</button><details><summary>Event policy and label taxonomy</summary><form id="event-policy" class="review-form"><label>Versioned event policy JSON<textarea name="document" rows="10" required></textarea></label><button class="button">Save organizer policy</button></form></details><div id="workflow-body"></div></div></section>`;
+      root.innerHTML = `<section class="panel"><div class="panel-head"><h2>Hackathon workflow</h2></div><div class="inset"><div id="judge-summary" class="stats judge-summary" aria-label="Judging overview"></div><nav id="judge-shortcuts" class="judge-shortcuts" aria-label="Review queues"><button class="button" data-queue="attention" disabled>Needs attention</button><button class="button" data-queue="failed" disabled>Failed evaluations</button><button class="button" data-queue="mapping" disabled>Missing team mapping</button><button class="button" data-queue="no-submission" disabled>Not submitted</button><button class="button" data-queue="triage" disabled>Issue triage</button></nav><details><summary>All event counts</summary><p id="workflow-counts"></p></details><details><summary>GitHub integration status</summary><p id="workflow-capabilities"></p></details><nav aria-label="Hackathon management"><button class="button" data-tab="teams" disabled>Teams</button> <button class="button" data-tab="issues" disabled>Issues</button> <button class="button" data-tab="submissions" disabled>Submissions</button></nav><p role="status"></p><form id="reconcile-repository" class="review-form"><label>Synchronize GitHub issues and PRs<select name="repositoryId">${options()}</select></label><button class="button">Reconcile repository</button></form><button class="button" id="retry-labels">Retry blocked label synchronization</button><details><summary>Event policy and label taxonomy</summary><form id="event-policy" class="review-form"><label>Versioned event policy JSON<textarea name="document" rows="10" required></textarea></label><button class="button">Save organizer policy</button></form></details><div id="workflow-body"></div></div></section>`;
       const [overview, settings] = await Promise.all([
         api('overview'),
         api('settings'),
@@ -384,8 +391,21 @@
       root.querySelector('#workflow-counts').textContent = Object.entries(
         overview.counts,
       )
-        .map(([k, v]) => `${k}: ${v}`)
+        .map(([k, v]) => `${k.replace(/([a-z])([A-Z])/g, '$1 $2')}: ${v}`)
         .join(' · ');
+      root.querySelector('#judge-summary').innerHTML = [
+        ['Needs attention', 'needsAttention'],
+        ['Active teams', 'activeTeams'],
+        ['Not submitted', 'notSubmitted'],
+        ['Running evaluations', 'runningRuns'],
+        ['Queued evaluations', 'queuedRuns'],
+        ['Current completed', 'currentCompleted'],
+      ]
+        .map(
+          ([label, key]) =>
+            `<article class="stat ${key === 'needsAttention' ? 'attention' : ''}"><div class="stat-label">${label}</div><div class="stat-value">${esc(overview.counts[key] ?? 'Unavailable')}</div></article>`,
+        )
+        .join('');
       root.querySelector('#workflow-capabilities').textContent =
         settings.capabilities?.issuesWrite &&
         ['issues', 'issue_comment'].every((e) =>
@@ -393,6 +413,11 @@
         )
           ? 'GitHub issue synchronization permissions and subscriptions confirmed.'
           : 'Owner setup needed: in GitHub App settings enable Issues read and write, subscribe to Issues and Issue comment events, then approve updated installation permissions. PR evaluation access remains available.';
+      root.querySelector('#workflow-capabilities').parentElement.open =
+        !settings.capabilities?.issuesWrite ||
+        !['issues', 'issue_comment'].every((e) =>
+          settings.capabilities?.events?.includes(e),
+        );
       if (settings.capabilities?.app) {
         const app = settings.capabilities.app;
         const panel = root.querySelector('#workflow-capabilities');
@@ -452,6 +477,17 @@
         });
       await view('teams');
       if (root !== node || !node.isConnected) return;
+      const queues = {
+        attention: ['submissions', { attention: '1' }],
+        failed: ['submissions', { evaluationState: 'FAILED' }],
+        mapping: ['submissions', { status: 'NEEDS_TEAM_MAPPING' }],
+        'no-submission': ['submissions', { status: 'NOT_SUBMITTED' }],
+        triage: ['issues', { status: 'NEEDS_TRIAGE' }],
+      };
+      root.querySelectorAll('[data-queue]').forEach((b) => {
+        b.onclick = () => action(() => view(...queues[b.dataset.queue]));
+        b.disabled = false;
+      });
       root.querySelectorAll('[data-tab]').forEach((b) => {
         b.onclick = () => action(() => view(b.dataset.tab));
         b.disabled = false;

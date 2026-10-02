@@ -750,6 +750,29 @@ test('read-only judges retain navigation and filters while administrative contro
   ).toBeEnabled();
   await page.getByRole('button', { name: 'Submissions', exact: true }).click();
   await expect(page.locator('#workflow-search')).toBeEnabled();
+  await page
+    .getByRole('button', { name: 'Needs attention', exact: true })
+    .click();
+  await expect(page.getByLabel('Attention filter')).toHaveValue('1');
+  await page
+    .getByRole('button', { name: 'Failed evaluations', exact: true })
+    .click();
+  await expect(page.locator('[data-query="evaluationState"]')).toHaveValue(
+    'FAILED',
+  );
+  await page
+    .getByRole('button', { name: 'Missing team mapping', exact: true })
+    .click();
+  await expect(page.locator('#workflow-filter')).toHaveValue(
+    'NEEDS_TEAM_MAPPING',
+  );
+  await page
+    .getByRole('button', { name: 'Not submitted', exact: true })
+    .click();
+  await expect(page.locator('#workflow-filter')).toHaveValue('NOT_SUBMITTED');
+  await page.getByRole('button', { name: 'Issue triage', exact: true }).click();
+  await expect(page.locator('#workflow-filter')).toHaveValue('NEEDS_TRIAGE');
+
   await expect(
     page.getByRole('button', { name: 'Lock organization' }),
   ).toBeEnabled();

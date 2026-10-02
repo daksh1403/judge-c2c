@@ -14,6 +14,8 @@ This cycle replaces every generic ledger placeholder with a scoped finding. It e
 - Execution result kinds supported only build/test/lint. Trusted policies may now distinguish other supplemental check kinds; the image must supply the actual tools. No participant dependency installation or network permission is introduced.
 - The ledger accepted generic audit notes and PASS based on any nonempty evidence string. Validation now rejects placeholders, source-only PASS, wrong item count/IDs, rewritten requirements and nonexistent local evidence against a separate authoritative requirement manifest.
 
+Judges also receive readable overview cards and one-click queues for attention, failed evaluations, missing team mappings, teams without submissions and issue triage. Shortcuts use the existing backend filters; unavailable counts remain visibly unavailable. Detailed integration state is collapsed to keep the primary review path clear.
+
 ## Evidence boundaries
 
 Tests use actual D1 migrations with fixture GitHub identities/API responses. They do not manufacture independent real GitHub accounts. Existing payment evidence separately records real App webhooks, frozen baseline/head, controlled Docker execution, CallMissed and exact-head Checks.
