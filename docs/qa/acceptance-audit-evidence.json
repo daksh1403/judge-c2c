@@ -1,0 +1,49 @@
+{
+  "at": "2026-10-02T18:51:42.234486+00:00",
+  "scope": "Local D1/GitHub API fixtures plus controlled real Docker; live organizer configuration separately identified; not event-scale launch validation",
+  "unitIntegration": {
+    "passed": 163,
+    "files": 21
+  },
+  "browser": {
+    "passed": 8,
+    "mode": "LOCAL_BROWSER_WITH_FIXTURE_API"
+  },
+  "docker": {
+    "mode": "REAL_LOCAL_DOCKER_CONTROLLED_FIXTURES",
+    "runnerVersion": "node-http-v1.2.0",
+    "ideal": ["PASS", "PASS", "PASS", "PASS"],
+    "partial": ["PASS", "PASS", "FAIL", "PASS"],
+    "hardcoded": ["PASS", "FAIL", "FAIL", "FAIL"],
+    "benchmark": "PASS",
+    "containment": {
+      "network": false,
+      "metadata": false,
+      "root": false,
+      "secret": false,
+      "boundedProcesses": true,
+      "otherSubmission": false,
+      "uid": 65534
+    }
+  },
+  "acceptanceCounts": {
+    "PASS": 463,
+    "BLOCKED": 2,
+    "PARTIAL": 179,
+    "UNVERIFIED": 6,
+    "NOT_APPLICABLE": 2,
+    "NOT_IMPLEMENTED": 61,
+    "FAIL": 1
+  },
+  "liveOrganizerSettings": {
+    "mode": "REAL_ORGANIZER_SETTINGS",
+    "at": "2026-10-02T18:46:15.645Z",
+    "organization": "Daksh-Codebase",
+    "ownerVerifiedViaGitHub": true,
+    "organizerGitHubIds": [166613207],
+    "taxonomyBefore": 35,
+    "taxonomyAfter": 54,
+    "preservedExistingLabels": true
+  },
+  "knownUnfixedDefect": "CallMissed narrative falsely describes missing bound test despite cited test existing; human evidence review remains required"
+}

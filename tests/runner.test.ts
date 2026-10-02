@@ -317,3 +317,45 @@ describe('trusted isolated execution', () => {
     ).toBe('FAILED');
   });
 });
+it('preserves configured check kinds and rejects forged kind relabeling', async () => {
+  const extended = {
+    ...policy,
+    commands: [
+      {
+        id: 'integration-check',
+        kind: 'integration' as const,
+        argv: ['node', '--test'],
+      },
+      {
+        id: 'coverage-check',
+        kind: 'coverage' as const,
+        argv: ['node', '--test', '--experimental-test-coverage'],
+      },
+      {
+        id: 'typecheck-check',
+        kind: 'typecheck' as const,
+        argv: ['node', '--check', 'server.mjs'],
+      },
+    ],
+  };
+  const extendedRequest = { ...request, policy: extended };
+  const extendedResult = await result(extendedRequest);
+  expect(
+    validateRunnerResult(
+      extendedResult,
+      extendedRequest,
+      await digest(canonical(extendedRequest)),
+    )
+      .checks.filter((c) => c.kind !== 'acceptance')
+      .map((c) => c.kind),
+  ).toEqual(['integration', 'coverage', 'typecheck']);
+  const forged = {
+    ...extendedResult,
+    checks: extendedResult.checks.map((c) =>
+      c.id === 'coverage-check' ? { ...c, kind: 'test' } : c,
+    ),
+  };
+  expect(() =>
+    validateRunnerResult(forged, extendedRequest, extendedResult.requestHash),
+  ).toThrow('RUNNER_CHECK_KIND_MISMATCH');
+});

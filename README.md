@@ -121,9 +121,7 @@ configuring assignments concurrently.
 Unassigned PRs fail explicitly instead of guessing a team or using participant judging
 policy. Redeliver an event rejected before assignment registration.
 
-`file_contains` is permitted for source/documentation criteria only. `runner` references an authoritative trusted acceptance case. The adapter is
-implemented but deployment is disabled, so runtime results remain UNVERIFIED; `human` needs future audited
-adjudication. AI cannot waive requirements, mint evidence or override objective failures.
+`file_contains` is permitted for source/documentation criteria only. `runner` references an authoritative trusted acceptance case. The development Docker/tunnel adapter is enabled for the controlled payment-engine rehearsal; production execution remains disabled. Functional criteria without trusted execution remain UNVERIFIED; `human` criteria do not become PASS merely through source inspection. AI cannot waive requirements, mint evidence or override objective failures.
 
 ## PR review and deployment
 
@@ -165,8 +163,7 @@ Optional AI requires an AI binding and `AI_MODEL`; the selected model is
 ## API
 
 All live organizer endpoints require `Authorization: Bearer <credential>` (at least
-32 characters). There is one organizer role here; individual scoped identities remain
-a production-readiness gate. `/health` is liveness, not a readiness attestation.
+32 characters). The protected organization console separates organizer and read-only judge role codes; individual scoped identities and participant permissions remain production-readiness gates. `/health` is liveness, not a readiness attestation.
 
 | Endpoint                          | Purpose                                                  |
 | --------------------------------- | -------------------------------------------------------- |
@@ -191,8 +188,7 @@ Choose Daksh-Codebase and only the repositories you want to test. No private key
 or personal GitHub token needs to be pasted into the browser.
 
 The [GitHub manifest flow](https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest)
-registers an organization-owned private App with contents, issues and PR read access,
-and Checks write access. Registration callbacks use expiring, session-bound, one-use
+registers an organization-owned private App with contents and PR read access, Issues write access, and Checks write access. Subscribe to Issues, Issue comment and Pull request events. Registration callbacks use expiring, session-bound, one-use
 state. Installation IDs are validated server-side against the App and organization.
 App keys and webhook secrets are encrypted in the separate organization database;
 short-lived installation tokens are scoped to the selected repository.
@@ -203,12 +199,7 @@ PR events use that assignment. Unconfigured PRs fail explicitly. GitHub Check de
 links open the protected organization report. The public workspace cannot read it.
 
 This slice performs immutable baseline/head comparison and configured source checks.
-Execution deployment is explicitly disabled. The implemented Node microVM adapter
-compares trusted baseline/head HTTP acceptance and supplemental syntax/tests/lint,
-but no deployed participant execution has been validated. Runtime functionality stays
-UNVERIFIED. The internal review host has bounded Workers AI requirement review enabled;
-it cannot turn unavailable checks into passes. Individual organizer identities, isolated execution
-and audited human adjudication remain production readiness work.
+The development Docker VM compares trusted baseline/head HTTP acceptance and bounded supplemental commands. Real payment-engine evaluations and CallMissed reviews are recorded in [readiness evidence](docs/qa/readiness-cycle-report.md). Production isolated capacity remains unprovisioned. Missing execution stays UNVERIFIED, and AI cannot override objective results. Real model calibration found inaccurate prose despite valid citation IDs: judges must check narrative claims against evidence.
 
 The organization console shows execution/reviewer configuration and offers an authenticated,
 rate-limited synthetic reviewer diagnostic. Select the payment retry test profile only after
@@ -218,3 +209,28 @@ Isolated execution in authorized reports. See [runner operation](docs/runner-bou
 for supported limits and explicit future enablement. No additional public URL is created.
 
 Development execution on the organizer machine: [Docker + tunnel guide](docs/local-docker-runner.md). Cloudflare Containers remain disabled; the website URL stays unchanged.
+
+## Acceptance audit and issue operations
+
+[The master acceptance ledger](docs/master-acceptance.md) records all 714 requirements
+with verification methods and explicit boundaries. `npm run acceptance:check` rejects
+generic placeholder audits, nonexistent local evidence and PASS claims based only on
+source inspection. Passing fixture tests do not attest a production hackathon launch.
+
+Configure numeric `organizerGitHubIds` in event policy before using native GitHub
+label overrides. Only those identities can suppress evaluator-owned labels; other
+changes are auditable review signals. Organizer console decisions are separately
+authenticated. Priority/difficulty parsed from exact structured issue metadata are
+advisory; organizer overrides prevail. Security and repeated-report signals route
+to review without public exploit comments, automatic closure or competitive credit.
+
+Issue queries combine repository, source, team, type, label, priority, difficulty and
+judging progress. The UI exposes organizer priority, difficulty, technical severity
+and recognition rationale separately. GitHub closure never proves completion, and
+closed issues cannot receive new assignments. Reservation expiry preserves audit history.
+
+Trusted Node HTTP policies can configure supplemental build, test, lint, integration,
+typecheck, format, coverage, security and dependency command kinds. Tools must exist
+in the immutable image; unavailable tools remain unavailable, and participant command
+success never proves functional criteria. The profile does not install participant
+dependencies or grant guest networking.

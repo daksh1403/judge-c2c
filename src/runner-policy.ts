@@ -11,6 +11,17 @@ const safePath = z
       !p.startsWith('.git/'),
   );
 const key = z.string().regex(/^[a-zA-Z0-9][\w.-]{0,79}$/);
+export const commandKinds = [
+  'build',
+  'test',
+  'lint',
+  'integration',
+  'typecheck',
+  'format',
+  'coverage',
+  'security',
+  'dependency',
+] as const;
 export const runnerPolicySchema = z
   .object({
     version: z.literal('node-http-v1'),
@@ -29,7 +40,7 @@ export const runnerPolicySchema = z
         z
           .object({
             id: key,
-            kind: z.enum(['build', 'test', 'lint']),
+            kind: z.enum(commandKinds),
             argv: z
               .array(
                 z
@@ -163,4 +174,4 @@ export const paymentRetryDescriptions: Record<string, string> = {
   'retry-permanent': 'Do not retry a permanent payment failure.',
   'retry-invalid': 'Reject a non-positive maximum attempt count.',
 };
-export const RUNNER_VERSION = 'node-http-v1.1.0';
+export const RUNNER_VERSION = 'node-http-v1.2.0';

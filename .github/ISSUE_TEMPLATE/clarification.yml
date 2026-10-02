@@ -1,0 +1,17 @@
+name: Challenge clarification
+description: Ask about ambiguity without changing frozen judging requirements.
+title: 'Clarification: '
+body:
+  - type: input
+    id: reference
+    attributes:
+      label: Challenge issue and requirement version
+    validations:
+      required: true
+  - type: textarea
+    id: ambiguity
+    attributes:
+      label: Ambiguity and proposed interpretation
+      description: Only an authorized organizer can publish a new contract; existing assignments retain their frozen version.
+    validations:
+      required: true

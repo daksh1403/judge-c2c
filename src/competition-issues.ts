@@ -57,6 +57,7 @@ export async function syncIssue(
     user: { id: number; login: string };
     labels: { name: string }[];
     updated_at: string;
+    created_at?: string;
     pull_request?: unknown;
     assignees?: { id: number; login: string }[];
   }>(`/repos/${repo.full_name}/issues/${number}`);
@@ -111,6 +112,18 @@ export async function syncIssue(
   const duplicates = possibleDuplicates(native.title, candidates.results);
   if (duplicates.length && !classification.flags.includes('possible-duplicate'))
     classification.flags.push('possible-duplicate');
+  const recent = await db
+    .prepare(
+      "SELECT count(*) AS n FROM github_issues WHERE author_id=? AND repository_id=? AND number<>? AND datetime(json_extract(classification,'$.nativeCreatedAt'))>=datetime('now','-1 hour')",
+    )
+    .bind(native.user.id, repositoryId, number)
+    .first<{ n: number }>();
+  if (
+    native.created_at &&
+    Date.parse(native.created_at) >= Date.now() - 3600000 &&
+    (recent?.n ?? 0) >= 20
+  )
+    classification.flags.push('possible-spam');
   const snapshotHash = await digest(canonical(native));
   const stored = {
     title: redact(native.title),
@@ -121,6 +134,7 @@ export async function syncIssue(
       ...classification,
       possibleDuplicates: duplicates,
       nativeAssignees: native.assignees ?? [],
+      nativeCreatedAt: native.created_at ?? null,
     },
     labels,
     githubState: native.state,
@@ -325,6 +339,34 @@ export async function publishChallenge(
   await queueIssueLabels(env, repo.id, data.issueNumber);
   return { contractHash: registered.hash };
 }
+export function expirationStatements(
+  env: Env,
+  issue?: { repositoryId: number; issueNumber: number },
+) {
+  const db = competitionDB(env);
+  const predicate =
+    "status IN('ACTIVE','RESERVED') AND expires_at IS NOT NULL AND datetime(expires_at)<=CURRENT_TIMESTAMP" +
+    (issue ? ' AND repository_id=? AND issue_number=?' : '');
+  const scoped = (statement: D1PreparedStatement) =>
+    issue ? statement.bind(issue.repositoryId, issue.issueNumber) : statement;
+  return [
+    scoped(
+      db.prepare(
+        `SELECT repository_id,issue_number FROM issue_assignments WHERE ${predicate}`,
+      ),
+    ),
+    scoped(
+      db.prepare(
+        `INSERT INTO audit(action,entity,actor,changes) SELECT 'issue.assignment.expired',id,'system',json_object('before',json_object('status',status,'expiresAt',expires_at),'after',json_object('status','EXPIRED')) FROM issue_assignments WHERE ${predicate}`,
+      ),
+    ),
+    scoped(
+      db.prepare(
+        `UPDATE issue_assignments SET status='EXPIRED',revoked_at=CURRENT_TIMESTAMP WHERE ${predicate}`,
+      ),
+    ),
+  ];
+}
 export async function prepareAssignment(
   env: Env,
   actor: string,
@@ -341,7 +383,7 @@ export async function prepareAssignment(
     throw new Error('RESERVATION_EXPIRATION_INVALID');
   const definition = await db
     .prepare(
-      "SELECT d.* FROM challenge_definitions d JOIN github_issues i ON i.repository_id=d.repository_id AND i.number=d.issue_number WHERE d.repository_id=? AND d.issue_number=? AND i.official=1 AND i.review_status='APPROVED'",
+      "SELECT d.* FROM challenge_definitions d JOIN github_issues i ON i.repository_id=d.repository_id AND i.number=d.issue_number WHERE d.repository_id=? AND d.issue_number=? AND i.official=1 AND i.review_status='APPROVED' AND i.github_state='open'",
     )
     .bind(data.repositoryId, data.issueNumber)
     .first<{
@@ -364,12 +406,10 @@ export async function prepareAssignment(
   const id = 'assignment-' + crypto.randomUUID(),
     status = data.reservation ? 'RESERVED' : 'ACTIVE';
   const statements = [
-    db.prepare(
-      "UPDATE issue_assignments SET status='EXPIRED',revoked_at=CURRENT_TIMESTAMP WHERE status IN('ACTIVE','RESERVED') AND expires_at IS NOT NULL AND datetime(expires_at)<=CURRENT_TIMESTAMP",
-    ),
+    ...expirationStatements(env, data).slice(1),
     db
       .prepare(
-        "INSERT INTO issue_assignments(id,team_id,repository_id,issue_number,contract_hash,exclusive,source,status,policy_snapshot,actor,expires_at) SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM teams t JOIN team_repositories r ON t.id=r.team_id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1) AND EXISTS(SELECT 1 FROM challenge_definitions WHERE repository_id=? AND issue_number=? AND current_contract_hash=? AND availability='AVAILABLE' AND EXISTS(SELECT 1 FROM github_issues i WHERE i.repository_id=challenge_definitions.repository_id AND i.number=challenge_definitions.issue_number AND i.official=1 AND i.review_status='APPROVED')) AND EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE') AND (SELECT count(*) FROM issue_assignments WHERE repository_id=? AND issue_number=? AND status IN('ACTIVE','RESERVED'))<?",
+        "INSERT INTO issue_assignments(id,team_id,repository_id,issue_number,contract_hash,exclusive,source,status,policy_snapshot,actor,expires_at) SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM teams t JOIN team_repositories r ON t.id=r.team_id WHERE t.id=? AND t.status='ACTIVE' AND r.repository_id=? AND r.active=1) AND EXISTS(SELECT 1 FROM challenge_definitions WHERE repository_id=? AND issue_number=? AND current_contract_hash=? AND availability='AVAILABLE' AND EXISTS(SELECT 1 FROM github_issues i WHERE i.repository_id=challenge_definitions.repository_id AND i.number=challenge_definitions.issue_number AND i.official=1 AND i.review_status='APPROVED' AND i.github_state='open')) AND EXISTS(SELECT 1 FROM hackathons WHERE id='initial' AND status='ACTIVE') AND (SELECT count(*) FROM issue_assignments WHERE repository_id=? AND issue_number=? AND status IN('ACTIVE','RESERVED'))<?",
       )
       .bind(
         id,
@@ -414,7 +454,7 @@ export async function assignIssue(
 ) {
   const prepared = await prepareAssignment(env, actor, raw, source);
   const results = await competitionDB(env).batch(prepared.statements);
-  if (!results[1]?.meta.changes)
+  if (!results[2]?.meta.changes)
     throw new Error('ASSIGNMENT_NOT_AVAILABLE_OR_INELIGIBLE');
   await queueIssueLabels(
     env,
@@ -508,9 +548,23 @@ export async function queueIssueLabels(
       ? ['judge:evaluation:approved-challenge']
       : []),
     ...(classification.type ? ['judge:type:' + classification.type] : []),
+    ...(classification.priority
+      ? ['judge:priority:' + classification.priority]
+      : []),
+    ...(classification.difficulty
+      ? ['judge:difficulty:' + classification.difficulty]
+      : []),
+    ...(classification.domains ?? []).map(
+      (domain: string) => 'judge:domain:' + domain,
+    ),
     ...classification.flags
       .filter((f: string) =>
-        ['needs-information', 'possible-duplicate'].includes(f),
+        [
+          'needs-information',
+          'possible-duplicate',
+          'security-review',
+          'possible-spam',
+        ].includes(f),
       )
       .map((f: string) => 'judge:status:' + f),
   ];

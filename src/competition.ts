@@ -35,6 +35,12 @@ import { resolveSubmission, resolutionSchema } from './competition-submissions';
 import { reconcileRepository, maintainCompetition } from './competition-sync';
 import { decideCompletion } from './competition-completion';
 import type { Env } from './env';
+const issueWorkflow = `CASE WHEN i.official=0 OR i.review_status<>'APPROVED' THEN lower(replace(i.review_status,'_','-'))
+ WHEN i.github_state='closed' AND NOT EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE') THEN 'closed'
+ WHEN NOT EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE') THEN coalesce((SELECT lower(availability) FROM challenge_definitions d WHERE d.repository_id=i.repository_id AND d.issue_number=i.number),'blocked')
+ WHEN NOT EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE' AND a.progress<>'COMPLETED') THEN 'completed'
+ WHEN EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE' AND a.progress='EVALUATING') THEN 'evaluating'
+ WHEN EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE' AND a.progress='IN_PROGRESS') THEN 'in-progress' ELSE 'assigned' END`;
 const json = (value: unknown, status = 200) =>
   Response.json(value, { status, headers: { 'cache-control': 'no-store' } });
 function decode(row: Record<string, unknown>) {
@@ -269,12 +275,17 @@ export async function competition(
         status = url.searchParams.get('status'),
         type = url.searchParams.get('type'),
         official = url.searchParams.get('official'),
+        team = url.searchParams.get('team'),
+        label = url.searchParams.get('label'),
+        workflow = url.searchParams.get('workflow'),
+        priority = url.searchParams.get('priority'),
+        difficulty = url.searchParams.get('difficulty'),
         cursor = Number(url.searchParams.get('offset') ?? 0);
       if (!Number.isInteger(cursor) || cursor < 0 || cursor > 100000)
         throw new Error('INVALID_PAGINATION');
       const rows = await db
         .prepare(
-          "SELECT i.repository_id,i.number,i.title,i.github_state,i.author_login,i.reporter_team_id,i.source,i.labels,i.classification,i.review_status,i.official,i.updated_at,r.full_name FROM github_issues i JOIN github_repositories r ON r.id=i.repository_id WHERE i.title LIKE ? ESCAPE '!' AND (? IS NULL OR i.repository_id=?) AND (? IS NULL OR i.source=?) AND (? IS NULL OR i.review_status=?) AND (? IS NULL OR json_extract(i.classification,'$.type')=?) AND (? IS NULL OR i.official=?) ORDER BY i.updated_at DESC,i.repository_id,i.number LIMIT 100 OFFSET ?",
+          `WITH classified_issues AS (SELECT i.*, ${issueWorkflow} AS workflow_status FROM github_issues i) SELECT i.repository_id,i.number,i.title,i.github_state,i.author_login,i.reporter_team_id,i.source,i.labels,i.classification,i.review_status,i.official,i.updated_at,i.workflow_status,r.full_name FROM classified_issues i JOIN github_repositories r ON r.id=i.repository_id WHERE i.title LIKE ? ESCAPE '!' AND (? IS NULL OR i.repository_id=?) AND (? IS NULL OR i.source=?) AND (? IS NULL OR i.review_status=?) AND (? IS NULL OR json_extract(i.classification,'$.type')=?) AND (? IS NULL OR i.official=?) AND (? IS NULL OR i.reporter_team_id=? OR EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.team_id=? AND a.status='ACTIVE')) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(i.labels) WHERE value=?)) AND (? IS NULL OR i.workflow_status=?) AND (? IS NULL OR json_extract(i.classification,'$.priority')=?) AND (? IS NULL OR json_extract(i.classification,'$.difficulty')=?) ORDER BY i.updated_at DESC,i.repository_id,i.number LIMIT 100 OFFSET ?`,
         )
         .bind(
           like,
@@ -288,6 +299,17 @@ export async function competition(
           type,
           official,
           official,
+          team,
+          team,
+          team,
+          label,
+          label,
+          workflow,
+          workflow,
+          priority,
+          priority,
+          difficulty,
+          difficulty,
           cursor,
         )
         .all<Record<string, unknown>>();

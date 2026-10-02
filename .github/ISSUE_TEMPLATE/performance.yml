@@ -1,0 +1,23 @@
+name: Performance report
+description: Report measured latency or resource use.
+title: 'Performance: '
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps and workload
+    validations:
+      required: true
+  - type: textarea
+    id: measurements
+    attributes:
+      label: Baseline and current measurements
+      description: Include sample count, environment, timings and correctness checks; omit secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior and performance target
+    validations:
+      required: true
