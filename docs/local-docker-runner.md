@@ -79,3 +79,18 @@ No saved evaluation or contract is rewritten when the runner is disconnected.
 
 References: [Docker Engine security](https://docs.docker.com/engine/security/),
 [Quick Tunnel limitations](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/).
+
+## Current organizer machine
+
+The local review runner is also installed as the user LaunchAgent
+`com.judge-c2c.local-runner` on the organizer's Mac. It runs the same trusted
+`runner:start` script, logs to ignored `.wrangler/local-runner-service.log`, and
+keeps the runner/tunnel independent of this development terminal. Docker Desktop
+must be running and the Mac must remain awake. A restarted Quick Tunnel requires
+`npm run runner:connect` to update the existing backend endpoint; the website URL
+stays unchanged.
+
+Inspect it with `launchctl print gui/$(id -u)/com.judge-c2c.local-runner`.
+Stop it with `launchctl bootout gui/$(id -u)/com.judge-c2c.local-runner`.
+This is local development operation, not a production deployment or a guarantee
+of availability after logout/reboot.

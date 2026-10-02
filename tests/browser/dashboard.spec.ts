@@ -419,9 +419,18 @@ test('organizers see not-submitted teams, member identity and issue provenance t
     github_members: 'alice, bob',
     submission_count: 0,
   };
-  await page.route('**/api/organization/manage/**', (route) => {
+  let holdTeam = false,
+    releaseTeam: () => void = () => {},
+    teamEntered: () => void = () => {};
+  const teamGate = new Promise<void>((r) => (releaseTeam = r)),
+    teamPending = new Promise<void>((r) => (teamEntered = r));
+  await page.route('**/api/organization/manage/**', async (route) => {
     const url = new URL(route.request().url());
     const p = url.pathname.split('/manage/')[1];
+    if (p === 'teams' && holdTeam) {
+      teamEntered();
+      await teamGate;
+    }
     const data =
       p === 'settings'
         ? {
@@ -507,6 +516,14 @@ test('organizers see not-submitted teams, member identity and issue provenance t
   await expect(
     page.getByText('PARTICIPANT · NEEDS_TRIAGE · Not scored'),
   ).toBeVisible();
+  holdTeam = true;
+  await page.getByRole('button', { name: 'Teams', exact: true }).click();
+  await teamPending;
+  await page.getByRole('button', { name: 'Issues', exact: true }).click();
+  await expect(
+    page.getByText('PARTICIPANT · NEEDS_TRIAGE · Not scored'),
+  ).toBeVisible();
+  releaseTeam();
   await page.getByRole('button', { name: 'Submissions', exact: true }).click();
   await page
     .getByLabel('Status', { exact: true })

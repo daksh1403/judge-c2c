@@ -55,6 +55,8 @@
       '</p></section>'
     );
   };
+  let listGeneration = 0,
+    detailGeneration = 0;
   let root,
     repositories = [],
     tab = 'teams';
@@ -98,14 +100,24 @@
   const row = (label, meta, detail) =>
     `<article class="inset"><button class="row-button" data-detail="${esc(detail)}"><strong>${esc(label)}</strong><small>${esc(meta)}</small></button></article>`;
   async function list() {
+    const generation = ++listGeneration,
+      selectedTab = tab,
+      currentRoot = root;
     const query = root.querySelector('#workflow-search')?.value || '';
     const filter = root.querySelector('#workflow-filter')?.value || '';
     let result = await api(
-      tab +
+      selectedTab +
         '?q=' +
         encodeURIComponent(query) +
         (filter ? '&status=' + encodeURIComponent(filter) : ''),
     );
+    if (
+      generation !== listGeneration ||
+      selectedTab !== tab ||
+      currentRoot !== root ||
+      !root.isConnected
+    )
+      return;
     const panel = root.querySelector('#workflow-list');
     if (tab === 'teams')
       panel.innerHTML =
@@ -229,8 +241,21 @@
     await list();
   }
   async function detail(path) {
-    const d = await api(path),
-      target = root.querySelector('#workflow-detail');
+    const requestedTab = path.split('/')[0];
+    if (requestedTab !== tab) await view(requestedTab);
+    if (requestedTab !== tab) return;
+    const generation = ++detailGeneration,
+      currentRoot = root,
+      selectedTab = tab;
+    const d = await api(path);
+    if (
+      generation !== detailGeneration ||
+      currentRoot !== root ||
+      selectedTab !== tab ||
+      !root.isConnected
+    )
+      return;
+    const target = root.querySelector('#workflow-detail');
     if (d.team) {
       const t = d.team;
       target.innerHTML = `<h3>${esc(t.name)} · ${esc(t.id)}</h3><form id="edit-team" class="review-form"><label>Name<input name="name" value="${esc(t.name)}" required></label>${select('status', 'Team status', ['PENDING', 'ACTIVE', 'WITHDRAWN', 'DISQUALIFIED', 'COMPLETED'])}<button class="button">Save team</button></form><h4>Members</h4>${d.members.map((m) => `<p>${esc(m.display_name)} · @${esc(m.github_login)} · GitHub ID ${m.github_id} · ${m.active ? 'Active' : 'Historical'} ${m.active ? `<button class="button" data-remove-member="${esc(m.id)}">Remove</button>` : ''}</p>`).join('')}<form id="add-member" class="review-form">${field('displayName', 'Member name')}${field('githubLogin', 'GitHub username')}<button class="button">Add verified member</button></form><h4>Repository assignments</h4>${d.repositories.map((r) => `<p>${esc(r.full_name)} · ${r.active ? 'Assigned' : 'Revoked'} ${r.active ? `<button class="button" data-revoke-repo="${r.repository_id}">Revoke</button>` : ''}</p>`).join('')}<form id="assign-repository" class="review-form"><label>Repository<select name="repositoryId">${options()}</select></label><button class="button">Assign repository</button></form><h4>Issues and immutable versions</h4>${d.assignments.map((a) => `<p>#${a.issue_number} ${esc(a.title)} · ${esc(a.status)} / ${esc(a.progress)}<br><code>${esc(a.contract_hash)}</code></p>`).join('') || '<p>No issue assignments.</p>'}<h4>Submissions</h4>${d.submissions.map((s) => row('PR #' + s.pr_number, `${s.status} · ${s.head_sha.slice(0, 12)}`, `submissions/${s.repository_id}/${s.pr_number}`)).join('') || '<p>NOT SUBMITTED</p>'}<h4>Participant-raised issues</h4>${d.raisedIssues.map((i) => `<p>#${i.number} ${esc(i.title)} · ${esc(i.review_status)}</p>`).join('')}<h4>Evaluation history</h4>${d.evaluations.map((e) => `<p>${e.current ? 'CURRENT' : 'Historical'} · ${esc(e.state)} · <code>${esc(e.head_sha)}</code></p>`).join('')}`;
@@ -330,11 +355,12 @@
     async mount(node, repos) {
       root = node;
       repositories = repos;
-      root.innerHTML = `<section class="panel"><div class="panel-head"><h2>Hackathon workflow</h2></div><div class="inset"><p id="workflow-counts"></p><p id="workflow-capabilities"></p><nav aria-label="Hackathon management"><button class="button" data-tab="teams">Teams</button> <button class="button" data-tab="issues">Issues</button> <button class="button" data-tab="submissions">Submissions</button></nav><p role="status"></p><form id="reconcile-repository" class="review-form"><label>Synchronize GitHub issues and PRs<select name="repositoryId">${options()}</select></label><button class="button">Reconcile repository</button></form><button class="button" id="retry-labels">Retry blocked label synchronization</button><details><summary>Event policy and label taxonomy</summary><form id="event-policy" class="review-form"><label>Versioned event policy JSON<textarea name="document" rows="10" required></textarea></label><button class="button">Save organizer policy</button></form></details><div id="workflow-body"></div></div></section>`;
+      root.innerHTML = `<section class="panel"><div class="panel-head"><h2>Hackathon workflow</h2></div><div class="inset"><p id="workflow-counts"></p><p id="workflow-capabilities"></p><nav aria-label="Hackathon management"><button class="button" data-tab="teams" disabled>Teams</button> <button class="button" data-tab="issues" disabled>Issues</button> <button class="button" data-tab="submissions" disabled>Submissions</button></nav><p role="status"></p><form id="reconcile-repository" class="review-form"><label>Synchronize GitHub issues and PRs<select name="repositoryId">${options()}</select></label><button class="button">Reconcile repository</button></form><button class="button" id="retry-labels">Retry blocked label synchronization</button><details><summary>Event policy and label taxonomy</summary><form id="event-policy" class="review-form"><label>Versioned event policy JSON<textarea name="document" rows="10" required></textarea></label><button class="button">Save organizer policy</button></form></details><div id="workflow-body"></div></div></section>`;
       const [overview, settings] = await Promise.all([
         api('overview'),
         api('settings'),
       ]);
+      if (root !== node || !node.isConnected) return;
       root.querySelector('#workflow-counts').textContent = Object.entries(
         overview.counts,
       )
@@ -386,10 +412,12 @@
             'Label synchronization retry requested; permission failures remain visible.',
           );
         });
-      root
-        .querySelectorAll('[data-tab]')
-        .forEach((b) => (b.onclick = () => action(() => view(b.dataset.tab))));
       await view('teams');
+      if (root !== node || !node.isConnected) return;
+      root.querySelectorAll('[data-tab]').forEach((b) => {
+        b.onclick = () => action(() => view(b.dataset.tab));
+        b.disabled = false;
+      });
     },
   };
 })();
