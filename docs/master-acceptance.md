@@ -126,10 +126,10 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **08.02 Type classification** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.03 Advisory priority** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.04 Advisory difficulty** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.05 Domain classification** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
-- [ ] **08.06 Source classification** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
-- [ ] **08.07 Workflow status** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
-- [ ] **08.08 Evaluation category** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [ ] **08.05 Domain classification** — UNVERIFIED. Not exercised by the payment-engine labeling scenario.
+- [x] **08.06 Source classification** — PASS. Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval. Evidence: `docs/qa/payment-readiness-report.md`.
+- [x] **08.07 Workflow status** — PASS. Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval. Evidence: `docs/qa/payment-readiness-report.md`.
+- [x] **08.08 Evaluation category** — PASS. Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval. Evidence: `docs/qa/payment-readiness-report.md`.
 - [ ] **08.09 Extensible type taxonomy** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.10 Bug** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.11 Feature** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
@@ -145,10 +145,10 @@ User master checklist; both end-to-end workflows are release gates. Optional cap
 - [ ] **08.21 Infrastructure** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.22 Accessibility** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.23 Reliability** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.24 Usability** — PARTIAL. Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests. Evidence: `docs/qa/payment-readiness-report.md`.
+- [ ] **08.24 Usability** — UNVERIFIED. Not exercised by the payment-engine labeling scenario.
 - [ ] **08.25 Controlled taxonomy** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.26 No duplicate variants** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
-- [ ] **08.27 Create missing labels when authorized** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
+- [x] **08.27 Create missing labels when authorized** — PASS. Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval. Evidence: `docs/qa/payment-readiness-report.md`.
 - [ ] **08.28 Low-confidence needs-triage** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.29 Honest confidence** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.
 - [ ] **08.30 Organizer overrides** — UNVERIFIED. Awaiting item-level acceptance audit; implementation alone is not proof.

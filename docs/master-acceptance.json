@@ -731,30 +731,30 @@
         {
           "id": "08.05",
           "requirement": "Domain classification",
-          "status": "PARTIAL",
-          "evidence": ["docs/qa/payment-readiness-report.md"],
-          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "Not exercised by the payment-engine labeling scenario."
         },
         {
           "id": "08.06",
           "requirement": "Source classification",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": ["docs/qa/payment-readiness-report.md"],
-          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
+          "note": "Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval."
         },
         {
           "id": "08.07",
           "requirement": "Workflow status",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": ["docs/qa/payment-readiness-report.md"],
-          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
+          "note": "Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval."
         },
         {
           "id": "08.08",
           "requirement": "Evaluation category",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval."
         },
         {
           "id": "08.09",
@@ -864,9 +864,9 @@
         {
           "id": "08.24",
           "requirement": "Usability",
-          "status": "PARTIAL",
-          "evidence": ["docs/qa/payment-readiness-report.md"],
-          "note": "Real issue #6 has source/status/evaluation labels applied by App; type remained uncertain and requires organizer triage. Full taxonomy and override cases are separate tests."
+          "status": "UNVERIFIED",
+          "evidence": [],
+          "note": "Not exercised by the payment-engine labeling scenario."
         },
         {
           "id": "08.25",
@@ -885,9 +885,9 @@
         {
           "id": "08.27",
           "requirement": "Create missing labels when authorized",
-          "status": "UNVERIFIED",
-          "evidence": [],
-          "note": "Awaiting item-level acceptance audit; implementation alone is not proof."
+          "status": "PASS",
+          "evidence": ["docs/qa/payment-readiness-report.md"],
+          "note": "Real issue #6 initially unlabeled; App created and applied controlled source, assigned-status and evaluation labels. Source provenance remains separate from official approval."
         },
         {
           "id": "08.28",
