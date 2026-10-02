@@ -14,6 +14,7 @@ import {
 import { GitHub } from './github';
 import type { Env } from './env';
 import { redact } from './security';
+import { tunnelEvaluate } from './runner-tunnel';
 export type SourceFile = { path: string; text: string };
 export const runnerRequestSchema = z
   .object({
@@ -167,7 +168,7 @@ export async function runObjective(
 ) {
   if (!c.execution.runner) return evidence;
   const policy = c.execution.runner;
-  if (!env.RUNNER || env.RUNNER_ENABLED !== 'true')
+  if ((!env.RUNNER && !env.RUNNER_ENDPOINT) || env.RUNNER_ENABLED !== 'true')
     return evidence.map((e) =>
       e.criterionId &&
       c.requirements.some((r) =>
@@ -206,12 +207,14 @@ export async function runObjective(
       files: await snapshot(github, c, commit),
     };
     const hash = await digest(canonical(request));
-    // A fresh microVM for every baseline/head attempt, including workflow retries.
-    const stub = env.RUNNER.get(
-      env.RUNNER.idFromName(run.id + '-' + commit + '-' + crypto.randomUUID()),
+    // Each adapter restores a fresh guest snapshot for every baseline/head attempt.
+    const stub = env.RUNNER?.get(
+      env.RUNNER!.idFromName(run.id + '-' + commit + '-' + crypto.randomUUID()),
     ) as unknown as RunnerStub;
     const result = validateRunnerResult(
-      await stub.evaluate(request),
+      env.RUNNER_ENDPOINT
+        ? await tunnelEvaluate(env, request)
+        : await stub.evaluate(request),
       request,
       hash,
     );

@@ -1,10 +1,12 @@
 # Isolated execution boundary
 
 The runner adapter, authoritative policy schema, baseline/head pipeline and evidence
-storage are implemented. **Execution deployment is disabled.** Cloudflare rejected
+storage are implemented. **Cloudflare Containers deployment is disabled.** Cloudflare rejected
 Containers provisioning on the current free Workers plan, and the owner explicitly
 chose to keep it disabled. There is no RUNNER binding in ordinary local, preview or
-review configuration. No participant code has been executed on the developer machine.
+review configuration. The owner subsequently authorized a development Docker runner through a tunnel; see
+[local Docker runner](local-docker-runner.md). The backend is explicit, and contracts
+pin its local image identity.
 The microVM API, teardown and adversarial resource behavior still need deployed
 validation before enabling real judging; platform mocks do not establish isolation.
 
@@ -90,7 +92,8 @@ Required deployed adversarial drills: infinite loops, fork/process exhaustion, d
 output exhaustion, install abuse, Internet/metadata/internal-network access, symlink
 escape, secret theft, source-changing tests and spoof servers. Use only disposable
 isolated infrastructure for hostile fixtures. Local adapter tests are mock-based and
-never launch these workloads. Do not run actual participant code in local Docker.
+never launch these workloads. Local Docker execution requires the explicitly selected development backend described
+in the local runner guide; it does not replace production microVM readiness.
 
 References: [sandbox isolation](https://developers.cloudflare.com/sandbox/concepts/security/),
 [container API](https://developers.cloudflare.com/sandbox/get-started/),

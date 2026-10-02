@@ -216,3 +216,5 @@ approving its exact requirements. The [reference fixture](examples/payment-retry
 is organizer-authored, not participant work. Stored execution logs and hashes appear under
 Isolated execution in authorized reports. See [runner operation](docs/runner-boundary.md)
 for supported limits and explicit future enablement. No additional public URL is created.
+
+Development execution on the organizer machine: [Docker + tunnel guide](docs/local-docker-runner.md). Cloudflare Containers remain disabled; the website URL stays unchanged.

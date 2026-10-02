@@ -599,10 +599,14 @@ export async function organization(
       organization: env.ORG_NAME,
       authenticated: true,
       runner: {
-        enabled: env.RUNNER_ENABLED === 'true' && !!env.RUNNER,
+        enabled:
+          env.RUNNER_ENABLED === 'true' &&
+          !!(env.RUNNER || env.RUNNER_ENDPOINT),
         reason:
-          env.RUNNER_ENABLED === 'true' && env.RUNNER
-            ? 'Available'
+          env.RUNNER_ENABLED === 'true' && (env.RUNNER || env.RUNNER_ENDPOINT)
+            ? env.RUNNER_ENDPOINT
+              ? 'Development Docker runner through authenticated tunnel. Availability depends on the organizer machine.'
+              : 'Available'
             : 'Isolated execution deployment is disabled.',
       },
       ai: { enabled: !!env.AI && !!env.AI_MODEL },

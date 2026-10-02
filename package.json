@@ -16,7 +16,11 @@
     "deploy": "node scripts/production-config.mjs && wrangler deploy --config .wrangler/production.json",
     "test:browser": "playwright test",
     "format:check": "prettier --check src tests public scripts docs examples *.json *.ts .github/workflows",
-    "build": "wrangler deploy --dry-run --env="
+    "build": "wrangler deploy --dry-run --env=",
+    "runner:build": "docker build --tag judge-c2c-runner-local runner",
+    "runner:start": "node scripts/local-runner-start.mjs",
+    "runner:connect": "node scripts/local-runner-connect.mjs",
+    "runner:smoke": "node scripts/local-runner-smoke.mjs"
   },
   "dependencies": {
     "jose": "6.2.12",
@@ -26,6 +30,7 @@
     "@cloudflare/workers-types": "5.20261001.1",
     "@playwright/test": "1.63.0",
     "@types/node": "26.6.3",
+    "esbuild": "0.28.1",
     "miniflare": "4.20260730.0",
     "prettier": "3.9.9",
     "typescript": "7.0.2",

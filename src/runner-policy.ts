@@ -16,6 +16,7 @@ export const runnerPolicySchema = z
     version: z.literal('node-http-v1'),
     image: z.union([
       z.literal('UNCONFIGURED'),
+      z.string().regex(/^docker-local@sha256:[a-f0-9]{64}$/),
       z
         .string()
         .regex(

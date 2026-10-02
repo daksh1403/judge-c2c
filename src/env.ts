@@ -1,6 +1,8 @@
 export interface Env {
   RUNNER?: DurableObjectNamespace;
   RUNNER_ENABLED?: string;
+  RUNNER_ENDPOINT?: string;
+  RUNNER_TUNNEL_KEY?: string;
   RUNNER_IMAGE_URI?: string;
   ORG_DB?: D1Database;
   ORG_SERVICE?: Fetcher;
