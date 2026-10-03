@@ -14,6 +14,24 @@ const item = z
       'NOT_APPLICABLE',
       'UNVERIFIED',
     ]),
+    assignedAgent: z.string().min(1).optional(),
+    defectReference: z.string().min(1).nullable().optional(),
+    relatedPR: z.string().url().nullable().optional(),
+    lastValidationState: z
+      .object({
+        status: z.enum([
+          'PASS',
+          'PARTIAL',
+          'FAIL',
+          'BLOCKED',
+          'NOT_IMPLEMENTED',
+          'NOT_APPLICABLE',
+          'UNVERIFIED',
+        ]),
+        basis: z.string().min(1),
+      })
+      .strict()
+      .optional(),
     evidence: z.array(z.string()),
     note: z
       .string()

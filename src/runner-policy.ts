@@ -25,6 +25,7 @@ export const commandKinds = [
 export const runnerPolicySchema = z
   .object({
     version: z.literal('node-http-v1'),
+    cache: z.enum(['NONE', 'BASELINE', 'ALL']).optional(),
     image: z.union([
       z.literal('UNCONFIGURED'),
       z.string().regex(/^docker-local@sha256:[a-f0-9]{64}$/),
@@ -109,6 +110,7 @@ export type RunnerPolicy = z.infer<typeof runnerPolicySchema>;
 // Explicit organizer opt-in: this profile is not inferred from an issue title.
 export const paymentRetryPolicy: RunnerPolicy = {
   version: 'node-http-v1',
+  cache: 'NONE',
   image: 'UNCONFIGURED',
   entrypoint: 'server.mjs',
   commands: [

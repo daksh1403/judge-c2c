@@ -1,3 +1,6 @@
+import { listCandidates } from './additional-contributions';
+import { requirementOutcomes } from './requirement-assessment';
+import { readArtifact, captureRunArtifacts } from './artifact-store';
 import { z } from 'zod';
 import { contractSchema, canonical, digest } from './domain';
 import { equalSecret, boundedBody } from './security';
@@ -85,24 +88,38 @@ export async function api(request: Request, env: Env) {
         : json({ error: 'NOT_FOUND' }, 404);
     const run = await getRun(env, runMatch[1]!);
     if (!run) return json({ error: 'NOT_FOUND' }, 404);
-    const [timeline, artifacts, execution] = await Promise.all([
-      env.DB.prepare('SELECT * FROM timeline WHERE run_id=? ORDER BY id')
-        .bind(run.id)
-        .all(),
-      env.DB.prepare('SELECT * FROM artifacts WHERE run_id=?')
-        .bind(run.id)
-        .all(),
-      env.DB.prepare(
-        'SELECT commit_sha,request_hash,result_hash,result,created_at FROM execution_results WHERE run_id=? ORDER BY created_at',
-      )
-        .bind(run.id)
-        .all(),
-    ]);
+    const [timeline, artifacts, execution, currentSubmission] =
+      await Promise.all([
+        env.DB.prepare('SELECT * FROM timeline WHERE run_id=? ORDER BY id')
+          .bind(run.id)
+          .all(),
+        env.DB.prepare('SELECT * FROM artifacts WHERE run_id=?')
+          .bind(run.id)
+          .all(),
+        env.DB.prepare(
+          'SELECT * FROM execution_results WHERE run_id=? ORDER BY created_at',
+        )
+          .bind(run.id)
+          .all(),
+        env.DB.prepare(
+          'SELECT head_sha AS headSha,latest_run_id AS latestRunId,closed FROM submissions WHERE repository_id=? AND pr_number=?',
+        )
+          .bind(run.repository_id, run.pr_number)
+          .first<{ headSha: string; latestRunId: string; closed: number }>(),
+      ]);
     const detail = {
       ...run,
       timeline: timeline.results,
       artifacts: artifacts.results,
       execution: execution.results,
+      additionalContributions: await listCandidates(env, run.id),
+      requirementResults: requirementOutcomes(
+        contractSchema.parse(JSON.parse(run.contract_snapshot)),
+        JSON.parse(run.evidence ?? '[]'),
+      ),
+      currentSubmission: currentSubmission
+        ? { ...currentSubmission, closed: Boolean(currentSubmission.closed) }
+        : null,
     };
     if (runMatch[2]) {
       const content = canonical({
@@ -125,24 +142,29 @@ export async function api(request: Request, env: Env) {
     return json(detail);
   }
   if (request.method === 'GET' && path === '/api/artifact') {
-    if (demo || !env.ARTIFACTS)
+    if (demo) return json({ error: 'ARTIFACT_STORAGE_NOT_CONFIGURED' }, 503);
+    return readArtifact(env, url.searchParams.get('key') ?? '');
+  }
+  const artifactRetry = path.match(
+    /^\/api\/evaluations\/([a-f0-9]{64})\/artifacts\/retry$/,
+  );
+  if (request.method === 'POST' && artifactRetry && !demo) {
+    const raw = await boundedBody(request, 1024);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(new TextDecoder().decode(raw));
+    } catch {
+      return json({ error: 'INVALID_REQUEST' }, 400);
+    }
+    const body = z.object({}).strict().safeParse(parsed);
+    if (!body.success) return json({ error: 'INVALID_REQUEST' }, 400);
+    const run = await getRun(env, artifactRetry[1]!);
+    if (!run) return json({ error: 'NOT_FOUND' }, 404);
+    if (!['COMPLETED', 'FAILED', 'SUPERSEDED'].includes(run.state))
+      return json({ error: 'RUN_NOT_TERMINAL' }, 409);
+    if (!env.ARTIFACTS && !env.ARTIFACT_KV)
       return json({ error: 'ARTIFACT_STORAGE_NOT_CONFIGURED' }, 503);
-    const key = url.searchParams.get('key');
-    const metadata = await env.DB.prepare('SELECT * FROM artifacts WHERE key=?')
-      .bind(key)
-      .first();
-    if (!metadata || !key) return json({ error: 'NOT_FOUND' }, 404);
-    const object = await env.ARTIFACTS.get(key);
-    if (!object) return json({ error: 'NOT_FOUND' }, 404);
-    return new Response(object.body, {
-      headers: {
-        'content-type': 'application/octet-stream',
-        'content-disposition': 'attachment; filename="evidence.json"',
-        'x-content-type-options': 'nosniff',
-        'cache-control': 'no-store',
-        'x-artifact-sha256': String(metadata.sha256),
-      },
-    });
+    return json(await captureRunArtifacts(env, run.id));
   }
   if (request.method === 'POST' && path === '/api/contracts') {
     const raw = await boundedBody(request, 200_000);

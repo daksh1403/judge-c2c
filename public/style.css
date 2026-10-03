@@ -527,6 +527,61 @@ td small {
   font-size: 10px;
   overflow-wrap: anywhere;
 }
+.freshness {
+  border-left: 4px solid var(--line);
+  padding: 10px 12px;
+  background: #f5f7fb;
+  font-weight: 600;
+}
+.freshness.current {
+  border-color: #21865b;
+}
+.freshness.historical {
+  border-color: #c77720;
+}
+.freshness.unknown {
+  border-color: #7e8796;
+}
+.ai-notice,
+.provenance {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 12px;
+  background: #f8f9fc;
+}
+.provenance {
+  margin: 14px 0;
+  overflow-wrap: anywhere;
+}
+.provenance ul {
+  padding-left: 20px;
+  font-size: 11px;
+}
+.criterion-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.button.disabled {
+  display: inline-block;
+  color: var(--muted);
+  background: #f1f2f4;
+  cursor: not-allowed;
+}
+.artifact-capture {
+  padding: 8px 24px 18px;
+}
+.artifact-capture [role='status'],
+.artifact-capture-notice {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+.artifact-capture-notice {
+  padding: 10px 24px;
+  color: #246644;
+}
 .inset {
   padding: 20px 24px;
 }

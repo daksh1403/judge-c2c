@@ -1,3 +1,4 @@
+import { captureRunArtifacts } from './artifact-store';
 import {
   acquireReviewer,
   releaseReviewer,
@@ -233,25 +234,9 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           )
             .bind(redact(canonical(evidence)), id)
             .run();
-          if (this.env.ARTIFACTS) {
-            const content = redact(canonical(evidence));
-            const key = `evaluations/${id}/objective.json`;
-            const hash = await digest(content);
-            await this.env.ARTIFACTS.put(key, content, {
-              httpMetadata: { contentType: 'application/json' },
-              customMetadata: { sha256: hash },
-            });
-            await this.env.DB.prepare(
-              'INSERT OR IGNORE INTO artifacts(key,run_id,sha256,bytes,content_type) VALUES(?,?,?,?,?)',
-            )
-              .bind(
-                key,
-                id,
-                hash,
-                new TextEncoder().encode(content).length,
-                'application/json',
-              )
-              .run();
+          if (this.env.ARTIFACTS || this.env.ARTIFACT_KV) {
+            // Artifact outages cannot erase objective evidence or prevent reasoning.
+            await captureRunArtifacts(this.env, id).catch(() => null);
           }
         },
       );
@@ -337,6 +322,20 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         JSON.stringify({ event: 'evaluation_failed', runId: id, code }),
       );
     }
+    await step.do('capture-final-artifacts', async () => {
+      if (!this.env.ARTIFACTS && !this.env.ARTIFACT_KV) return;
+      const result = await captureRunArtifacts(this.env, id).catch(() => null);
+      if (!result || result.status === 'PARTIAL') {
+        await this.env.DB.prepare(
+          'INSERT OR IGNORE INTO timeline(run_id,state,detail) SELECT id,state,? FROM evaluations WHERE id=?',
+        )
+          .bind(
+            'Artifact capture incomplete; objective evidence remains in the evaluation bundle.',
+            id,
+          )
+          .run();
+      }
+    });
     await step.do('assignment-progress', () =>
       updateAssignmentProgress(this.env, id),
     );

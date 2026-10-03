@@ -36,20 +36,88 @@ export async function equalSecret(
   for (let i = 0; i < a.length; i++) diff |= a[i]! ^ b[i]!;
   return diff === 0;
 }
+const secretKey = `["']?\\b(?:password|passwd|secret|secret[_-]?key|api[_-]?key|token|aws[_-]?secret[_-]?access[_-]?key|client[_-]?secret|access[_-]?token|refresh[_-]?token|auth[_-]?token|private[_-]?key|credential|bearer[_-]?token)["']?`;
+const sensitiveJsonField =
+  /(?:password|passwd|secret|api[_-]?key|token|credential|private[_-]?key)/i;
+const MAX_JSON_REDACTION_DEPTH = 100;
+
+function redactPlainText(text: string) {
+  const prefix = `(${secretKey}\\s*[:=]\\s*)`;
+  return (
+    text
+      .replace(
+        /(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|(?:AKIA|ASIA)[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,})/g,
+        '[REDACTED]',
+      )
+      .replace(
+        /-----BEGIN [^-]*PRIVATE KEY-----[\s\S]*?(?:-----END [^-]*PRIVATE KEY-----|$)/g,
+        '[REDACTED PRIVATE KEY]',
+      )
+      // Quote-specific forms allow the other quote character inside the value
+      // and honor escapes, so e.g. a double-quoted value may contain apostrophes.
+      .replace(
+        new RegExp(`${prefix}"((?:\\\\.|[^"\\\\]){8,})"`, 'gi'),
+        '$1"[REDACTED]"',
+      )
+      .replace(
+        new RegExp(`${prefix}'((?:\\\\.|[^'\\\\]){8,})'`, 'gi'),
+        "$1'[REDACTED]'",
+      )
+      .replace(
+        new RegExp(`${prefix}([^\\s"'\\x60,;}\\]]{8,})`, 'gi'),
+        '$1[REDACTED]',
+      )
+  );
+}
+
+function jsonNestingTooDeep(text: string) {
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+  for (const char of text) {
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') quoted = false;
+      continue;
+    }
+    if (char === '"') quoted = true;
+    else if (char === '{' || char === '[') {
+      depth++;
+      if (depth > MAX_JSON_REDACTION_DEPTH) return true;
+    } else if (char === '}' || char === ']') depth--;
+  }
+  return false;
+}
+
+function redactJsonStrings(text: string) {
+  if (jsonNestingTooDeep(text))
+    return JSON.stringify({
+      redacted: true,
+      reason: 'JSON nesting limit exceeded',
+    });
+  try {
+    const parsed: unknown = JSON.parse(text);
+    let changed = false;
+    const cleaned = JSON.stringify(parsed, (key: string, value: unknown) => {
+      if (typeof value !== 'string') return value;
+      const redacted = redactPlainText(value);
+      if (redacted !== value) changed = true;
+      if (key && sensitiveJsonField.test(key) && value.length > 0) {
+        changed = true;
+        return '[REDACTED]';
+      }
+      return redacted;
+    });
+    return changed ? cleaned : text;
+  } catch {
+    return null;
+  }
+}
+
 export function redact(text: string) {
-  return text
-    .replace(
-      /(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,})/g,
-      '[REDACTED]',
-    )
-    .replace(
-      /-----BEGIN [^-]*PRIVATE KEY-----[\s\S]*?-----END [^-]*PRIVATE KEY-----/g,
-      '[REDACTED PRIVATE KEY]',
-    )
-    .replace(
-      /(["']?(?:password|secret|api[_-]?key|token)["']?\s*[:=]\s*["']?)[^\s"',;}\]]{8,}/gi,
-      '$1[REDACTED]',
-    );
+  const structured = redactJsonStrings(text);
+  return structured === null ? redactPlainText(text) : structured;
 }
 export async function boundedBody(
   request: Request,

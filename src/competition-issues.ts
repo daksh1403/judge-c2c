@@ -489,6 +489,78 @@ export async function revokeAssignment(
   ]);
   await queueIssueLabels(env, before.repository_id, before.issue_number);
 }
+export async function activateReservation(env: Env, actor: string, id: string) {
+  const db = competitionDB(env),
+    reconciliationId = crypto.randomUUID();
+  const results = await db.batch([
+    db
+      .prepare(
+        `UPDATE issue_assignments AS a SET status='ACTIVE'
+       WHERE a.id=? AND a.status='RESERVED'
+         AND (a.expires_at IS NULL OR datetime(a.expires_at)>CURRENT_TIMESTAMP)
+         AND json_valid(a.policy_snapshot)
+         AND json_extract(a.policy_snapshot,'$.repository_id')=a.repository_id
+         AND json_extract(a.policy_snapshot,'$.issue_number')=a.issue_number
+         AND json_extract(a.policy_snapshot,'$.current_contract_hash')=a.contract_hash
+         AND json_extract(a.policy_snapshot,'$.ownership') IN('EXCLUSIVE','SHARED')
+         AND a.exclusive=CASE json_extract(a.policy_snapshot,'$.ownership') WHEN 'EXCLUSIVE' THEN 1 ELSE 0 END
+         AND json_extract(a.policy_snapshot,'$.capacity') BETWEEN 1 AND 1000
+         AND json_extract(a.policy_snapshot,'$.availability')='AVAILABLE'
+         AND CASE WHEN json_valid(json_extract(a.policy_snapshot,'$.eligible_teams'))
+                  THEN json_type(json_extract(a.policy_snapshot,'$.eligible_teams')) ELSE NULL END='array'
+         AND (json_array_length(CASE WHEN json_valid(json_extract(a.policy_snapshot,'$.eligible_teams'))
+                                    THEN json_extract(a.policy_snapshot,'$.eligible_teams') ELSE '[]' END)=0
+              OR EXISTS(SELECT 1 FROM json_each(CASE WHEN json_valid(json_extract(a.policy_snapshot,'$.eligible_teams'))
+                                                     THEN json_extract(a.policy_snapshot,'$.eligible_teams') ELSE '[]' END) t WHERE t.value=a.team_id))
+         AND EXISTS(SELECT 1 FROM contracts c WHERE c.hash=a.contract_hash AND c.repository_id=a.repository_id)
+         AND EXISTS(SELECT 1 FROM challenge_versions v WHERE v.contract_hash=a.contract_hash AND v.repository_id=a.repository_id AND v.issue_number=a.issue_number)
+         AND EXISTS(SELECT 1 FROM hackathons h WHERE h.id='initial' AND h.status='ACTIVE')
+         AND EXISTS(SELECT 1 FROM teams t JOIN team_repositories tr ON tr.team_id=t.id JOIN github_repositories r ON r.id=tr.repository_id
+                    WHERE t.id=a.team_id AND t.hackathon_id='initial' AND t.status='ACTIVE'
+                      AND tr.repository_id=a.repository_id AND tr.active=1 AND r.accessible=1)
+         AND EXISTS(SELECT 1 FROM github_issues i JOIN challenge_definitions d ON d.repository_id=i.repository_id AND d.issue_number=i.number
+                    WHERE i.repository_id=a.repository_id AND i.number=a.issue_number AND i.official=1
+                      AND i.review_status='APPROVED' AND i.github_state='open'
+                      AND d.availability IN('AVAILABLE','RESERVED'))`,
+      )
+      .bind(id),
+    db
+      .prepare(
+        `INSERT INTO github_sync_actions(id,repository_id,issue_number,kind,document)
+       SELECT ?,a.repository_id,a.issue_number,'LABELS','{"labels":[]}'
+       FROM issue_assignments a WHERE a.id=? AND a.status='ACTIVE' AND changes()=1`,
+      )
+      .bind(reconciliationId, id),
+    db
+      .prepare(
+        `INSERT INTO audit(action,entity,actor,changes)
+       SELECT 'assignment.reservation.activated',a.id,?,json_object(
+         'before',json_object('status','RESERVED'),
+         'after',json_object('status','ACTIVE','contractHash',a.contract_hash,
+                             'policySnapshot',json(a.policy_snapshot),'expiresAt',a.expires_at))
+       FROM issue_assignments a WHERE a.id=? AND a.status='ACTIVE' AND changes()=1`,
+      )
+      .bind(actor, id),
+  ]);
+  if (!results[0]?.meta.changes)
+    throw new Error('RESERVATION_ACTIVATION_CONFLICT');
+  const assignment = await db
+    .prepare(
+      "SELECT repository_id,issue_number FROM issue_assignments WHERE id=? AND status='ACTIVE'",
+    )
+    .bind(id)
+    .first<{ repository_id: number; issue_number: number }>();
+  if (!assignment) throw new Error('RESERVATION_ACTIVATION_CONFLICT');
+  try {
+    await queueIssueLabels(
+      env,
+      assignment.repository_id,
+      assignment.issue_number,
+    );
+  } catch {
+    // The transaction already stored a durable label reconciliation intent.
+  }
+}
 export async function queueIssueLabels(
   env: Env,
   repositoryId: number,

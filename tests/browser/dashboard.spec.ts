@@ -704,6 +704,770 @@ test('approach review exposes separate evidence-backed observations and uncertai
   await expect(
     page.getByText('Private reasoning is unknown.', { exact: false }),
   ).toBeVisible();
+  const legacyRequirement = page.locator(
+    '.requirement-group[data-requirement-id="schedule"]',
+  );
+  await expect(legacyRequirement.locator('.badge')).toHaveText('UNVERIFIED');
+  await expect(legacyRequirement.getByText('Mandatory')).toBeVisible();
+  await expect(
+    page.getByText('No additional contributions have been recorded.'),
+  ).toBeVisible();
+});
+
+test('judge detail separates stale runs, compares checks, shows provenance and gates artifact downloads', async ({
+  page,
+}) => {
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Fixture',
+        authenticated: true,
+        role: 'judge',
+        app: { slug: 'fixture', installationId: 1 },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({ json: { counts: {} } }),
+  );
+  const runId = 'historical-run',
+    detail = {
+      ...demoDetail,
+      id: runId,
+      state: 'COMPLETED',
+      baseline_sha: 'a'.repeat(40),
+      head_sha: 'b'.repeat(40),
+      currentSubmission: {
+        headSha: 'c'.repeat(40),
+        latestRunId: 'newer-run',
+        closed: false,
+      },
+      requirementResults: [
+        {
+          requirementId: 'req',
+          mandatory: false,
+          status: 'PARTIAL',
+          needsAttention: true,
+          criteria: [
+            {
+              criterionId: 'criterion-one',
+              status: 'FAIL',
+              evidenceIds: ['objective-evidence'],
+              reason: 'Trusted execution failed this criterion.',
+            },
+          ],
+        },
+      ],
+      additionalContributions: [
+        {
+          id: 'judge-read-contribution',
+          runId,
+          actor: 'team-member',
+          category: 'testing',
+          title: 'Added a focused test',
+          description:
+            'The test covers an edge case in the current implementation.',
+          paths: ['src/scheduler.ts'],
+          evidenceIds: ['objective-evidence'],
+          criterionIds: ['criterion-one'],
+          verificationStatus: 'UNVERIFIED',
+          createdAt: '2026-01-02T03:00:00.000Z',
+          latestDecision: null,
+        },
+      ],
+      contract_snapshot: JSON.stringify({
+        ...demoContract,
+        repository: { fullName: 'example/project' },
+        requirements: [
+          {
+            id: 'req',
+            title: 'Requirement',
+            criteria: [
+              {
+                id: 'criterion-one',
+                description: '<img src=x onerror=window.hostile=true>',
+                kind: 'functional',
+              },
+            ],
+          },
+        ],
+      }),
+      evidence: JSON.stringify([
+        {
+          id: 'objective-evidence',
+          status: 'PASS',
+          claim: 'Trusted check passed.',
+        },
+      ]),
+      report: JSON.stringify({
+        summary: 'Advisory summary.',
+        assessments: [
+          {
+            criterionId: 'criterion-one',
+            status: 'PASS',
+            explanation: 'Evidence supports the criterion.',
+            evidenceIds: ['objective-evidence'],
+          },
+        ],
+      }),
+      execution: [
+        {
+          commit_sha: 'a'.repeat(40),
+          result_hash: 'older-baseline-digest',
+          created_at: '2026-01-01 00:00:00',
+          result: JSON.stringify({
+            image: 'fixture',
+            runtime: 'node',
+            version: '22',
+            checks: [
+              {
+                kind: 'test',
+                id: 'suite',
+                status: 'PASS',
+                detail: 'Older baseline retry passed.',
+                durationMs: 1,
+              },
+            ],
+          }),
+        },
+        {
+          commit_sha: 'a'.repeat(40),
+          result_hash: 'baseline-digest',
+          request_hash: 'request-digest',
+          created_at: '2026-01-01T00:00:00.000Z',
+          cache_status: 'MISS',
+          result: JSON.stringify({
+            image: 'fixture',
+            runtime: 'node',
+            version: '22',
+            checks: [
+              {
+                kind: 'test',
+                id: 'suite',
+                status: 'FAIL',
+                detail: 'Failed before this change.',
+                durationMs: 1,
+              },
+              {
+                kind: 'test',
+                id: 'new-suite',
+                status: 'PASS',
+                detail: 'Baseline passed.',
+                durationMs: 1,
+              },
+            ],
+          }),
+        },
+        {
+          commit_sha: 'b'.repeat(40),
+          result_hash: 'head-digest',
+          request_hash: 'request-digest',
+          created_at: '2026-01-02 03:05:00',
+          cache_status: 'HIT',
+          origin_run_id: 'origin-run',
+          origin_execution_id: 'origin-exec',
+          cache_key: 'cache-key',
+          request: JSON.stringify({
+            schemaVersion: 1,
+            runId,
+            commit: 'b'.repeat(40),
+            policyHash: 'policy-hash',
+            files: [{ path: 'src/app.js', sha256: 'file-digest', bytes: 10 }],
+          }),
+          result: JSON.stringify({
+            image: 'fixture',
+            runtime: 'node',
+            version: '22',
+            checks: [
+              {
+                kind: 'test',
+                id: 'suite',
+                status: 'FAIL',
+                detail: 'Still failing.',
+                durationMs: 2,
+              },
+              {
+                kind: 'test',
+                id: 'new-suite',
+                status: 'FAIL',
+                detail: 'Introduced failure.',
+                durationMs: 2,
+              },
+            ],
+            startedAt: '2026-01-02T03:04:05.000Z',
+            finishedAt: '2026-01-02T03:04:06.000Z',
+          }),
+        },
+      ],
+      artifacts: [
+        {
+          key: 'safe/stored?x',
+          kind: 'stdout',
+          status: 'STORED',
+          bytes: 20,
+          sha256: 'artifact-digest',
+          created_at: '2026-01-02T00:00:00.000Z',
+          expires_at: Date.now() + 60_000,
+        },
+        {
+          key: 'failed-key',
+          kind: '<img src=x>',
+          status: 'FAILED',
+          error_code: '<script>window.hostile=true</script>',
+          bytes: 0,
+          created_at: '2026-01-02T00:00:00.000Z',
+        },
+        {
+          key: 'pending-key',
+          kind: 'pending',
+          status: 'PENDING',
+          bytes: 0,
+          created_at: '2026-01-02T00:00:00.000Z',
+        },
+        {
+          key: 'expired-key',
+          kind: 'old',
+          status: 'STORED',
+          bytes: 4,
+          sha256: 'old',
+          created_at: '2025-01-01T00:00:00.000Z',
+          expires_at: 1,
+        },
+      ],
+    };
+  await page.route('**/api/organization/evaluations/*', (r) =>
+    r.fulfill({ json: detail }),
+  );
+  await page.goto('/?organization=1&evaluation=' + runId);
+  await expect(
+    page.getByText('Historical evaluation.', { exact: false }),
+  ).toBeVisible();
+  const requirementGroup = page.locator(
+    '.requirement-group[data-requirement-id="req"]',
+  );
+  await expect(requirementGroup.locator('.badge')).toHaveText('PARTIAL');
+  await expect(requirementGroup.getByText('Optional')).toBeVisible();
+  await expect(requirementGroup.getByText('Needs attention')).toBeVisible();
+  await expect(
+    requirementGroup.getByText('criterion-one · FAIL'),
+  ).toBeVisible();
+  await expect(
+    requirementGroup.getByText('Trusted execution failed this criterion.'),
+  ).toBeVisible();
+  await expect(
+    requirementGroup.getByRole('link', { name: 'objective-evidence' }),
+  ).toHaveAttribute('href', '#evidence-objective-evidence');
+  const readContribution = page.locator(
+    '[data-contribution-id="judge-read-contribution"]',
+  );
+  await expect(
+    page.getByRole('heading', { name: 'Additional contributions' }),
+  ).toBeVisible();
+  await expect(
+    readContribution.getByText('Added a focused test'),
+  ).toBeVisible();
+  await expect(
+    readContribution.getByRole('link', { name: 'objective-evidence' }),
+  ).toBeVisible();
+  await expect(
+    readContribution.getByRole('button', {
+      name: 'Recognize criterion improvement',
+    }),
+  ).toHaveCount(0);
+  await expect(page.locator('#add-contribution-form')).toHaveCount(0);
+  await expect(
+    page.getByText(/multiple exact-commit executions exist/),
+  ).toBeVisible();
+  await expect(page.getByText(/regression observed/)).toHaveCount(0);
+  await expect(
+    page.getByText(/original execution: 2026-01-02T03:04:05.000Z/),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Recorded in detail: 2026-01-02T03:05:00.000Z/),
+  ).toBeVisible();
+  await expect(page.getByText('Cache: HIT', { exact: false })).toBeVisible();
+  await expect(page.getByText('origin-run', { exact: false })).toBeVisible();
+  await expect(
+    page.getByText('AI interpretation is advisory inference.', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Download protected artifact' }),
+  ).toHaveAttribute('href', /key=safe%2Fstored%3Fx/);
+  await expect(page.getByText('Download unavailable')).toHaveCount(2);
+  await expect(page.getByText('Download expired')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Retry artifact capture' }),
+  ).toHaveCount(0);
+  await expect(page.locator('#evidence-objective-evidence')).toBeVisible();
+  await expect(page.locator('img')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as any).hostile)).toBeUndefined();
+});
+
+test('organizers can recapture artifacts without rerunning evaluation and see partial results', async ({
+  page,
+}) => {
+  const runId = 'organizer-capture-run';
+  let detailRequests = 0;
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Fixture',
+        authenticated: true,
+        role: 'organizer',
+        app: { slug: 'fixture', installationId: 1 },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({ json: { counts: {} } }),
+  );
+  const detail = {
+    ...demoDetail,
+    id: runId,
+    state: 'COMPLETED',
+    contract_snapshot: JSON.stringify(demoContract),
+    artifacts: [
+      {
+        key: 'capture-key',
+        run_id: runId,
+        sha256: 'capture-digest',
+        bytes: 0,
+        content_type: 'text/plain',
+        created_at: '2026-01-01 00:00:00',
+        kind: 'stderr',
+        storage: 'KV',
+        status: 'FAILED',
+        expires_at: Date.now() + 60_000,
+        error_code: 'STORAGE_UNAVAILABLE',
+      },
+    ],
+  };
+  await page.route('**/api/organization/evaluations/' + runId, (r) => {
+    detailRequests += 1;
+    return r.fulfill({
+      json: {
+        ...detail,
+        artifacts:
+          detailRequests > 1
+            ? [{ ...detail.artifacts[0], status: 'STORED', bytes: 12 }]
+            : detail.artifacts,
+      },
+    });
+  });
+  let retryBody: string | null = null;
+  await page.route(
+    '**/api/organization/evaluations/' + runId + '/artifacts/retry',
+    (r) => {
+      retryBody = r.request().postData();
+      return r.fulfill({
+        json: {
+          runId,
+          status: 'PARTIAL',
+          artifacts: [],
+          failures: [{ kind: 'stderr', code: 'STORAGE_UNAVAILABLE' }],
+        },
+      });
+    },
+  );
+  let evaluationRetries = 0;
+  await page.route(
+    '**/api/organization/evaluations/' + runId + '/retry',
+    (r) => {
+      evaluationRetries += 1;
+      return r.fulfill({ json: { runId: 'unexpected-evaluation-retry' } });
+    },
+  );
+  await page.goto('/?organization=1&evaluation=' + runId);
+  await page.getByRole('button', { name: 'Retry artifact capture' }).click();
+  await expect(
+    page.getByText('Artifact capture PARTIAL. stderr: STORAGE_UNAVAILABLE.'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Download protected artifact' }),
+  ).toBeVisible();
+  expect(retryBody).toBe('{}');
+  expect(detailRequests).toBe(2);
+  expect(evaluationRetries).toBe(0);
+});
+
+test('organizer contribution controls use verified evidence and refresh guarded decisions', async ({
+  page,
+}) => {
+  const runId = 'contribution-run';
+  let detailRequests = 0;
+  let contributionBody: Record<string, unknown> | null = null;
+  const capturedDecision: { body: Record<string, unknown> | null } = {
+    body: null,
+  };
+  let decisionStatus = 409;
+  const contribution = {
+    id: 'candidate-1',
+    runId,
+    actor: 'organizer',
+    category: 'testing',
+    title: 'Edge coverage',
+    description: 'Covers a boundary case.',
+    paths: ['src/one.ts'],
+    evidenceIds: ['evidence-1'],
+    criterionIds: ['verified-criterion'],
+    verificationStatus: 'VERIFIED',
+    createdAt: '2026-01-03T00:00:00.000Z',
+    latestDecision: null,
+  };
+  let detail: any = {
+    ...demoDetail,
+    id: runId,
+    state: 'COMPLETED',
+    head_sha: 'b'.repeat(40),
+    currentSubmission: {
+      headSha: 'b'.repeat(40),
+      latestRunId: runId,
+      closed: false,
+    },
+    contract_snapshot: JSON.stringify({
+      ...demoContract,
+      additionalCategories: ['testing'],
+      requirements: [
+        {
+          id: 'req',
+          title: 'Requirement',
+          mandatory: false,
+          criteria: [
+            {
+              id: 'verified-criterion',
+              description: 'Verified.',
+              kind: 'functional',
+            },
+            {
+              id: 'unknown-criterion',
+              description: 'Unknown.',
+              kind: 'functional',
+            },
+          ],
+        },
+        {
+          id: 'mandatory-req',
+          title: 'Mandatory requirement',
+          mandatory: true,
+          criteria: [
+            {
+              id: 'mandatory-pass',
+              description: 'Mandatory verified criterion.',
+              kind: 'functional',
+            },
+          ],
+        },
+      ],
+    }),
+    context: JSON.stringify({ files: [{ filename: 'src/one.ts' }] }),
+    evidence: JSON.stringify([
+      { id: 'evidence-1', status: 'PASS', claim: 'Trusted result.' },
+    ]),
+    report: JSON.stringify({
+      assessments: [{ criterionId: 'unknown-criterion', status: 'PASS' }],
+    }),
+    requirementResults: [
+      {
+        requirementId: 'req',
+        mandatory: false,
+        status: 'PARTIAL',
+        needsAttention: true,
+        criteria: [
+          {
+            criterionId: 'verified-criterion',
+            status: 'PASS',
+            evidenceIds: ['evidence-1'],
+            reason: 'Trusted pass.',
+          },
+          {
+            criterionId: 'unknown-criterion',
+            status: 'UNVERIFIED',
+            evidenceIds: [],
+            reason: 'No execution.',
+          },
+        ],
+      },
+      {
+        requirementId: 'mandatory-req',
+        mandatory: true,
+        status: 'PASS',
+        needsAttention: false,
+        criteria: [
+          {
+            criterionId: 'mandatory-pass',
+            status: 'PASS',
+            evidenceIds: ['evidence-1'],
+            reason: 'Trusted pass.',
+          },
+        ],
+      },
+    ],
+    additionalContributions: [
+      contribution,
+      {
+        ...contribution,
+        id: 'unknown-candidate',
+        verificationStatus: 'UNVERIFIED',
+      },
+    ],
+    artifacts: [],
+  };
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Fixture',
+        authenticated: true,
+        role: 'organizer',
+        app: { slug: 'fixture', installationId: 1 },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({ json: { counts: {} } }),
+  );
+  await page.route('**/api/organization/evaluations/' + runId, (r) => {
+    detailRequests += 1;
+    return r.fulfill({ json: detail });
+  });
+  await page.route(
+    '**/api/organization/evaluations/' + runId + '/contributions',
+    (r) => {
+      contributionBody = r.request().postDataJSON();
+      detail = {
+        ...detail,
+        additionalContributions: [
+          ...detail.additionalContributions,
+          {
+            ...contribution,
+            id: 'new-candidate',
+            ...contributionBody,
+            verificationStatus: 'UNVERIFIED',
+            latestDecision: null,
+          },
+        ],
+      };
+      return r.fulfill({ json: { id: 'new-candidate' } });
+    },
+  );
+  await page.route(
+    '**/api/organization/contributions/candidate-1/decisions',
+    (r) => {
+      capturedDecision.body = r.request().postDataJSON();
+      if (decisionStatus === 409)
+        return r.fulfill({
+          status: 409,
+          json: { error: 'unsafe conflict detail' },
+        });
+      detail = {
+        ...detail,
+        additionalContributions: detail.additionalContributions.map(
+          (item: any) =>
+            item.id === 'candidate-1'
+              ? {
+                  ...item,
+                  latestDecision: {
+                    id: 'decision-1',
+                    candidateId: item.id,
+                    runId,
+                    sequence: 1,
+                    decision: 'RECOGNIZED',
+                    reason: String(capturedDecision.body?.reason),
+                    actor: 'organizer',
+                    createdAt: '2026-01-03T01:00:00.000Z',
+                  },
+                }
+              : item,
+        ),
+      };
+      return r.fulfill({ json: { decision: 'RECOGNIZED' } });
+    },
+  );
+
+  await page.goto('/?organization=1&evaluation=' + runId);
+  await expect(
+    page.getByText(
+      'Contribution records and decisions do not change evaluation results automatically.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByLabel('Category')).toHaveValue('testing');
+  await expect(page.getByLabel('src/one.ts')).toBeVisible();
+  await expect(page.getByLabel(/evidence-1 · PASS/)).toBeVisible();
+  await expect(page.getByLabel('verified-criterion')).toBeVisible();
+  await expect(page.getByLabel('unknown-criterion')).toHaveCount(0);
+  await expect(page.getByLabel('mandatory-pass')).toHaveCount(0);
+  await expect(page.getByLabel('Title')).toHaveAttribute('maxlength', '120');
+  await expect(page.getByLabel('Description')).toHaveAttribute(
+    'minlength',
+    '20',
+  );
+  await expect(
+    page.getByText(
+      'Optional criterion checks (passing checks do not alone prove baseline improvement)',
+    ),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator('[data-contribution-id="candidate-1"]')
+      .getByRole('button', { name: 'Recognize criterion improvement' }),
+  ).toBeEnabled();
+  await expect(
+    page.getByText(
+      'Configured criterion improvement verified; claimed design and file attribution require organizer review.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator('[data-contribution-id="unknown-candidate"]')
+      .getByRole('button', { name: 'Recognize criterion improvement' }),
+  ).toBeDisabled();
+  await page.getByLabel('Title').fill('Tested edge case');
+  await page
+    .getByLabel('Description')
+    .fill('Added verified regression coverage.');
+  await page.getByLabel('src/one.ts').check();
+  await page.getByLabel(/evidence-1 · PASS/).check();
+  await page.getByLabel('verified-criterion').check();
+  await page.getByRole('button', { name: 'Add contribution' }).click();
+  await expect(page.getByText('Tested edge case')).toBeVisible();
+  expect(contributionBody).toEqual({
+    category: 'testing',
+    title: 'Tested edge case',
+    description: 'Added verified regression coverage.',
+    paths: ['src/one.ts'],
+    evidenceIds: ['evidence-1'],
+    criterionIds: ['verified-criterion'],
+  });
+  let candidate = page.locator('[data-contribution-id="candidate-1"]');
+  await candidate
+    .getByLabel('Decision reason')
+    .fill('Recognize the verified contribution with this evidence.');
+  await candidate
+    .getByRole('button', { name: 'Recognize criterion improvement' })
+    .click();
+  await expect(
+    page.getByText(
+      'Decision state or eligibility changed; refreshing contribution records.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByText('unsafe conflict detail')).toHaveCount(0);
+  expect(detailRequests).toBe(3);
+  decisionStatus = 200;
+  candidate = page.locator('[data-contribution-id="candidate-1"]');
+  await candidate
+    .getByLabel('Decision reason')
+    .fill('Recognize the verified contribution with this evidence.');
+  await candidate
+    .getByRole('button', { name: 'Recognize criterion improvement' })
+    .click();
+  await expect(
+    page.getByText('Latest decision RECOGNIZED · sequence 1'),
+  ).toBeVisible();
+  expect(capturedDecision.body).toMatchObject({
+    decision: 'RECOGNIZED',
+    reason: 'Recognize the verified contribution with this evidence.',
+    expectedPreviousSequence: null,
+  });
+  expect(capturedDecision.body?.requestId).toMatch(/^[0-9a-f-]{36}$/i);
+});
+
+test('organizer artifact recapture reports 409 and 503 safely', async ({
+  page,
+}) => {
+  const runId = 'capture-error-run';
+  let responseStatus = 409;
+  let artifactExpiry = Date.now() + 60_000;
+  let retryRequests = 0;
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        organization: 'Fixture',
+        authenticated: true,
+        role: 'organizer',
+        app: { slug: 'fixture', installationId: 1 },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: { active: 0, attention: 0 }, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({ json: { counts: {} } }),
+  );
+  await page.route('**/api/organization/evaluations/' + runId, (r) =>
+    r.fulfill({
+      json: {
+        ...demoDetail,
+        id: runId,
+        state: 'COMPLETED',
+        contract_snapshot: JSON.stringify(demoContract),
+        artifacts: [
+          {
+            key: 'capture-key',
+            kind: 'stdout',
+            status: 'PENDING',
+            expires_at: artifactExpiry,
+          },
+        ],
+      },
+    }),
+  );
+  await page.route(
+    '**/api/organization/evaluations/' + runId + '/artifacts/retry',
+    (r) => {
+      retryRequests += 1;
+      return r.fulfill({
+        status: responseStatus,
+        json: { error: 'unsafe backend detail must not be shown' },
+      });
+    },
+  );
+  await page.goto('/?organization=1&evaluation=' + runId);
+  await page.getByRole('button', { name: 'Retry artifact capture' }).click();
+  await expect(
+    page.getByText(
+      'Artifact capture retry is only available for terminal evaluations.',
+    ),
+  ).toBeVisible();
+  responseStatus = 503;
+  await page.reload();
+  await page.getByRole('button', { name: 'Retry artifact capture' }).click();
+  await expect(
+    page.getByText(
+      'Artifact storage is unavailable. Existing evidence metadata is unchanged.',
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByText('unsafe backend detail must not be shown'),
+  ).toHaveCount(0);
+  artifactExpiry = 1;
+  await page.reload();
+  await expect(
+    page.getByRole('button', { name: 'Retry artifact capture' }),
+  ).toHaveCount(0);
+  expect(retryRequests).toBe(2);
 });
 
 test('read-only judges retain navigation and filters while administrative controls are disabled', async ({

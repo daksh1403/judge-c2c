@@ -15,6 +15,7 @@ export interface Env {
   ORG_VAULT_KEY?: string;
   DB: D1Database;
   ARTIFACTS?: R2Bucket;
+  ARTIFACT_KV?: KVNamespace;
   ASSETS: Fetcher;
   EVALUATOR: Workflow<{ runId: string }>;
   PREVIEW_EVALUATOR?: Workflow<{ runId: string }>;

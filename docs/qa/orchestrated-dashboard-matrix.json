@@ -1,0 +1,98 @@
+{
+  "scope": "read-only dashboard expectation matrix; C03/C10 UX source and agreed contracts",
+  "browser_runtime": "BLOCKED: Wrangler could not bind 127.0.0.1 (EPERM); no browser tests executed",
+  "unit_tests": "not run per instruction",
+  "evidence_key": {
+    "source_only": "Present in changed source or contract; runtime behavior remains unverified.",
+    "prior_browser_executed": "No prior successful browser execution evidence is known for this UX worktree.",
+    "new_source_unverified": "Changed C03/C10 rendering or fixture authored but not executed in browser."
+  },
+  "expectations": [
+    {
+      "area": "global counts",
+      "data": "workflow overview counts and attention totals",
+      "source": "public/competition.js",
+      "route_selector": "GET organization workflow overview; #judge-summary, #workflow-counts",
+      "status_evidence": "source_only; prior_browser_executed: none known"
+    },
+    {
+      "area": "team",
+      "data": "team records and counts",
+      "source": "public/competition.js",
+      "route_selector": "organization manage teams API; data-tab=teams, #workflow-body",
+      "status_evidence": "source_only; prior_browser_executed: none known"
+    },
+    {
+      "area": "issue",
+      "data": "issue triage/status and issue filters",
+      "source": "public/competition.js",
+      "route_selector": "organization manage issues API; data-tab=issues, #workflow-filter, #workflow-body",
+      "status_evidence": "source_only; prior_browser_executed: none known"
+    },
+    {
+      "area": "submission",
+      "data": "PR mapping, head SHA, run history, and matching latest run",
+      "source": "public/competition.js",
+      "route_selector": "organization manage submissions API; data-tab=submissions, #workflow-body, evaluation detail link",
+      "status_evidence": "source_only; browser fixture authored, not executed"
+    },
+    {
+      "area": "current-head",
+      "data": "currentSubmission {headSha, latestRunId, closed}; absent legacy field means freshness unknown",
+      "source": "public/organization.js",
+      "route_selector": "GET /api/organization/evaluations/:id; .freshness",
+      "status_evidence": "new_source_unverified; stale fixture authored, not executed"
+    },
+    {
+      "area": "requirement",
+      "data": "requirementResults projection: mandatory, status, needsAttention; criterion status/reason/evidenceIds",
+      "source": "public/organization.js",
+      "route_selector": "GET /api/organization/evaluations/:id; .requirement-group[data-requirement-id], .criterion",
+      "status_evidence": "new_source_unverified; PARTIAL-with-FAIL and missing-field fixtures authored, not executed"
+    },
+    {
+      "area": "approach",
+      "data": "AI solution_approach with uncertainty and cited evidence, kept separate from deterministic requirement results",
+      "source": "public/organization.js via window.JudgeApproach",
+      "route_selector": "evaluation detail; Observable solution approach heading",
+      "status_evidence": "source_only; browser fixture authored, not executed"
+    },
+    {
+      "area": "findings",
+      "data": "report findings/assessments and objective evidence ledger",
+      "source": "public/organization.js",
+      "route_selector": "evaluation detail; #evidence-<encoded evidence id>, Evidence ledger",
+      "status_evidence": "source_only; browser fixture authored, not executed"
+    },
+    {
+      "area": "artifact",
+      "data": "artifact status, expiry, safe error_code, protected key and download eligibility",
+      "source": "public/organization.js",
+      "route_selector": "GET /api/organization/evaluations/:id; .artifact; GET /api/organization/artifact?key=encoded",
+      "status_evidence": "new_source_unverified; pending/failed/expired/hostile fixtures authored, not executed"
+    },
+    {
+      "area": "history",
+      "data": "evaluation timeline and historical/current submission runs",
+      "source": "public/organization.js and public/competition.js",
+      "route_selector": "evaluation detail; .timeline; submission history evaluation links",
+      "status_evidence": "source_only; browser fixture authored, not executed"
+    },
+    {
+      "area": "attention",
+      "data": "server needsAttention and workflow attention counts/reasons",
+      "source": "public/organization.js requirement projection; public/competition.js workflow summary",
+      "route_selector": ".requirement-group needs-attention text; #judge-summary; data-queue=attention",
+      "status_evidence": "new_source_unverified for requirement projection; existing workflow source otherwise"
+    },
+    {
+      "area": "filters",
+      "data": "submission queues, status filters, search, issue triage",
+      "source": "public/competition.js",
+      "route_selector": "data-queue buttons; #workflow-filter; #workflow-search",
+      "status_evidence": "source_only; browser fixtures/tests not executed"
+    }
+  ],
+  "static_verification": "C10 typecheck, JavaScript syntax, diff-check, and Prettier passed; this does not establish browser behavior.",
+  "missing_judge_critical_functionality": []
+}

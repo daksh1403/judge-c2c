@@ -10,6 +10,9 @@ export async function migrate(
     '0008_console_roles.sql',
     '0009_publication_recovery.sql',
     '0010_reviewer_capacity.sql',
+    '0011_execution_cache.sql',
+    '0012_artifact_store.sql',
+    '0013_additional_contributions.sql',
   ],
 ) {
   for (const file of files) {

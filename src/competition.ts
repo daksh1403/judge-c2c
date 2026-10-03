@@ -1,3 +1,4 @@
+import { evaluationMetrics } from './evaluation-metrics';
 import { competitionOverview } from './competition-overview';
 import { z } from 'zod';
 import { canonical } from './domain';
@@ -11,7 +12,6 @@ import {
   competitionDB,
   eventSettings,
   auditStatement,
-  eligibleTeam,
   selectedRepository,
   type CompetitionServices,
 } from './competition-store';
@@ -29,7 +29,7 @@ import {
   publishChallenge,
   assignIssue,
   revokeAssignment,
-  queueIssueLabels,
+  activateReservation,
 } from './competition-issues';
 import { resolveSubmission, resolutionSchema } from './competition-submissions';
 import { reconcileRepository, maintainCompetition } from './competition-sync';
@@ -149,7 +149,7 @@ export async function competition(
     }
     if (path === '/overview' && method === 'GET') {
       const counts = await competitionOverview(db);
-      return json({ counts });
+      return json({ counts, metrics: await evaluationMetrics(db) });
     }
     if (path === '/teams' && method === 'GET') {
       const status = url.searchParams.get('status'),
@@ -420,34 +420,10 @@ export async function competition(
         201,
       );
     if (assignmentPath?.[2] === 'activate' && method === 'POST') {
-      const row = await db
-        .prepare(
-          "SELECT team_id,repository_id,issue_number FROM issue_assignments WHERE id=? AND status='RESERVED' AND (expires_at IS NULL OR datetime(expires_at)>CURRENT_TIMESTAMP)",
-        )
-        .bind(assignmentPath[1])
-        .first<{
-          team_id: string;
-          repository_id: number;
-          issue_number: number;
-        }>();
-      if (!row) throw new Error('ACTIVE_RESERVATION_REQUIRED');
-      await eligibleTeam(env, row.team_id, row.repository_id);
-      await db.batch([
-        db
-          .prepare(
-            "UPDATE issue_assignments SET status='ACTIVE' WHERE id=? AND status='RESERVED'",
-          )
-          .bind(assignmentPath[1]),
-        auditStatement(
-          env,
-          actor,
-          'assignment.reservation.activated',
-          assignmentPath[1]!,
-          row,
-          { status: 'ACTIVE' },
-        ),
-      ]);
-      await queueIssueLabels(env, row.repository_id, row.issue_number);
+      z.object({})
+        .strict()
+        .parse(await input(request));
+      await activateReservation(env, actor, assignmentPath[1]!);
       return json({ status: 'ACTIVE' });
     }
     if (path === '/submissions' && method === 'GET') {
@@ -462,7 +438,10 @@ export async function competition(
               .parse(url.searchParams.get('issue'))
           : null,
         state = url.searchParams.get('evaluationState'),
-        notSubmitted = url.searchParams.get('notSubmitted') === '1';
+        notSubmitted = url.searchParams.get('notSubmitted') === '1',
+        sort = z
+          .enum(['newest', 'oldest'])
+          .parse(url.searchParams.get('sort') ?? 'newest');
       if (notSubmitted || status === 'NOT_SUBMITTED')
         return json({
           teams: (
@@ -476,7 +455,7 @@ export async function competition(
         });
       const rows = await db
         .prepare(
-          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY s.github_updated_at DESC LIMIT 200",
+          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY CASE WHEN ?='oldest' THEN s.github_updated_at END ASC, CASE WHEN ?='newest' THEN s.github_updated_at END DESC,s.repository_id,s.pr_number LIMIT 200",
         )
         .bind(
           like,
@@ -495,6 +474,8 @@ export async function competition(
           Number(url.searchParams.get('attention') === '1'),
           Number(url.searchParams.get('security') === '1'),
           Number(url.searchParams.get('regression') === '1'),
+          sort,
+          sort,
         )
         .all<Record<string, unknown>>();
       return json({ submissions: rows.results.map(decode) });

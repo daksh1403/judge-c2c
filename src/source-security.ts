@@ -1,5 +1,6 @@
 import type { Evidence } from './domain';
 import type { Context } from './evaluate';
+import { compareSecretObservations } from './secret-scanner';
 const rules = [
   {
     id: 'dynamic-eval',
@@ -15,11 +16,6 @@ const rules = [
     id: 'metadata-address',
     pattern: /169\.254\.169\.254|metadata\.google\.internal/g,
     description: 'cloud metadata destination',
-  },
-  {
-    id: 'private-key',
-    pattern: /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/g,
-    description: 'private-key marker',
   },
 ];
 export function sourceSecurity(context: Context): Evidence[] {
@@ -39,6 +35,28 @@ export function sourceSecurity(context: Context): Evidence[] {
         baselineStatus: old.length ? 'UNVERIFIED' : 'PASS',
         path,
         claim: `Source-security-patterns-v1 observed ${rule.description}: baseline ${old.length} occurrences, submission ${current.length}, submission lines ${lines.join(',') || 'none'}. This is a bounded source pattern, not a confirmed vulnerability or proof of exploitability. Inspect code context; removed patterns alone do not prove a security fix. Secret values are omitted.`,
+      });
+    }
+  for (const [path, source] of Object.entries(context.sources))
+    for (const finding of compareSecretObservations(
+      source.baseline,
+      source.head,
+    )) {
+      if (finding.baselineCount === 0 && finding.headCount === 0) continue;
+      const complete = finding.comparisonComplete;
+      const comparison = complete
+        ? `comparison complete; ${finding.inheritedCount} inherited and ${finding.introducedCount} new observations`
+        : 'comparison incomplete because baseline or submission content was unavailable, truncated, or contained an unterminated private-key marker; introduction and removal cannot be attributed';
+      evidence.push({
+        id: `security-secret-${evidence.length}`,
+        kind: 'source',
+        status: 'UNVERIFIED',
+        baselineStatus:
+          source.baseline !== null && finding.baselineCount === 0 && complete
+            ? 'PASS'
+            : 'UNVERIFIED',
+        path,
+        claim: `Source-secret-scan-v1 found ${finding.ruleId}: baseline ${finding.baselineCount} observations, submission ${finding.headCount}, submission lines ${finding.headLines.join(',') || 'none'}; ${comparison}. These bounded format heuristics are unverified observations, not proof of an exposed or exploitable credential. Secret values, snippets, and fingerprints are omitted.`,
       });
     }
   return evidence;

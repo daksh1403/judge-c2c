@@ -1,3 +1,243 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "C01",
+      "description": "Implement authenticated opt-in execution cache with origin provenance and invalidation tests",
+      "owner": "teammate-back",
+      "status": "review",
+      "files": [
+        "src/execution-cache.ts",
+        "src/runner.ts",
+        "src/runner-policy.ts",
+        "migrations/0011_execution_cache.sql",
+        "tests/execution-cache.test.ts",
+        "tests/database.ts",
+        "tests/execution-cache-sqlite.test.ts"
+      ],
+      "depends_on": [
+        "C00"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C00",
+      "description": "Review cache/artifact/frontend cross-component contracts before implementation",
+      "owner": "teammate-adv",
+      "status": "done",
+      "files": [
+        "docs/completeness-contracts.md"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C02",
+      "description": "Implement protected bounded artifact storage, integrity, retention, recovery and API integration",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "src/artifact-store.ts",
+        "src/env.ts",
+        "src/api.ts",
+        "src/organization.ts",
+        "src/workflow.ts",
+        "migrations/0012_artifact_store.sql",
+        "tests/artifact-store.test.ts",
+        "wrangler.jsonc"
+      ],
+      "depends_on": [
+        "C00"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C03",
+      "description": "Render judge evidence workspace with current-head warnings, check comparisons, cache provenance and artifact states",
+      "owner": "teammate-ux",
+      "status": "review",
+      "files": [
+        "public/organization.js",
+        "public/competition.js",
+        "public/style.css",
+        "tests/browser/dashboard.spec.ts"
+      ],
+      "depends_on": [
+        "C00"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C04",
+      "description": "Integrate accepted changes, run QA, update item-level checklist evidence and publish stacked PR with native preview; Git metadata write, gh authentication and preview/runtime validation unavailable in this sandbox",
+      "owner": "lead",
+      "status": "blocked",
+      "files": [
+        "docs/master-acceptance.json",
+        "docs/master-acceptance.md",
+        "docs/qa/",
+        "docs/completion-plan.md",
+        "tasks.json"
+      ],
+      "depends_on": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C05",
+      "description": "Identify next concrete locally implementable gaps from full acceptance ledger",
+      "owner": "spec_review",
+      "status": "done",
+      "files": [],
+      "depends_on": [],
+      "requires_adversary_review": false
+    },
+    {
+      "id": "C06",
+      "description": "Audit unsupported acceptance claims and launch-critical security/integrity gaps",
+      "owner": "standards_review",
+      "status": "done",
+      "files": [],
+      "depends_on": [],
+      "requires_adversary_review": false
+    },
+    {
+      "id": "C07",
+      "description": "Atomic reservation activation preserving frozen assignments and auditing race winners",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "src/competition-issues.ts",
+        "src/competition.ts",
+        "tests/reservation-lifecycle.test.ts"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C08",
+      "description": "Deterministic requirement-level outcomes from criterion evidence, without AI credit or waivers",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "src/requirement-assessment.ts",
+        "tests/requirement-assessment.test.ts"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C09",
+      "description": "Bounded location-only credential observations with baseline comparison; root redaction update",
+      "owner": "teammate-back",
+      "status": "review",
+      "files": [
+        "src/secret-scanner.ts",
+        "src/source-security.ts",
+        "tests/secret-scanner.test.ts"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C10",
+      "description": "Judge requirement-level mandatory/optional outcome groups with criterion evidence",
+      "owner": "teammate-ux",
+      "status": "review",
+      "files": [
+        "public/organization.js",
+        "tests/browser/dashboard.spec.ts"
+      ],
+      "depends_on": [
+        "C08"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C11",
+      "description": "Fix structural redaction preserving serialized evidence and quote-specific credential masking",
+      "owner": "teammate-back",
+      "status": "review",
+      "files": [
+        "src/security.ts",
+        "tests/security.test.ts"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C12",
+      "description": "Immutable evidence-backed additional contributions and audited organizer decisions",
+      "owner": "teammate-back",
+      "status": "review",
+      "files": [
+        "src/additional-contributions.ts",
+        "migrations/0013_additional_contributions.sql",
+        "tests/additional-contributions.test.ts"
+      ],
+      "depends_on": [
+        "C08"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C13",
+      "description": "Organizer candidate review and judge visibility for additional contributions",
+      "owner": "teammate-ux",
+      "status": "review",
+      "files": [
+        "public/organization.js",
+        "tests/browser/dashboard.spec.ts"
+      ],
+      "depends_on": [
+        "C12"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C14",
+      "description": "Authenticated additional-contribution API and run-detail integration",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "src/api.ts",
+        "src/organization.ts",
+        "tests/database.ts"
+      ],
+      "depends_on": [
+        "C12"
+      ],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C15",
+      "description": "Bounded timeline timing summaries and judge submission sorting",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "src/evaluation-metrics.ts",
+        "src/competition.ts",
+        "public/competition.js"
+      ],
+      "depends_on": [],
+      "requires_adversary_review": true
+    },
+    {
+      "id": "C16",
+      "description": "Prepare guarded feature-branch publish script and concrete PR review guide while session Git/network access is blocked",
+      "owner": "lead",
+      "status": "review",
+      "files": [
+        "scripts/publish-completeness.sh",
+        "docs/qa/completeness-pr.md",
+        "docs/qa/completeness-review-guide.md"
+      ],
+      "depends_on": [
+        "C04"
+      ],
+      "requires_adversary_review": true
+    }
+  ]
 }

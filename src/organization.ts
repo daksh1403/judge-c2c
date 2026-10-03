@@ -1,3 +1,5 @@
+import { createCandidate, reviewCandidate } from './additional-contributions';
+import { expireArtifacts } from './artifact-store';
 import { acquireReviewer, releaseReviewer } from './reviewer-capacity';
 import { appAccess } from './github-app-access';
 import { z } from 'zod';
@@ -726,6 +728,36 @@ export async function organization(
     url.pathname !== '/api/organization/logout'
   )
     return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+  const contributionCreate = url.pathname.match(
+    /^\/api\/organization\/evaluations\/([a-f0-9]{64})\/contributions$/,
+  );
+  const contributionDecision = url.pathname.match(
+    /^\/api\/organization\/contributions\/([\w-]{1,80})\/decisions$/,
+  );
+  if (
+    request.method === 'POST' &&
+    (contributionCreate || contributionDecision)
+  ) {
+    const raw = await boundedBody(request, 20_000);
+    let body: unknown;
+    try {
+      body = JSON.parse(new TextDecoder().decode(raw));
+    } catch {
+      return json({ error: 'INVALID_REQUEST' }, 400);
+    }
+    // Existing session, organizer-role and same-origin guards precede this route.
+    const scopedEnv = { ...env, DB: env.ORG_DB! };
+    const actor = session.role + ':' + session.hash;
+    const result = contributionCreate
+      ? await createCandidate(scopedEnv, contributionCreate[1]!, actor, body)
+      : await reviewCandidate(
+          scopedEnv,
+          contributionDecision![1]!,
+          actor,
+          body,
+        );
+    return json(result.body, result.status);
+  }
   if (url.pathname.startsWith('/api/organization/manage/'))
     return competition(
       request,
@@ -985,19 +1017,30 @@ export async function organization(
       }),
       await organizationEnv(env),
     );
+  if (url.pathname === '/api/organization/artifact' && request.method === 'GET')
+    return api(
+      new Request(origin + '/api/artifact' + url.search, {
+        headers: { authorization: 'Bearer ' + env.ORG_ADMIN_TOKEN },
+      }),
+      await organizationEnv(env),
+    );
   const evaluation = url.pathname.match(
-    /^\/api\/organization\/evaluations\/([a-f0-9]{64})(\/bundle|\/retry)?$/,
+    /^\/api\/organization\/evaluations\/([a-f0-9]{64})(\/bundle|\/retry|\/artifacts\/retry)?$/,
   );
   if (
     evaluation &&
-    ((request.method === 'GET' && evaluation[2] !== '/retry') ||
-      (request.method === 'POST' && evaluation[2] === '/retry'))
+    ((request.method === 'GET' && !evaluation[2]?.endsWith('/retry')) ||
+      (request.method === 'POST' && evaluation[2]?.endsWith('/retry')))
   )
     return api(
       new Request(
         origin + '/api/evaluations/' + evaluation[1] + (evaluation[2] ?? ''),
         {
           method: request.method,
+          body:
+            request.method === 'POST' && evaluation[2] === '/artifacts/retry'
+              ? await boundedBody(request, 1024)
+              : undefined,
           headers: { authorization: 'Bearer ' + env.ORG_ADMIN_TOKEN },
         },
       ),
@@ -1019,6 +1062,7 @@ export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
       "DELETE FROM organizer_login_limits WHERE CAST(substr(bucket,instr(bucket,':')+1) AS INTEGER)<?",
     ).bind(Math.floor(Date.now() / 60000) - 60),
   ]);
+  await expireArtifacts(await organizationEnv(env));
   const row = await connection(env);
   if (!row?.installation_id) return;
   const { reconcile } = await import('./store');
