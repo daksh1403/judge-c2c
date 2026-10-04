@@ -31,7 +31,7 @@ import { canonical, digest, type Evidence } from './domain';
 import { redact } from './security';
 import { runObjective } from './runner';
 import { publish } from './github-checks';
-import { dependencyAudit } from './dependency-audit';
+import { cachedDependencyAudit } from './dependency-audit-cache';
 export { publish } from './github-checks';
 
 export class EvaluationWorkflow extends WorkflowEntrypoint<
@@ -157,7 +157,16 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           if (c.analysis?.dependencyAudit === 'OSV_NPM_V1') {
             const scanStarted = Date.now();
             evidence.push(
-              ...(await dependencyAudit(
+              ...(await cachedDependencyAudit(
+                this.env.DB,
+                {
+                  repositoryId: c.repository.id,
+                  runId: id,
+                  baseline: c.baseline,
+                  head: run.head_sha,
+                  contractHash: run.contract_hash,
+                  cache: c.execution.runner?.cache ?? 'NONE',
+                },
                 {
                   manifest: sources['package.json']?.baseline ?? null,
                   lock: sources['package-lock.json']?.baseline ?? null,

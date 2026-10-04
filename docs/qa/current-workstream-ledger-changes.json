@@ -732,6 +732,420 @@
       "before": "PARTIAL",
       "after": "PASS",
       "previousNote": "Approach review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
+    },
+    {
+      "id": "04.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Issue edited: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised."
+    },
+    {
+      "id": "04.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Issue assigned and unassigned: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised."
+    },
+    {
+      "id": "07.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence."
+    },
+    {
+      "id": "09.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Bug template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+    },
+    {
+      "id": "09.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Feature template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+    },
+    {
+      "id": "09.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Performance template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+    },
+    {
+      "id": "09.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Clarification workflow: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+    },
+    {
+      "id": "09.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection."
+    },
+    {
+      "id": "09.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection."
+    },
+    {
+      "id": "10.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Multi-team assignment: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered."
+    },
+    {
+      "id": "10.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Reservation when configured: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered."
+    },
+    {
+      "id": "11.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "In progress: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+    },
+    {
+      "id": "11.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "PR opened: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+    },
+    {
+      "id": "11.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Evaluating: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+    },
+    {
+      "id": "11.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Blocked: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+    },
+    {
+      "id": "41.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+    },
+    {
+      "id": "41.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+    },
+    {
+      "id": "41.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+    },
+    {
+      "id": "48.17",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Known organizer-supplied model rates and actual provider token usage produce a scoped successful-final-response USD estimate. Missing rates/usage remain unavailable; retrieval, failed-request and whole-provider invoice accounting are not certified."
+    },
+    {
+      "id": "49.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Baseline build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+    },
+    {
+      "id": "49.12",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Submission build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+    },
+    {
+      "id": "16.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Obsolete view warning: Submission history labels CURRENT/Historical; every obsolete deep-link/view race is not independently verified."
+    },
+    {
+      "id": "30.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.12",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "30.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+    },
+    {
+      "id": "39.29",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Additional-work records and organizer decisions are now displayed separately, with scoped criterion-improvement verification, evidence links and read-only judge access. Current code has static and independent source review only; deployed UI and live decision flows still require validation."
+    },
+    {
+      "id": "40.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified."
+    },
+    {
+      "id": "17.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Regression requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+    },
+    {
+      "id": "17.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Testing requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+    },
+    {
+      "id": "17.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Performance requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+    },
+    {
+      "id": "20.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+    },
+    {
+      "id": "20.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+    },
+    {
+      "id": "20.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+    },
+    {
+      "id": "19.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "49.20",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested."
+    },
+    {
+      "id": "25.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Regression: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+    },
+    {
+      "id": "25.18",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "No private intention claims: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+    },
+    {
+      "id": "20.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+    },
+    {
+      "id": "22.18",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Redaction: Known credential formats are redacted; arbitrary secret recognition and binary artifact scanning are not exhaustive."
+    },
+    {
+      "id": "23.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Prompt injection: Hostile README and forged AI outputs did not override objective statuses; semantic narrative accuracy still fails calibration in some claims."
+    },
+    {
+      "id": "34.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "README hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+    },
+    {
+      "id": "34.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Comments hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+    },
+    {
+      "id": "34.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Issue body hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+    },
+    {
+      "id": "34.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Test output hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+    },
+    {
+      "id": "34.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Logs hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+    },
+    {
+      "id": "34.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Context redaction: Known credentials are redacted from stored/model context; unknown secret formats require stronger scanners."
+    },
+    {
+      "id": "17.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Security requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+    },
+    {
+      "id": "20.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Security scans: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent."
+    },
+    {
+      "id": "01.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Main is production branch: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+    },
+    {
+      "id": "01.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "No normal feature work on main: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+    },
+    {
+      "id": "02.06",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "Preview production separation: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+    },
+    {
+      "id": "02.07",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "No production data copied: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+    },
+    {
+      "id": "02.08",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "No production secrets exposed: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+    },
+    {
+      "id": "03.01",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup."
+    },
+    {
+      "id": "22.02",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "Isolation architecture: Deliberate Docker VM isolation is implemented for development; suitable production hostile-code capacity remains unprovisioned."
+    },
+    {
+      "id": "37.08",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned."
+    },
+    {
+      "id": "51.14",
+      "before": "PARTIAL",
+      "after": "BLOCKED",
+      "previousNote": "Safe objective execution: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
     }
   ]
 }

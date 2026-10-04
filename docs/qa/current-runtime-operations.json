@@ -96,5 +96,71 @@
     "Two local Worker isolates verify shared-D1 lease fencing, not deployed autoscaling or regional resilience.",
     "Docker/container argument and bridge tests do not prove live container capacity.",
     "Storage and scanner outages are controlled injections, not production provider failures."
-  ]
+  ],
+  "queueRuntime": {
+    "capturedAt": "2026-10-04T08:10:01.549650+00:00",
+    "ids": [
+      "36.03",
+      "36.06",
+      "36.08",
+      "36.10",
+      "36.11",
+      "38.02",
+      "38.03",
+      "38.04",
+      "38.05",
+      "38.07"
+    ],
+    "command": "npx vitest run tests/workflow-capacity-runtime.test.ts tests/intake.test.ts tests/reviewer-capacity.test.ts",
+    "tests": {
+      "passed": 20,
+      "failed": 0,
+      "total": 20
+    },
+    "reportSha256": "cf6ee7790c505cae39678165d8b87cd9def0e7532cc029e4f3907b6a4c632b96",
+    "scenarios": [
+      {
+        "file": "tests/intake.test.ts",
+        "name": "dispatches only the latest five queued items per recovery sweep, skips obsolete work, and exposes authoritative queue counts",
+        "status": "passed",
+        "durationMs": 424.7425830000002
+      },
+      {
+        "file": "tests/reviewer-capacity.test.ts",
+        "name": "fences a 24-request provider burst across two real Worker isolates sharing D1, including crash recovery",
+        "status": "passed",
+        "durationMs": 687.397917
+      },
+      {
+        "file": "tests/reviewer-capacity.test.ts",
+        "name": "keeps provider leases independent across provider identities",
+        "status": "passed",
+        "durationMs": 21.00912500000004
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "executes production prepare backoff and recovery in the real Miniflare Workflow engine",
+        "status": "passed",
+        "durationMs": 31152.381167
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "releases an acquired AI lease when newer authoritative work supersedes the run before reasoning",
+        "status": "passed",
+        "durationMs": 687.7813330000026
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "fences obsolete active provider output and releases its lease after the active request returns",
+        "status": "passed",
+        "durationMs": 687.6861250000002
+      }
+    ],
+    "productionLimits": [
+      "Real Miniflare Workflow engine verifies configured exponential delays and recovery locally, not Cloudflare production scheduling or provider SLA.",
+      "Cancellation is cooperative at stage boundaries; an active external provider request holds its lease until it returns. Obsolete output is fenced and lease then released.",
+      "Latest-first recovery dispatches at most five queued items per sweep; queued outbox history is preserved during outage.",
+      "Two local Worker isolates share one D1 database; horizontal multi-host throughput, autoscaling and high-load latency remain unmeasured."
+    ]
+  }
 }

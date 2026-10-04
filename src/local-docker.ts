@@ -17,6 +17,7 @@ const INITIALIZE = `let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('
 // Trusted probe runs as a different UID, using read-only prepared Node, with no repository imports.
 const PROBE = `let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('end',async()=>{try{const t=JSON.parse(s);const r=await fetch('http://127.0.0.1:9000'+t.path,{method:t.method,headers:{'content-type':'application/json'},body:t.body,redirect:'manual',signal:AbortSignal.timeout(2000)});let n=0,b=[];for await(const c of r.body){n+=c.length;if(n>16000)throw Error('limit');b.push(Buffer.from(c));}console.log(JSON.stringify({status:r.status,body:Buffer.concat(b).toString('base64')}));}catch{process.exitCode=1;}});`;
 const TOOLS = `console.log(JSON.stringify({node:process.version,npm:require('/usr/local/lib/node_modules/npm/package.json').version}));`;
+const EXECUTABLE = `const fs=require('node:fs'),p=require('node:path'),v=process.argv[1];const candidates=v.includes('/')?[p.resolve('/work',v)]:['/usr/local/bin','/usr/bin','/bin'].map(dir=>p.join(dir,v));console.log(candidates.some(path=>{try{return fs.statSync(path).isFile()&&(fs.accessSync(path,fs.constants.X_OK),true);}catch{return false;}})?'AVAILABLE':'UNAVAILABLE');`;
 // Kernel-owned cgroup counters; no guest log or participant import is trusted.
 const RESOURCES = `const fs=require('node:fs'),read=p=>fs.readFileSync('/sys/fs/cgroup/'+p,'utf8');console.log(JSON.stringify({cpuUsageUsec:Number(read('cpu.stat').match(/^usage_usec (\\d+)$/m)[1]),memoryBytes:Number(read('memory.current')),pids:Number(read('pids.current'))}));`;
 export function containerArguments(name: string, image: string) {
@@ -393,6 +394,37 @@ export async function evaluateDocker(
       let guest: string | undefined;
       try {
         guest = await prepare();
+        const executable = await docker(
+          [
+            'exec',
+            '--user',
+            '65533:65533',
+            '--workdir',
+            '/opt/judge',
+            guest,
+            'node',
+            '-e',
+            EXECUTABLE,
+            command.argv[0]!,
+          ],
+          undefined,
+          remaining(),
+        );
+        if (
+          executable.exitCode !== 0 ||
+          executable.stdout.trim() !== 'AVAILABLE'
+        )
+          return {
+            id: command.id,
+            kind: command.kind,
+            status: 'UNVERIFIED',
+            exitCode: null,
+            durationMs: executable.durationMs,
+            stdout: '',
+            stderr: '',
+            detail:
+              'Configured executable is unavailable in the isolated prepared guest. The check did not run; this is an infrastructure limitation, not a participant failure.',
+          } satisfies RunnerResult['checks'][number];
         const result = await docker(
           [
             'exec',

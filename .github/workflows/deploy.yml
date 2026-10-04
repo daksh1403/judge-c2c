@@ -58,7 +58,16 @@ jobs:
       - run: node scripts/production-config.mjs
         env:
           PRODUCTION_DATABASE_ID: ${{ vars.PRODUCTION_DATABASE_ID }}
+          PRODUCTION_ORG_DATABASE_ID: ${{ vars.PRODUCTION_ORG_DATABASE_ID }}
           PRODUCTION_ARTIFACT_BUCKET: ${{ vars.PRODUCTION_ARTIFACT_BUCKET }}
+          PRODUCTION_ARTIFACT_KV_ID: ${{ vars.PRODUCTION_ARTIFACT_KV_ID }}
+          PRODUCTION_ORG_NAME: ${{ vars.PRODUCTION_ORG_NAME }}
+          PRODUCTION_ORG_PUBLIC_ORIGIN: ${{ vars.PRODUCTION_ORG_PUBLIC_ORIGIN }}
+          PRODUCTION_AI_PROVIDER: ${{ vars.PRODUCTION_AI_PROVIDER }}
+          PRODUCTION_AI_MODEL: ${{ vars.PRODUCTION_AI_MODEL }}
+          PRODUCTION_RUNNER_ENDPOINT: ${{ vars.PRODUCTION_RUNNER_ENDPOINT }}
+          PRODUCTION_RUNNER_IMAGE: ${{ vars.PRODUCTION_RUNNER_IMAGE }}
           PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
       - run: npx wrangler d1 migrations apply DB --config .wrangler/production.json --remote
+      - run: npx wrangler d1 migrations apply ORG_DB --config .wrangler/production.json --remote
       - run: npx wrangler deploy --config .wrangler/production.json

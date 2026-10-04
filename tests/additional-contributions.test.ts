@@ -123,7 +123,7 @@ function fixture() {
     )
     .run(
       runId,
-      'a'.repeat(40),
+      'b'.repeat(40),
       'COMPLETED',
       JSON.stringify(contract),
       JSON.stringify({ team_id: 'team-1', resolution_snapshot: null }),
@@ -134,7 +134,7 @@ function fixture() {
     .prepare(
       'INSERT INTO submissions(repository_id,pr_number,head_sha,latest_run_id,closed,status,team_id) VALUES(1,2,?,?,0,?,?)',
     )
-    .run('a'.repeat(40), runId, 'VALID', 'team-1');
+    .run('b'.repeat(40), runId, 'VALID', 'team-1');
   sql
     .prepare('INSERT INTO hackathons(id,status) VALUES(?,?)')
     .run('initial', 'ACTIVE');
@@ -525,6 +525,9 @@ it('caps automatic discovery at five suggestions and preserves the existing twen
 });
 it('does not discover suggestions before completion or when baseline and head are identical', async () => {
   const f = fixture();
+  f.sql
+    .prepare('UPDATE evaluations SET head_sha=? WHERE id=?')
+    .run('a'.repeat(40), runId);
   expect(
     (await discoverAdditionalContributions(f.env, runId)).candidateIds,
   ).toEqual([]);
@@ -534,6 +537,260 @@ it('does not discover suggestions before completion or when baseline and head ar
   expect(await discoverAdditionalContributions(f.env, runId)).toEqual({
     status: 'UNAVAILABLE',
     candidateIds: [],
+  });
+  f.sql.close();
+});
+
+const allowedCategoryCases = [
+  'feature',
+  'performance',
+  'security',
+  'testing',
+  'analytics',
+  'architecture',
+  'documentation',
+  'AI-ML',
+  'language-conversion',
+  'other',
+];
+
+function functionalFixture(
+  category = 'feature',
+  kind = 'execution',
+  baselineStatus = 'FAIL',
+) {
+  const f = fixture();
+  const frozen = structuredClone(contract);
+  frozen.additionalCategories = [category];
+  frozen.execution = {
+    ...frozen.execution,
+    runner: paymentRetryPolicy,
+  } as typeof frozen.execution;
+  frozen.requirements[0]!.criteria = [
+    {
+      id: 'extra-opt',
+      description: 'Organizer-defined optional bounded retry improvement.',
+      kind: 'functional',
+      verification: { type: 'runner', checkId: 'retry-bounded' },
+    },
+  ] as never;
+  const objective = [
+    {
+      id: 'extra-proof',
+      kind,
+      status: 'PASS',
+      baselineStatus,
+      criterionId: 'extra-opt',
+      claim: 'Fixture objective check improved from frozen baseline.',
+    },
+  ];
+  f.sql
+    .prepare(
+      'UPDATE evaluations SET contract_snapshot=?,context=?,evidence=? WHERE id=?',
+    )
+    .run(
+      JSON.stringify(frozen),
+      JSON.stringify({
+        files: [{ filename: 'server.mjs', status: 'modified', additions: 5 }],
+      }),
+      JSON.stringify(objective),
+      runId,
+    );
+  return {
+    ...f,
+    objective,
+    input: {
+      ...candidateInput,
+      category,
+      paths: ['server.mjs'],
+      evidenceIds: ['extra-proof'],
+      criterionIds: ['extra-opt'],
+    },
+  };
+}
+
+it.each(allowedCategoryCases)(
+  'supports frozen allowed category %s with execution delta and explicit human recognition',
+  async (category) => {
+    const f = functionalFixture(category);
+    const created = await createCandidate(
+      f.env,
+      runId,
+      'organizer:named-identity',
+      f.input,
+    );
+    expect(created.status).toBe(201);
+    expect(created.body).toMatchObject({
+      category,
+      paths: ['server.mjs'],
+      criterionIds: ['extra-opt'],
+      verificationStatus: 'VERIFIED',
+      latestDecision: null,
+    });
+    expect(
+      f.sql
+        .prepare('SELECT count(*) n FROM additional_contribution_decisions')
+        .get()?.n,
+    ).toBe(0);
+    const id = (created.body as { id: string }).id;
+    expect(() =>
+      f.sql
+        .prepare('UPDATE additional_contributions SET paths=? WHERE id=?')
+        .run('["other.mjs"]', id),
+    ).toThrow();
+    const reviewed = await reviewCandidate(
+      f.env,
+      id,
+      'organizer:named-identity',
+      {
+        decision: 'RECOGNIZED',
+        requestId: crypto.randomUUID(),
+        expectedPreviousSequence: null,
+        reason:
+          'Organizer inspected usefulness, category relevance, novelty and attribution against the frozen criterion.',
+      },
+    );
+    expect(reviewed.status).toBe(200);
+    const snapshot = f.sql
+      .prepare(
+        'SELECT evidence_snapshot FROM additional_contribution_decisions WHERE candidate_id=?',
+      )
+      .get(id);
+    expect(JSON.parse(snapshot!.evidence_snapshot as string)).toEqual(
+      f.objective,
+    );
+    f.sql.close();
+  },
+);
+
+it.each([
+  ['source-only functional proof', 'source', 'FAIL'],
+  ['already passing baseline', 'execution', 'PASS'],
+  ['missing baseline execution', 'execution', undefined],
+])(
+  'keeps %s unverified and denies recognition',
+  async (_label, kind, baselineStatus) => {
+    const f = functionalFixture('feature', kind, baselineStatus);
+    if (baselineStatus === undefined) {
+      delete (f.objective[0] as { baselineStatus?: string }).baselineStatus;
+      f.sql
+        .prepare('UPDATE evaluations SET evidence=? WHERE id=?')
+        .run(JSON.stringify(f.objective), runId);
+    }
+    const created = await createCandidate(
+      f.env,
+      runId,
+      'organizer:identity',
+      f.input,
+    );
+    expect(created.body).toMatchObject({ verificationStatus: 'UNVERIFIED' });
+    expect(
+      (
+        await reviewCandidate(
+          f.env,
+          (created.body as { id: string }).id,
+          'organizer:identity',
+          {
+            decision: 'RECOGNIZED',
+            requestId: crypto.randomUUID(),
+            expectedPreviousSequence: null,
+            reason:
+              'Cannot substitute source assertions for actual functional execution.',
+          },
+        )
+      ).status,
+    ).toBe(409);
+    f.sql.close();
+  },
+);
+
+it.each(['policy', 'regression', 'stale-head', 'closed', 'same-baseline'])(
+  'denies manual recognition with %s while retaining the candidate',
+  async (blocker) => {
+    const f = functionalFixture();
+    const created = await createCandidate(
+      f.env,
+      runId,
+      'organizer:identity',
+      f.input,
+    );
+    expect(created.body).toMatchObject({ verificationStatus: 'VERIFIED' });
+    if (blocker === 'policy' || blocker === 'regression')
+      f.sql.prepare('UPDATE evaluations SET evidence=? WHERE id=?').run(
+        JSON.stringify([
+          ...f.objective,
+          {
+            id: 'blocker',
+            kind: blocker === 'policy' ? 'policy' : 'execution',
+            status: 'FAIL',
+            ...(blocker === 'regression' ? { baselineStatus: 'PASS' } : {}),
+            claim: 'Authoritative blocker.',
+          },
+        ]),
+        runId,
+      );
+    if (blocker === 'stale-head')
+      f.sql.prepare('UPDATE submissions SET head_sha=?').run('c'.repeat(40));
+    if (blocker === 'closed')
+      f.sql.prepare('UPDATE submissions SET closed=1').run();
+    if (blocker === 'same-baseline') {
+      f.sql.prepare('UPDATE evaluations SET head_sha=?').run('a'.repeat(40));
+      f.sql.prepare('UPDATE submissions SET head_sha=?').run('a'.repeat(40));
+    }
+    expect(
+      (
+        await reviewCandidate(
+          f.env,
+          (created.body as { id: string }).id,
+          'organizer:identity',
+          {
+            decision: 'RECOGNIZED',
+            requestId: crypto.randomUUID(),
+            expectedPreviousSequence: null,
+            reason:
+              'Recognition requires eligible current objective evidence and no authoritative blocker.',
+          },
+        )
+      ).status,
+    ).toBe(409);
+    expect(await listCandidates(f.env, runId)).toHaveLength(1);
+    expect(
+      f.sql
+        .prepare('SELECT count(*) n FROM additional_contribution_decisions')
+        .get()?.n,
+    ).toBe(0);
+    f.sql.close();
+  },
+);
+
+it('refuses unknown categories and evidence and prevents identical baseline/head verification', async () => {
+  const f = functionalFixture();
+  expect(
+    (
+      await createCandidate(f.env, runId, 'organizer:identity', {
+        ...f.input,
+        category: 'unapproved',
+      })
+    ).status,
+  ).toBe(400);
+  expect(
+    (
+      await createCandidate(f.env, runId, 'organizer:identity', {
+        ...f.input,
+        evidenceIds: ['invented-proof'],
+      })
+    ).status,
+  ).toBe(400);
+  f.sql.prepare('UPDATE evaluations SET head_sha=?').run('a'.repeat(40));
+  const created = await createCandidate(
+    f.env,
+    runId,
+    'organizer:identity',
+    f.input,
+  );
+  expect(created.body).toMatchObject({
+    verificationStatus: 'UNVERIFIED',
+    latestDecision: null,
   });
   f.sql.close();
 });

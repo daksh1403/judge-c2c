@@ -1,0 +1,6 @@
+# Separate tool image; the frozen payment image and catalogue remain unchanged.
+FROM judge-c2c-runner-dependencies@sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1
+COPY typescript/package.json typescript/package-lock.json /opt/judge-typescript/
+RUN cd /opt/judge-typescript && npm ci --ignore-scripts --omit=dev --no-audit --no-fund \
+    && chmod -R go-w /opt/judge-typescript \
+    && /opt/judge-typescript/node_modules/.bin/tsc --version

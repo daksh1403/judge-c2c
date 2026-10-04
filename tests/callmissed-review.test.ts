@@ -216,3 +216,35 @@ it.each([false, true])(
     expect(JSON.stringify(result)).not.toContain('provider-secret');
   },
 );
+
+it('prices Cloudflare actual invoked model usage without treating a response alias as the billed route', async () => {
+  const model = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+  const cf = {
+    AI_PROVIDER: 'cloudflare',
+    AI_MODEL: model,
+    AI_PRICING_JSON: JSON.stringify({
+      ['cloudflare/' + model]: {
+        inputUsdPerMillion: 0.293,
+        outputUsdPerMillion: 2.253,
+      },
+    }),
+    AI: {
+      run: vi.fn().mockResolvedValue({
+        model: 'response-json-alias',
+        response: JSON.stringify(deterministicReport(demoContract, evidence)),
+        usage: { prompt_tokens: 1000, completion_tokens: 100 },
+      }),
+    },
+  } as unknown as Env;
+  const result = await aiReview(cf, demoContract, context, evidence);
+  expect(result.status).toBe('COMPLETED');
+  expect(result.trace).toMatchObject({
+    model: 'response-json-alias',
+    invokedModel: model,
+    cost: {
+      status: 'ESTIMATE',
+      microUsd: 518,
+      scope: 'successful-final-response',
+    },
+  });
+});

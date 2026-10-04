@@ -175,3 +175,189 @@ it('does not count source presence, routing omissions, AI prose or unknown check
   expect(security.findingIndexes).toEqual([0]);
   expect(security.status).toBe('UNVERIFIED');
 });
+
+it('classifies compatible objective facts and safe server coverage assessments while rejecting arbitrary model prose', () => {
+  const { contract, evidence, review } = fixture();
+  review.findings[0]!.claim =
+    'Architecture is perfect; all authentication attacks are prevented.';
+  const dims = enrichEngineeringReview(contract, evidence, review)
+    .engineeringReview.dimensions;
+  const quality = dims.find((d) => d.dimension === 'QUALITY')!;
+  expect(quality.supportMatrix.facts).toMatchObject({
+    status: 'SUPPORTED_FACT',
+    scope: 'configured-check-outcomes-only',
+    evidenceIds: ['execution-lint'],
+  });
+  expect(quality.supportMatrix.engineeringAssessment).toMatchObject({
+    status: 'SUPPORTED_ENGINEERING_ASSESSMENT',
+    origin: 'SERVER_EVIDENCE_COVERAGE_ASSESSMENT',
+    checkIds: ['lint'],
+    requiresHumanInspection: true,
+  });
+  expect(quality.supportMatrix.engineeringAssessment.text).toContain(
+    'regression',
+  );
+  const architecture = dims.find((d) => d.dimension === 'ARCHITECTURE')!;
+  expect(architecture.supportMatrix.facts.status).toBe('UNVERIFIED');
+  expect(architecture.supportMatrix.engineeringAssessment.status).toBe(
+    'UNVERIFIED',
+  );
+  const security = dims.find((d) => d.dimension === 'SECURITY')!;
+  expect(security.supportMatrix.facts.status).toBe('UNVERIFIED');
+  expect(security.supportMatrix.engineeringAssessment.text).toContain(
+    'lack verified results',
+  );
+  for (const dimension of dims)
+    expect(dimension.supportMatrix.contextualAi.status).toBe('UNVERIFIED');
+  expect(JSON.stringify(dims)).not.toContain('all authentication attacks');
+});
+
+it('covers all49 review facets explicitly without inheriting unrelated lint outcomes', () => {
+  const { contract, evidence, review } = fixture();
+  const rubric = enrichEngineeringReview(contract, evidence, review)
+    .engineeringReview.rubric;
+  expect(rubric).toHaveLength(49);
+  expect(new Set(rubric.map((r) => r.id)).size).toBe(49);
+  for (const id of ['27.02', '27.05', '28.03', '29.03', '25.13'])
+    expect(rubric.find((r) => r.id === id)).toMatchObject({
+      status: 'UNVERIFIED',
+      requiresHumanInspection: true,
+      evidenceIds: [],
+    });
+  expect(rubric.find((r) => r.id === '25.15')).toMatchObject({
+    status: 'SUPPORTED_FACT',
+    scope: 'configured-baseline-head-check-deltas-only',
+  });
+  expect(
+    rubric.every(
+      (r) =>
+        r.aiNarrativeStatus === 'UNVERIFIED' && r.inspectReason.length > 20,
+    ),
+  ).toBe(true);
+});
+
+it('projects specific contextual observations and finding indexes with exact server-owned citations without semantic promotion', () => {
+  const { contract, evidence, review } = fixture();
+  review.solution_approach.problem_understanding = {
+    text: 'The required payment retry must stop at the frozen attempt bound.',
+    evidenceIds: ['criterion'],
+    verification: 'UNVERIFIED',
+  };
+  review.solution_approach.unverified_assumptions = [
+    {
+      text: 'The assumption that invalid input cannot reach the retry loop requires inspection.',
+      evidenceIds: ['source', 'criterion'],
+      verification: 'UNVERIFIED',
+    },
+  ];
+  review.findings = [
+    {
+      category: 'security',
+      severity: 'high',
+      claim:
+        'Input validation should reject an invalid attempt count at the request boundary.',
+      evidenceIds: ['source', 'criterion'],
+      verification: 'inference',
+    },
+  ];
+  const result = enrichEngineeringReview(contract, evidence, review);
+  const validation = result.engineeringReview.rubric.find(
+    (r) => r.id === '28.02',
+  )!;
+  expect(validation.status).toBe('UNVERIFIED');
+  expect(validation.analysisCoverage).toBe('CONTEXTUAL_ANALYSIS_AVAILABLE');
+  const finding = validation.contextualAnalysis.find(
+    (a) => a.findingIndex === 0,
+  )!;
+  expect(finding).toMatchObject({
+    status: 'UNVERIFIED',
+    relevanceBasis: 'EXPLICIT_TOPIC_MATCH',
+    findingIndex: 0,
+    observationPath: null,
+  });
+  expect(finding.evidence).toEqual([
+    {
+      evidenceId: 'source',
+      kind: 'source',
+      status: 'PASS',
+      path: 'server.mjs',
+      criterionId: null,
+      requirementId: null,
+      checkId: null,
+      checkKind: null,
+      scope: 'CITED_CONTEXT_ONLY',
+    },
+    {
+      evidenceId: 'criterion',
+      kind: 'execution',
+      status: 'PASS',
+      path: null,
+      criterionId: 'bounded',
+      requirementId: 'retry',
+      checkId: 'retry-bounded',
+      checkKind: 'acceptance',
+      scope: 'CONFIGURED_CHECK_ONLY',
+    },
+  ]);
+  expect(
+    result.engineeringReview.rubric.find((r) => r.id === '25.01')!
+      .contextualAnalysis[0]!.observationPath,
+  ).toBe('solution_approach.problem_understanding');
+  expect(
+    result.engineeringReview.rubric
+      .find((r) => r.id === '25.10')!
+      .contextualAnalysis.some(
+        (a) =>
+          a.observationPath === 'solution_approach.unverified_assumptions[0]',
+      ),
+  ).toBe(true);
+  expect(
+    result.engineeringReview.rubric.find((r) => r.id === '28.03')!
+      .analysisCoverage,
+  ).toBe('MISSING_MEANINGFUL_ANALYSIS');
+});
+
+it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate out of contextual facet coverage', () => {
+  const { contract, evidence, review } = fixture();
+  review.solution_approach.maintainability = {
+    text: 'Maintainability is excellent and all concerns are fixed.',
+    evidenceIds: ['invented'],
+    verification: 'UNVERIFIED',
+  };
+  review.findings = [
+    {
+      category: 'security',
+      severity: 'high',
+      claim: 'All authentication is secure because lint passed.',
+      evidenceIds: ['invented', 'execution-lint'],
+      verification: 'inference',
+    },
+  ];
+  const rubric = enrichEngineeringReview(contract, evidence, review)
+    .engineeringReview.rubric;
+  expect(rubric.find((r) => r.id === '27.01')!.contextualAnalysis).toEqual([]);
+  expect(rubric.find((r) => r.id === '28.03')!.contextualAnalysis).toEqual([]);
+  expect(rubric.find((r) => r.id === '25.18')).toMatchObject({
+    status: 'UNVERIFIED',
+    analysisCoverage: 'MISSING_MEANINGFUL_ANALYSIS',
+    contextualAnalysis: [],
+  });
+  review.findings[0]!.evidenceIds = ['execution-lint'];
+  const auth = enrichEngineeringReview(
+    contract,
+    evidence,
+    review,
+  ).engineeringReview.rubric.find((r) => r.id === '28.03')!;
+  expect(auth.status).toBe('UNVERIFIED');
+  expect(auth.contextualAnalysis[0]!.evidence[0]!.scope).toBe(
+    'CONFIGURED_CHECK_ONLY',
+  );
+  expect(
+    enrichEngineeringReview(
+      contract,
+      evidence,
+      review,
+      'DETERMINISTIC_POLICY',
+    ).engineeringReview.rubric.every((r) => r.contextualAnalysis.length === 0),
+  ).toBe(true);
+});

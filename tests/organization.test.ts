@@ -224,6 +224,14 @@ describe('protected organization setup', () => {
     expect(stored.GITHUB_APP_PRIVATE_KEY).toContain('BEGIN PRIVATE KEY');
     expect(stored.GITHUB_APP_ID).toBe('101');
     expect(stored.DB).toBe(env.ORG_DB);
+    expect(stored.ENVIRONMENT).toBe(env.ENVIRONMENT);
+    const production = await organizationEnv({
+      ...env,
+      ENVIRONMENT: 'production',
+    });
+    expect(production.ENVIRONMENT).toBe('production');
+    expect(production.DB).toBe(env.ORG_DB);
+    expect(production.PREVIEW_TESTING).toBe('false');
     expect((await organization(request(callback), env, ctx)).status).toBe(403);
     expect(api).toHaveBeenCalledTimes(1);
     const status = await body(

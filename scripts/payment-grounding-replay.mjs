@@ -118,6 +118,75 @@ try {
       (e) => e.kind === 'execution' && e.status !== 'PASS',
     ),
     humanAttention: trace?.requiresHumanAttention === true,
+    engineeringReviewVersion: report.engineeringReview?.version ?? null,
+    engineeringDimensions: report.engineeringReview?.dimensions ?? [],
+    engineeringRubric: report.engineeringReview?.rubric ?? [],
+    engineeringSupport: {
+      contextualFacetIds: (report.engineeringReview?.rubric ?? [])
+        .filter((facet) => facet.contextualAnalysis?.length)
+        .map((facet) => facet.id),
+      guidanceOnlyFacetIds: (report.engineeringReview?.rubric ?? [])
+        .filter((facet) => !facet.contextualAnalysis?.length)
+        .map((facet) => facet.id),
+      contextualNarrativesUnverified: (
+        report.engineeringReview?.rubric ?? []
+      ).every((facet) =>
+        (facet.contextualAnalysis ?? []).every(
+          (entry) => entry.status === 'UNVERIFIED',
+        ),
+      ),
+      unknownContextualCitations: (report.engineeringReview?.rubric ?? [])
+        .flatMap((facet) => facet.contextualAnalysis ?? [])
+        .flatMap((entry) => entry.evidence ?? [])
+        .filter(
+          (citation) =>
+            !evidence.some(
+              (item) =>
+                item.id === citation.evidenceId &&
+                item.kind === citation.kind &&
+                (item.path ?? null) === citation.path &&
+                (item.criterionId ?? null) === citation.criterionId,
+            ),
+        ),
+      rubricCount: report.engineeringReview?.rubric?.length ?? 0,
+      parentStatuses: (report.engineeringReview?.dimensions ?? []).map((d) => ({
+        dimension: d.dimension,
+        facts: d.supportMatrix?.facts?.status ?? 'UNVERIFIED',
+        engineeringAssessment:
+          d.supportMatrix?.engineeringAssessment?.status ?? 'UNVERIFIED',
+        contextualAi: d.supportMatrix?.contextualAi?.status ?? 'UNVERIFIED',
+      })),
+      arbitraryNarrativesUnverified: (
+        report.engineeringReview?.dimensions ?? []
+      ).every((d) => d.supportMatrix?.contextualAi?.status === 'UNVERIFIED'),
+      unknownFactCitations: (report.engineeringReview?.rubric ?? [])
+        .filter((f) => f.status === 'SUPPORTED_FACT')
+        .flatMap((f) => f.evidenceIds ?? [])
+        .filter(
+          (id) =>
+            !evidence.some(
+              (e) =>
+                e.id === id &&
+                e.kind === 'execution' &&
+                e.status !== 'UNVERIFIED',
+            ),
+        ),
+      semanticFacetsNotPromotedByLint: (report.engineeringReview?.rubric ?? [])
+        .filter((f) => !['25.15', '25.16'].includes(f.id))
+        .every(
+          (f) =>
+            f.status === 'UNVERIFIED' &&
+            f.inspectReason?.length > 20 &&
+            f.requiresHumanInspection === true,
+        ),
+      privateIntentionUnknown: (report.engineeringReview?.rubric ?? []).some(
+        (f) => f.id === '25.18' && f.status === 'UNVERIFIED',
+      ),
+      criticalMissingAnalysisAttention:
+        trace?.qualitativeCriterionAnalysis?.status === 'UNVERIFIED'
+          ? trace?.requiresHumanAttention === true
+          : null,
+    },
   };
   const capture = await call('evaluations/' + id + '/artifacts/retry', {});
   result.artifactRecapture = { status: capture.status, result: capture.value };
@@ -180,6 +249,28 @@ try {
       !result.humanAttention)
   )
     throw Error('MISSING_AI_ANALYSIS_HIDDEN');
+  if (
+    ['requirements-and-approach-v10', 'requirements-and-approach-v11'].includes(
+      trace?.policy,
+    ) &&
+    (result.engineeringSupport.rubricCount !== 49 ||
+      result.engineeringDimensions.length !== 6 ||
+      !result.engineeringSupport.arbitraryNarrativesUnverified ||
+      result.engineeringSupport.unknownFactCitations.length ||
+      !result.engineeringSupport.semanticFacetsNotPromotedByLint ||
+      !result.engineeringSupport.privateIntentionUnknown)
+  )
+    throw Error('ENGINEERING_MATRIX_NOT_VERIFIED');
+  if (
+    trace?.policy === 'requirements-and-approach-v11' &&
+    (result.engineeringReviewVersion !== 'judge-engineering-dimensions-v2' ||
+      !result.engineeringSupport.contextualNarrativesUnverified ||
+      result.engineeringSupport.unknownContextualCitations.length ||
+      !result.engineeringSupport.contextualFacetIds.length ||
+      report.engineeringReview.rubric.find((facet) => facet.id === '25.18')
+        ?.contextualAnalysis?.length)
+  )
+    throw Error('SEMANTIC_PROJECTION_NOT_VERIFIED');
   if (
     pr === 8 &&
     !result.requirements.some((r) =>

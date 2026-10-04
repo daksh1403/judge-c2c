@@ -22,17 +22,19 @@ export async function migrate(
     '0020_runner_measurements.sql',
     '0021_console_identities.sql',
     '0022_stage_measurements.sql',
+    '0023_dependency_audit_cache.sql',
   ],
 ) {
   for (const file of files) {
     const source = readFileSync('migrations/' + file, 'utf8'),
       triggers = source.match(/CREATE TRIGGER[\s\S]*?END;/g) ?? [];
     const sql = source.replace(/CREATE TRIGGER[\s\S]*?END;/g, '');
-    for (const statement of sql
+    const statements = sql
       .split(';')
       .map((s) => s.trim())
-      .filter(Boolean))
-      await db.prepare(statement).run();
-    for (const trigger of triggers) await db.prepare(trigger).run();
+      .filter(Boolean);
+    // One ordered transaction per migration avoids exhausting local HTTP ports
+    // when several real D1 fixture databases are initialized concurrently.
+    await db.batch([...statements, ...triggers].map((sql) => db.prepare(sql)));
   }
 }

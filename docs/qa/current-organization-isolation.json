@@ -1,0 +1,30 @@
+{
+  "checklistIds": ["45.01"],
+  "status": "RESOURCE_ISOLATION_PROVEN_MULTI_ORGANIZATION_UI_AND_MULTI_EVENT_OPERATION_UNSUPPORTED",
+  "mode": "TWO_REAL_LOCAL_MINIFLARE_D1_BINDINGS_WITH_DISTINCT_ORGANIZATION_ENVIRONMENTS",
+  "validation": {
+    "command": "npx vitest run tests/organization-isolation.test.ts",
+    "passed": 1,
+    "failed": 0,
+    "typecheck": "passed"
+  },
+  "proof": [
+    "Two independently migrated D1 resources contain colliding repository/team/PR IDs but different organization data.",
+    "Actual organization login establishes resource-local sessions; each cookie receives 401 against the other environment.",
+    "Actual authenticated teams/submissions/status APIs return only the selected resource data, never the other organization or plaintext App credentials.",
+    "organizationEnv selects the correct D1 and App identity for each environment.",
+    "AES-GCM ciphertext cannot decrypt under the other ORG_NAME even with the same vault key. Copying ciphertext into the other resource causes organizationEnv to reject it; the source organization remains usable.",
+    "Each resource contains current and archived event records. eventSettings selects only initial and archived record remains intact."
+  ],
+  "productionChanges": [],
+  "actualGaps": [
+    "One configured ORG_NAME/ORG_DB and single github_connection id=1 per environment. No organization switching UI or tenant routing exists.",
+    "Although schema permits multiple event rows, eventSettings and active-event eligibility use hardcoded initial. Organizer console lists are not event scoped and there is no event selection/creation flow.",
+    "Multiple independently operational frozen events are therefore not proven; seeding archived rows is not equivalent to multi-event evaluation."
+  ],
+  "limits": [
+    "Resource deployment boundaries must be configured independently; this is not a shared-database tenant authorization proof.",
+    "No live GitHub installation or Cloudflare multi-organization deployment was created.",
+    "45.01 cannot be honestly marked fully complete if it requires multi-organization UI or concurrent event management."
+  ]
+}

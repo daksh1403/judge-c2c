@@ -1,0 +1,35 @@
+{
+  "checklistIds": ["49.20"],
+  "mode": "REAL_LOCAL_MINIFLARE_WORKFLOW_AND_D1_WITH_CONTROLLED_TRANSIENT_WRITE_FAILURE",
+  "test": "durably retries a transient mid-workflow D1 evidence write without losing prior evidence or inventing PASS",
+  "command": "npx vitest run tests/workflow-capacity-runtime.test.ts -t 'transient mid-workflow'",
+  "result": {
+    "passed": 1,
+    "failed": 0,
+    "otherTestsSkipped": 3,
+    "durationSeconds": 16.75,
+    "typecheck": "passed"
+  },
+  "fault": {
+    "stage": "objective",
+    "operation": "UPDATE evaluations SET evidence=? WHERE id=? AND state='CHECKING'",
+    "injection": "Transparent D1 statement proxy rejects first write with D1_TRANSIENT_FIXTURE after earlier prepare evidence is committed; second write delegates to actual D1.",
+    "attempts": 2,
+    "durableRetryDelayMinimumMs": 14500
+  },
+  "assertions": [
+    "During retry window evaluation remains CHECKING with earlier evidence present and report null.",
+    "Earlier evidence is identical at both objective-write attempts.",
+    "Real Workflow engine performs configured 15-second retry and completes/publishes.",
+    "Final evidence retains every earlier item and has unique evidence identifiers.",
+    "Unavailable execution never becomes an execution PASS; no execution PASS appears before or after recovery.",
+    "Final failure_code remains null and exactly one COMPLETED timeline event exists."
+  ],
+  "productionChanges": [],
+  "limits": [
+    "Controlled local transient write rejection, not a Cloudflare regional D1 outage.",
+    "GitHub client is synthetic; no Docker runner or live model invocation in this scenario.",
+    "This proves retry safety for the selected objective evidence-write operation, not arbitrary multi-day outages or every D1 operation.",
+    "Earlier persisted evidence survives local workflow retry; no claim of cross-region disaster recovery."
+  ]
+}

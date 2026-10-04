@@ -1611,3 +1611,134 @@ test('read-only judges retain navigation and filters while administrative contro
     page.getByRole('button', { name: 'Lock organization' }),
   ).toBeEnabled();
 });
+
+test('engineering support matrix separates trusted check facts, server assessments and unverified model prose', async ({
+  page,
+}) => {
+  const { enrichEngineeringReview } =
+    await import('../../src/engineering-review');
+  const { deterministicReport } = await import('../../src/evaluate');
+  const contract = structuredClone(demoContract);
+  const { paymentRetryPolicy } = await import('../../src/runner-policy');
+  contract.execution.runner = {
+    ...paymentRetryPolicy,
+    commands: [{ id: 'lint', kind: 'lint', argv: ['node', 'lint.mjs'] }],
+  };
+  const evidence = [
+    {
+      id: 'execution-lint',
+      kind: 'execution' as const,
+      status: 'FAIL' as const,
+      baselineStatus: 'PASS' as const,
+      claim: 'Configured lint check failed.',
+    },
+  ];
+  const review = deterministicReport(contract, evidence);
+  review.solution_approach.problem_understanding = {
+    text: 'The observable problem is a failed configured lint check; broader correctness requires inspection.',
+    evidenceIds: ['execution-lint'],
+    verification: 'UNVERIFIED',
+  };
+  review.findings = [
+    {
+      category: 'architecture',
+      severity: 'high',
+      claim: 'All architecture is perfect.',
+      evidenceIds: ['execution-lint'],
+      verification: 'inference',
+    },
+  ];
+  const report = {
+    ...review,
+    ...enrichEngineeringReview(contract, evidence, review),
+  };
+  await page.route('**/api/organization/status', (r) =>
+    r.fulfill({
+      json: {
+        authenticated: true,
+        role: 'judge',
+        organization: 'Fixture',
+        app: { slug: 'fixture', installationId: 1 },
+        runner: { enabled: false },
+        ai: { enabled: false },
+      },
+    }),
+  );
+  await page.route('**/api/organization/repositories', (r) =>
+    r.fulfill({ json: { repositories: [] } }),
+  );
+  await page.route('**/api/organization/overview', (r) =>
+    r.fulfill({ json: { counts: {}, runs: [] } }),
+  );
+  await page.route('**/api/organization/manage/**', (r) =>
+    r.fulfill({ json: { counts: {}, teams: [], issues: [], submissions: [] } }),
+  );
+  await page.route('**/api/organization/evaluations/matrix-run', (r) =>
+    r.fulfill({
+      json: {
+        ...demoDetail,
+        id: 'matrix-run',
+        state: 'COMPLETED',
+        contract_snapshot: JSON.stringify(contract),
+        evidence: JSON.stringify(evidence),
+        report: JSON.stringify(report),
+        ai_status: 'COMPLETED',
+        requirementResults: [],
+      },
+    }),
+  );
+  await page.goto('/?organization=1&evaluation=matrix-run');
+  const quality = page
+    .locator('.engineering-dimension')
+    .filter({ has: page.locator('strong').filter({ hasText: 'QUALITY' }) });
+  await expect(
+    quality.getByText('Facts: SUPPORTED_FACT', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    quality.getByText(
+      'Engineering assessment: SUPPORTED_ENGINEERING_ASSESSMENT',
+      { exact: false },
+    ),
+  ).toBeVisible();
+  await expect(
+    quality.getByText('Human inspection required.', { exact: false }),
+  ).toBeVisible();
+  const architecture = page.locator('.engineering-dimension').filter({
+    has: page.locator('strong').filter({ hasText: 'ARCHITECTURE' }),
+  });
+  await expect(
+    architecture.getByText('Facts: UNVERIFIED', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    architecture.getByText('Model interpretation: UNVERIFIED', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    architecture.getByText('All architecture is perfect.', { exact: false }),
+  ).toHaveCount(0);
+  await page.locator('.engineering-rubric summary').click();
+  const observableProblem = page.locator('.engineering-rubric article').filter({
+    has: page
+      .locator('strong')
+      .filter({ hasText: '25.01 · Observable problem' }),
+  });
+  await expect(
+    observableProblem.getByText('CONTEXTUAL_ANALYSIS_AVAILABLE', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    observableProblem.getByText('solution_approach.problem_understanding', {
+      exact: false,
+    }),
+  ).toBeVisible();
+  const authentication = page.locator('.engineering-rubric article').filter({
+    has: page
+      .locator('strong')
+      .filter({ hasText: '28.03 · Authentication regression' }),
+  });
+  await expect(
+    authentication.getByText('MISSING_MEANINGFUL_ANALYSIS', { exact: false }),
+  ).toBeVisible();
+});

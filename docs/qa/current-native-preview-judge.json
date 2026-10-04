@@ -1,0 +1,27 @@
+{
+  "mode": "ACTUAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "at": "2026-10-04T08:19:52.188Z",
+  "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+  "role": "judge",
+  "home": {
+    "rendered": true,
+    "latestTimeSorting": true,
+    "runCount": 35,
+    "sourceFilterVerified": true,
+    "relatedPrRendered": true,
+    "evaluationStateRendered": true
+  },
+  "evaluation": {
+    "id": "2929444a43522ea744b358c025f2a1f7584ecbf13419863e7e4e6e2c5f2cb4ed",
+    "state": "COMPLETED",
+    "historyWarning": true,
+    "artifactsRendered": true,
+    "persistedArtifactCount": 52,
+    "additionalWorkRendered": true,
+    "persistedContributionCount": 1,
+    "reviewerTracePersisted": true,
+    "reviewerVersion": "requirements-and-approach-v9",
+    "reviewerRoutingVersion": "server-model-routing-v1",
+    "decisionButtonsDisabled": true
+  }
+}

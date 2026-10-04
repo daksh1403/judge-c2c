@@ -601,10 +601,30 @@
           ? report.engineeringReview.dimensions
               .map(
                 (dimension) =>
-                  `<article class="inset engineering-dimension"><strong>${esc(dimension.dimension)} · ${esc(dimension.status)}</strong><p>${esc(dimension.summary)}</p>${(dimension.checks || []).map((check) => `<p><code>${esc(check.checkId)}</code> · ${esc(check.kind)} · baseline ${esc(check.baselineStatus)} → head ${esc(check.status)} · ${esc(check.delta)}</p>${evidenceLinks(check.evidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}`).join('')}${(dimension.missingCapabilities || []).map((capability) => `<p class="subtle">${esc(capability.status)} · ${esc(capability.reason)}</p>`).join('')}${dimension.contextualEvidenceIds?.length ? `<p>Context only; no dimension-wide verification:</p>${evidenceLinks(dimension.contextualEvidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}` : ''}</article>`,
+                  `<article class="inset engineering-dimension"><strong>${esc(dimension.dimension)} · ${esc(dimension.status)}</strong><p>${esc(dimension.summary)}</p>${dimension.supportMatrix ? `<p>Facts: ${esc(dimension.supportMatrix.facts.status)} · configured check outcomes only. Engineering assessment: ${esc(dimension.supportMatrix.engineeringAssessment.status)}. Model interpretation: ${esc(dimension.supportMatrix.contextualAi.status)}.</p><p>${esc(dimension.supportMatrix.engineeringAssessment.text)} Human inspection required.</p>${evidenceLinks(dimension.supportMatrix.engineeringAssessment.evidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}` : ''}${(dimension.checks || []).map((check) => `<p><code>${esc(check.checkId)}</code> · ${esc(check.kind)} · baseline ${esc(check.baselineStatus)} → head ${esc(check.status)} · ${esc(check.delta)}</p>${evidenceLinks(check.evidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}`).join('')}${(dimension.missingCapabilities || []).map((capability) => `<p class="subtle">${esc(capability.status)} · ${esc(capability.reason)}</p>`).join('')}${dimension.contextualEvidenceIds?.length ? `<p>Context only; no dimension-wide verification:</p>${evidenceLinks(dimension.contextualEvidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}` : ''}</article>`,
               )
               .join('')
           : '<p>Engineering dimension normalization unavailable for this historical report.</p>') +
+        (Array.isArray(report?.engineeringReview?.rubric)
+          ? `<details class="engineering-rubric"><summary>Engineering review facets — evidence scope and inspection needs</summary>${report.engineeringReview.rubric
+              .map(
+                (facet) =>
+                  `<article class="inset"><strong>${esc(facet.id)} · ${esc(facet.label)} · ${esc(facet.status)}</strong><p>${esc(facet.inspectReason)}</p><p>Scope ${esc(facet.scope)} · human inspection required · AI narrative ${esc(facet.aiNarrativeStatus)}.</p>${evidenceLinks(facet.evidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}<p>${esc(facet.analysisCoverage || 'MISSING_MEANINGFUL_ANALYSIS')} · ${esc(facet.missingAnalysisReason || 'Contextual interpretation requires human inspection.')}</p>${(
+                    facet.contextualAnalysis || []
+                  )
+                    .map(
+                      (analysis) =>
+                        `<p><strong>${esc(analysis.observationPath || `findings[${analysis.findingIndex}]`)}</strong> · ${esc(analysis.status)} · ${esc(analysis.relevanceBasis)}</p><p>${esc(analysis.text)}</p>${evidenceLinks(
+                          (analysis.evidence || []).map(
+                            (item) => item.evidenceId,
+                          ),
+                          new Map(evidence.map((e) => [String(e.id), e])),
+                        )}<p>Requirements: ${esc([...new Set((analysis.evidence || []).map((item) => item.requirementId).filter(Boolean))].join(', ') || 'No cited criterion linkage')} · source/check scope only.</p>`,
+                    )
+                    .join('')}</article>`,
+              )
+              .join('')}</details>`
+          : '') +
         '</section>';
       const regressions = evidence.filter(
         (e) => e.baselineStatus === 'PASS' && e.status === 'FAIL',

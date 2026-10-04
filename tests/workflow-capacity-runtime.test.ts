@@ -208,3 +208,228 @@ it('releases an acquired AI lease when newer authoritative work supersedes the r
     await mf.dispose();
   }
 });
+
+it('fences obsolete active provider output and releases its lease after the active request returns', async () => {
+  const mf = new Miniflare({
+    modules: true,
+    script: 'export default{}',
+    d1Databases: ['DB'],
+    compatibilityDate: '2026-08-01',
+  });
+  let release!: () => void;
+  const active = new Promise<void>((resolve) => (release = resolve));
+  try {
+    const db = (await mf.getD1Database('DB')) as unknown as D1Database;
+    await seed(db);
+    const client = {
+      compare: async () => [],
+      file: async () => '## Scheduling',
+      api: async (path: string) =>
+        path.includes('/pulls/')
+          ? { title: 'Fixture', body: '', head: { sha: head }, state: 'open' }
+          : path.includes('check-runs?')
+            ? { check_runs: [] }
+            : path.includes('check-runs')
+              ? { id: 7 }
+              : { commits: [] },
+    } as unknown as GitHub;
+    vi.spyOn(GitHub, 'installation').mockResolvedValue(client);
+    const original = review.aiReview;
+    const ai = vi
+      .spyOn(review, 'aiReview')
+      .mockImplementation(async (env, contract, context, evidence) => {
+        await active;
+        return original(
+          { ...env, CALLMISSED_API_KEY: undefined },
+          contract,
+          context,
+          evidence,
+        );
+      });
+    const env = {
+      DB: db,
+      ENVIRONMENT: 'local',
+      AI_PROVIDER: 'callmissed',
+      CALLMISSED_API_KEY: 'fixture-key',
+    } as Env;
+    const step = {
+      do: async (_name: string, options: unknown, callback?: () => unknown) =>
+        typeof options === 'function' ? options() : callback!(),
+    } as unknown as WorkflowStep;
+    const running = new EvaluationWorkflow(ctx, env).run(
+      { payload: { runId: id } } as WorkflowEvent<{ runId: string }>,
+      step,
+    );
+    await vi.waitFor(() => expect(ai).toHaveBeenCalledTimes(1));
+    expect(await acquireReviewer(db, 'callmissed')).toBeNull();
+    await db.batch([
+      db
+        .prepare(
+          'UPDATE submissions SET latest_run_id=?,head_sha=? WHERE repository_id=1 AND pr_number=24',
+        )
+        .bind('d'.repeat(64), 'e'.repeat(40)),
+      db
+        .prepare("UPDATE evaluations SET state='SUPERSEDED' WHERE id=?")
+        .bind(id),
+    ]);
+    // Cancellation is cooperative: in-flight external work holds its lease until return.
+    expect(await acquireReviewer(db, 'callmissed')).toBeNull();
+    release();
+    await running;
+    expect(
+      await db
+        .prepare("SELECT owner FROM reviewer_slots WHERE provider='callmissed'")
+        .first(),
+    ).toBeNull();
+    const run = await db
+      .prepare('SELECT state,report FROM evaluations WHERE id=?')
+      .bind(id)
+      .first<{ state: string; report: string | null }>();
+    expect(run).toEqual({ state: 'SUPERSEDED', report: null });
+    const next = await acquireReviewer(db, 'callmissed');
+    expect(next).not.toBeNull();
+    await releaseReviewer(db, next!);
+  } finally {
+    release?.();
+    await mf.dispose();
+  }
+});
+
+it('durably retries a transient mid-workflow D1 evidence write without losing prior evidence or inventing PASS', async () => {
+  const script = buildSync({
+    stdin: {
+      resolveDir: process.cwd(),
+      contents: `
+ import {EvaluationWorkflow as ProductionWorkflow} from './src/workflow.ts';
+ import {GitHub} from './src/github.ts';
+ GitHub.installation=async()=>({compare:async()=>[],file:async()=> '## Scheduling',api:async(path)=>path.includes('/pulls/')?{title:'Fixture',body:'',head:{sha:'${head}'},state:'open'}:path.includes('check-runs?')?{check_runs:[]}:path.includes('check-runs')?{id:7}:{commits:[]}});
+ export class EvaluationWorkflow extends ProductionWorkflow {
+  async run(event,step){
+   const real=this.env.DB;
+   this.env.DB={prepare(query){
+    const wrap=(statement)=>new Proxy(statement,{get(target,key){
+     if(key==='bind')return (...values)=>wrap(target.bind(...values));
+     if(key==='run' && query.includes('UPDATE evaluations SET evidence=? WHERE id=? AND state='))return async()=>{
+      const attempts=await real.prepare('SELECT count(*) n FROM fixture_d1_attempts').first();
+      const prior=await real.prepare('SELECT state,evidence,report FROM evaluations WHERE id=?').bind('${id}').first();
+      await real.prepare('INSERT INTO fixture_d1_attempts(at_ms,state,evidence,report) VALUES(?,?,?,?)').bind(Date.now(),prior.state,prior.evidence,prior.report).run();
+      if(attempts.n===0)throw Error('D1_TRANSIENT_FIXTURE');
+      return target.run();
+     };
+     const value=Reflect.get(target,key);return typeof value==='function'?value.bind(target):value;
+    }});return wrap(real.prepare(query));
+   },batch(...args){return real.batch(...args);},exec(...args){return real.exec(...args);}};
+   return super.run(event,step);
+  }
+ }
+ export default {async fetch(request,env){if(new URL(request.url).pathname==='/create')return Response.json(await(await env.EVALUATOR.create({id:'${id}',params:{runId:'${id}'}})).status());return Response.json(await(await env.EVALUATOR.get('${id}')).status());}};
+ `,
+    },
+    bundle: true,
+    write: false,
+    format: 'esm',
+    platform: 'neutral',
+    external: ['cloudflare:workers', 'node:*'],
+  }).outputFiles[0]!.text;
+  const runtime = new Miniflare({
+    modules: true,
+    script,
+    compatibilityDate: '2026-08-01',
+    compatibilityFlags: ['nodejs_compat'],
+    d1Databases: ['DB'],
+    workflows: {
+      EVALUATOR: {
+        name: 'd1-recovery-runtime',
+        className: 'EvaluationWorkflow',
+      },
+    },
+    bindings: { ENVIRONMENT: 'local' },
+  });
+  try {
+    const db = (await runtime.getD1Database('DB')) as unknown as D1Database;
+    await seed(db);
+    await db
+      .prepare(
+        'CREATE TABLE fixture_d1_attempts(at_ms INTEGER,state TEXT,evidence TEXT,report TEXT)',
+      )
+      .run();
+    await runtime.dispatchFetch('https://fixture.test/create');
+    await vi.waitFor(
+      async () => {
+        expect(
+          await db
+            .prepare('SELECT count(*) n FROM fixture_d1_attempts')
+            .first(),
+        ).toEqual({ n: 1 });
+      },
+      { timeout: 10000, interval: 100 },
+    );
+    const pending = await db
+      .prepare('SELECT state,evidence,report FROM evaluations WHERE id=?')
+      .bind(id)
+      .first<{ state: string; evidence: string; report: string | null }>();
+    expect(pending!.state).toBe('CHECKING');
+    expect(pending!.report).toBeNull();
+    const earlier = JSON.parse(pending!.evidence) as {
+      id: string;
+      kind: string;
+      status: string;
+    }[];
+    expect(earlier.length).toBeGreaterThan(0);
+    expect(
+      earlier.some((e) => e.kind === 'execution' && e.status === 'PASS'),
+    ).toBe(false);
+    await vi.waitFor(
+      async () => {
+        expect(
+          await db
+            .prepare(
+              'SELECT state,publication_status FROM evaluations WHERE id=?',
+            )
+            .bind(id)
+            .first(),
+        ).toEqual({ state: 'COMPLETED', publication_status: 'PUBLISHED' });
+      },
+      { timeout: 30000, interval: 200 },
+    );
+    const attempts = (
+      await db.prepare('SELECT * FROM fixture_d1_attempts ORDER BY rowid').all<{
+        at_ms: number;
+        state: string;
+        evidence: string;
+        report: string | null;
+      }>()
+    ).results;
+    expect(attempts).toHaveLength(2);
+    expect(attempts[1]!.at_ms - attempts[0]!.at_ms).toBeGreaterThanOrEqual(
+      14500,
+    );
+    expect(attempts[0]!.report).toBeNull();
+    expect(attempts[1]!.evidence).toBe(attempts[0]!.evidence);
+    const final = await db
+      .prepare('SELECT evidence,failure_code FROM evaluations WHERE id=?')
+      .bind(id)
+      .first<{ evidence: string; failure_code: string | null }>();
+    const recovered = JSON.parse(final!.evidence) as {
+      id: string;
+      kind: string;
+      status: string;
+    }[];
+    for (const item of earlier) expect(recovered).toContainEqual(item);
+    expect(new Set(recovered.map((e) => e.id)).size).toBe(recovered.length);
+    expect(
+      recovered.some((e) => e.kind === 'execution' && e.status === 'PASS'),
+    ).toBe(false);
+    expect(final!.failure_code).toBeNull();
+    expect(
+      await db
+        .prepare(
+          "SELECT count(*) n FROM timeline WHERE run_id=? AND state='COMPLETED'",
+        )
+        .bind(id)
+        .first(),
+    ).toEqual({ n: 1 });
+  } finally {
+    await runtime.dispose();
+  }
+}, 45000);

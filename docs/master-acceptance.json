@@ -73,45 +73,47 @@
         {
           "id": "01.04",
           "requirement": "Main is production branch",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "AGENTS.md",
             ".github/workflows/ci.yml",
-            ".github/workflows/deploy.yml"
+            ".github/workflows/deploy.yml",
+            "docs/qa/current-branch-governance.json"
           ],
-          "note": "Main is production branch: Workflow configuration was inspected; governance and clean independent setup require separate operational proof.",
+          "note": "Authenticated live PR6 remains open on feat/evaluation-completeness targeting default main. Current feature work stays on this branch; production workflow requires main push and protected explicit enablement. No merge or feature push to main performed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Current live GitHub branch/PR/check evidence and gated workflow; does not certify future privileged-actor behavior or production deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Authenticated live PR6 remains open on feat/evaluation-completeness targeting default main. Current feature work stays on this branch; production workflow requires main push and protected explicit enablement. No merge or feature push to main performed."
           }
         },
         {
           "id": "01.05",
           "requirement": "No normal feature work on main",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "AGENTS.md",
             ".github/workflows/ci.yml",
-            ".github/workflows/deploy.yml"
+            ".github/workflows/deploy.yml",
+            "docs/qa/current-branch-governance.json"
           ],
-          "note": "No normal feature work on main: Workflow configuration was inspected; governance and clean independent setup require separate operational proof.",
+          "note": "Authenticated live PR6 remains open on feat/evaluation-completeness targeting default main. Current feature work stays on this branch; production workflow requires main push and protected explicit enablement. No merge or feature push to main performed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Current live GitHub branch/PR/check evidence and gated workflow; does not certify future privileged-actor behavior or production deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Authenticated live PR6 remains open on feat/evaluation-completeness targeting default main. Current feature work stays on this branch; production workflow requires main push and protected explicit enablement. No merge or feature push to main performed."
           }
         },
         {
@@ -266,11 +268,7 @@
           "id": "01.13",
           "requirement": "No committed secrets",
           "status": "PARTIAL",
-          "evidence": [
-            ".gitignore",
-            "src/security.ts",
-            "tests/domain.test.ts"
-          ],
+          "evidence": [".gitignore", "src/security.ts", "tests/domain.test.ts"],
           "note": "No committed secrets: Recognized credentials are redacted and local secret files ignored; exhaustive Git history and arbitrary-secret scanning are not proven.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -422,64 +420,67 @@
         {
           "id": "02.06",
           "requirement": "Preview production separation",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "wrangler.jsonc",
-            "scripts/production-config.mjs"
+            "scripts/production-config.mjs",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Preview production separation: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
           "id": "02.07",
           "requirement": "No production data copied",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "wrangler.jsonc",
-            "scripts/production-config.mjs"
+            "scripts/production-config.mjs",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "No production data copied: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
           "id": "02.08",
           "requirement": "No production secrets exposed",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "wrangler.jsonc",
-            "scripts/production-config.mjs"
+            "scripts/production-config.mjs",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "No production secrets exposed: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
@@ -528,9 +529,7 @@
           "id": "02.11",
           "requirement": "Approved main merge deploys production",
           "status": "BLOCKED",
-          "evidence": [
-            ".github/workflows/deploy.yml"
-          ],
+          "evidence": [".github/workflows/deploy.yml"],
           "note": "Approved main merge deploys production: Production remains disabled; preview success cannot prove a production merge deploy.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -574,22 +573,23 @@
         {
           "id": "03.01",
           "requirement": "GitHub App production credentials",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "docs/qa/payment-readiness-report.md",
-            "src/github.ts"
+            "src/github.ts",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
@@ -619,10 +619,7 @@
           "id": "03.03",
           "requirement": "Least privilege",
           "status": "PARTIAL",
-          "evidence": [
-            "docs/qa/payment-readiness-report.md",
-            "src/github.ts"
-          ],
+          "evidence": ["docs/qa/payment-readiness-report.md", "src/github.ts"],
           "note": "Least privilege: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -964,9 +961,7 @@
           "id": "04.05",
           "requirement": "Issue opened",
           "status": "PASS",
-          "evidence": [
-            "docs/qa/payment-issue-triage-evidence.json"
-          ],
+          "evidence": ["docs/qa/payment-issue-triage-evidence.json"],
           "note": "Issue opened: Actual initially unlabeled GitHub issue #10 was ingested and attributed with not-scored review labels.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -983,32 +978,34 @@
         {
           "id": "04.06",
           "requirement": "Issue edited",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-sync.ts",
             "tests/intake.test.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Issue edited: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "04.07",
           "requirement": "Issue labeled and unlabeled",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue labeled and unlabeled: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1025,32 +1022,34 @@
         {
           "id": "04.08",
           "requirement": "Issue assigned and unassigned",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-sync.ts",
             "tests/intake.test.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Issue assigned and unassigned: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "04.09",
           "requirement": "Issue closed and reopened",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue closed and reopened: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1438,9 +1437,7 @@
           "id": "05.11",
           "requirement": "Policy-controlled registration",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Policy-controlled registration: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1458,9 +1455,7 @@
           "id": "05.12",
           "requirement": "Approval when self-registration enabled",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Approval when self-registration enabled: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1806,21 +1801,25 @@
         {
           "id": "07.03",
           "requirement": "Mandatory optional bonus and non-scored scopes",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "src/competition-issues.ts"
+            "src/competition-issues.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -2762,47 +2761,55 @@
         {
           "id": "09.01",
           "requirement": "Bug template",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/bug.yml",
             ".github/ISSUE_TEMPLATE/feature.yml",
             ".github/ISSUE_TEMPLATE/performance.yml",
-            ".github/ISSUE_TEMPLATE/clarification.yml"
+            ".github/ISSUE_TEMPLATE/clarification.yml",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Bug template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "09.02",
           "requirement": "Feature template",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/bug.yml",
             ".github/ISSUE_TEMPLATE/feature.yml",
             ".github/ISSUE_TEMPLATE/performance.yml",
-            ".github/ISSUE_TEMPLATE/clarification.yml"
+            ".github/ISSUE_TEMPLATE/clarification.yml",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Feature template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -2831,47 +2838,55 @@
         {
           "id": "09.04",
           "requirement": "Performance template",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/bug.yml",
             ".github/ISSUE_TEMPLATE/feature.yml",
             ".github/ISSUE_TEMPLATE/performance.yml",
-            ".github/ISSUE_TEMPLATE/clarification.yml"
+            ".github/ISSUE_TEMPLATE/clarification.yml",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Performance template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "09.05",
           "requirement": "Clarification workflow",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/bug.yml",
             ".github/ISSUE_TEMPLATE/feature.yml",
             ".github/ISSUE_TEMPLATE/performance.yml",
-            ".github/ISSUE_TEMPLATE/clarification.yml"
+            ".github/ISSUE_TEMPLATE/clarification.yml",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Clarification workflow: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -2965,41 +2980,49 @@
         {
           "id": "09.10",
           "requirement": "Spam limits",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "09.11",
           "requirement": "Gaming controls",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -3167,45 +3190,53 @@
         {
           "id": "10.06",
           "requirement": "Multi-team assignment",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Multi-team assignment: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "10.07",
           "requirement": "Reservation when configured",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Reservation when configured: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -3437,67 +3468,79 @@
         {
           "id": "11.06",
           "requirement": "In progress",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition-completion.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "In progress: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "11.07",
           "requirement": "PR opened",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition-completion.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "PR opened: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "11.08",
           "requirement": "Evaluating",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition-completion.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Evaluating: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -3525,23 +3568,27 @@
         {
           "id": "11.10",
           "requirement": "Blocked",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-issues.ts",
             "src/competition-completion.ts",
-            "tests/acceptance-audit.test.ts"
+            "tests/acceptance-audit.test.ts",
+            "docs/qa/current-issue-lifecycle-runtime.json",
+            "tests/issue-lifecycle-runtime.test.ts",
+            "tests/competition.test.ts",
+            "tests/reservation-lifecycle.test.ts"
           ],
-          "note": "Blocked: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.",
+          "note": "45focused issue/assignment/lifecycle runtime tests passed: signed edited/assigned/unassigned/closed/reopened issue andPR sequences preserve frozen assignments; all4 immutable scope definitions, shared/exclusive claim races, expiry/reassignment,4template markdown triage and reversible21report spam/duplicate moderation without automatic credit. NativeGitHub responses are fixtures; not exhaustive event permutations or account-wide throttle.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -3968,9 +4015,7 @@
           "id": "14.01",
           "requirement": "Multiple issues per PR",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple issues per PR: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -3988,9 +4033,7 @@
           "id": "14.02",
           "requirement": "Separable requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Separable requirements: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4008,9 +4051,7 @@
           "id": "14.03",
           "requirement": "Multiple attempts per issue",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple attempts per issue: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4074,9 +4115,7 @@
           "id": "14.06",
           "requirement": "Retained history",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Retained history: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4316,10 +4355,7 @@
           "id": "16.01",
           "requirement": "Run distinct from submission",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Run distinct from submission: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4337,10 +4373,7 @@
           "id": "16.02",
           "requirement": "Multiple runs",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Multiple runs: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4358,10 +4391,7 @@
           "id": "16.03",
           "requirement": "New run per head",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "New run per head: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4379,10 +4409,7 @@
           "id": "16.04",
           "requirement": "Previous evaluation retained",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Previous evaluation retained: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4400,10 +4427,7 @@
           "id": "16.05",
           "requirement": "Superseded state",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Superseded state: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4421,10 +4445,7 @@
           "id": "16.06",
           "requirement": "Obvious current run",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Obvious current run: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4442,10 +4463,7 @@
           "id": "16.07",
           "requirement": "No historical overwrite",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "No historical overwrite: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4462,22 +4480,24 @@
         {
           "id": "16.08",
           "requirement": "Obsolete view warning",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "public/competition.js",
-            "tests/browser/dashboard.spec.ts"
+            "tests/browser/dashboard.spec.ts",
+            "docs/qa/current-native-preview-judge.json",
+            "docs/qa/current-judge-ui-stabilization.md"
           ],
-          "note": "Obsolete view warning: Submission history labels CURRENT/Historical; every obsolete deep-link/view race is not independently verified.",
+          "note": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review deployment and persisted development evaluations, with no API mocks; not production or proof of every concurrent stale-view race."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations."
           }
         }
       ]
@@ -4490,10 +4510,7 @@
           "id": "17.01",
           "requirement": "Authoritative contract",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Authoritative contract: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4511,10 +4528,7 @@
           "id": "17.02",
           "requirement": "Schema version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4532,10 +4546,7 @@
           "id": "17.03",
           "requirement": "Repository identity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Repository identity: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4553,10 +4564,7 @@
           "id": "17.04",
           "requirement": "Challenge and evaluation version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Challenge and evaluation version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4574,10 +4582,7 @@
           "id": "17.05",
           "requirement": "Baseline",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Baseline: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4595,10 +4600,7 @@
           "id": "17.06",
           "requirement": "Assigned issues",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Assigned issues: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4616,10 +4618,7 @@
           "id": "17.07",
           "requirement": "Mandatory requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Mandatory requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4637,10 +4636,7 @@
           "id": "17.08",
           "requirement": "Optional requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Optional requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4658,10 +4654,7 @@
           "id": "17.09",
           "requirement": "Acceptance criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Acceptance criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4679,10 +4672,7 @@
           "id": "17.10",
           "requirement": "Constraints",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Constraints: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4699,22 +4689,24 @@
         {
           "id": "17.11",
           "requirement": "Regression requirements",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/domain.ts",
-            "examples/payment-engine-contract.json"
+            "examples/payment-engine-contract.json",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Regression requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
@@ -4746,74 +4738,77 @@
         {
           "id": "17.13",
           "requirement": "Security requirements",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/domain.ts",
-            "examples/payment-engine-contract.json"
+            "examples/payment-engine-contract.json",
+            "docs/qa/security-profile-evidence.json",
+            "docs/qa/security-profile-validation.md"
           ],
-          "note": "Security requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.",
+          "note": "Configured security profile executed inside actual Docker guests: JSON.parse passed, eval failed with no-eval diagnostic and exit1; hostile comments could not bypass the scoped trusted rule. Security outcomes represent configured checks, not comprehensive exploitability or arbitrary-secret detection.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Real positive/negative isolated ESLint security check plus controlled advisory/secret delta fixtures; no live OSV availability or universal scanner guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Configured security profile executed inside actual Docker guests: JSON.parse passed, eval failed with no-eval diagnostic and exit1; hostile comments could not bypass the scoped trusted rule. Security outcomes represent configured checks, not comprehensive exploitability or arbitrary-secret detection."
           }
         },
         {
           "id": "17.14",
           "requirement": "Testing requirements",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/domain.ts",
-            "examples/payment-engine-contract.json"
+            "examples/payment-engine-contract.json",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Testing requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
           "id": "17.15",
           "requirement": "Performance requirements",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/domain.ts",
-            "examples/payment-engine-contract.json"
+            "examples/payment-engine-contract.json",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Performance requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
           "id": "17.16",
           "requirement": "Additional categories",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Additional categories: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4831,10 +4826,7 @@
           "id": "17.17",
           "requirement": "Forbidden actions",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Forbidden actions: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4852,10 +4844,7 @@
           "id": "17.18",
           "requirement": "Schema validation",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema validation: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4873,10 +4862,7 @@
           "id": "17.19",
           "requirement": "No AI-invented criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "No AI-invented criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4894,10 +4880,7 @@
           "id": "17.20",
           "requirement": "Participant cannot override policy",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Participant cannot override policy: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -5179,10 +5162,7 @@
           "id": "18.12",
           "requirement": "Credit attributable to diff",
           "status": "PARTIAL",
-          "evidence": [
-            "src/evaluate.ts",
-            "src/competition-completion.ts"
-          ],
+          "evidence": ["src/evaluate.ts", "src/competition-completion.ts"],
           "note": "Credit attributable to diff: No automatic additional credit exists; reviewed completion is evidence-gated, but functional extra-contribution attribution is incomplete.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5345,25 +5325,27 @@
         {
           "id": "19.06",
           "requirement": "Dependency audit reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/dependency-audit-cache-controlled-evidence.json",
+            "tests/dependency-audit-cache.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Opt-in immutable advisory snapshots use exact input/provider identities, original observation provenance and hourly expiry. Five real Miniflare D1 scenarios prove hits, expiry, corruption, incomplete/failure bypass and origin/input rejection.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real local D1 cache with controlled OSV responses; live provider availability remains unverified; reused advisory observations are explicitly historical."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Opt-in immutable advisory snapshots use exact input/provider identities, original observation provenance and hourly expiry. Five real Miniflare D1 scenarios prove hits, expiry, corruption, incomplete/failure bypass and origin/input rejection."
           }
         },
         {
@@ -5520,22 +5502,24 @@
         {
           "id": "20.04",
           "requirement": "Integration tests",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner-policy.ts",
-            "tests/runner.test.ts"
+            "tests/runner.test.ts",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
@@ -5589,86 +5573,94 @@
         {
           "id": "20.07",
           "requirement": "Type check",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner-policy.ts",
-            "tests/runner.test.ts"
+            "tests/runner.test.ts",
+            "docs/qa/typescript-docker-evidence.json",
+            "docs/qa/typescript-execution.md"
           ],
-          "note": "Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
+          "note": "Pinned TypeScript7.0.2 in a separate immutable trusted tool image compiled strict valid input PASS and invalid assignment FAIL with TS2322 inside real isolated guests. Missing prepared tools remain infrastructure UNVERIFIED; original frozen image/contracts remain unchanged.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Actual local Docker positive/negative compiler execution with a newly pinned trusted image; original missing-tool evidence retained; not production tool-image deployment."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Pinned TypeScript7.0.2 in a separate immutable trusted tool image compiled strict valid input PASS and invalid assignment FAIL with TS2322 inside real isolated guests. Missing prepared tools remain infrastructure UNVERIFIED; original frozen image/contracts remain unchanged."
           }
         },
         {
           "id": "20.08",
           "requirement": "Formatting where relevant",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner-policy.ts",
-            "tests/runner.test.ts"
+            "tests/runner.test.ts",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
           "id": "20.09",
           "requirement": "Coverage",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner-policy.ts",
-            "tests/runner.test.ts"
+            "tests/runner.test.ts",
+            "docs/qa/execution-profile-evidence.json",
+            "docs/qa/execution-profile-rehearsal-notes.md"
           ],
-          "note": "Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
+          "note": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Local isolated synthetic guest baseline/head execution; coverage is measured for the fixture, not comprehensive test quality; latency is environment-specific, not production performance."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual immutable Docker baseline/head pair executed integration, formatting, Node coverage and trusted HTTP/performance checks. Failed integration, measured coverage regression and unchanged-budget benchmark failure remain failures. Contract profiles reuse existing typed check schema; measurements cover only configured cases."
           }
         },
         {
           "id": "20.10",
           "requirement": "Security scans",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/source-security.test.ts",
             "tests/dependency-audit.test.ts",
-            "docs/qa/osv-live-evidence.json"
+            "docs/qa/osv-live-evidence.json",
+            "docs/qa/security-profile-evidence.json",
+            "docs/qa/security-profile-validation.md"
           ],
-          "note": "Security scans: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent.",
+          "note": "Configured security profile executed inside actual Docker guests: JSON.parse passed, eval failed with no-eval diagnostic and exit1; hostile comments could not bypass the scoped trusted rule. Security outcomes represent configured checks, not comprehensive exploitability or arbitrary-secret detection.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Real positive/negative isolated ESLint security check plus controlled advisory/secret delta fixtures; no live OSV availability or universal scanner guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Configured security profile executed inside actual Docker guests: JSON.parse passed, eval failed with no-eval diagnostic and exit1; hostile comments could not bypass the scoped trusted rule. Security outcomes represent configured checks, not comprehensive exploitability or arbitrary-secret detection."
           }
         },
         {
@@ -6014,22 +6006,23 @@
         {
           "id": "22.02",
           "requirement": "Isolation architecture",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "src/local-docker.ts",
-            "docs/local-docker-runner.md"
+            "docs/local-docker-runner.md",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Isolation architecture: Deliberate Docker VM isolation is implemented for development; suitable production hostile-code capacity remains unprovisioned.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
@@ -6353,22 +6346,25 @@
         {
           "id": "22.18",
           "requirement": "Redaction",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
-            "src/security.ts"
+            "src/security.ts",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Redaction: Known credential formats are redacted; arbitrary secret recognition and binary artifact scanning are not exhaustive.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         }
       ]
@@ -6649,22 +6645,25 @@
         {
           "id": "23.13",
           "requirement": "Prompt injection",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Prompt injection: Hostile README and forged AI outputs did not override objective statuses; semantic narrative accuracy still fails calibration in some claims.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
@@ -7264,22 +7263,26 @@
         {
           "id": "25.15",
           "requirement": "Regression",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "docs/qa/current-payment-grounding-11.json",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-engineering-support-matrix.md"
           ],
-          "note": "Regression: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.",
+          "note": "Current policy-v10 original reference, partial and protected-test reports executed real AI with consistent authoritative criterion outcomes, known scoped citations, explicit unknown private intentions and human attention. Regression comparisons remain scoped to configured baseline/head checks.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Original GitHub payment calibration through actual Docker and Cloudflare/CallMissed providers; no assertion of comprehensive qualitative accuracy or participant private intentions."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current policy-v10 original reference, partial and protected-test reports executed real AI with consistent authoritative criterion outcomes, known scoped citations, explicit unknown private intentions and human attention. Regression comparisons remain scoped to configured baseline/head checks."
           }
         },
         {
@@ -7332,22 +7335,26 @@
         {
           "id": "25.18",
           "requirement": "No private intention claims",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "docs/qa/current-payment-grounding-11.json",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-engineering-support-matrix.md"
           ],
-          "note": "No private intention claims: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.",
+          "note": "Current policy-v10 original reference, partial and protected-test reports executed real AI with consistent authoritative criterion outcomes, known scoped citations, explicit unknown private intentions and human attention. Regression comparisons remain scoped to configured baseline/head checks.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Original GitHub payment calibration through actual Docker and Cloudflare/CallMissed providers; no assertion of comprehensive qualitative accuracy or participant private intentions."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current policy-v10 original reference, partial and protected-test reports executed real AI with consistent authoritative criterion outcomes, known scoped citations, explicit unknown private intentions and human attention. Regression comparisons remain scoped to configured baseline/head checks."
           }
         },
         {
@@ -8573,361 +8580,391 @@
         {
           "id": "30.01",
           "requirement": "Feature",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.02",
           "requirement": "Performance",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.03",
           "requirement": "Security",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.04",
           "requirement": "Tests",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.05",
           "requirement": "Analytics",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.06",
           "requirement": "Architecture",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.07",
           "requirement": "Documentation",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.08",
           "requirement": "AI-ML",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.09",
           "requirement": "Language conversion",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.10",
           "requirement": "Approved other category",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.11",
           "requirement": "Introduced in diff",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.12",
           "requirement": "Functional verification",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.13",
           "requirement": "Relevance",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.14",
           "requirement": "Evidence",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         },
         {
           "id": "30.15",
           "requirement": "Regression safety",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/additional-contributions.ts",
             "migrations/0013_additional_contributions.sql",
             "src/organization.ts",
             "public/organization.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-additional-category-runtime.json",
+            "tests/additional-contributions.test.ts"
           ],
-          "note": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.",
+          "note": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Static integration and independent adversary source review only; units not run at user request, deployed review pending."
+            "method": "FIXTURE_TEST",
+            "boundary": "Real SQLite and production creation/recognition functions with synthetic frozen execution evidence; proves common category gates, not ten independent live innovations or automatic novelty judgments."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C12-C14 source implementation; no fabricated live proof or automatic credit."
+            "status": "PASS",
+            "basis": "Thirty production-function SQLite scenarios prove all ten allowed categories share immutable diff/evidence gates, functional baseline FAIL/head PASS verification and explicit organizer recognition. Source-only, missing baseline, regression, stale/closed and identical heads deny credit. Category truth, relevance and attribution remain explicit organizer judgments; suggestions never award credit."
           }
         }
       ]
@@ -9434,9 +9471,7 @@
           "id": "32.08",
           "requirement": "Cheap trivial classification",
           "status": "PASS",
-          "evidence": [
-            "tests/issue-taxonomy.test.ts"
-          ],
+          "evidence": ["tests/issue-taxonomy.test.ts"],
           "note": "Cheap trivial classification: Trivial issue classification runs deterministic rules without a paid model call.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9460,10 +9495,7 @@
           "id": "33.01",
           "requirement": "Category",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Category: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9481,10 +9513,7 @@
           "id": "33.02",
           "requirement": "Severity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Severity: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9502,10 +9531,7 @@
           "id": "33.03",
           "requirement": "Claim",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Claim: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9523,10 +9549,7 @@
           "id": "33.04",
           "requirement": "Evidence",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Evidence: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9544,10 +9567,7 @@
           "id": "33.05",
           "requirement": "Verification",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Verification: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9565,10 +9585,7 @@
           "id": "33.06",
           "requirement": "Source",
           "status": "PASS",
-          "evidence": [
-            "src/domain.ts",
-            "tests/engineering-review.test.ts"
-          ],
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9586,10 +9603,7 @@
           "id": "33.07",
           "requirement": "Requirement",
           "status": "PASS",
-          "evidence": [
-            "src/domain.ts",
-            "tests/engineering-review.test.ts"
-          ],
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9607,10 +9621,7 @@
           "id": "33.08",
           "requirement": "Fact versus inference",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Fact versus inference: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9657,10 +9668,7 @@
           "id": "33.10",
           "requirement": "Unverified state",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Unverified state: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9683,111 +9691,126 @@
         {
           "id": "34.01",
           "requirement": "README hostile",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
             "tests/callmissed-review.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "README hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
           "id": "34.02",
           "requirement": "Comments hostile",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
             "tests/callmissed-review.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Comments hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
           "id": "34.03",
           "requirement": "Issue body hostile",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
             "tests/callmissed-review.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Issue body hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
           "id": "34.04",
           "requirement": "Test output hostile",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
             "tests/callmissed-review.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Test output hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
           "id": "34.05",
           "requirement": "Logs hostile",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
             "tests/callmissed-review.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Logs hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         },
         {
@@ -9859,22 +9882,25 @@
         {
           "id": "34.09",
           "requirement": "Context redaction",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/domain.test.ts",
-            "src/security.ts"
+            "src/security.ts",
+            "docs/qa/current-hostile-review-matrix.json",
+            "tests/claim-grounding.test.ts",
+            "tests/security.test.ts"
           ],
-          "note": "Context redaction: Known credentials are redacted from stored/model context; unknown secret formats require stronger scanners.",
+          "note": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Controlled provider fixtures exercise real request/validation/redaction functions, not universal resistance to every semantic attack or arbitrary unknown secret format; native issue bodies omitted rather than retrieved."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Sixty focused tests include a six-channel actual AI-request/validator fixture matrix: hostile source/README/PR prose and normalized execution output cannot waive authoritative FAIL; forged citations and repeated contradictions are denied. Unsupported qualitative analysis remains UNVERIFIED; no tools exposed. Native issue bodies excluded from AI Context. Six known credential formats redacted from text/serialized evidence."
           }
         }
       ]
@@ -10324,10 +10350,7 @@
           "id": "36.10",
           "requirement": "Horizontal capacity",
           "status": "PARTIAL",
-          "evidence": [
-            "src/store.ts",
-            "src/workflow.ts"
-          ],
+          "evidence": ["src/store.ts", "src/workflow.ts"],
           "note": "Horizontal capacity: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10530,10 +10553,7 @@
           "id": "37.07",
           "requirement": "Prepared environments",
           "status": "PASS",
-          "evidence": [
-            "runner/Dockerfile",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["runner/Dockerfile", "docs/qa/docker-evidence.json"],
           "note": "Prepared environments: Actual development jobs use a prepared immutable image rather than rebuilding participant environments.",
           "verification": {
             "method": "LOCAL_EXECUTION",
@@ -10550,21 +10570,22 @@
         {
           "id": "37.08",
           "requirement": "Warm capacity decision",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
-            "docs/local-docker-runner.md"
+            "docs/local-docker-runner.md",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {
@@ -10694,9 +10715,7 @@
           "id": "37.14",
           "requirement": "Risk routing",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts"],
           "note": "Risk routing: Deterministic risk signals are tested; they are routing metadata, not scores.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -11572,24 +11591,26 @@
         {
           "id": "39.29",
           "requirement": "Additional work",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "public/organization.js",
             "src/api.ts",
             "src/additional-contributions.ts",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-native-preview-judge.json",
+            "docs/qa/current-judge-ui-stabilization.md"
           ],
-          "note": "Additional-work records and organizer decisions are now displayed separately, with scoped criterion-improvement verification, evidence links and read-only judge access. Current code has static and independent source review only; deployed UI and live decision flows still require validation.",
+          "note": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current revision is uncommitted and undeployed; no browser/live validation is claimed."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review deployment and persisted development evaluations, with no API mocks; not production or proof of every concurrent stale-view race."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Corrected stale absence claim against the newly implemented C12-C14 UI/API."
+            "status": "PASS",
+            "basis": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations."
           }
         },
         {
@@ -11918,22 +11939,24 @@
         {
           "id": "40.13",
           "requirement": "Latest-time sorting",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition.ts",
-            "public/competition.js"
+            "public/competition.js",
+            "docs/qa/current-native-preview-judge.json",
+            "docs/qa/current-judge-ui-stabilization.md"
           ],
-          "note": "Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified.",
+          "note": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Adversary source review cleared; static checks only, no unit/runtime execution."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review deployment and persisted development evaluations, with no API mocks; not production or proof of every concurrent stale-view race."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C15 implementation and independent source review; runtime remains unverified."
+            "status": "PASS",
+            "basis": "Authenticated actual Native Preview browser verified historical warning, additional contribution evidence with read-only judge controls and timestamp ordering of 35 persisted evaluations."
           }
         },
         {
@@ -12218,64 +12241,73 @@
         {
           "id": "41.13",
           "requirement": "Source filter",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition.ts",
-            "public/competition.js"
+            "public/competition.js",
+            "docs/qa/current-issue-preview.json",
+            "scripts/current-issue-preview-proof.mjs",
+            "tests/browser/dashboard.spec.ts"
           ],
-          "note": "Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
+          "note": "Native pushedPreview judge browser verifies sourcefilter and4original related PR/head/evaluation states with directcurrent-evidence links. Targeted browser also validates escaped names, sourcequery, explicit missing-current-head states and protectedreadonly controls.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "41.14",
           "requirement": "Related PR",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition.ts",
-            "public/competition.js"
+            "public/competition.js",
+            "docs/qa/current-issue-preview.json",
+            "scripts/current-issue-preview-proof.mjs",
+            "tests/browser/dashboard.spec.ts"
           ],
-          "note": "Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
+          "note": "Native pushedPreview judge browser verifies sourcefilter and4original related PR/head/evaluation states with directcurrent-evidence links. Targeted browser also validates escaped names, sourcequery, explicit missing-current-head states and protectedreadonly controls.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "41.15",
           "requirement": "Evaluation state",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition.ts",
-            "public/competition.js"
+            "public/competition.js",
+            "docs/qa/current-issue-preview.json",
+            "scripts/current-issue-preview-proof.mjs",
+            "tests/browser/dashboard.spec.ts"
           ],
-          "note": "Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
+          "note": "Native pushedPreview judge browser verifies sourcefilter and4original related PR/head/evaluation states with directcurrent-evidence links. Targeted browser also validates escaped names, sourcequery, explicit missing-current-head states and protectedreadonly controls.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         }
       ]
@@ -14317,24 +14349,27 @@
         {
           "id": "48.17",
           "requirement": "AI cost",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/competition-overview.ts",
             "src/review-cost.ts",
-            "tests/review-cost.test.ts"
+            "tests/review-cost.test.ts",
+            "docs/qa/current-review-cost.json",
+            "tests/callmissed-review.test.ts",
+            "https://developers.cloudflare.com/workers-ai/models/llama-3.3-70b-instruct-fp8-fast/"
           ],
-          "note": "Known organizer-supplied model rates and actual provider token usage produce a scoped successful-final-response USD estimate. Missing rates/usage remain unavailable; retrieval, failed-request and whole-provider invoice accounting are not certified.",
+          "note": "Known actualinvoked Cloudflare model token usage and verifiedpublished listprices yield scoped final-responseESTIMATE. Unknown rates/usage remainUNAVAILABLE with actualusage exposed; returnedmodelaliases cannot select a guessedprice. Tests14passed and original3provider usage estimates preserved separately without alteringhistorical reports. Retrieval/failedrequests/freequota/invoice are explicitlyexcluded.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Executed synthetic pricing arithmetic and missing/invalid input behavior; no complete live provider billing reconciliation."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -14687,49 +14722,53 @@
         {
           "id": "49.11",
           "requirement": "Baseline build fail",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/competition.test.ts",
             "tests/runner.test.ts",
             "tests/benchmark.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-build-failures.json",
+            "runner/build-failure-proof.ts"
           ],
-          "note": "Baseline build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery.",
+          "note": "Real disposableDocker fixtures separately fail baseline or head build commands and preserve successful trustedHTTP checks plus independent counterpart outcomes. FAIL is structured and cannot become participantPASS or erase baseline/head provenance.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
           "id": "49.12",
           "requirement": "Submission build fail",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/competition.test.ts",
             "tests/runner.test.ts",
             "tests/benchmark.test.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-build-failures.json",
+            "runner/build-failure-proof.ts"
           ],
-          "note": "Submission build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery.",
+          "note": "Real disposableDocker fixtures separately fail baseline or head build commands and preserve successful trustedHTTP checks plus independent counterpart outcomes. FAIL is structured and cannot become participantPASS or erase baseline/head provenance.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Recorded targeted fixture/runtime and actual isolated nativePreview evidence as identified; no production guarantee, exhaustive semantic analysis or universal event ordering."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 affected rootcause runtime validation, limitations retained."
           }
         },
         {
@@ -14904,22 +14943,24 @@
         {
           "id": "49.20",
           "requirement": "Database fail",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
-            "src/index.ts"
+            "src/index.ts",
+            "docs/qa/current-d1-recovery-runtime.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested.",
+          "note": "Actual local Workflow engine recovered a one-time D1 objective-write rejection through durable retry. Earlier evidence remained intact, no report or execution PASS appeared during outage and completion occurred once.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Executed intake failure injection with real migrated D1 for recovery; not a live D1 outage or mid-evaluation failure drill."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Controlled transient write failure in real local D1 and Workflow engine; proves retry/idempotency and preserved evidence, not regional disaster recovery."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Actual local Workflow engine recovered a one-time D1 objective-write rejection through durable retry. Earlier evidence remained intact, no report or execution PASS appeared during outage and completion occurred once."
           }
         },
         {
@@ -14998,9 +15039,7 @@
           "id": "49.24",
           "requirement": "Preview fail",
           "status": "PASS",
-          "evidence": [
-            "https://github.com/daksh1403/judge-c2c/pull/4"
-          ],
+          "evidence": ["https://github.com/daksh1403/judge-c2c/pull/4"],
           "note": "Preview fail: A real native build failure was investigated and repaired; later builds passed.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -16074,22 +16113,23 @@
         {
           "id": "51.14",
           "requirement": "Safe objective execution",
-          "status": "PARTIAL",
+          "status": "BLOCKED",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "docs/qa/docker-evidence.json"
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Safe objective execution: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates.",
+          "note": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "BLOCKED",
+            "basis": "Repository prerequisites and isolated review checks implemented; actual production resource inventory, distinct secrets/App and isolated runner capacity are absent and production deployment is unauthorized. Provision fresh production resources/secrets/runner after approval, deploy approved main, then verify isolation, credentials and objective execution. Preview proof cannot certify production."
           }
         },
         {

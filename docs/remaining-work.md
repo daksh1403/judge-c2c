@@ -1,20 +1,15 @@
 # Current remaining work
 
-Updated after targeted stabilization and evidence closure. This is bookkeeping from the existing ledger, not a new repository audit. All714 requirements are retained.
+Affected workstream bookkeeping; requirements and acceptance criteria are unchanged.
 
-| Status          | Items |
-| --------------- | ----: |
-| PASS            |   586 |
-| PARTIAL         |   124 |
-| NOT_IMPLEMENTED |     0 |
-| UNVERIFIED      |     0 |
-| FAIL            |     0 |
-| BLOCKED         |     2 |
-| NOT_APPLICABLE  |     2 |
+| Status         | Items |
+| -------------- | ----: |
+| PASS           |   636 |
+| BLOCKED        |     2 |
+| PARTIAL        |    74 |
+| NOT_APPLICABLE |     2 |
 
-The original three-submission grounding defect is resolved. PR#6 commit7c688d2 qualityCI and native Cloudflare build passed; actual unmocked judge views and14 Preview browser scenarios passed. Later evidence/test commits require their own CI. Production remains unauthorized. Live OSV advisory reads timed out twice; no successful live scan is certified.
-
-Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; subsequent affected-item updates are preserved in current-workstream-ledger-changes.json.
+Original calibration is resolved, current policy-v10 three-submission replay is recorded. Production remains unauthorized.
 
 ## 01. Project foundation & development workflow
 
@@ -36,46 +31,9 @@ Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; su
 - **03.01 — GitHub App production credentials (PARTIAL)**: GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.
 - **03.03 — Least privilege (PARTIAL)**: Least privilege: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.
 
-## 04. GitHub webhook system
-
-- **04.06 — Issue edited (PARTIAL)**: Issue edited: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised.
-- **04.08 — Issue assigned and unassigned (PARTIAL)**: Issue assigned and unassigned: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised.
-
-## 07. GitHub Issues management
-
-- **07.03 — Mandatory optional bonus and non-scored scopes (PARTIAL)**: Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence.
-
-## 09. Issue quality & moderation
-
-- **09.01 — Bug template (PARTIAL)**: Bug template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.
-- **09.02 — Feature template (PARTIAL)**: Feature template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.
-- **09.04 — Performance template (PARTIAL)**: Performance template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.
-- **09.05 — Clarification workflow (PARTIAL)**: Clarification workflow: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository.
-- **09.10 — Spam limits (PARTIAL)**: Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.
-- **09.11 — Gaming controls (PARTIAL)**: Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.
-
-## 10. Issue assignment & claiming
-
-- **10.06 — Multi-team assignment (PARTIAL)**: Multi-team assignment: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered.
-- **10.07 — Reservation when configured (PARTIAL)**: Reservation when configured: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered.
-
-## 11. Issue lifecycle
-
-- **11.06 — In progress (PARTIAL)**: In progress: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.
-- **11.07 — PR opened (PARTIAL)**: PR opened: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.
-- **11.08 — Evaluating (PARTIAL)**: Evaluating: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.
-- **11.10 — Blocked (PARTIAL)**: Blocked: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised.
-
-## 16. Evaluation runs
-
-- **16.08 — Obsolete view warning (PARTIAL)**: Obsolete view warning: Submission history labels CURRENT/Historical; every obsolete deep-link/view race is not independently verified.
-
 ## 17. Evaluation Contract
 
-- **17.11 — Regression requirements (PARTIAL)**: Regression requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.
 - **17.13 — Security requirements (PARTIAL)**: Security requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.
-- **17.14 — Testing requirements (PARTIAL)**: Testing requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.
-- **17.15 — Performance requirements (PARTIAL)**: Performance requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete.
 
 ## 18. Baseline system
 
@@ -83,16 +41,8 @@ Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; su
 - **18.09 — New vulnerabilities (PARTIAL)**: New vulnerabilities: Bounded source patterns and declared npm advisory comparisons distinguish deltas; exploitability and comprehensive vulnerability analysis are not proven.
 - **18.12 — Credit attributable to diff (PARTIAL)**: Credit attributable to diff: No automatic additional credit exists; reviewed completion is evidence-gated, but functional extra-contribution attribution is incomplete.
 
-## 19. Baseline precomputation
-
-- **19.06 — Dependency audit reuse (PARTIAL)**: Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.
-
 ## 20. Deterministic evaluation
 
-- **20.04 — Integration tests (PARTIAL)**: Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.
-- **20.07 — Type check (PARTIAL)**: Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.
-- **20.08 — Formatting where relevant (PARTIAL)**: Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.
-- **20.09 — Coverage (PARTIAL)**: Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.
 - **20.10 — Security scans (PARTIAL)**: Security scans: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent.
 - **20.11 — Dependency audit (PARTIAL)**: Dependency audit: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent.
 
@@ -121,8 +71,6 @@ Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; su
 - **25.12 — Maintainability (PARTIAL)**: Maintainability: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.
 - **25.13 — Scalability (PARTIAL)**: Scalability: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.
 - **25.14 — Security risk (PARTIAL)**: Security risk: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.
-- **25.15 — Regression (PARTIAL)**: Regression: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.
-- **25.18 — No private intention claims (PARTIAL)**: No private intention claims: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.
 
 ## 27. Code-quality review
 
@@ -165,24 +113,6 @@ Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; su
 - **29.09 — Layer bypass (PARTIAL)**: Layer bypass: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete.
 - **29.10 — Responsibility placement (PARTIAL)**: Responsibility placement: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete.
 
-## 30. Additional contribution detection
-
-- **30.01 — Feature (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.02 — Performance (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.03 — Security (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.04 — Tests (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.05 — Analytics (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.06 — Architecture (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.07 — Documentation (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.08 — AI-ML (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.09 — Language conversion (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.10 — Approved other category (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.11 — Introduced in diff (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.12 — Functional verification (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.13 — Relevance (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.14 — Evidence (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-- **30.15 — Regression safety (PARTIAL)**: Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified.
-
 ## 34. Prompt-injection protection
 
 - **34.01 — README hostile (PARTIAL)**: README hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment.
@@ -200,33 +130,9 @@ Remaining groups are recorded in docs/qa/current-partial-closure-groups.json; su
 
 - **37.08 — Warm capacity decision (PARTIAL)**: Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned.
 
-## 39. Administrator dashboard
-
-- **39.29 — Additional work (PARTIAL)**: Additional-work records and organizer decisions are now displayed separately, with scoped criterion-improvement verification, evidence links and read-only judge access. Current code has static and independent source review only; deployed UI and live decision flows still require validation.
-
-## 40. Submission sorting filtering
-
-- **40.13 — Latest-time sorting (PARTIAL)**: Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified.
-
-## 41. Issue dashboard
-
-- **41.13 — Source filter (PARTIAL)**: Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.
-- **41.14 — Related PR (PARTIAL)**: Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.
-- **41.15 — Evaluation state (PARTIAL)**: Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.
-
 ## 45. Persistent data model
 
 - **45.01 — Organizations (PARTIAL)**: Organizations: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete.
-
-## 48. Observability
-
-- **48.17 — AI cost (PARTIAL)**: Known organizer-supplied model rates and actual provider token usage produce a scoped successful-final-response USD estimate. Missing rates/usage remain unavailable; retrieval, failed-request and whole-provider invoice accounting are not certified.
-
-## 49. Failure handling
-
-- **49.11 — Baseline build fail (PARTIAL)**: Baseline build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery.
-- **49.12 — Submission build fail (PARTIAL)**: Submission build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery.
-- **49.20 — Database fail (PARTIAL)**: Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested.
 
 ## 51. MVP readiness
 

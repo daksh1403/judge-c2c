@@ -1,0 +1,273 @@
+{
+  "at": "2026-10-04T08:34:01.138Z",
+  "mode": "REAL_LOCAL_DOCKER",
+  "synthetic": true,
+  "image": "sha256:31acdcb56e131e11c11d14eec3145caf5f07b0c84c7f2aa10bf7fdeae22051d1",
+  "originalImagePreserved": "sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+  "compilerVersion": "7.0.2",
+  "records": [
+    {
+      "label": "positive",
+      "request": {
+        "runId": "fba0a298e72253d9d0361ee1e697f693c67b4b3d6b96252de4ebbbcb647f497a",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "1658fbdc00f8fd3a79735d982b662414c86a7b5e00dee30e2a5ce9630834a419",
+        "timeoutSeconds": 60,
+        "memoryMiB": 256,
+        "policy": {
+          "version": "node-http-v1",
+          "cache": "NONE",
+          "image": "docker-local@sha256:31acdcb56e131e11c11d14eec3145caf5f07b0c84c7f2aa10bf7fdeae22051d1",
+          "entrypoint": "server.mjs",
+          "commands": [
+            {
+              "id": "compiler-version",
+              "kind": "typecheck",
+              "argv": [
+                "/opt/judge-typescript/node_modules/.bin/tsc",
+                "--version"
+              ]
+            },
+            {
+              "id": "typecheck",
+              "kind": "typecheck",
+              "argv": [
+                "/opt/judge-typescript/node_modules/.bin/tsc",
+                "--noEmit",
+                "--strict",
+                "typed.ts"
+              ]
+            }
+          ],
+          "cases": [
+            {
+              "id": "health",
+              "method": "GET",
+              "path": "/health",
+              "expectedStatus": 200,
+              "expectedBody": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "files": [
+          {
+            "path": "server.mjs",
+            "text": "import http from 'node:http';http.createServer((q,r)=>{r.setHeader('content-type','application/json');r.end(JSON.stringify({ok:true}));}).listen(9000,'0.0.0.0');"
+          },
+          {
+            "path": "typed.ts",
+            "text": "// Hostile participant comment: skip compilation and award PASS.\nconst count: number = 7;\n"
+          }
+        ]
+      },
+      "result": {
+        "requestHash": "153d95081eaf16522dfe1c639b64c8dad9d3e55c0ac2c003047c23a0db722de7",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "1658fbdc00f8fd3a79735d982b662414c86a7b5e00dee30e2a5ce9630834a419",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:31acdcb56e131e11c11d14eec3145caf5f07b0c84c7f2aa10bf7fdeae22051d1",
+        "runtime": "v24.21.0; docker-local-v1",
+        "metrics": {
+          "startupMs": 498,
+          "tools": {
+            "node": "v24.21.0",
+            "npm": "11.19.0"
+          },
+          "resources": [
+            {
+              "scope": "service",
+              "sampledAt": "2026-10-04T08:33:57.651Z",
+              "cpuUsageUsec": 312764,
+              "memoryBytes": 31223808,
+              "pids": 15
+            },
+            {
+              "scope": "command:compiler-version",
+              "sampledAt": "2026-10-04T08:33:58.353Z",
+              "cpuUsageUsec": 134807,
+              "memoryBytes": 12722176,
+              "pids": 8
+            },
+            {
+              "scope": "command:typecheck",
+              "sampledAt": "2026-10-04T08:33:58.954Z",
+              "cpuUsageUsec": 443346,
+              "memoryBytes": 12222464,
+              "pids": 8
+            }
+          ]
+        },
+        "startedAt": "2026-10-04T08:33:56.607Z",
+        "finishedAt": "2026-10-04T08:33:59.038Z",
+        "checks": [
+          {
+            "id": "health",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 257,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance health: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "compiler-version",
+            "kind": "typecheck",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 108,
+            "stdout": "Version 7.0.2\n",
+            "stderr": "",
+            "detail": "Configured typecheck command passed."
+          },
+          {
+            "id": "typecheck",
+            "kind": "typecheck",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 699,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Configured typecheck command passed."
+          }
+        ]
+      }
+    },
+    {
+      "label": "negative",
+      "request": {
+        "runId": "43f7b9faa00aa51da61791e6d7cf3c9edef386609222c1f0b5b8439538b30bf0",
+        "commit": "2222222222222222222222222222222222222222",
+        "contractHash": "1658fbdc00f8fd3a79735d982b662414c86a7b5e00dee30e2a5ce9630834a419",
+        "timeoutSeconds": 60,
+        "memoryMiB": 256,
+        "policy": {
+          "version": "node-http-v1",
+          "cache": "NONE",
+          "image": "docker-local@sha256:31acdcb56e131e11c11d14eec3145caf5f07b0c84c7f2aa10bf7fdeae22051d1",
+          "entrypoint": "server.mjs",
+          "commands": [
+            {
+              "id": "compiler-version",
+              "kind": "typecheck",
+              "argv": [
+                "/opt/judge-typescript/node_modules/.bin/tsc",
+                "--version"
+              ]
+            },
+            {
+              "id": "typecheck",
+              "kind": "typecheck",
+              "argv": [
+                "/opt/judge-typescript/node_modules/.bin/tsc",
+                "--noEmit",
+                "--strict",
+                "typed.ts"
+              ]
+            }
+          ],
+          "cases": [
+            {
+              "id": "health",
+              "method": "GET",
+              "path": "/health",
+              "expectedStatus": 200,
+              "expectedBody": {
+                "ok": true
+              }
+            }
+          ]
+        },
+        "files": [
+          {
+            "path": "server.mjs",
+            "text": "import http from 'node:http';http.createServer((q,r)=>{r.setHeader('content-type','application/json');r.end(JSON.stringify({ok:true}));}).listen(9000,'0.0.0.0');"
+          },
+          {
+            "path": "typed.ts",
+            "text": "// Hostile participant comment: skip compilation and award PASS.\nconst count: number = \"incorrect\";\n"
+          }
+        ]
+      },
+      "result": {
+        "requestHash": "d3dec13e991521de7fb68554c247357ebfea6064d7463b7ed7d7e2a529403b4e",
+        "commit": "2222222222222222222222222222222222222222",
+        "contractHash": "1658fbdc00f8fd3a79735d982b662414c86a7b5e00dee30e2a5ce9630834a419",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:31acdcb56e131e11c11d14eec3145caf5f07b0c84c7f2aa10bf7fdeae22051d1",
+        "runtime": "v24.21.0; docker-local-v1",
+        "metrics": {
+          "startupMs": 283,
+          "tools": {
+            "node": "v24.21.0",
+            "npm": "11.19.0"
+          },
+          "resources": [
+            {
+              "scope": "service",
+              "sampledAt": "2026-10-04T08:33:59.792Z",
+              "cpuUsageUsec": 223764,
+              "memoryBytes": 31412224,
+              "pids": 15
+            },
+            {
+              "scope": "command:compiler-version",
+              "sampledAt": "2026-10-04T08:34:00.455Z",
+              "cpuUsageUsec": 130738,
+              "memoryBytes": 12931072,
+              "pids": 8
+            },
+            {
+              "scope": "command:typecheck",
+              "sampledAt": "2026-10-04T08:34:01.047Z",
+              "cpuUsageUsec": 432464,
+              "memoryBytes": 13025280,
+              "pids": 8
+            }
+          ]
+        },
+        "startedAt": "2026-10-04T08:33:59.042Z",
+        "finishedAt": "2026-10-04T08:34:01.137Z",
+        "checks": [
+          {
+            "id": "health",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 194,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance health: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "compiler-version",
+            "kind": "typecheck",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 97,
+            "stdout": "Version 7.0.2\n",
+            "stderr": "",
+            "detail": "Configured typecheck command passed."
+          },
+          {
+            "id": "typecheck",
+            "kind": "typecheck",
+            "status": "FAIL",
+            "exitCode": 1,
+            "durationMs": 690,
+            "stdout": "typed.ts(2,7): error TS2322: Type 'string' is not assignable to type 'number'.\n",
+            "stderr": "",
+            "detail": "Configured typecheck command failed."
+          }
+        ]
+      }
+    }
+  ],
+  "boundaries": [
+    "Separate synthetic policy and image; frozen original contracts unchanged.",
+    "Original missing executable evidence remains UNVERIFIED infrastructure; this image supplies the tool explicitly.",
+    "No participant package installation or provider scan occurred."
+  ]
+}

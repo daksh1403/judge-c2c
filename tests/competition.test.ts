@@ -97,6 +97,45 @@ async function challenge(number = 12, extra = {}) {
   });
 }
 describe('coherent competitive state', () => {
+  it('enforces shared capacity under three concurrent claims without losing frozen assignments', async () => {
+    const teams = await Promise.all(
+      [
+        ['Alpha', 'alice'],
+        ['Beta', 'bob'],
+        ['Gamma', 'charlie'],
+      ].map(([name, login]) =>
+        createTeam(env, services, 'organizer', team(name!, login!)),
+      ),
+    );
+    await challenge(12, { ownership: 'SHARED', capacity: 2, claimable: true });
+    await env
+      .ORG_DB!.prepare('UPDATE hackathons SET policy=?')
+      .bind(JSON.stringify({ claimingEnabled: true }))
+      .run();
+    const claims = await Promise.allSettled(
+      teams.map((t) =>
+        assignIssue(
+          env,
+          'github:' + t.members[0]!.githubId,
+          { teamId: t.id, repositoryId: 1, issueNumber: 12 },
+          'CLAIM',
+        ),
+      ),
+    );
+    expect(claims.filter((c) => c.status === 'fulfilled')).toHaveLength(2);
+    const rows = (
+      await env
+        .ORG_DB!.prepare(
+          'SELECT status,exclusive,contract_hash FROM issue_assignments WHERE issue_number=12',
+        )
+        .all<{ status: string; exclusive: number; contract_hash: string }>()
+    ).results;
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r) => r.status === 'ACTIVE' && r.exclusive === 0)).toBe(
+      true,
+    );
+    expect(new Set(rows.map((r) => r.contract_hash)).size).toBe(1);
+  });
   it('keeps stable team IDs across renames and rejects conflicting numeric identities', async () => {
     const created = await createTeam(
       env,

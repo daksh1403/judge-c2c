@@ -117,7 +117,7 @@ export async function organizationEnv(env: Env): Promise<Env> {
     ...env,
     DB: env.ORG_DB!,
     EVALUATOR: env.ORG_EVALUATOR!,
-    ENVIRONMENT: 'review',
+    ENVIRONMENT: env.ENVIRONMENT,
     DEMO_MODE: 'false',
     PREVIEW_TESTING: 'false',
     ADMIN_TOKEN: env.ORG_ADMIN_TOKEN,

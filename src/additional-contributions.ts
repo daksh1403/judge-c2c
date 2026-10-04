@@ -267,7 +267,10 @@ async function createCandidateRecord(
   const evidenceById = new Map(evidence.map((item) => [item.id, item]));
   if (input.evidenceIds.some((id) => !evidenceById.has(id)))
     throw new AdditionalContributionError('Unknown evidence citation', 400);
-  const status = verificationStatus(input, contract, evidence);
+  const status =
+    run.head_sha === contract.baseline
+      ? 'UNVERIFIED'
+      : verificationStatus(input, contract, evidence);
   const id = stableId ?? crypto.randomUUID();
   const statements = await env.DB.batch([
     env.DB.prepare(
@@ -411,6 +414,7 @@ async function reviewCandidateRecord(
            OR (? IS NOT NULL AND (SELECT max(sequence) FROM additional_contribution_decisions d WHERE d.candidate_id=c.id)=?))
          AND (?=0 OR (c.verification_status='VERIFIED' AND e.state='COMPLETED'
            AND e.id=s.latest_run_id AND e.head_sha=s.head_sha AND s.closed=0 AND s.status='VALID'
+           AND e.head_sha<>json_extract(e.contract_snapshot,'$.baseline')
            AND EXISTS(SELECT 1 FROM hackathons h WHERE h.id='initial' AND h.status='ACTIVE')
            AND coalesce(json_extract(e.assignment_snapshot,'$.team_id'),json_extract(e.assignment_snapshot,'$.teamId'))=s.team_id
            AND EXISTS(SELECT 1 FROM teams t JOIN team_repositories tr ON tr.team_id=t.id AND tr.repository_id=e.repository_id AND tr.active=1 JOIN github_repositories r ON r.id=tr.repository_id AND r.accessible=1 WHERE t.id=s.team_id AND t.status='ACTIVE')
