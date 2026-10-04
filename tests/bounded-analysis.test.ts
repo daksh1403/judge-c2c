@@ -839,3 +839,71 @@ describe('execution and inspection grounding regressions', () => {
     ).toBe('UNVERIFIED');
   });
 });
+
+it('omits raw hostile source snippets from bounded security and engineering reports', () => {
+  const credential = 'tiny';
+  const privateKey = 'fixture-private-key-material';
+  const diff = [
+    `+const password = "${credential}"; // intentionally hardcoded TODO`,
+    `+console.log("password", "${credential}");`,
+    '+const private_key = "-----BEGIN PRIVATE KEY-----',
+    `+${privateKey}`,
+    '+-----END PRIVATE KEY-----";',
+    `+exec(user + "${credential}");`,
+    `+eval("${credential}");`,
+    `+readFileSync("../${credential}");`,
+  ].join('\n');
+  for (const analyzer of [
+    analyzeHardcodedSecrets,
+    analyzeSensitiveData,
+    analyzeCommandExecution,
+    analyzeInjection,
+    analyzeFileHandling,
+    analyzeTechnicalDebt,
+    analyzeNoPrivateIntentions,
+    analyzeExtensibility,
+  ]) {
+    const result = analyzer({ contract: demoContract, evidence: [], diff });
+    expect(result.status).toBe('CONCERN');
+    expect(JSON.stringify(result)).not.toContain(credential);
+    expect(JSON.stringify(result)).not.toContain(privateKey);
+    expect(result.assessment).toContain('source content omitted');
+  }
+  const api = analyzeAPIDesign({
+    contract: demoContract,
+    evidence: [
+      {
+        id: 'api-check',
+        kind: 'execution',
+        status: 'PASS',
+        criterionId: 'api-compatibility',
+        claim: 'Configured case passed',
+      },
+    ],
+    exports: {
+      'src/api.ts': [
+        `function request(password="${credential}", ${'arg, '.repeat(60)})`,
+      ],
+    },
+  });
+  expect(api.status).toBe('CONCERN');
+  expect(api.evidenceIds).toEqual(['api-check']);
+  expect(JSON.stringify(api)).not.toContain(credential);
+  expect(api.assessment).toContain('signature content omitted');
+  const name = 'ghp_' + 'A'.repeat(30);
+  const naming = analyzeNaming({
+    contract: demoContract,
+    evidence: [],
+    changedSymbols: [name],
+  });
+  expect(naming.status).toBe('CONCERN');
+  expect(JSON.stringify(naming)).not.toContain(name);
+  const duplication = analyzeDuplication({
+    contract: demoContract,
+    evidence: [],
+    diff: '+const value = 1;',
+    changedSymbols: [name, name],
+  });
+  expect(duplication.status).toBe('CONCERN');
+  expect(JSON.stringify(duplication)).not.toContain(name);
+});

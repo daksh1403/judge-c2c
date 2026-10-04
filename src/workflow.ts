@@ -125,6 +125,8 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
             files: files.map((f) => ({
               ...f,
               patch: f.patch ? redact(f.patch).slice(0, 5000) : undefined,
+              patchTruncated:
+                f.patchTruncated || (!!f.patch && f.patch.length > 5000),
             })),
             sources,
             pullRequest: {

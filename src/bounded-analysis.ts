@@ -185,7 +185,7 @@ export function analyzeDuplication(
 
     if (duplicateSymbols.length > 0) {
       concerns.push(
-        `Duplicate symbol definitions: ${duplicateSymbols.join(', ')}`,
+        `Duplicate symbol definitions: ${duplicateSymbols.length} repeated identifiers`,
       );
     }
   }
@@ -243,7 +243,7 @@ export function analyzeNoPrivateIntentions(
       intentionPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential intention claim in added line: ${line.substring(0, 50)}...`,
+            `Potential intention claim in added line: [source content omitted]`,
           );
         }
       });
@@ -457,17 +457,17 @@ export function analyzeNaming(input: BoundedAnalysisInput): AnalysisResult {
       symbol.length < 3 &&
       !['i', 'j', 'k', 'x', 'y', 'z', 'a', 'b'].includes(symbol)
     ) {
-      concerns.push(`Very short symbol name: ${symbol}`);
+      concerns.push(`Very short symbol name: [identifier content omitted]`);
     }
 
     // Non-ASCII or special characters (excluding allowed patterns)
     if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(symbol)) {
-      concerns.push(`Non-standard naming pattern: ${symbol}`);
+      concerns.push(`Non-standard naming pattern: [identifier content omitted]`);
     }
 
     // Inconsistent casing (camelCase vs snake_case)
     if (symbol.includes('_') && /[A-Z]/.test(symbol)) {
-      concerns.push(`Mixed snake_case and camelCase: ${symbol}`);
+      concerns.push(`Mixed snake_case and camelCase: [identifier content omitted]`);
     }
   });
 
@@ -523,7 +523,7 @@ export function analyzeAPIDesign(input: BoundedAnalysisInput): AnalysisResult {
       // Very long function signatures
       if (exp.length > 200) {
         concerns.push(
-          `Long API signature in ${file}: ${exp.substring(0, 50)}...`,
+          `Long API signature in ${file}: [signature content omitted]`,
         );
       }
 
@@ -531,7 +531,7 @@ export function analyzeAPIDesign(input: BoundedAnalysisInput): AnalysisResult {
       const paramCount = (exp.match(/,/g) || []).length;
       if (paramCount > 7) {
         concerns.push(
-          `High parameter count in ${file}: ${exp.substring(0, 50)}...`,
+          `High parameter count in ${file}: [signature content omitted]`,
         );
       }
     });
@@ -607,7 +607,7 @@ export function analyzeTechnicalDebt(
       debtPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Technical debt marker in added line: ${line.substring(0, 50)}...`,
+            `Technical debt marker in added line: [source content omitted]`,
           );
         }
       });
@@ -743,7 +743,7 @@ export function analyzeHardcodedSecrets(
       secretPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential hardcoded secret in added line: ${line.substring(0, 50)}...`,
+            `Potential hardcoded secret in added line: [source content omitted]`,
           );
         }
       });
@@ -997,7 +997,7 @@ export function analyzeInjection(input: BoundedAnalysisInput): AnalysisResult {
       dangerousPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potentially dangerous pattern in added line: ${line.substring(0, 50)}...`,
+            `Potentially dangerous pattern in added line: [source content omitted]`,
           );
         }
       });
@@ -1072,7 +1072,7 @@ export function analyzeSensitiveData(
       loggingPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential sensitive data logging in added line: ${line.substring(0, 50)}...`,
+            `Potential sensitive data logging in added line: [source content omitted]`,
           );
         }
       });
@@ -1145,7 +1145,7 @@ export function analyzeCommandExecution(
       commandPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Command execution in added line: ${line.substring(0, 50)}...`,
+            `Command execution in added line: [source content omitted]`,
           );
         }
       });
@@ -1165,7 +1165,7 @@ export function analyzeCommandExecution(
       untrustedInputPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential untrusted input in command: ${line.substring(0, 50)}...`,
+            `Potential untrusted input in command: [source content omitted]`,
           );
         }
       });
@@ -1237,7 +1237,7 @@ export function analyzeFileHandling(
       traversalPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential path traversal in added line: ${line.substring(0, 50)}...`,
+            `Potential path traversal in added line: [source content omitted]`,
           );
         }
       });
@@ -1256,7 +1256,7 @@ export function analyzeFileHandling(
       unsafePatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Unsafe file operation with potential untrusted input: ${line.substring(0, 50)}...`,
+            `Unsafe file operation with potential untrusted input: [source content omitted]`,
           );
         }
       });
@@ -1617,7 +1617,7 @@ export function analyzeExtensibility(
       hardcodedPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
           concerns.push(
-            `Potential hardcoded behavior in added line: ${line.substring(0, 50)}...`,
+            `Potential hardcoded behavior in added line: [source content omitted]`,
           );
         }
       });

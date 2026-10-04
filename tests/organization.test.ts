@@ -158,6 +158,28 @@ describe('protected organization setup', () => {
     );
     expect(status.status).toBe(200);
     expect((await body(status)).authenticated).toBe(false);
+    // A trusted deployment origin does not authorize cross-origin mutations.
+    for (const source of [
+      undefined,
+      'null',
+      origin,
+      approved + '.attacker.test',
+    ]) {
+      const response = await organization(
+        new Request(approved + '/api/organization/login', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            ...(source ? { origin: source } : {}),
+          },
+          body: JSON.stringify({ token }),
+        }),
+        reviewEnv,
+        ctx,
+      );
+      expect(response.status).toBe(403);
+      expect((await body(response)).error).toBe('SAME_ORIGIN_REQUIRED');
+    }
     for (const rejected of [
       'https://unapproved-judge-c2c.dakshx.workers.dev',
       approved + '.attacker.test',

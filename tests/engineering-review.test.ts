@@ -448,3 +448,46 @@ it('inspects actual frozen patches without promoting bounded assessments to fact
     evidenceIds: [],
   });
 });
+
+it('retains failed objective checks without exposing credentials from raw scoped patches', () => {
+  const { contract, evidence, review } = fixture();
+  const credential = 'short-value';
+  evidence.push({
+    id: 'diff',
+    kind: 'diff',
+    status: 'PASS',
+    claim: 'Frozen comparison metadata.',
+  });
+  const enriched = enrichEngineeringReview(
+    contract,
+    evidence,
+    review,
+    'AI_ASSESSMENT',
+    {
+      files: [
+        {
+          filename: 'server.mjs',
+          status: 'modified',
+          additions: 1,
+          deletions: 0,
+          patch: `+const password = "${credential}";`,
+        },
+      ],
+    },
+  );
+  const facet = enriched.engineeringReview.rubric.find(
+    (facet) => facet.id === '28.01',
+  )!;
+  expect(facet).toMatchObject({
+    status: 'UNVERIFIED',
+    needsReview: true,
+    evidenceIds: ['diff'],
+    boundedAnalysis: { status: 'CONCERN' },
+  });
+  expect(JSON.stringify(enriched)).not.toContain(credential);
+  expect(
+    enriched.engineeringReview.dimensions.find(
+      (dimension) => dimension.dimension === 'QUALITY',
+    )?.checks[0],
+  ).toMatchObject({ status: 'FAIL', evidenceIds: ['execution-lint'] });
+});
