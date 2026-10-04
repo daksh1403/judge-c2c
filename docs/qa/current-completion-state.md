@@ -1,6 +1,6 @@
 # Current completion checkpoint
 
-2026-10-04 stabilization. Current ledger remains 700 PASS, 3 PARTIAL, 9 BLOCKED and 2 NOT_APPLICABLE; all 714 requirements remain intact. No acceptance status was upgraded solely from implementation.
+2026-10-04 stabilization. Current ledger remains 704 PASS, 3 PARTIAL, 5 BLOCKED and 2 NOT_APPLICABLE; all 714 requirements remain intact. No acceptance status was upgraded solely from implementation.
 
 Actual PR #7 Cloudflare frontend clicks, without mocked responses or direct test API calls, verified the reviewer diagnostic and the ORIGINAL payment-engine reference PR #11, partial PR #8 and protected-test PR #9. All three new attempts executed CallMissed kimi-k2.6 under policy v14, completed, published GitHub checks, retained objective criterion outcomes, had zero unknown citations and zero unsupported OBSERVED claims, and displayed human attention and inspectable citations. Protected-test manipulation remains a policy FAIL. See current-ai-reviewer-frontend.json and its screenshots. Prior rejected diagnostic evidence is preserved separately.
 
@@ -27,3 +27,5 @@ Production worker deployed at https://judge-c2c-production.dakshx.workers.dev wi
 Acceptance 01.12 is now PASS from actual deployed resource metadata and three frontend cross-environment credential denials. This is the only acceptance status changed in post-merge stabilization; production AI quota/App/capacity gaps remain open.
 
 Actual production UI now reports Cloudflare quota exhaustion with one provider attempt, preserving UNVERIFIED analysis (current-production-ai-quota-only.json/.png). A runner diagnostic timed out during concurrent deployment; its failed evidence is retained (current-production-quota-frontend.json/.png). One subsequent frontend runner-only retry passed, restoring baseline FAIL → canary PASS (current-production-runner-recovery.json/.png). The tunnel was independently reachable; no claim of managed availability follows from this recovery.
+
+Approved main commit 0e520a14e87d20bd5a49df09ea23b3d6ff3c67fa was deployed to production version e001ffb7-4aed-4421-a6ce-4ac6e2f65390. Production deployment and preview/data/secret separation entries 01.03, 02.06, 02.07 and 02.08 now close from shared actual deployment/frontend/binding evidence. All remaining blocked notes reflect current App/CI/capacity/runtime conditions; old absence/unauthorized-merge blockers were removed.
