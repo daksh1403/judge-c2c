@@ -47,6 +47,10 @@ async function load() {
       await repositories();
       return;
     }
+    if (page === 'attention') {
+      await attention();
+      return;
+    }
     overview = await get('/api/overview');
     $('#login').hidden = true;
     $('#content').hidden = false;
@@ -65,6 +69,310 @@ async function load() {
     message(e.message);
   }
 }
+
+function buildJudgeSummary(r, c, a, e, report, engineeringReview) {
+  const passCount = e.filter(x => x.status === 'PASS').length;
+  const failCount = e.filter(x => x.status === 'FAIL').length;
+  const unverifiedCount = e.filter(x => x.status === 'UNVERIFIED').length;
+  
+  return `<section class="panel judge-summary"><div class="panel-head"><h2>Judge Summary</h2></div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">Team</div>
+        <div class="summary-value">${esc(a.team_name)}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Issue</div>
+        <div class="summary-value">${c.issueNumbers.length ? esc(c.issueNumbers.map(n => '#' + n).join(', ')) : 'N/A'}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">PR</div>
+        <div class="summary-value">#${r.pr_number}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Head commit</div>
+        <div class="summary-value"><code>${esc(r.head_sha.slice(0, 7))}</code></div>
+      </div>
+    </div>
+    <div class="summary-checks">
+      <div class="check-stat pass">${passCount} PASS</div>
+      <div class="check-stat fail">${failCount} FAIL</div>
+      <div class="check-stat unverified">${unverifiedCount} UNVERIFIED</div>
+    </div>
+    <div class="summary-assessment">
+      <strong>Overall assessment:</strong> ${esc(report?.summary || 'Evaluation in progress')}
+    </div>
+  </section>`;
+}
+
+function buildRequirementsSection(c, report, e) {
+  return `<section class="panel"><div class="panel-head"><h2>Requirements</h2><span class="subtle">${c.requirements.length} requirements</span></div>
+    ${c.requirements.map(req => `
+      <div class="inset">
+        <strong>${esc(req.title)}</strong> <span class="subtle">${req.mandatory ? 'Mandatory' : 'Optional'}</span>
+        ${req.criteria.map(cr => {
+          const result = report?.assessments?.find(x => x.criterionId === cr.id);
+          return `<div class="criterion">
+            <div class="criterion-head">
+              <strong>${esc(cr.id)}</strong>
+              ${badge(result?.status || 'UNVERIFIED')}
+              <span class="criterion-kind">${esc(cr.kind)}</span>
+            </div>
+            <p class="description">${esc(cr.description)}</p>
+            <p class="explanation">${esc(result?.explanation || 'No evidence assessment available yet.')}</p>
+            ${(result?.evidenceIds || []).map(id => `<button class="evidence-link" data-evidence="${esc(id)}">↗ ${esc(id)}</button>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+    `).join('')}
+  </section>`;
+}
+
+function buildObjectiveChecksSection(r, e) {
+  const executionEvidence = e.filter(x => x.kind === 'execution');
+  const hasExecution = executionEvidence.length > 0;
+  
+  return `<section class="panel"><div class="panel-head"><h2>Objective Checks</h2><span class="subtle">${hasExecution ? executionEvidence.length + ' execution checks' : 'No execution evidence'}</span></div>
+    ${hasExecution ? `
+      <div class="checks-grid">
+        ${executionEvidence.map(x => `
+          <div class="check-item ${x.status.toLowerCase()}">
+            <div class="check-status">${badge(x.status)}</div>
+            <div class="check-id"><code>${esc(x.id)}</code></div>
+            <div class="check-claim">${esc(x.claim)}</div>
+            ${x.baselineStatus ? `<div class="check-delta">Baseline ${badge(x.baselineStatus)} → ${badge(x.status)}</div>` : ''}
+            ${x.path ? `<div class="check-path"><code>${esc(x.path)}</code></div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div class="empty">No execution evidence available. Runtime behavior remains unverified.</div>'}
+  </section>`;
+}
+
+function buildEngineeringReviewSection(engineeringReview) {
+  if (!engineeringReview || !engineeringReview.rubric) {
+    return `<section class="panel"><div class="panel-head"><h2>Engineering Review</h2></div><div class="empty">Engineering review not available yet.</div></section>`;
+  }
+  
+  const rubric = engineeringReview.rubric;
+  
+  // Group by dimension
+  const byDimension = {};
+  rubric.forEach(item => {
+    if (!byDimension[item.dimension]) byDimension[item.dimension] = [];
+    byDimension[item.dimension].push(item);
+  });
+  
+  return `<section class="panel"><div class="panel-head"><h2>Engineering Review</h2><span class="subtle">Bounded evidence-backed analysis</span></div>
+    ${Object.entries(byDimension).map(([dimension, items]) => `
+      <details class="dimension-section" open>
+        <summary><strong>${esc(dimension)}</strong> <span class="subtle">(${items.length} facets)</span></summary>
+        <div class="dimension-facets">
+          ${items.map(item => `
+            <div class="facet-item">
+              <div class="facet-head">
+                <strong>${esc(item.id)}</strong>
+                <span class="facet-label">${esc(item.label)}</span>
+                ${badge(item.status)}
+                <span class="facet-coverage">${esc(item.analysisCoverage)}</span>
+              </div>
+              ${item.boundedAnalysis ? `
+                <div class="bounded-analysis">
+                  <div class="analysis-assessment">${esc(item.boundedAnalysis.assessment)}</div>
+                  <div class="analysis-meta">
+                    <span class="confidence">Confidence: ${esc(item.boundedAnalysis.confidence)}</span>
+                    <span class="limit">Limit: ${esc(item.boundedAnalysis.limit)}</span>
+                  </div>
+                </div>
+              ` : ''}
+              ${item.needsReview ? '<div class="needs-review-flag">⚠ Requires human review</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `).join('')}
+  </section>`;
+}
+
+function buildSecuritySection(e, engineeringReview) {
+  const securityEvidence = e.filter(x => x.criterionId?.includes('security') || x.kind === 'security');
+  const secretEvidence = e.filter(x => x.criterionId?.includes('secret'));
+  
+  const securityFacets = engineeringReview?.rubric?.filter(r => r.dimension === 'SECURITY') || [];
+  
+  return `<section class="panel"><div class="panel-head"><h2>Security</h2><span class="subtle">${securityFacets.length} facets analyzed</span></div>
+    <div class="security-facets">
+      ${securityFacets.map(facet => `
+        <div class="security-facet">
+          <div class="facet-head">
+            <strong>${esc(facet.id)}</strong>
+            <span class="facet-label">${esc(facet.label)}</span>
+            ${badge(facet.status)}
+          </div>
+          ${facet.boundedAnalysis ? `
+            <div class="bounded-analysis">
+              <div class="analysis-assessment">${esc(facet.boundedAnalysis.assessment)}</div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ${secretEvidence.length ? `
+      <details class="security-evidence">
+        <summary>Secret scan results (${secretEvidence.length})</summary>
+        ${secretEvidence.map(x => `
+          <div class="evidence-item">
+            ${badge(x.status)} <code>${esc(x.id)}</code>
+            <p>${esc(x.claim)}</p>
+          </div>
+        `).join('')}
+      </details>
+    ` : ''}
+  </section>`;
+}
+
+function buildContributionsSection(additionalContributions, report) {
+  const findings = report?.findings || [];
+  
+  return `<section class="panel"><div class="panel-head"><h2>Additional Contributions</h2><span class="subtle">${additionalContributions.length} candidates · ${findings.length} findings</span></div>
+    ${additionalContributions.length ? `
+      <div class="contributions-list">
+        ${additionalContributions.map(c => `
+          <div class="contribution-item">
+            <div class="contribution-category">${esc(c.category)}</div>
+            <div class="contribution-description">${esc(c.description)}</div>
+            <div class="contribution-paths">${c.changedPaths.map(p => `<code>${esc(p)}</code>`).join(', ')}</div>
+            <div class="contribution-status">
+              <span class="status-label">Functional:</span> ${badge(c.functional)}
+              <span class="status-label">Relevant:</span> ${badge(c.relevant)}
+              <span class="status-label">Regressions:</span> ${badge(c.regressionSafe)}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div class="empty">No additional contribution candidates detected.</div>'}
+    
+    ${findings.length ? `
+      <div class="findings-section">
+        <h3>Confirmed Findings</h3>
+        ${findings.map(f => `
+          <div class="finding-item">
+            <strong>${esc(f.severity)} · ${esc(f.category)}</strong>
+            <p>${esc(f.claim)}</p>
+            <span class="subtle">Evidence: ${esc(f.evidenceIds.join(', '))}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  </section>`;
+}
+
+function buildEvidenceSection(e) {
+  const byKind = {};
+  e.forEach(x => {
+    if (!byKind[x.kind]) byKind[x.kind] = [];
+    byKind[x.kind].push(x);
+  });
+  
+  return `<section class="panel"><div class="panel-head"><h2>Evidence Explorer</h2><span class="subtle">${e.length} records</span></div>
+    ${Object.entries(byKind).map(([kind, items]) => `
+      <details class="evidence-kind" ${kind === 'execution' ? 'open' : ''}>
+        <summary><strong>${esc(kind.toUpperCase())}</strong> <span class="subtle">(${items.length})</span></summary>
+        <div class="evidence-list">
+          ${items.map(x => `
+            <article class="evidence-item" id="e-${esc(x.id)}">
+              <div>${badge(x.status)} <code>${esc(x.id)}</code></div>
+              <p>${esc(x.claim)}</p>
+              ${x.path ? `<code>${esc(x.path)}</code>` : ''}
+              ${x.baselineStatus ? `<p>Baseline ${badge(x.baselineStatus)} → submission ${badge(x.status)}</p>` : ''}
+              ${x.criterionId ? `<span class="subtle">Criterion: ${esc(x.criterionId)}</span>` : ''}
+            </article>
+          `).join('')}
+        </div>
+      </details>
+    `).join('')}
+  </section>`;
+}
+
+function buildAttentionSection(attentionItems) {
+  if (!attentionItems || attentionItems.length === 0) {
+    return '';
+  }
+  
+  return `<section class="panel attention-section"><div class="panel-head"><h2>⚠ Needs Attention</h2><span class="subtle">${attentionItems.length} items</span></div>
+    <div class="attention-list">
+      ${attentionItems.map(item => `
+        <div class="attention-item">
+          <div class="attention-reason">${esc(item.reason)}</div>
+          <div class="attention-detail">${esc(item.detail)}</div>
+        </div>
+      `).join('')}
+    </div>
+  </section>`;
+}
+
+async function attention() {
+  $('#breadcrumb').innerHTML = 'Workspace <span class="slash">/</span> Needs Attention';
+  $('#content').innerHTML = '<div class="loading">Loading attention items…</div>';
+  
+  try {
+    const runs = await get('/api/overview');
+    const attentionRuns = runs.runs.filter(r => {
+      const e = parse(r.evidence) || [];
+      const report = parse(r.report);
+      return r.state === 'FAILED' || 
+             e.some(x => x.status === 'FAIL') ||
+             (report?.aiTrace?.requiresHumanAttention) ||
+             (r.ai_status !== 'COMPLETED' && r.state === 'COMPLETED');
+    });
+    
+    $('#content').innerHTML = `
+      <button class="back" id="back">← All submissions</button>
+      <section class="panel">
+        <div class="panel-head"><h2>Needs Attention</h2><span class="subtle">${attentionRuns.length} items</span></div>
+        ${attentionRuns.length ? `
+          <div class="attention-grid">
+            ${attentionRuns.map(r => {
+              const a = parse(r.assignment_snapshot);
+              const e = parse(r.evidence) || [];
+              const report = parse(r.report);
+              const failCount = e.filter(x => x.status === 'FAIL').length;
+              
+              let reason = '';
+              if (r.state === 'FAILED') reason = 'Evaluation failed';
+              else if (failCount > 0) reason = `${failCount} failed checks`;
+              else if (report?.aiTrace?.requiresHumanAttention) reason = 'AI review requires attention';
+              else if (r.ai_status !== 'COMPLETED') reason = 'AI review incomplete';
+              
+              return `
+                <div class="attention-card">
+                  <button class="row-button" data-run="${esc(r.id)}">
+                    <div class="attention-header">
+                      <strong>${esc(r.full_name)}</strong>
+                      <span class="attention-reason">${esc(reason)}</span>
+                    </div>
+                    <div class="attention-meta">
+                      <span>PR #${r.pr_number}</span>
+                      <span>${esc(a.team_name)}</span>
+                      <span>${badge(r.state)}</span>
+                    </div>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : '<div class="empty">No items currently need attention.</div>'}
+      </section>
+    `;
+    
+    document.querySelectorAll('[data-run]').forEach(b => {
+      b.addEventListener('click', () => openRun(b.dataset.run));
+    });
+  } catch (e) {
+    message(e.message);
+  }
+}
+
 function renderOverview() {
   const c = overview.counts;
   $('#breadcrumb').innerHTML =
@@ -106,7 +414,7 @@ function renderOverview() {
   renderRows();
 }
 function reviewForm() {
-  return `<section class="panel"><div class="panel-head"><h2>Evaluate a real public PR</h2><button class="button" id="prepared-example" type="button">Use prepared public example</button><span class="subtle">GitHub evidence · isolated review session</span></div><form id="review-form" class="review-form"><label for="pr-url">Public GitHub pull request URL</label><input id="pr-url" name="prUrl" type="url" placeholder="https://github.com/owner/repository/pull/123" maxlength="300" required><label for="expected-behavior">What was the team expected to implement?</label><textarea id="expected-behavior" name="expectedBehavior" rows="3" minlength="10" maxlength="2000" placeholder="Describe the required behavior and acceptance criteria. Repository text cannot change these expectations." required></textarea><details><summary>Baseline and objective assertions (optional)</summary><div class="form-grid"><div><label for="baseline">Frozen baseline commit SHA</label><input id="baseline" name="baseline" placeholder="40-character commit SHA" pattern="[a-f0-9]{40}"><p class="subtle">If omitted, the PR merge base is captured. Use a frozen challenge baseline for hackathon testing.</p></div><div><label for="protected-paths">Protected paths (one per line)</label><textarea id="protected-paths" name="protectedPaths" rows="2" placeholder=".github/workflows&#10;tests"></textarea></div><div><label for="assertion-path">Source assertion: file path</label><input id="assertion-path" name="assertionPath" placeholder="README.md" maxlength="240"></div><div><label for="assertion-text">Must contain this literal text</label><input id="assertion-text" name="assertionText" placeholder="Exact case-sensitive text" maxlength="1000"></div></div><p class="subtle">Source assertions compare baseline and head. They establish source presence, not whether code works.</p></details><div class="form-actions"><button class="button primary" type="submit">Evaluate PR</button><span class="subtle">No code execution, AI review or GitHub publication in this test workspace.</span></div><div id="review-error" role="status"></div></form></section>`;
+  return `<section class="panel"><div class="panel-head"><h2>Evaluate a real public PR</h2><button class="button" id="prepared-example" type="button">Use prepared public example</button><span class="subtle">GitHub evidence · isolated review session</span></div><form id="review-form" class="review-form"><label for="pr-url">Public GitHub pull request URL</label><input id="pr-url" name="prUrl" type="url" placeholder="https://github.com/owner/repository/pull/123" maxlength="300" required><label for="expected-behavior">What was the team expected to implement?</label><textarea id="expected-behavior" name="expectedBehavior" rows="3" minlength="10" maxlength="2000" placeholder="Describe the required behavior and acceptance criteria. Repository text cannot change these expectations." required></textarea><details><summary>Baseline and objective assertions (optional)</summary><div class="form-grid"><div><label for="baseline">Frozen baseline commit SHA</label><input id="baseline" name="baseline" placeholder="40-character commit SHA" pattern="[a-f0-9]{40}"><p class="subtle">If omitted, the PR merge base is captured. Use a frozen challenge baseline for hackathon testing.</p></div><div><label for="protected-paths">Protected paths (one per line)</label><textarea id="protected-paths" name="protectedPaths" rows="2" placeholder=".github/workflows&#10;tests"></textarea></div><div><label for="assertion-path">Source assertion: file path</label><input id="assertion-path" name="assertionPath" placeholder="README.md" maxlength="240"></div><div><label for="assertion-text">Must contain this literal text</label><input id="assertion-text" name="assertionText" placeholder="Exact case-sensitive text" maxlength="1000"></div></div><p class="subtle">Source assertions compare baseline and head. They establish source presence, not whether code works.</p></details><div class="form-actions"><button class="button primary" type="submit">Evaluate PR</button><span class="subtle">No code execution, AI review is optional. GitHub evidence only.</span></div><p id="review-error" class="error"></p></form></section>`;
 }
 async function submitReview(event) {
   event.preventDefault();
@@ -132,7 +440,7 @@ async function submitReview(event) {
     }
     input.sourceAssertion = {
       path: String(values.get('assertionPath')).trim(),
-      text: values.get('assertionText'),
+      text: String(values.get('assertionText')).trim(),
     };
   }
   button.disabled = true;
@@ -174,7 +482,8 @@ function renderRows() {
         const a = parse(r.assignment_snapshot),
           e = parse(r.evidence) || [];
         const uncertain = e.some((x) => x.status === 'UNVERIFIED');
-        return `<tr><td><button class="row-button" data-run="${esc(r.id)}"><strong>${esc(r.full_name)}</strong><small>PR #${r.pr_number} · ${esc(r.head_sha.slice(0, 7))}</small></button></td><td>${esc(a.team_name)}<small>${esc(a.team_id)}</small></td><td>${badge(r.state)}</td><td><strong>${e.filter((x) => x.status === 'PASS').length} verified checks</strong><small>${e.filter((x) => x.status === 'FAIL').length} failed · ${e.filter((x) => x.status === 'UNVERIFIED').length} unverified</small></td><td>${uncertain ? badge('UNVERIFIED') : '<span class="subtle">Inspect report</span>'}</td></tr>`;
+        const failed = e.some((x) => x.status === 'FAIL');
+        return `<tr><td><button class="row-button" data-run="${esc(r.id)}"><strong>${esc(r.full_name)}</strong><small>PR #${r.pr_number} · ${esc(r.head_sha.slice(0, 7))}</small></button></td><td>${esc(a.team_name)}<small>${esc(a.team_id)}</small></td><td>${badge(r.state)}</td><td><strong>${e.filter((x) => x.status === 'PASS').length} verified checks</strong><small>${e.filter((x) => x.status === 'FAIL').length} failed · ${e.filter((x) => x.status === 'UNVERIFIED').length} unverified</small></td><td>${failed ? badge('FAIL') : uncertain ? badge('UNVERIFIED') : '<span class="subtle">Inspect report</span>'}</td></tr>`;
       })
       .join('') ||
     `<tr><td colspan="5" class="empty">${overview.preview ? 'No reviews yet. Enter a real public PR above to begin.' : 'No submissions match. Register a repository contract and PR assignment to begin live evaluation.'}</td></tr>`;
@@ -218,11 +527,39 @@ async function detail(id) {
     },
     a = parse(r.assignment_snapshot),
     e = parse(r.evidence) || [],
-    report = parse(r.report);
+    report = parse(r.report),
+    engineeringReview = report?.engineeringReview,
+    additionalContributions = r.additionalContributions || [],
+    attentionItems = r.attentionItems || [];
   $('#breadcrumb').innerHTML =
     'Workspace <span class="slash">/</span> Submission detail';
+  
+  // Build state banner
+  let stateBanner = '';
+  if (r.state === 'FAILED') {
+    stateBanner = `<div class="state-banner state-failed">FAILED EVALUATION · ${esc(r.failure_code || 'Unknown error')}</div>`;
+  } else if (r.state === 'COMPLETED' && (r.ai_status !== 'COMPLETED' || (report?.aiTrace?.requiresHumanAttention))) {
+    stateBanner = `<div class="state-banner state-attention">NEEDS REVIEW · AI review incomplete or requires human attention</div>`;
+  } else if (r.currentSubmission && !r.currentSubmission.closed && r.currentSubmission.latestRunId !== r.id) {
+    stateBanner = `<div class="state-banner state-superseded">SUPERSEDED · A newer evaluation exists for this PR</div>`;
+  }
+
+  // Build sections
+  const judgeSummary = buildJudgeSummary(r, c, a, e, report, engineeringReview);
+  const requirementsSection = buildRequirementsSection(c, report, e);
+  const objectiveChecksSection = buildObjectiveChecksSection(r, e);
+  const engineeringReviewSection = buildEngineeringReviewSection(engineeringReview);
+  const securitySection = buildSecuritySection(e, engineeringReview);
+  const contributionsSection = buildContributionsSection(additionalContributions, report);
+  const evidenceSection = buildEvidenceSection(e);
+  const attentionSection = buildAttentionSection(attentionItems);
+
   $('#content').innerHTML =
-    `<button class="back" id="back">← All submissions</button><div class="detail-title"><div><div class="eyebrow">${esc(c.department)} / ${esc(c.category)} / PR #${r.pr_number}</div><h2>${esc(c.repository.fullName)}</h2><span class="subtle">${esc(a.team_name)}${c.issueNumbers.length ? ' · Issue ' + esc(c.issueNumbers.map((n) => '#' + n).join(', ')) : ''}</span></div>${badge(r.state)}</div><section class="panel"><div class="commit-grid">${[
+    `<button class="back" id="back">← All submissions</button>${stateBanner}<div class="detail-title"><div><div class="eyebrow">${esc(c.department)} / ${esc(c.category)} / PR #${r.pr_number}</div><h2>${esc(c.repository.fullName)}</h2><span class="subtle">${esc(a.team_name)}${c.issueNumbers.length ? ' · Issue ' + esc(c.issueNumbers.map((n) => '#' + n).join(', ')) : ''}</span></div>${badge(r.state)}</div>
+    
+    ${judgeSummary}
+    
+    <section class="panel"><div class="panel-head"><h2>Submission metadata</h2></div><div class="commit-grid">${[
       ['BASELINE', r.baseline_sha],
       ['PARTICIPANT HEAD', r.head_sha],
       ['EVALUATION VERSION', c.evaluationVersion],
@@ -232,23 +569,17 @@ async function detail(id) {
         ([l, v]) =>
           `<div><div class="meta-label">${l}</div><div class="meta-value" title="${esc(v)}">${esc(v.length > 20 ? v.slice(0, 12) + '…' : v)}</div></div>`,
       )
-      .join(
-        '',
-      )}</div></section><div class="detail-grid"><div><section class="panel"><div class="panel-head"><h2>Assigned requirements</h2><span class="subtle">${c.requirements.length} requirements</span></div>${c.requirements
-      .map(
-        (req) =>
-          `<div class="inset"><strong>${esc(req.title)}</strong> <span class="subtle">${req.mandatory ? 'Mandatory' : 'Optional'}</span></div>${req.criteria
-            .map((cr) => {
-              const result = report?.assessments.find(
-                (x) => x.criterionId === cr.id,
-              );
-              return `<div class="criterion"><div class="criterion-head"><strong>${esc(cr.id)}</strong>${badge(result?.status || 'UNVERIFIED')}</div><p class="description">${esc(cr.description)}</p><p>${esc(result?.explanation || 'No evidence assessment available yet.')}</p>${(result?.evidenceIds || []).map((id) => `<button class="evidence-link" data-evidence="${esc(id)}">↗ ${esc(id)}</button>`).join('')}</div>`;
-            })
-            .join('')}`,
-      )
-      .join(
-        '',
-      )}</section><section class="panel"><div class="panel-head"><h2>Evidence ledger</h2><span class="subtle">${e.length} records</span></div>${e.map((x) => `<article class="evidence-item" id="e-${esc(x.id)}"><div>${badge(x.status)}<code>${esc(x.id)}</code></div><p>${esc(x.claim)}</p>${x.path ? `<code>${esc(x.path)}</code>` : ''}${x.baselineStatus ? `<p>Baseline ${badge(x.baselineStatus)} → submission ${badge(x.status)}</p>` : ''}</article>`).join('') || '<div class="empty">Evidence has not been recorded yet.</div>'}</section>${window.JudgeApproach(report)}<section class="panel"><div class="panel-head"><h2>Findings & additional contributions</h2></div><div class="inset">${report?.findings.length ? report.findings.map((f) => `<p><strong>${esc(f.severity)} · ${esc(f.category)}</strong><br>${esc(f.claim)}<br><span class="subtle">Contextual inference · ${esc(f.evidenceIds.join(', '))}</span></p>`).join('') : '<p>No additional contribution credit or confirmed security findings have been established by this evaluation.</p>'}</div></section></div><aside><section class="panel"><div class="panel-head"><h2>Judge attention</h2></div><div class="inset"><p>${esc(report?.summary || r.failure_code || 'Evaluation is in progress.')}</p><p><strong>Build, tests & benchmarks</strong><br>Isolated execution is not configured. Runtime behavior remains unverified.</p><p><strong>AI review</strong><br>${esc(r.ai_status || 'Pending')}</p><p><strong>GitHub publication</strong><br>${esc(r.publication_status)}</p></div></section><section class="panel"><div class="panel-head"><h2>Constraints</h2></div><div class="inset">${c.constraints.map((s) => `<p>${esc(s)}</p>`).join('')}</div></section><section class="panel"><div class="panel-head"><h2>Evaluation timeline</h2></div><ol class="timeline">${r.timeline.map((t) => `<li><strong>${esc(t.state)}</strong><br>${esc(t.detail)}<small>${esc(t.created_at)} UTC</small></li>`).join('')}</ol></section><section class="panel"><div class="panel-head"><h2>Artifacts</h2></div><div class="inset">${r.artifacts.length ? r.artifacts.map((x) => `<p><button class="evidence-link" data-artifact="${esc(x.key)}">Download evidence</button><br><code>${esc(x.sha256.slice(0, 12))}…</code></p>`).join('') : '<p>No large artifacts stored for this evaluation.</p>'}</div></section></aside></div>`;
+      .join('')}</div></section>
+    
+    ${requirementsSection}
+    ${objectiveChecksSection}
+    ${engineeringReviewSection}
+    ${securitySection}
+    ${contributionsSection}
+    ${evidenceSection}
+    ${attentionSection}
+    
+    <div class="detail-grid"><div>${window.JudgeApproach(report)}<section class="panel"><div class="panel-head"><h2>Findings</h2></div><div class="inset">${report?.findings.length ? report.findings.map((f) => `<p><strong>${esc(f.severity)} · ${esc(f.category)}</strong><br>${esc(f.claim)}<br><span class="subtle">Contextual inference · ${esc(f.evidenceIds.join(', '))}</span></p>`).join('') : '<p>No confirmed findings have been established by this evaluation.</p>'}</div></section></div><aside><section class="panel"><div class="panel-head"><h2>Judge attention</h2></div><div class="inset"><p>${esc(report?.summary || r.failure_code || 'Evaluation is in progress.')}</p><p><strong>Build, tests & benchmarks</strong><br>Isolated execution is not configured. Runtime behavior remains unverified.</p><p><strong>AI review</strong><br>${esc(r.ai_status || 'Pending')}</p><p><strong>GitHub publication</strong><br>${esc(r.publication_status)}</p></div></section><section class="panel"><div class="panel-head"><h2>Constraints</h2></div><div class="inset">${c.constraints.map((s) => `<p>${esc(s)}</p>`).join('')}</div></section><section class="panel"><div class="panel-head"><h2>Evaluation timeline</h2></div><ol class="timeline">${r.timeline.map((t) => `<li><strong>${esc(t.state)}</strong><br>${esc(t.detail)}<small>${esc(t.created_at)} UTC</small></li>`).join('')}</ol></section><section class="panel"><div class="panel-head"><h2>Artifacts</h2></div><div class="inset">${r.artifacts.length ? r.artifacts.map((a) => `<button class="artifact-link" data-artifact="${esc(a.key)}">↗ ${esc(a.key)}</button>`).join('') : '<div class="empty">No artifacts available yet.</div>'}</div></section></div>`;
   if (r.preview) {
     $('#content').insertAdjacentHTML(
       'beforeend',
@@ -339,87 +670,76 @@ function failureDescription(code) {
     GITHUB_HTTP_422: 'GitHub could not compare the requested commits.',
     BASELINE_NOT_ANCESTOR:
       'The specified baseline is not an ancestor of the PR head.',
-    BODY_LIMIT: 'GitHub response exceeded the review size limit.',
-    PUBLIC_REVIEW_FAILED:
-      'The public PR response could not be safely processed. Reviews support at most 100 changed files.',
   };
-  return (
-    descriptions[code] ||
-    `Review failed: ${code}. Existing evidence and history are preserved.`
-  );
+  return descriptions[code] || code;
+}
+async function repositories() {
+  $('#breadcrumb').innerHTML =
+    'Workspace <span class="slash">/</span> Repositories';
+  $('#content').innerHTML = '<div class="loading">Loading repositories…</div>';
+  try {
+    const data = await get('/api/repositories');
+    $('#content').innerHTML =
+      `<section class="panel"><div class="panel-head"><h2>Registered repositories</h2><span class="subtle">${data.repositories.length} repositories</span></div>${data.repositories.map((r) => `<div class="inset"><strong>${esc(r.full_name)}</strong><small>ID: ${r.id}</small></div>`).join('') || '<div class="empty">No repositories registered yet.</div>'}</section>`;
+  } catch (e) {
+    message(e.message);
+  }
 }
 function back() {
   currentRun = null;
+  page = 'overview';
   history.replaceState(null, '', '/');
   load();
 }
-async function repositories() {
-  const d = await get('/api/repositories');
-  $('#content').hidden = false;
-  $('#breadcrumb').innerHTML =
-    'Workspace <span class="slash">/</span> Repositories';
-  $('#content').innerHTML =
-    `<section class="panel"><div class="panel-head"><h2>${overview?.preview ? 'Repositories reviewed in this session' : 'Registered challenge repositories'}</h2><span class="subtle">${overview?.preview ? 'Reviewer-defined test expectations' : 'Authoritative, versioned contracts'}</span></div>${
-      d.repositories
-        .map((r) => {
-          const c = parse(r.document);
-          return `<article class="repo-card"><h2>${esc(r.full_name)}</h2><p>${esc(c.department)} · ${esc(c.category)} · ${esc(c.evaluationVersion)}</p><p>${c.requirements.length} requirements · Issues ${esc(c.issueNumbers.join(', '))}</p><code>Frozen baseline ${esc(c.baseline)}</code></article>`;
-        })
-        .join('') ||
-      '<div class="empty">No repositories registered. Use the protected contract API to register a frozen challenge.</div>'
-    }</section>`;
-}
-$('#refresh').addEventListener('click', load);
-$('#nav-overview').addEventListener('click', () => {
-  window.organizationWorkspace.stop();
-  $('#nav-organization').classList.remove('active');
-  page = 'overview';
-  $('#nav-overview').classList.add('active');
-  $('#nav-repos').classList.remove('active');
-  back();
-});
-$('#nav-repos').addEventListener('click', () => {
-  window.organizationWorkspace.stop();
-  $('#nav-organization').classList.remove('active');
-  page = 'repositories';
-  currentRun = null;
-  history.replaceState(null, '', '/');
-  $('#nav-repos').classList.add('active');
-  $('#nav-overview').classList.remove('active');
-  load();
-});
-$('#login-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  credential = $('#token').value;
-  $('#token').value = '';
-  load();
-});
-$('#signout').addEventListener('click', () => {
-  credential = '';
-  currentRun = null;
-  page = 'overview';
-  $('#content').innerHTML = '';
-  $('#content').hidden = true;
-  $('#signout').hidden = true;
-  load();
-});
-$('#nav-organization').addEventListener('click', () => {
-  page = 'organization';
-  currentRun = null;
-  $('#nav-organization').classList.add('active');
-  $('#nav-overview').classList.remove('active');
-  $('#nav-repos').classList.remove('active');
-  history.replaceState(null, '', '/?organization=1');
-  load();
-});
-async function init() {
-  if (new URL(location.href).searchParams.get('organization')) {
-    page = 'organization';
-    $('#nav-organization').classList.add('active');
-    $('#nav-overview').classList.remove('active');
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('run')) {
+    currentRun = params.get('run');
   }
-  const id = new URL(location.href).searchParams.get('run');
-  await load();
-  if (id && overview) await openRun(id);
-}
-init();
+  if (params.get('organization')) {
+    page = 'organization';
+  }
+  if (params.get('attention')) {
+    page = 'attention';
+  }
+  $('#nav-overview').addEventListener('click', () => {
+    page = 'overview';
+    currentRun = null;
+    document.querySelectorAll('.nav').forEach(b => b.classList.remove('active'));
+    $('#nav-overview').classList.add('active');
+    history.replaceState(null, '', '/');
+    load();
+  });
+  $('#nav-attention').addEventListener('click', () => {
+    page = 'attention';
+    currentRun = null;
+    document.querySelectorAll('.nav').forEach(b => b.classList.remove('active'));
+    $('#nav-attention').classList.add('active');
+    history.replaceState(null, '', '?attention=1');
+    load();
+  });
+  $('#nav-repos').addEventListener('click', () => {
+    page = 'repositories';
+    currentRun = null;
+    document.querySelectorAll('.nav').forEach(b => b.classList.remove('active'));
+    $('#nav-repos').classList.add('active');
+    history.replaceState(null, '', '/');
+    load();
+  });
+  $('#nav-organization').addEventListener('click', () => {
+    page = 'organization';
+    currentRun = null;
+    document.querySelectorAll('.nav').forEach(b => b.classList.remove('active'));
+    $('#nav-organization').classList.add('active');
+    history.replaceState(null, '', '?organization=1');
+    load();
+  });
+  $('#signout').addEventListener('click', () => {
+    credential = '';
+    $('#signout').hidden = true;
+    $('#login').hidden = false;
+    $('#content').hidden = true;
+    load();
+  });
+  load();
+});
