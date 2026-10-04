@@ -64,6 +64,380 @@ test('judges can filter submissions and follow criterion evidence', async ({
   await page.getByRole('button', { name: 'All submissions' }).click();
   expect(errors).toEqual([]);
 });
+
+test('needs attention page displays work queue', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 0,
+          failed: 1,
+          attention: 1,
+        },
+        runs: [{ ...demoRun, state: 'FAILED', failure_code: 'BUILD_FAILED' }],
+      },
+    }),
+  );
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: demoDetail }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/?attention=1');
+  await expect(page.getByRole('heading', { name: 'Needs Attention' })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('competition metrics display on overview', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 5,
+          openSubmissions: 3,
+          active: 0,
+          completed: 2,
+          failed: 1,
+          attention: 1,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: demoDetail }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Competition metrics' })).toBeVisible();
+  await expect(page.getByText('Total teams')).toBeVisible();
+  await expect(page.getByText('Submitted teams')).toBeVisible();
+  await expect(page.getByText('Success rate')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('submission sorting works correctly', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 2,
+          active: 0,
+          completed: 2,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [
+          { ...demoRun, id: 'run-1', head_sha: 'a'.repeat(40) },
+          { ...demoRun, id: 'run-2', head_sha: 'b'.repeat(40) },
+        ],
+      },
+    }),
+  );
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: demoDetail }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByLabel('Sort submissions').selectOption('oldest');
+  await expect(page.getByLabel('Sort submissions')).toHaveValue('oldest');
+  expect(errors).toEqual([]);
+});
+
+test('judge summary displays key information', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: demoDetail }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'Judge Summary' })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('objective checks display baseline comparison', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  const detailWithExecution = {
+    ...demoDetail,
+    evidence: JSON.stringify([
+      {
+        id: 'build-check',
+        kind: 'execution',
+        status: 'PASS',
+        claim: 'Build succeeded',
+        baselineStatus: 'PASS',
+      },
+      {
+        id: 'test-check',
+        kind: 'execution',
+        status: 'FAIL',
+        claim: 'Tests failed',
+        baselineStatus: 'PASS',
+      },
+    ]),
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithExecution }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'Objective Checks' })).toBeVisible();
+  await expect(page.getByText('execution checks')).toBeVisible();
+  await expect(page.getByText('↓ Regression')).toBeVisible();
+  await expect(page.getByText('→ Unchanged')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('AI review state displays grounding information', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  const detailWithAI = {
+    ...demoDetail,
+    ai_status: 'COMPLETED',
+    report: JSON.stringify({
+      ...JSON.parse(demoDetail.report),
+      aiTrace: {
+        model: 'llama-3.3-70b',
+        grounding: 'HIGH',
+        citationCount: 5,
+        assessment: 'VERIFIED',
+        requiresHumanAttention: false,
+      },
+    }),
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithAI }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'AI Review State' })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('regressions section displays when failures detected', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  const detailWithRegression = {
+    ...demoDetail,
+    evidence: JSON.stringify([
+      {
+        id: 'regression-check',
+        kind: 'execution',
+        status: 'FAIL',
+        claim: 'New test failure',
+        baselineStatus: 'PASS',
+      },
+    ]),
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithRegression }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'Regressions' })).toBeVisible();
+  await expect(page.getByText('regressions detected')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('evidence explorer groups by kind', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  const detailWithEvidence = {
+    ...demoDetail,
+    evidence: JSON.stringify([
+      { id: 'e1', kind: 'execution', status: 'PASS', claim: 'Build succeeded' },
+      { id: 'e2', kind: 'source', status: 'PASS', claim: 'Source matches' },
+      { id: 'e3', kind: 'test', status: 'FAIL', claim: 'Test failed' },
+    ]),
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithEvidence }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'Evidence Explorer' })).toBeVisible();
+  await expect(page.getByText('EXECUTION', { exact: true })).toBeVisible();
+  await expect(page.getByText('SOURCE', { exact: true })).toBeVisible();
+  await expect(page.getByText('TEST', { exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('state banners display for evaluation states', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 0,
+          failed: 1,
+          attention: 1,
+        },
+        runs: [{ ...demoRun, state: 'FAILED', failure_code: 'BUILD_FAILED' }],
+      },
+    }),
+  );
+  const detailWithFailure = {
+    ...demoDetail,
+    state: 'FAILED',
+    failure_code: 'BUILD_FAILED',
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithFailure }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByText('FAILED EVALUATION')).toBeVisible();
+  await expect(page.getByText('BUILD_FAILED')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('performance section displays when benchmarks available', async ({ page }) => {
+  await page.route('**/api/overview', (route) =>
+    route.fulfill({
+      json: {
+        demo: true,
+        counts: {
+          repositories: 1,
+          teams: 1,
+          openSubmissions: 1,
+          active: 0,
+          completed: 1,
+          failed: 0,
+          attention: 0,
+        },
+        runs: [demoRun],
+      },
+    }),
+  );
+  const detailWithBenchmark = {
+    ...demoDetail,
+    evidence: JSON.stringify([
+      {
+        id: 'perf-check',
+        kind: 'benchmark',
+        status: 'PASS',
+        claim: 'Performance improved',
+        baselineStatus: 'FAIL',
+      },
+    ]),
+  };
+  await page.route('**/api/evaluations/*', (route) =>
+    route.fulfill({ json: detailWithBenchmark }),
+  );
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
+  await expect(page.getByRole('heading', { name: 'Performance' })).toBeVisible();
+  await expect(page.getByText('1 benchmarks')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('review APIs reject privileged writes and expose security headers', async ({
   request,
 }) => {
