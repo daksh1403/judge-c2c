@@ -450,7 +450,16 @@ test('organizers see not-submitted teams, member identity and issue provenance t
           definition: null,
           versions: [],
           assignments: [],
-          submissions: [],
+          submissions: [
+            {
+              pr_number: 23,
+              team_name: 'Related team',
+              status: 'VALID',
+              evaluation_state: 'COMPLETED',
+              head_sha: 'a'.repeat(40),
+              latest_run_id: 'related-run',
+            },
+          ],
           decisions: [],
         },
       });
@@ -568,12 +577,14 @@ test('organizers see not-submitted teams, member identity and issue provenance t
   ).toBeVisible();
   await page.getByLabel('Priority filter').selectOption('high');
   await page.getByLabel('Difficulty filter').selectOption('hard');
+  await page.getByLabel('Source filter').selectOption('PARTICIPANT');
   await page.getByLabel('Work progress').selectOption('assigned');
   await page.getByLabel('Label filter').fill('judge:type:bug');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect.poll(() => issueQuery.get('priority')).toBe('high');
   expect(issueQuery.get('difficulty')).toBe('hard');
   expect(issueQuery.get('workflow')).toBe('assigned');
+  expect(issueQuery.get('source')).toBe('PARTICIPANT');
   expect(issueQuery.get('label')).toBe('judge:type:bug');
   await page
     .getByRole('button', {
@@ -582,6 +593,18 @@ test('organizers see not-submitted teams, member identity and issue provenance t
     })
     .click();
   await page.getByLabel('Priority override').selectOption('high');
+  await expect(
+    page.getByRole('heading', { name: 'Related submissions' }),
+  ).toBeVisible();
+  await expect(page.getByText('PR #23 · Related team')).toBeVisible();
+  await expect(
+    page.getByText('Submission VALID · evaluation COMPLETED', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', {
+      name: 'Inspect current requirements, approach and evidence',
+    }),
+  ).toHaveAttribute('href', '?organization=1&evaluation=related-run');
   await page.getByLabel('Difficulty override').selectOption('hard');
   await page.getByLabel('Technical severity override').selectOption('medium');
   await page
