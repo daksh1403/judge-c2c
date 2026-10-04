@@ -142,7 +142,7 @@ describe('advisory evaluation plans', () => {
     const plan = buildEvaluationPlan(c, large);
     expect(plan.depth).toBe('DEEP');
     expect(plan.maxChangedFiles).toBe(40);
-    expect(plan.maxContextBytes).toBe(48_000);
+    expect(plan.maxContextBytes).toBe(64_000);
     expect(plan.reviewAreas).toContain('architecture');
     c.category = 'Architecture';
     expect(buildEvaluationPlan(c, context()).depth).toBe('DEEP');
