@@ -1,9 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { parse } from 'jsonc-parser';
 
 // Read identifiers only to deny reuse; never inherit review bindings or values.
-const existing = JSON.parse(
-  (await readFile('wrangler.jsonc', 'utf8')).replace(/,\s*([}\]])/g, '$1'),
-);
+const existing = parse(await readFile('wrangler.jsonc', 'utf8'));
 const nonproduction = [
   existing,
   existing.previews,
