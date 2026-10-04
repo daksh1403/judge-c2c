@@ -51,7 +51,7 @@ git add -- docs/master-acceptance.json docs/master-acceptance.md docs/completene
   migrations/0011_execution_cache.sql migrations/0012_artifact_store.sql migrations/0013_additional_contributions.sql \
   tests/browser/dashboard.spec.ts tests/database.ts tests/additional-contributions.test.ts tests/artifact-store.test.ts \
   tests/execution-cache-sqlite.test.ts tests/execution-cache.test.ts tests/requirement-assessment.test.ts \
-  tests/reservation-lifecycle.test.ts tests/secret-scanner.test.ts tests/security.test.ts tasks.json
+  tests/reservation-lifecycle.test.ts tests/secret-scanner.test.ts tests/security.test.ts
 git diff --cached --check
 if ! git diff --cached --quiet; then
   git commit -m "Add judge evidence workspace and evaluation completeness safeguards"
