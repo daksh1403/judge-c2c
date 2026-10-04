@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-04T18:38:46.857059+00:00",
+  "sourceCommit": "0e520a14e87d20bd5a49df09ea23b3d6ff3c67fa",
+  "sourcePR": 8,
+  "approval": "Owner explicitly authorized merge and production testing",
+  "worker": "judge-c2c-production",
+  "versionId": "e001ffb7-4aed-4421-a6ce-4ac6e2f65390",
+  "url": "https://judge-c2c-production.dakshx.workers.dev",
+  "deployment": "WRANGLER_AUTHENTICATED_SUCCESS",
+  "mode": "OWNER_TUNNEL_KV_ONLY",
+  "R2": false,
+  "runtimeEvidence": [
+    "docs/qa/current-production-runner-recovery.json",
+    "docs/qa/current-production-ai-quota-only.json",
+    "docs/qa/current-live-environment-isolation.json",
+    "docs/qa/current-deployed-environment-bindings.json"
+  ],
+  "limitations": [
+    "Production GitHub App not connected",
+    "AI daily quota exhausted",
+    "Event-scale capacity and multiple independent organizations unverified",
+    "Protected CI production deployment not enabled"
+  ]
+}

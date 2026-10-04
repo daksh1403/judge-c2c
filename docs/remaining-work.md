@@ -4,8 +4,8 @@ Affected workstream bookkeeping; requirements and acceptance criteria are unchan
 
 | Status         | Items |
 | -------------- | ----: |
-| PASS           |   700 |
-| BLOCKED        |     9 |
+| PASS           |   704 |
+| BLOCKED        |     5 |
 | PARTIAL        |     3 |
 | NOT_APPLICABLE |     2 |
 
