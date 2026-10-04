@@ -250,19 +250,20 @@
             ".github/workflows/ci.yml",
             ".github/workflows/deploy.yml",
             "scripts/preview-config.mjs",
-            "scripts/production-config.mjs"
+            "scripts/production-config.mjs",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Local preview production separation: Workflow configuration proves isolation in code; actual production deployment requires main merge with explicit CLOUDFLARE_PRODUCTION_ENABLED flag and production environment setup.",
+          "note": "Production generator now declares an exact custom-domain route and rejects invalid/review resource origins. Four configuration tests pass. Live GitHub has no cloudflare-production environment, repository variables or secret names; actual independent production resources, deployment and separation remain unverified.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Configuration analysis; production separation requires actual deployment verification."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed configuration regressions; no production resources or deployment were created."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "Production generator now declares an exact custom-domain route and rejects invalid/review resource origins. Four configuration tests pass. Live GitHub has no cloudflare-production environment, repository variables or secret names; actual independent production resources, deployment and separation remain unverified."
           }
         },
         {
@@ -630,19 +631,20 @@
           "evidence": [
             "src/github.ts",
             "src/runner.ts",
-            "AGENTS.md"
+            "AGENTS.md",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Least privilege: Current implementation uses repository-scoped credentials. GitHub App with granular downscoped permissions requires owner configuration in production.",
+          "note": "Evaluation tokens are repository-scoped and downscoped. Live review App installation nevertheless selects all repositories and grants excess pull_requests:write, repository_hooks:write and workflows:write permissions. Owner grant reduction and separate production installation verification remain required.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current scope analysis; least-privilege app permissions require owner GitHub App configuration."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Authenticated gh inspected actual organization installation permissions; owner grants were not changed."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "Evaluation tokens are repository-scoped and downscoped. Live review App installation nevertheless selects all repositories and grants excess pull_requests:write, repository_hooks:write and workflows:write permissions. Owner grant reduction and separate production installation verification remain required."
           }
         },
         {
@@ -10516,19 +10518,20 @@
           "evidence": [
             "src/reviewer-capacity.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Horizontal capacity: Distributed lease mechanism tested with multi-worker simulation; actual multi-host event-scale deployment requires production infrastructure verification.",
+          "note": "Eight focused capacity/runtime tests passed, including 24 contenders across two real local Worker isolates sharing D1, crash recovery, stale-owner fencing, prepare backoff, supersession and D1 write recovery. Actual multi-host event-scale deployment and provider budget are not verified.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Multi-worker simulation; production multi-host deployment requires infrastructure verification."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Two local Worker isolates and real durable engine; not deployed event-scale production capacity."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "Eight focused capacity/runtime tests passed, including 24 contenders across two real local Worker isolates sharing D1, crash recovery, stale-owner fencing, prepare backoff, supersession and D1 write recovery. Actual multi-host event-scale deployment and provider budget are not verified."
           }
         },
         {
@@ -13015,19 +13018,20 @@
           "evidence": [
             "src/organization.ts",
             "tests/organization-isolation.test.ts",
-            "migrations/0001_foundation.sql"
+            "migrations/0001_foundation.sql",
+            "docs/qa/current-real-participant-frontend.json"
           ],
-          "note": "Organizations: Single-organization model tested with isolation fixtures; multi-organization deployment requires production infrastructure verification.",
+          "note": "Current organization console is verified for the existing isolated review organization and one real GitHub participant account. Multiple independently deployed organizations/events and their production isolation are not proven; merging alone does not establish this capability.",
           "verification": {
-            "method": "FIXTURE_TEST",
-            "boundary": "Single-organization isolation tests; multi-organization support requires production deployment."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Real review frontend and existing registered organization/team; not multiple organizations or independent participants."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "Current organization console is verified for the existing isolated review organization and one real GitHub participant account. Multiple independently deployed organizations/events and their production isolation are not proven; merging alone does not establish this capability."
           }
         },
         {

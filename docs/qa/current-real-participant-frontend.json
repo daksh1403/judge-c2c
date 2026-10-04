@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-04T13:30:28.245Z",
+  "origin": "https://feat-frontend-polish-judge-c2c.dakshx.workers.dev",
+  "mode": "REAL_FRONTEND_CLICKS_NO_MOCKS_NO_DIRECT_API_CALLS",
+  "github": {
+    "id": 166613207,
+    "login": "daksh1403"
+  },
+  "checks": {
+    "ownTeamAndRequirementsRendered": true,
+    "privilegedControlsAbsent": true,
+    "revocationRemovesActiveFrontendAccess": true
+  },
+  "limitations": [
+    "One real GitHub account and its existing registered team, using organizer-issued participant access; not multiple independent people or OAuth sign-in.",
+    "Isolated review resources. No scoring or existing assignment changes."
+  ],
+  "team": {
+    "id": "team-67b28fd4-8d8a-4920-b861-ae42fc0ae980",
+    "name": "QA rehearsal — one real GitHub account",
+    "githubMemberVerified": true,
+    "assignments": 4,
+    "submissions": 12
+  },
+  "errors": [],
+  "status": "PASS"
+}

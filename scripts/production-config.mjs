@@ -33,6 +33,9 @@ const input = (key) => {
   if (!value || value.trim() !== value) throw new Error(`Set ${key}`);
   return value;
 };
+const runnerMode = process.env.PRODUCTION_RUNNER_MODE || 'MANAGED';
+if (!['MANAGED', 'OWNER_TUNNEL'].includes(runnerMode))
+  throw new Error('Invalid PRODUCTION_RUNNER_MODE');
 const resourceId = (key, pattern) => {
   const value = input(key);
   if (!pattern.test(value) || forbiddenIds.has(value))
@@ -68,17 +71,31 @@ const organizationDatabase = resourceId(
 if (database === organizationDatabase)
   throw new Error('Production DB and ORG_DB must be separate');
 const artifactKv = resourceId('PRODUCTION_ARTIFACT_KV_ID', /^[a-f0-9]{32}$/);
-const bucket = input('PRODUCTION_ARTIFACT_BUCKET');
+const bucket =
+  runnerMode === 'OWNER_TUNNEL' && !process.env.PRODUCTION_ARTIFACT_BUCKET
+    ? null
+    : input('PRODUCTION_ARTIFACT_BUCKET');
 if (
-  !/^[a-z0-9][a-z0-9-]{2,62}$/.test(bucket) ||
-  forbiddenBuckets.has(bucket) ||
-  /(^|-)(local|review|preview|test)(-|$)/.test(bucket)
+  bucket !== null &&
+  (!/^[a-z0-9][a-z0-9-]{2,62}$/.test(bucket) ||
+    forbiddenBuckets.has(bucket) ||
+    /(^|-)(local|review|preview|test)(-|$)/.test(bucket))
 )
   throw new Error(
     'PRODUCTION_ARTIFACT_BUCKET must be a separate production bucket',
   );
 const origin = httpsOrigin('PUBLIC_ORIGIN');
 const publicUrl = new URL(origin);
+const workersDev = /(^|\.)workers\.dev$/.test(publicUrl.hostname);
+if (workersDev) {
+  const subdomain = input('CLOUDFLARE_WORKERS_SUBDOMAIN');
+  if (
+    runnerMode !== 'OWNER_TUNNEL' ||
+    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(subdomain) ||
+    publicUrl.hostname !== `judge-c2c-production.${subdomain}.workers.dev`
+  )
+    throw new Error('PUBLIC_ORIGIN must match the separate production Worker');
+}
 if (
   publicUrl.port ||
   isIP(publicUrl.hostname) ||
@@ -86,8 +103,7 @@ if (
   publicUrl.hostname.split('.').length < 2 ||
   !publicUrl.hostname
     .split('.')
-    .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) ||
-  /(^|\.)workers\.dev$/.test(publicUrl.hostname)
+    .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
 )
   throw new Error('PUBLIC_ORIGIN must use a production custom-domain hostname');
 const organizationOrigin = httpsOrigin('PRODUCTION_ORG_PUBLIC_ORIGIN');
@@ -110,19 +126,30 @@ if (runnerEndpoint === origin)
   throw new Error('Production runner must use a separate isolated endpoint');
 const image = input('PRODUCTION_RUNNER_IMAGE');
 if (
-  !/^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/.test(
-    image,
-  )
+  !(
+    runnerMode === 'OWNER_TUNNEL'
+      ? /^docker-local@sha256:[a-f0-9]{64}$/
+      : /^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/
+  ).test(image)
 )
   throw new Error('PRODUCTION_RUNNER_IMAGE must be digest pinned');
+if (
+  runnerMode === 'OWNER_TUNNEL' &&
+  !/^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.trycloudflare\.com$/.test(
+    runnerEndpoint,
+  )
+)
+  throw new Error('OWNER_TUNNEL requires an HTTPS trycloudflare runner origin');
 const config = {
-  name: 'judge-c2c',
+  name: 'judge-c2c-production',
   main: '../src/index.ts',
   compatibility_date: '2026-08-01',
   compatibility_flags: ['nodejs_compat'],
-  workers_dev: false,
+  workers_dev: workersDev,
   preview_urls: false,
-  routes: [{ pattern: publicUrl.hostname, custom_domain: true }],
+  ...(workersDev
+    ? {}
+    : { routes: [{ pattern: publicUrl.hostname, custom_domain: true }] }),
   assets: {
     directory: '../public',
     binding: 'ASSETS',
@@ -147,7 +174,7 @@ const config = {
   workflows: [
     {
       binding: 'EVALUATOR',
-      name: 'judge-c2c-evaluator',
+      name: 'judge-c2c-production-evaluator',
       class_name: 'EvaluationWorkflow',
     },
     {
@@ -171,7 +198,9 @@ const config = {
       migrations_dir: '../migrations',
     },
   ],
-  r2_buckets: [{ binding: 'ARTIFACTS', bucket_name: bucket }],
+  ...(bucket
+    ? { r2_buckets: [{ binding: 'ARTIFACTS', bucket_name: bucket }] }
+    : {}),
   kv_namespaces: [{ binding: 'ARTIFACT_KV', id: artifactKv }],
   ai: { binding: 'AI' },
   triggers: { crons: ['*/2 * * * *'] },

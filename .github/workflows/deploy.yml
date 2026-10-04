@@ -67,6 +67,8 @@ jobs:
           PRODUCTION_AI_MODEL: ${{ vars.PRODUCTION_AI_MODEL }}
           PRODUCTION_RUNNER_ENDPOINT: ${{ vars.PRODUCTION_RUNNER_ENDPOINT }}
           PRODUCTION_RUNNER_IMAGE: ${{ vars.PRODUCTION_RUNNER_IMAGE }}
+          PRODUCTION_RUNNER_MODE: ${{ vars.PRODUCTION_RUNNER_MODE }}
+          CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
           PUBLIC_ORIGIN: ${{ vars.PUBLIC_ORIGIN }}
       - run: npx wrangler d1 migrations apply DB --config .wrangler/production.json --remote
       - run: npx wrangler d1 migrations apply ORG_DB --config .wrangler/production.json --remote

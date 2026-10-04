@@ -1,0 +1,57 @@
+{
+  "mode": "ACTUAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "capture": "Native UI network responses only; no direct API requests, interception, or new attempts",
+  "at": "2026-10-04T13:38:16.160Z",
+  "origin": "https://feat-frontend-polish-judge-c2c.dakshx.workers.dev",
+  "role": "public-review-session",
+  "run": {
+    "id": "9041e2113da7f8fc098b853454738dd779c3f4715864cd632b50fbbbb3b48461",
+    "state": "FAILED",
+    "prUrl": "https://github.com/Daksh-Codebase/payment-engine/pull/11",
+    "baseline": "pending",
+    "head": "pending",
+    "aiStatus": "NOT_RUN",
+    "failureCode": "GITHUB_HTTP_403",
+    "timeline": [
+      {
+        "created_at": "2026-10-04T13:06:43.016Z",
+        "detail": "Real public PR review requested",
+        "state": "QUEUED"
+      },
+      {
+        "created_at": "2026-10-04T13:06:49.431Z",
+        "detail": "Reading real public PR metadata and capturing exact commits",
+        "state": "FETCHING"
+      },
+      {
+        "created_at": "2026-10-04T13:07:00.511Z",
+        "detail": "GITHUB_HTTP_403",
+        "state": "FAILED"
+      }
+    ]
+  },
+  "scope": "One real GitHub PR submitted in an isolated public review session; no runner or scoring decisions. Retrieval may fail before evidence capture.",
+  "evidence": {
+    "count": 0,
+    "functionalCriterionCount": 0,
+    "aiReviewRun": false,
+    "functionalCriteriaUnverified": null,
+    "executionRecordCount": 0,
+    "contextKeys": [],
+    "privilegedExecutionAbsent": null
+  },
+  "limitations": [
+    "GitHub rejected unauthenticated public metadata retrieval before contract capture: GITHUB_HTTP_403",
+    "Successful public review, criterion grounding and AI context could not be verified."
+  ],
+  "browser": {
+    "errors": [],
+    "directLinkModeVerified": true,
+    "failureSummaryVerified": true,
+    "structuredObservationsRendered": null,
+    "regressionScopeTruthful": true,
+    "sortingVerified": false,
+    "displayedRunCount": 1,
+    "teamCountsUnavailable": true
+  }
+}

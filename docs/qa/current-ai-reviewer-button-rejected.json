@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-04T13:18:50.812Z",
+  "origin": "https://feat-frontend-polish-judge-c2c.dakshx.workers.dev",
+  "mode": "REAL_FRONTEND_CLICKS_NO_MOCKS_NO_DIRECT_API_CALLS",
+  "evaluations": [],
+  "errors": [],
+  "boundary": "Actual isolated deployed review frontend and real provider/runner evaluation records for the original GitHub PRs. One authenticated operator account, not a production hackathon or multiple independent participants.",
+  "reviewerButton": {
+    "http": 200,
+    "status": "FAILED",
+    "trace": {
+      "policy": "requirements-and-approach-v12",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "inputHash": "4e9688f48df05cd91ad35585ad327b7bda23f32d7dacc0bafeefd43541eea7f4",
+      "durationMs": 47897,
+      "attempts": 2,
+      "attemptFailures": [
+        "AI_UNVERIFIED_OBSERVED",
+        "AI_APPROACH_CITATION_UNLISTED"
+      ],
+      "failureCode": "AI_APPROACH_CITATION_UNLISTED",
+      "contextBudget": {
+        "version": "bounded-review-context-v1",
+        "contextBytes": 4192,
+        "maxContextBytes": 48000,
+        "reservedInputBytes": 9260,
+        "reservedOutputTokens": 4500,
+        "estimatedInputTokens": 3363,
+        "inputTokenEstimateMethod": "UTF-8 byte count divided by four; estimate only",
+        "omittedEvidenceIds": [],
+        "omittedSourcePaths": [],
+        "omittedDiffPaths": [],
+        "finalContextBytes": 4192
+      },
+      "evaluationPlan": {
+        "version": "adaptive-review-v1",
+        "depth": "STANDARD",
+        "reviewAreas": [
+          "correctness",
+          "documentation",
+          "policy",
+          "requirements",
+          "solution-approach",
+          "testing"
+        ],
+        "reasons": [
+          "All frozen contract criteria remain required at every review depth.",
+          "Authoritative execution checks are unchanged by this advisory plan.",
+          "Changed paths contain documentation only.",
+          "Functional criteria or trusted runner checks require objective verification."
+        ],
+        "maxContextBytes": 48000,
+        "maxChangedFiles": 30
+      },
+      "modelRouting": {
+        "version": "server-model-routing-v1",
+        "model": "kimi-k2.6",
+        "reason": "CALLMISSED_MODEL retained; no depth override is configured."
+      }
+    },
+    "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+    "visibleMessage": "Reviewer diagnostic: FAILED. Objective evidence remains available."
+  },
+  "status": "FAIL",
+  "failure": "Provider diagnostic must verify actual review\n\n'FAILED' !== 'PASS'\n"
+}
