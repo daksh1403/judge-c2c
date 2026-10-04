@@ -473,21 +473,26 @@ export async function aiReview(
       };
     } catch (error) {
       failureCode =
-        error instanceof Error && validationErrors[error.message]
-          ? validationErrors[error.message]!
-          : error instanceof Error &&
-              /^CALLMISSED_[A-Z0-9_]+$/.test(error.message)
-            ? error.message
-            : provider === 'callmissed' &&
-                error instanceof Error &&
-                ['TimeoutError', 'AbortError'].includes(error.name)
-              ? 'CALLMISSED_TIMEOUT'
-              : error instanceof Error && error.name === 'ZodError'
-                ? 'AI_SCHEMA_INVALID'
-                : error instanceof SyntaxError
-                  ? 'AI_JSON_INVALID'
-                  : 'AI_OUTPUT_INVALID';
+        provider === 'cloudflare' &&
+        error instanceof Error &&
+        /4006|daily free allocation/i.test(error.message)
+          ? 'CLOUDFLARE_AI_QUOTA_EXHAUSTED'
+          : error instanceof Error && validationErrors[error.message]
+            ? validationErrors[error.message]!
+            : error instanceof Error &&
+                /^CALLMISSED_[A-Z0-9_]+$/.test(error.message)
+              ? error.message
+              : provider === 'callmissed' &&
+                  error instanceof Error &&
+                  ['TimeoutError', 'AbortError'].includes(error.name)
+                ? 'CALLMISSED_TIMEOUT'
+                : error instanceof Error && error.name === 'ZodError'
+                  ? 'AI_SCHEMA_INVALID'
+                  : error instanceof SyntaxError
+                    ? 'AI_JSON_INVALID'
+                    : 'AI_OUTPUT_INVALID';
       attemptFailures.push(failureCode);
+      if (failureCode === 'CLOUDFLARE_AI_QUOTA_EXHAUSTED') break;
       /* Bounded recovery. Invalid/provider output never becomes evidence. */
     }
   }
@@ -500,7 +505,7 @@ export async function aiReview(
       model,
       inputHash: await digest(prompt),
       durationMs: Date.now() - started,
-      attempts: 2,
+      attempts: attemptFailures.length,
       attemptFailures,
       failureCode,
       contextBudget: {

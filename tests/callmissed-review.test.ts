@@ -465,3 +465,31 @@ it('uses the same precise trusted uncertainty repair feedback for Cloudflare', a
     valid.solution_approach.maintainability,
   );
 });
+
+it('exposes Cloudflare quota exhaustion without retrying or fabricating review success', async () => {
+  const run = vi
+    .fn()
+    .mockRejectedValue(
+      new Error('AiError 4006: daily free allocation exhausted'),
+    );
+  const result = await aiReview(
+    {
+      AI_PROVIDER: 'cloudflare',
+      AI_MODEL: 'synthetic/model',
+      AI: { run },
+    } as unknown as Env,
+    demoContract,
+    context,
+    evidence,
+  );
+  expect(run).toHaveBeenCalledTimes(1);
+  expect(result.status).toBe('FAILED');
+  expect(result.trace).toMatchObject({
+    failureCode: 'CLOUDFLARE_AI_QUOTA_EXHAUSTED',
+    attempts: 1,
+    attemptFailures: ['CLOUDFLARE_AI_QUOTA_EXHAUSTED'],
+  });
+  expect(
+    result.review.assessments.every((a) => a.status === 'UNVERIFIED'),
+  ).toBe(true);
+});
