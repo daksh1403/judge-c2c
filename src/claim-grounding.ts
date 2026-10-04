@@ -1,4 +1,9 @@
-import type { Contract, Evidence, Review } from './domain';
+import {
+  reviewSchema,
+  type Contract,
+  type Evidence,
+  type Review,
+} from './domain';
 import { requirementOutcomes } from './requirement-assessment';
 
 export const GROUNDING_POLICY = 'objective-facts-unverified-narratives-v1';
@@ -117,5 +122,57 @@ export function completeObjectiveAssessments(
       ],
     },
     filledCriterionIds: missing.map((c) => c.criterionId),
+  };
+}
+
+/** Repair only the redundant citation declaration index, never model claims or facts. */
+export function completeApproachEvidenceIndex(
+  value: unknown,
+  evidence: Evidence[],
+) {
+  const parsed = reviewSchema.safeParse(value);
+  const unchanged = { value, addedEvidenceIds: [] as string[] };
+  if (!parsed.success) return unchanged;
+  const review = parsed.data;
+  const approach = review.solution_approach;
+  const observations = [
+    approach.problem_understanding,
+    approach.approach_summary,
+    approach.solution_design,
+    ...approach.strengths,
+    ...approach.weaknesses,
+    ...approach.tradeoffs,
+    approach.correctness,
+    approach.maintainability,
+    approach.architecture_fit,
+    ...approach.unverified_assumptions,
+  ];
+  const known = new Set(evidence.map((item) => item.id));
+  const referenced = [
+    ...approach.evidence,
+    ...observations.flatMap((observation) => observation.evidenceIds),
+    ...review.assessments.flatMap((assessment) => assessment.evidenceIds),
+    ...review.findings.flatMap((finding) => finding.evidenceIds),
+  ];
+  // Unknown IDs remain untouched so the authoritative validator rejects them.
+  if (referenced.some((id) => !known.has(id))) return unchanged;
+  const declared = new Set(approach.evidence);
+  const addedEvidenceIds = [
+    ...new Set(observations.flatMap((observation) => observation.evidenceIds)),
+  ].filter((id) => !declared.has(id));
+  if (
+    !addedEvidenceIds.length ||
+    approach.evidence.length + addedEvidenceIds.length > 100
+  )
+    return unchanged;
+  return {
+    value: {
+      ...review,
+      solution_approach: {
+        ...approach,
+        evidence: [...approach.evidence, ...addedEvidenceIds],
+      },
+    },
+    addedEvidenceIds,
   };
 }

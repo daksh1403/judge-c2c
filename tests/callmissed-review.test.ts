@@ -65,6 +65,18 @@ it('uses fixed CallMissed Responses endpoint and strict schema with no tools or 
   expect(compact.citationGuide.criterionEvidence['future-time']).toEqual(
     evidence.filter((e) => e.criterionId === 'future-time').map((e) => e.id),
   );
+  expect([...body.text.format.schema.$defs.evidenceId.enum].sort()).toEqual(
+    evidence.map((item) => item.id).sort(),
+  );
+  expect(
+    body.text.format.schema.properties.assessments.items.properties.criterionId
+      .enum,
+  ).toEqual(
+    demoContract.requirements.flatMap((requirement) =>
+      requirement.criteria.map((criterion) => criterion.id),
+    ),
+  );
+  expect(JSON.parse(body.input).schema).toEqual(body.text.format.schema);
   expect(body.max_output_tokens).toBe(4500);
   expect(body.tools).toBeUndefined();
   expect(body.input).not.toContain(env.CALLMISSED_API_KEY);
@@ -247,4 +259,41 @@ it('prices Cloudflare actual invoked model usage without treating a response ali
       scope: 'successful-final-response',
     },
   });
+});
+
+it('repairs a known omitted approach declaration without retrying or promoting narrative truth', async () => {
+  const review = deterministicReport(demoContract, evidence);
+  review.solution_approach.maintainability = {
+    text: 'The implementation is always maintainable.',
+    evidenceIds: ['diff'],
+    verification: 'OBSERVED',
+  };
+  review.solution_approach.evidence = [];
+  const fetcher = vi
+    .fn()
+    .mockResolvedValue(
+      Response.json({
+        status: 'completed',
+        output: [
+          {
+            type: 'message',
+            content: [{ type: 'output_text', text: JSON.stringify(review) }],
+          },
+        ],
+      }),
+    );
+  vi.stubGlobal('fetch', fetcher);
+  const result = await aiReview(env, demoContract, context, evidence);
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(result.status).toBe('COMPLETED');
+  expect(result.trace).toMatchObject({
+    policy: 'requirements-and-approach-v13',
+    approachEvidenceIndexRepair: ['diff'],
+    objectiveCriterionRecovery: [],
+    requiresHumanAttention: true,
+  });
+  expect(result.review.solution_approach.evidence).toEqual(['diff']);
+  expect(result.review.solution_approach.maintainability.verification).toBe(
+    'UNVERIFIED',
+  );
 });

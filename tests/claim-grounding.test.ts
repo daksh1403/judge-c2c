@@ -3,6 +3,7 @@ import {
   groundReview,
   GROUNDING_POLICY,
   completeObjectiveAssessments,
+  completeApproachEvidenceIndex,
 } from '../src/claim-grounding';
 import { demoContract } from '../src/demo';
 import { deterministicReport, aiReview } from '../src/evaluate';
@@ -294,3 +295,127 @@ it.each([
     expect({ contract, evidence, context }).toEqual(before);
   },
 );
+
+it('completes only known approach citation declarations without changing observations or authoritative validation', () => {
+  const { contract, evidence, review } = fixture();
+  review.solution_approach.maintainability = {
+    text: 'All future changes are easy.',
+    evidenceIds: ['source'],
+    verification: 'OBSERVED',
+  };
+  review.solution_approach.correctness = {
+    text: evidence[0]!.claim,
+    evidenceIds: ['bounded'],
+    verification: 'OBSERVED',
+  };
+  review.solution_approach.evidence = [];
+  const original = structuredClone(review);
+  const indexed = completeApproachEvidenceIndex(review, evidence);
+  expect(indexed.addedEvidenceIds).toEqual(['bounded', 'source']);
+  expect(review).toEqual(original);
+  expect(indexed.value).toEqual({
+    ...original,
+    solution_approach: {
+      ...original.solution_approach,
+      evidence: ['bounded', 'source'],
+    },
+  });
+  const grounded = groundReview(
+    validateReview(indexed.value, contract, evidence),
+    contract,
+    evidence,
+  );
+  expect(grounded.review.assessments[0]?.status).toBe('FAIL');
+  expect(grounded.review.solution_approach.maintainability.verification).toBe(
+    'UNVERIFIED',
+  );
+  const contradiction = structuredClone(indexed.value) as typeof review;
+  contradiction.assessments[0]!.status = 'PASS';
+  expect(() =>
+    validateReview(
+      completeApproachEvidenceIndex(contradiction, evidence).value,
+      contract,
+      evidence,
+    ),
+  ).toThrow('AI cannot override objective failure');
+});
+
+it.each(['declared', 'observation', 'assessment', 'finding'] as const)(
+  'leaves unknown %s evidence untouched for rejection',
+  (location) => {
+    const { contract, evidence, review } = fixture();
+    review.solution_approach.maintainability.evidenceIds = ['source'];
+    review.solution_approach.evidence = [];
+    if (location === 'declared')
+      review.solution_approach.evidence = ['invented'];
+    if (location === 'observation')
+      review.solution_approach.maintainability.evidenceIds.push('invented');
+    if (location === 'assessment')
+      review.assessments[0]!.evidenceIds.push('invented');
+    if (location === 'finding')
+      review.findings = [
+        {
+          category: 'quality',
+          severity: 'low',
+          claim: 'Unproven.',
+          evidenceIds: ['invented'],
+          verification: 'inference',
+        },
+      ];
+    const indexed = completeApproachEvidenceIndex(review, evidence);
+    expect(indexed.value).toBe(review);
+    expect(indexed.addedEvidenceIds).toEqual([]);
+    expect(() => validateReview(indexed.value, contract, evidence)).toThrow(
+      /Unknown/,
+    );
+  },
+);
+
+it('leaves malformed review data unrepaired', () => {
+  const { evidence, review } = fixture();
+  const malformed = { ...review, summary: 123 };
+  expect(completeApproachEvidenceIndex(malformed, evidence)).toEqual({
+    value: malformed,
+    addedEvidenceIds: [],
+  });
+});
+
+it('traces citation-index repair while preserving missing-criterion NEEDS_REVIEW and semantic downgrade', async () => {
+  const { contract, evidence, review } = fixture();
+  review.assessments = [];
+  review.solution_approach.maintainability = {
+    text: 'All changes will be simple.',
+    evidenceIds: ['source'],
+    verification: 'OBSERVED',
+  };
+  review.solution_approach.evidence = [];
+  const result = await aiReview(
+    {
+      AI_PROVIDER: 'cloudflare',
+      AI_MODEL: 'synthetic/model',
+      AI: { run: async () => ({ response: review }) },
+    } as unknown as import('../src/env').Env,
+    contract,
+    {
+      files: [],
+      sources: {},
+      risk: [],
+      environment: 'test',
+      toolVersion: 'test',
+    },
+    evidence,
+  );
+  expect(result.status).toBe('NEEDS_REVIEW');
+  expect(result.trace).toMatchObject({
+    approachEvidenceIndexRepair: ['source'],
+    objectiveCriterionRecovery: ['retry-bounded'],
+    qualitativeCriterionAnalysis: {
+      status: 'UNVERIFIED',
+      missingCriterionIds: ['retry-bounded'],
+    },
+  });
+  expect(result.review.solution_approach.maintainability.verification).toBe(
+    'UNVERIFIED',
+  );
+  expect(result.review.assessments[0]?.status).toBe('FAIL');
+});

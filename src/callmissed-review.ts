@@ -10,6 +10,7 @@ export async function callMissedReview(
   prompt: string,
   attempt: number,
   repairCode?: string,
+  schema: Record<string, unknown> = reviewSchema.toJSONSchema(),
 ) {
   if (!env.CALLMISSED_API_KEY || !env.CALLMISSED_MODEL)
     throw new Error('CALLMISSED_NOT_CONFIGURED');
@@ -26,7 +27,7 @@ export async function callMissedReview(
       store: false,
       instructions: policy,
       input: JSON.stringify({
-        schema: reviewSchema.toJSONSchema(),
+        schema,
         untrustedContext: prompt,
         attempt,
         ...(repairCode
@@ -46,7 +47,7 @@ export async function callMissedReview(
           type: 'json_schema',
           name: 'engineering_review',
           strict: true,
-          schema: reviewSchema.toJSONSchema(),
+          schema,
         },
       },
     }),
