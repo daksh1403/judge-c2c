@@ -102,6 +102,10 @@ describe('production prerequisites and isolation', () => {
       AI_PROVIDER: 'cloudflare',
     });
     expect(config.preview_urls).toBe(false);
+    expect(config.workers_dev).toBe(false);
+    expect(config.routes).toEqual([
+      { pattern: 'judge.example.org', custom_domain: true },
+    ]);
     expect(JSON.stringify(config)).not.toMatch(
       /must-never-copy-secret|ORG_REVIEW_ORIGINS|cbbc7d68|35f5053d/,
     );
@@ -111,5 +115,39 @@ describe('production prerequisites and isolation', () => {
     }).config;
     expect(callmissed.vars.CALLMISSED_MODEL).toBe('kimi-k2.6');
     expect(callmissed.vars.AI_MODEL).toBeUndefined();
+  });
+  it('requires a routable custom-domain hostname and preserves valid isolated runner ports', () => {
+    for (const origin of [
+      'https://judge.example.org:8443',
+      'https://judge.example.org/app',
+      'https://judge.example.org?preview=true',
+      'https://192.0.2.1',
+      'https://[2001:db8::1]',
+      'https://judge',
+      'https://*.example.org',
+      'https://judge.example.org.',
+      'https://judge.example_org',
+      'https://judge.dakshx.workers.dev',
+    ]) {
+      const result = generate({
+        PUBLIC_ORIGIN: origin,
+        PRODUCTION_ORG_PUBLIC_ORIGIN: origin,
+      });
+      expect(result.status, origin).not.toBe(0);
+      expect(result.config, origin).toBeNull();
+    }
+    const result = generate({
+      PUBLIC_ORIGIN: 'https://Judge.Example.org:443',
+      PRODUCTION_ORG_PUBLIC_ORIGIN: 'https://judge.example.org',
+      PRODUCTION_RUNNER_ENDPOINT: 'https://runner.example.org:8443',
+    });
+    expect(result.status).toBe(0);
+    expect(result.config.vars.PUBLIC_ORIGIN).toBe('https://judge.example.org');
+    expect(result.config.routes).toEqual([
+      { pattern: 'judge.example.org', custom_domain: true },
+    ]);
+    expect(result.config.vars.RUNNER_ENDPOINT).toBe(
+      'https://runner.example.org:8443',
+    );
   });
 });

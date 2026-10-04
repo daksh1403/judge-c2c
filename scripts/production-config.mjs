@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { parse } from 'jsonc-parser';
+import { isIP } from 'node:net';
 
 // Read identifiers only to deny reuse; never inherit review bindings or values.
 const existing = parse(await readFile('wrangler.jsonc', 'utf8'));
@@ -77,6 +78,18 @@ if (
     'PRODUCTION_ARTIFACT_BUCKET must be a separate production bucket',
   );
 const origin = httpsOrigin('PUBLIC_ORIGIN');
+const publicUrl = new URL(origin);
+if (
+  publicUrl.port ||
+  isIP(publicUrl.hostname) ||
+  publicUrl.hostname.length > 253 ||
+  publicUrl.hostname.split('.').length < 2 ||
+  !publicUrl.hostname
+    .split('.')
+    .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label)) ||
+  /(^|\.)workers\.dev$/.test(publicUrl.hostname)
+)
+  throw new Error('PUBLIC_ORIGIN must use a production custom-domain hostname');
 const organizationOrigin = httpsOrigin('PRODUCTION_ORG_PUBLIC_ORIGIN');
 // The organization is hosted in this worker; ORG_SERVICE delegation is unnecessary.
 if (origin !== organizationOrigin)
@@ -109,6 +122,7 @@ const config = {
   compatibility_flags: ['nodejs_compat'],
   workers_dev: false,
   preview_urls: false,
+  routes: [{ pattern: publicUrl.hostname, custom_domain: true }],
   assets: {
     directory: '../public',
     binding: 'ASSETS',
