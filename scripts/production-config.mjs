@@ -116,7 +116,7 @@ if (
 )
   throw new Error('PRODUCTION_RUNNER_IMAGE must be digest pinned');
 const config = {
-  name: 'judge-c2c',
+  name: 'judge-c2c-production',
   main: '../src/index.ts',
   compatibility_date: '2026-08-01',
   compatibility_flags: ['nodejs_compat'],
@@ -147,7 +147,7 @@ const config = {
   workflows: [
     {
       binding: 'EVALUATOR',
-      name: 'judge-c2c-evaluator',
+      name: 'judge-c2c-production-evaluator',
       class_name: 'EvaluationWorkflow',
     },
     {

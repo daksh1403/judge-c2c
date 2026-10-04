@@ -9,6 +9,7 @@ import {
 import { tmpdir } from 'node:os';
 import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { parse } from 'jsonc-parser';
 const inputs = {
   PRODUCTION_DATABASE_ID: '11111111-1111-1111-1111-111111111111',
   PRODUCTION_ORG_DATABASE_ID: '22222222-2222-2222-2222-222222222222',
@@ -85,6 +86,27 @@ describe('production prerequisites and isolation', () => {
   it('generates organization workflows, artifacts, AI and isolated runner without secrets or review defaults', () => {
     const { status, config } = generate();
     expect(status).toBe(0);
+    expect(config.name).toBe('judge-c2c-production');
+    expect(config.workflows.map((w: { name: string }) => w.name)).toEqual([
+      'judge-c2c-production-evaluator',
+      'judge-c2c-organization-production-evaluator',
+    ]);
+    const native = parse(readFileSync('wrangler.jsonc', 'utf8'));
+    const nonproduction = [
+      native,
+      native.previews,
+      ...Object.values(native.env),
+    ];
+    for (const fixture of nonproduction as {
+      name?: string;
+      workflows?: { name: string }[];
+    }[]) {
+      expect(config.name).not.toBe(fixture.name);
+      for (const workflow of fixture.workflows ?? [])
+        expect(
+          config.workflows.map((w: { name: string }) => w.name),
+        ).not.toContain(workflow.name);
+    }
     expect(
       config.d1_databases.map((d: { binding: string }) => d.binding),
     ).toEqual(['DB', 'ORG_DB']);
