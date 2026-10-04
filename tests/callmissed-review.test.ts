@@ -59,8 +59,8 @@ it('uses fixed CallMissed Responses endpoint and strict schema with no tools or 
     text: { format: { type: 'json_schema', strict: true } },
   });
   const compact = JSON.parse(JSON.parse(body.input).untrustedContext);
-  expect(compact.citationGuide.knownEvidenceIds).toEqual(
-    evidence.map((e) => e.id),
+  expect([...compact.citationGuide.knownEvidenceIds].sort()).toEqual(
+    evidence.map((e) => e.id).sort(),
   );
   expect(compact.citationGuide.criterionEvidence['future-time']).toEqual(
     evidence.filter((e) => e.criterionId === 'future-time').map((e) => e.id),

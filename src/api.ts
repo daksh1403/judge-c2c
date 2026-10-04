@@ -1,7 +1,7 @@
 import { assessExpectedArtifacts } from './expected-artifacts';
 import { buildEvaluationPlan } from './evaluation-plan';
 import type { ArtifactMetadata } from './artifact-store';
-import type { Context } from './evaluate';
+import { AI_POLICY_VERSION, type Context } from './evaluate';
 import { listCandidates } from './additional-contributions';
 import { requirementOutcomes } from './requirement-assessment';
 import { readArtifact, captureRunArtifacts } from './artifact-store';
@@ -113,6 +113,8 @@ export async function api(request: Request, env: Env) {
       ]);
     const detail = {
       ...run,
+      reviewPolicyCurrent:
+        JSON.parse(run.report || '{}').aiTrace?.policy === AI_POLICY_VERSION,
       timeline: timeline.results,
       artifacts: artifacts.results,
       execution: execution.results,
@@ -257,9 +259,11 @@ export async function api(request: Request, env: Env) {
       !(
         run.state === 'FAILED' ||
         (run.state === 'COMPLETED' &&
-          ['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED'].includes(
+          (['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED'].includes(
             run.ai_status ?? '',
-          ))
+          ) ||
+            JSON.parse(run.report || '{}').aiTrace?.policy !==
+              AI_POLICY_VERSION))
       ) ||
       !(await isCurrent(env, run))
     )

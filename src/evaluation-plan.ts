@@ -12,8 +12,8 @@ export type EvaluationPlan = {
 
 const budgets = {
   LIGHT: { maxContextBytes: 12_000, maxChangedFiles: 10 },
-  STANDARD: { maxContextBytes: 48_000, maxChangedFiles: 30 },
-  DEEP: { maxContextBytes: 64_000, maxChangedFiles: 100 },
+  STANDARD: { maxContextBytes: 32_000, maxChangedFiles: 30 },
+  DEEP: { maxContextBytes: 48_000, maxChangedFiles: 100 },
 } as const;
 
 function documentationPath(path: string) {
