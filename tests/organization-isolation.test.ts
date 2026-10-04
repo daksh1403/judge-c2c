@@ -180,3 +180,159 @@ it('isolates two organization resources, sessions, submissions and encrypted App
     await runtime.dispose();
   }
 }, 30000);
+
+it('keeps HTTP sessions and mutations isolated across two independently configured Worker isolates', async () => {
+  const { buildSync } = await import('esbuild');
+  const script = buildSync({
+    stdin: {
+      // Miniflare's host proxy restricts Origin headers. Forward the fixture value
+      // under a test-only header, then restore it before the real router checks it.
+      contents: `import { organization } from './src/organization.ts';
+export default { fetch(request,env,ctx) { const headers=new Headers(request.headers);headers.set('origin',headers.get('x-fixture-origin'));headers.delete('x-fixture-origin');return organization(new Request(request,{headers}),env,ctx); } };`,
+      resolveDir: process.cwd(),
+    },
+    bundle: true,
+    write: false,
+    format: 'esm',
+    platform: 'neutral',
+    external: ['cloudflare:workers', 'node:*'],
+  }).outputFiles[0]!.text;
+  const names = ['organization-a', 'organization-b'];
+  const origins = names.map((name) => `https://${name}.test`);
+  const tokens = names.map((name) => `fixture-${name}-` + 'x'.repeat(40));
+  const runtime = new Miniflare({
+    workers: names.map((name, index) => ({
+      name,
+      modules: true,
+      script,
+      d1Databases: { ORG_DB: crypto.randomUUID() },
+      bindings: {
+        ORG_NAME: name,
+        ORG_PUBLIC_ORIGIN: origins[index]!,
+        ORG_ADMIN_TOKEN: tokens[index]!,
+        ORG_VAULT_KEY: '12'.repeat(32),
+      },
+      compatibilityDate: '2026-08-01',
+      compatibilityFlags: ['nodejs_compat'],
+    })),
+  });
+  try {
+    const workers = await Promise.all(
+      names.map((name) => runtime.getWorker(name)),
+    );
+    const databases = await Promise.all(
+      names.map(async (name) => {
+        const db = (await runtime.getD1Database(
+          'ORG_DB',
+          name,
+        )) as unknown as D1Database;
+        await migrate(db);
+        await db
+          .prepare(
+            "INSERT INTO teams(id,name,status) VALUES('same-id',?,'ACTIVE')",
+          )
+          .bind(`${name} team`)
+          .run();
+        return db;
+      }),
+    );
+    const request = (
+      index: number,
+      path: string,
+      cookie = '',
+      method = 'GET',
+      body?: unknown,
+      sourceOrigin = origins[index]!,
+    ) =>
+      workers[index]!.fetch(sourceOrigin + path, {
+        method,
+        headers: {
+          'x-fixture-origin': sourceOrigin,
+          'content-type': 'application/json',
+          ...(cookie ? { cookie } : {}),
+        },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    const cookies: string[] = [];
+    for (const index of [0, 1]) {
+      const login = await request(
+        index,
+        '/api/organization/login',
+        '',
+        'POST',
+        { token: tokens[index] },
+      );
+      expect(login.status, await login.clone().text()).toBe(200);
+      expect(login.headers.get('set-cookie')).toContain('Secure');
+      cookies.push(login.headers.get('set-cookie')!.split(';')[0]!);
+    }
+    for (const index of [0, 1]) {
+      const other = 1 - index;
+      const own = await request(
+        index,
+        '/api/organization/manage/teams',
+        cookies[index],
+      );
+      expect(own.status).toBe(200);
+      const ownText = await own.text();
+      expect(ownText).toContain(`${names[index]} team`);
+      expect(ownText).not.toContain(`${names[other]} team`);
+      const foreignCookie = await request(
+        index,
+        '/api/organization/manage/teams',
+        cookies[other],
+      );
+      expect(foreignCookie.status).toBe(401);
+      const foreignToken = await request(
+        index,
+        '/api/organization/login',
+        '',
+        'POST',
+        { token: tokens[other] },
+      );
+      expect(foreignToken.status).toBe(401);
+      const foreignOrigin = await request(
+        index,
+        '/api/organization/manage/teams',
+        cookies[index],
+        'GET',
+        undefined,
+        origins[other],
+      );
+      expect(foreignOrigin.status).toBe(403);
+    }
+    const mutation = await request(
+      0,
+      '/api/organization/manage/teams/same-id',
+      cookies[0],
+      'PATCH',
+      { name: 'organization-a changed team' },
+    );
+    expect(mutation.status).toBe(200);
+    expect(
+      await databases[0]!
+        .prepare("SELECT name FROM teams WHERE id='same-id'")
+        .first(),
+    ).toEqual({ name: 'organization-a changed team' });
+    expect(
+      await databases[1]!
+        .prepare("SELECT name FROM teams WHERE id='same-id'")
+        .first(),
+    ).toEqual({ name: 'organization-b team' });
+    const foreignMutation = await request(
+      1,
+      '/api/organization/manage/teams/same-id',
+      cookies[0],
+      'PATCH',
+      { name: 'cross-organization edit' },
+    );
+    expect(foreignMutation.status).toBe(401);
+    expect(
+      await databases[1]!
+        .prepare("SELECT name FROM teams WHERE id='same-id'")
+        .first(),
+    ).toEqual({ name: 'organization-b team' });
+  } finally {
+    await runtime.dispose();
+  }
+}, 30000);

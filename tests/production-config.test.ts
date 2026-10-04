@@ -51,6 +51,80 @@ function generate(overrides: Record<string, string | undefined> = {}) {
   }
 }
 describe('production prerequisites and isolation', () => {
+  it('supports an explicit owner tunnel without granting native or foreign previews production access', () => {
+    const owner = {
+      PRODUCTION_RUNNER_MODE: 'OWNER_TUNNEL',
+      PRODUCTION_ARTIFACT_BUCKET: undefined,
+      CLOUDFLARE_WORKERS_SUBDOMAIN: 'owner-account',
+      PUBLIC_ORIGIN: 'https://judge-c2c-production.owner-account.workers.dev',
+      PRODUCTION_ORG_PUBLIC_ORIGIN:
+        'https://judge-c2c-production.owner-account.workers.dev',
+      PRODUCTION_RUNNER_ENDPOINT: 'https://owner-bridge.trycloudflare.com',
+      PRODUCTION_RUNNER_IMAGE: 'docker-local@sha256:' + 'a'.repeat(64),
+    };
+    const result = generate(owner);
+    expect(result.status).toBe(0);
+    expect(result.config.name).toBe('judge-c2c-production');
+    expect(result.config.workers_dev).toBe(true);
+    expect(result.config.preview_urls).toBe(false);
+    expect(result.config.routes).toBeUndefined();
+    expect(result.config.services).toEqual([]);
+    expect(result.config.r2_buckets).toBeUndefined();
+    expect(result.config.kv_namespaces).toEqual([
+      { binding: 'ARTIFACT_KV', id: inputs.PRODUCTION_ARTIFACT_KV_ID },
+    ]);
+    expect(result.config.vars.RUNNER_IMAGE_URI).toBe(
+      owner.PRODUCTION_RUNNER_IMAGE,
+    );
+    expect(result.config.vars.ORG_REVIEW_ORIGINS).toBeUndefined();
+    expect(JSON.stringify(result.config)).not.toContain(
+      'must-never-copy-secret',
+    );
+    for (const override of [
+      { PRODUCTION_RUNNER_MODE: 'unknown' },
+      { PRODUCTION_RUNNER_MODE: 'MANAGED' },
+      { PRODUCTION_ARTIFACT_KV_ID: undefined },
+      { PRODUCTION_ARTIFACT_BUCKET: 'judge-review-artifacts' },
+      { PRODUCTION_RUNNER_IMAGE: 'docker-local:latest' },
+      { PRODUCTION_RUNNER_IMAGE: 'docker-local@sha256:' + 'a'.repeat(63) },
+      { PRODUCTION_RUNNER_IMAGE: inputs.PRODUCTION_RUNNER_IMAGE },
+      { PRODUCTION_RUNNER_ENDPOINT: 'http://owner-bridge.trycloudflare.com' },
+      {
+        PRODUCTION_RUNNER_ENDPOINT:
+          'https://owner-bridge.trycloudflare.com:8443',
+      },
+      {
+        PRODUCTION_RUNNER_ENDPOINT:
+          'https://owner-bridge.trycloudflare.com.evil.org',
+      },
+      { PRODUCTION_RUNNER_ENDPOINT: 'https://runner.example.org' },
+      { CLOUDFLARE_WORKERS_SUBDOMAIN: undefined },
+      { PUBLIC_ORIGIN: 'https://judge-c2c.owner-account.workers.dev' },
+      {
+        PUBLIC_ORIGIN:
+          'https://preview-judge-c2c-production.owner-account.workers.dev',
+      },
+      {
+        PUBLIC_ORIGIN:
+          'https://judge-c2c-production.foreign-account.workers.dev',
+      },
+    ]) {
+      const invalid = generate({ ...owner, ...override });
+      expect(invalid.status, JSON.stringify(override)).not.toBe(0);
+      expect(invalid.config).toBeNull();
+    }
+    const customDomain = generate({
+      ...owner,
+      PUBLIC_ORIGIN: inputs.PUBLIC_ORIGIN,
+      PRODUCTION_ORG_PUBLIC_ORIGIN: inputs.PRODUCTION_ORG_PUBLIC_ORIGIN,
+      CLOUDFLARE_WORKERS_SUBDOMAIN: undefined,
+    });
+    expect(customDomain.status).toBe(0);
+    expect(customDomain.config.workers_dev).toBe(false);
+    expect(customDomain.config.routes).toEqual([
+      { pattern: 'judge.example.org', custom_domain: true },
+    ]);
+  });
   it('requires every explicit prerequisite before writing configuration', () => {
     for (const key of Object.keys(inputs)) {
       const result = generate({ [key]: undefined });
