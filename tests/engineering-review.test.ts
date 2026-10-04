@@ -314,7 +314,7 @@ it('projects specific contextual observations and finding indexes with exact ser
   expect(
     result.engineeringReview.rubric.find((r) => r.id === '28.03')!
       .analysisCoverage,
-  ).toBe('MISSING_MEANINGFUL_ANALYSIS');
+  ).toBe('BOUNDED_ANALYSIS_AVAILABLE');
 });
 
 it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate out of contextual facet coverage', () => {
@@ -339,7 +339,7 @@ it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate ou
   expect(rubric.find((r) => r.id === '28.03')!.contextualAnalysis).toEqual([]);
   expect(rubric.find((r) => r.id === '25.18')).toMatchObject({
     status: 'UNVERIFIED',
-    analysisCoverage: 'MISSING_MEANINGFUL_ANALYSIS',
+    analysisCoverage: 'BOUNDED_ANALYSIS_AVAILABLE',
     contextualAnalysis: [],
   });
   review.findings[0]!.evidenceIds = ['execution-lint'];

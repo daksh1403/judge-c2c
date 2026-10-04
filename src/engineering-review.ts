@@ -1,4 +1,68 @@
 import type { Contract, Evidence, Review } from './domain';
+import {
+  analyzeSymptomMasking,
+  analyzeDuplication,
+  analyzeNoPrivateIntentions,
+  analyzeSeparationOfConcerns,
+  analyzeErrorHandling,
+  analyzeNaming,
+  analyzeAPIDesign,
+  analyzeTechnicalDebt,
+  analyzeTestability,
+  analyzeHardcodedSecrets,
+  analyzeAuthRegression,
+  analyzeAuthzRegression,
+  analyzeInjection,
+  analyzeSensitiveData,
+  analyzeCommandExecution,
+  analyzeFileHandling,
+  analyzePermissionBypass,
+  analyzeConsistency,
+  analyzeBoundaries,
+  analyzeCohesion,
+  analyzeExtensibility,
+  analyzeUnnecessaryRewrite,
+  analyzeResponsibilityPlacement,
+} from './bounded-analysis';
+
+const facetAnalyzers: Record<
+  string,
+  (input: {
+    contract: Contract;
+    evidence: Evidence[];
+    diff?: string;
+    changedFiles?: string[];
+    changedSymbols?: string[];
+    repositoryIndex?: Record<string, string[]>;
+    imports?: Record<string, string[]>;
+    exports?: Record<string, string[]>;
+  }) => { status: string; evidenceIds: string[]; assessment: string; confidence: string; limit: string }
+> = {
+  '25.05': analyzeSymptomMasking,
+  '25.07': analyzeDuplication,
+  '25.18': analyzeNoPrivateIntentions,
+  '27.02': analyzeSeparationOfConcerns,
+  '27.03': analyzeDuplication,
+  '27.04': analyzeErrorHandling,
+  '27.05': analyzeNaming,
+  '27.08': analyzeAPIDesign,
+  '27.10': analyzeTechnicalDebt,
+  '27.11': analyzeTestability,
+  '28.01': analyzeHardcodedSecrets,
+  '28.03': analyzeAuthRegression,
+  '28.04': analyzeAuthzRegression,
+  '28.05': analyzeInjection,
+  '28.06': analyzeSensitiveData,
+  '28.08': analyzeCommandExecution,
+  '28.09': analyzeFileHandling,
+  '28.10': analyzePermissionBypass,
+  '29.01': analyzeConsistency,
+  '29.02': analyzeBoundaries,
+  '29.04': analyzeCohesion,
+  '29.07': analyzeExtensibility,
+  '29.08': analyzeUnnecessaryRewrite,
+  '29.10': analyzeResponsibilityPlacement,
+};
 
 const dimensions = {
   QUALITY: {
@@ -704,33 +768,83 @@ export function enrichEngineeringReview(
         const evidenceIds = [
           ...new Set(supportingChecks.flatMap((check) => check.evidenceIds)),
         ];
+
+        // Apply bounded analysis if available for this facet
+        let boundedAnalysis: {
+          status: string;
+          evidenceIds: string[];
+          assessment: string;
+          confidence: string;
+          limit: string;
+        } | null = null;
+        if (facetAnalyzers[id]) {
+          const diffEvidence = evidence.find(e => e.kind === 'diff');
+          const changedFileEvidence = evidence.find(e => e.kind === 'source' && e.criterionId === 'changed-files');
+          const changedFiles = changedFileEvidence?.claim?.split(',') || [];
+          
+          boundedAnalysis = facetAnalyzers[id]({
+            contract,
+            evidence,
+            diff: diffEvidence?.claim,
+            changedFiles,
+            changedSymbols: [], // Would need to extract from diff evidence
+            repositoryIndex: {},
+            imports: {},
+            exports: {},
+          });
+        }
+
         const contextualAnalysis = contextualForFacet(id);
+        
+        // If bounded analysis is available, use its status
+        const facetStatus = boundedAnalysis
+          ? boundedAnalysis.status === 'SUPPORTED' ? 'SUPPORTED_FACT' : boundedAnalysis.status
+          : evidenceIds.length ? 'SUPPORTED_FACT' : 'UNVERIFIED';
+
+        const facetEvidenceIds = boundedAnalysis
+          ? [...evidenceIds, ...boundedAnalysis.evidenceIds]
+          : evidenceIds;
+
         return {
           id,
           label,
           dimension,
-          status: evidenceIds.length ? 'SUPPORTED_FACT' : 'UNVERIFIED',
+          status: facetStatus,
           scope:
             id === '25.15'
               ? 'configured-baseline-head-check-deltas-only'
               : id === '25.16'
                 ? 'configured-check-outcomes-only'
-                : 'semantic-facet',
-          evidenceIds,
+                : boundedAnalysis
+                  ? 'bounded-evidence-backed-analysis'
+                  : 'semantic-facet',
+          evidenceIds: [...new Set(facetEvidenceIds)],
           inspectReason,
           contextualAnalysis,
           analysisCoverage: contextualAnalysis.length
             ? 'CONTEXTUAL_ANALYSIS_AVAILABLE'
-            : 'MISSING_MEANINGFUL_ANALYSIS',
-          needsReview: true,
-          missingAnalysisReason: contextualAnalysis.length
-            ? null
-            : id === '25.18'
-              ? 'Private intention is unknown and cannot be inferred.'
-              : 'No sufficiently scoped persisted observation or finding with known citations addresses this facet.',
+            : boundedAnalysis
+              ? 'BOUNDED_ANALYSIS_AVAILABLE'
+              : 'MISSING_MEANINGFUL_ANALYSIS',
+          needsReview: boundedAnalysis ? boundedAnalysis.status === 'CONCERN' : true,
+          missingAnalysisReason: boundedAnalysis
+            ? boundedAnalysis.status === 'UNVERIFIED'
+              ? boundedAnalysis.assessment
+              : null
+            : contextualAnalysis.length
+              ? null
+              : id === '25.18'
+                ? 'Private intention is unknown and cannot be inferred.'
+                : 'No sufficiently scoped persisted observation or finding with known citations addresses this facet.',
           requiresHumanInspection: true,
           aiNarrativeStatus: 'UNVERIFIED',
           parentFactStatus: parent.supportMatrix.facts.status,
+          boundedAnalysis: boundedAnalysis ? {
+            status: boundedAnalysis.status,
+            assessment: boundedAnalysis.assessment,
+            confidence: boundedAnalysis.confidence,
+            limit: boundedAnalysis.limit,
+          } : undefined,
         };
       }),
     },
