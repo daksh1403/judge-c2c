@@ -278,7 +278,7 @@ function buildEvidenceSection(e) {
     ${Object.entries(byKind).map(([kind, items]) => `
       <details class="evidence-kind" ${kind === 'execution' ? 'open' : ''}>
         <summary><strong>${esc(kind.toUpperCase())}</strong> <span class="subtle">(${items.length})</span></summary>
-        <div class="evidence-list">
+        <div class="evidence-list" style="max-height: none;">
           ${items.map(x => `
             <article class="evidence-item" id="e-${esc(x.id)}">
               <div>${badge(x.status)} <code>${esc(x.id)}</code></div>
