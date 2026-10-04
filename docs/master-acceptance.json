@@ -266,7 +266,11 @@
           "id": "01.13",
           "requirement": "No committed secrets",
           "status": "PARTIAL",
-          "evidence": [".gitignore", "src/security.ts", "tests/domain.test.ts"],
+          "evidence": [
+            ".gitignore",
+            "src/security.ts",
+            "tests/domain.test.ts"
+          ],
           "note": "No committed secrets: Recognized credentials are redacted and local secret files ignored; exhaustive Git history and arbitrary-secret scanning are not proven.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -283,23 +287,25 @@
         {
           "id": "01.14",
           "requirement": "Reproducible engineer setup",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "AGENTS.md",
             ".github/workflows/ci.yml",
-            ".github/workflows/deploy.yml"
+            ".github/workflows/deploy.yml",
+            "https://github.com/daksh1403/judge-c2c/actions/runs/37186633708",
+            "docs/qa/current-stabilization-runtime.md"
           ],
-          "note": "Reproducible engineer setup: Workflow configuration was inspected; governance and clean independent setup require separate operational proof.",
+          "note": "Fresh authenticated GitHubCI checkout on7c688d2 completed pinned npmci, npmcheck, dependency audits, trustedDocker build and all browser checks. NativeCloudflare build and deployed judge views passed. This verifies the review development setup, not production provisioning.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -417,7 +423,10 @@
           "id": "02.06",
           "requirement": "Preview production separation",
           "status": "PARTIAL",
-          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
+          "evidence": [
+            "wrangler.jsonc",
+            "scripts/production-config.mjs"
+          ],
           "note": "Preview production separation: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -435,7 +444,10 @@
           "id": "02.07",
           "requirement": "No production data copied",
           "status": "PARTIAL",
-          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
+          "evidence": [
+            "wrangler.jsonc",
+            "scripts/production-config.mjs"
+          ],
           "note": "No production data copied: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -453,7 +465,10 @@
           "id": "02.08",
           "requirement": "No production secrets exposed",
           "status": "PARTIAL",
-          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
+          "evidence": [
+            "wrangler.jsonc",
+            "scripts/production-config.mjs"
+          ],
           "note": "No production secrets exposed: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -513,7 +528,9 @@
           "id": "02.11",
           "requirement": "Approved main merge deploys production",
           "status": "BLOCKED",
-          "evidence": [".github/workflows/deploy.yml"],
+          "evidence": [
+            ".github/workflows/deploy.yml"
+          ],
           "note": "Approved main merge deploys production: Production remains disabled; preview success cannot prove a production merge deploy.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -558,7 +575,10 @@
           "id": "03.01",
           "requirement": "GitHub App production credentials",
           "status": "PARTIAL",
-          "evidence": ["docs/qa/payment-readiness-report.md", "src/github.ts"],
+          "evidence": [
+            "docs/qa/payment-readiness-report.md",
+            "src/github.ts"
+          ],
           "note": "GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -599,7 +619,10 @@
           "id": "03.03",
           "requirement": "Least privilege",
           "status": "PARTIAL",
-          "evidence": ["docs/qa/payment-readiness-report.md", "src/github.ts"],
+          "evidence": [
+            "docs/qa/payment-readiness-report.md",
+            "src/github.ts"
+          ],
           "note": "Least privilege: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -941,7 +964,9 @@
           "id": "04.05",
           "requirement": "Issue opened",
           "status": "PASS",
-          "evidence": ["docs/qa/payment-issue-triage-evidence.json"],
+          "evidence": [
+            "docs/qa/payment-issue-triage-evidence.json"
+          ],
           "note": "Issue opened: Actual initially unlabeled GitHub issue #10 was ingested and attributed with not-scored review labels.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -981,7 +1006,9 @@
           "id": "04.07",
           "requirement": "Issue labeled and unlabeled",
           "status": "PASS",
-          "evidence": ["tests/acceptance-audit.test.ts"],
+          "evidence": [
+            "tests/acceptance-audit.test.ts"
+          ],
           "note": "Issue labeled and unlabeled: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1021,7 +1048,9 @@
           "id": "04.09",
           "requirement": "Issue closed and reopened",
           "status": "PASS",
-          "evidence": ["tests/acceptance-audit.test.ts"],
+          "evidence": [
+            "tests/acceptance-audit.test.ts"
+          ],
           "note": "Issue closed and reopened: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1157,14 +1186,14 @@
           "note": "Live review webhook aggregates record observed request latency, while the bounded signed concurrent burst verifies durable intake/backpressure with authoritative latest heads. These measurements are not a production throughput guarantee.",
           "verification": {
             "method": "LIVE_INTEGRATION",
-            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -1409,7 +1438,9 @@
           "id": "05.11",
           "requirement": "Policy-controlled registration",
           "status": "NOT_APPLICABLE",
-          "evidence": ["src/competition-domain.ts"],
+          "evidence": [
+            "src/competition-domain.ts"
+          ],
           "note": "Policy-controlled registration: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1427,7 +1458,9 @@
           "id": "05.12",
           "requirement": "Approval when self-registration enabled",
           "status": "NOT_APPLICABLE",
-          "evidence": ["src/competition-domain.ts"],
+          "evidence": [
+            "src/competition-domain.ts"
+          ],
           "note": "Approval when self-registration enabled: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1774,7 +1807,9 @@
           "id": "07.03",
           "requirement": "Mandatory optional bonus and non-scored scopes",
           "status": "PARTIAL",
-          "evidence": ["src/competition-issues.ts"],
+          "evidence": [
+            "src/competition-issues.ts"
+          ],
           "note": "Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2033,7 +2068,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -2693,7 +2728,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -2715,7 +2750,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -2790,7 +2825,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -2931,7 +2966,9 @@
           "id": "09.10",
           "requirement": "Spam limits",
           "status": "PARTIAL",
-          "evidence": ["tests/acceptance-audit.test.ts"],
+          "evidence": [
+            "tests/acceptance-audit.test.ts"
+          ],
           "note": "Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2949,7 +2986,9 @@
           "id": "09.11",
           "requirement": "Gaming controls",
           "status": "PARTIAL",
-          "evidence": ["tests/acceptance-audit.test.ts"],
+          "evidence": [
+            "tests/acceptance-audit.test.ts"
+          ],
           "note": "Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2983,7 +3022,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -3006,7 +3045,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -3929,7 +3968,9 @@
           "id": "14.01",
           "requirement": "Multiple issues per PR",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
+          "evidence": [
+            "tests/hackathon-rehearsal.test.ts"
+          ],
           "note": "Multiple issues per PR: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -3947,7 +3988,9 @@
           "id": "14.02",
           "requirement": "Separable requirements",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
+          "evidence": [
+            "tests/hackathon-rehearsal.test.ts"
+          ],
           "note": "Separable requirements: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -3965,7 +4008,9 @@
           "id": "14.03",
           "requirement": "Multiple attempts per issue",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
+          "evidence": [
+            "tests/hackathon-rehearsal.test.ts"
+          ],
           "note": "Multiple attempts per issue: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4001,7 +4046,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -4022,14 +4067,16 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "14.06",
           "requirement": "Retained history",
           "status": "PASS",
-          "evidence": ["tests/hackathon-rehearsal.test.ts"],
+          "evidence": [
+            "tests/hackathon-rehearsal.test.ts"
+          ],
           "note": "Retained history: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4269,7 +4316,10 @@
           "id": "16.01",
           "requirement": "Run distinct from submission",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "Run distinct from submission: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4287,7 +4337,10 @@
           "id": "16.02",
           "requirement": "Multiple runs",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "Multiple runs: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4305,7 +4358,10 @@
           "id": "16.03",
           "requirement": "New run per head",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "New run per head: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4323,7 +4379,10 @@
           "id": "16.04",
           "requirement": "Previous evaluation retained",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "Previous evaluation retained: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4341,7 +4400,10 @@
           "id": "16.05",
           "requirement": "Superseded state",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "Superseded state: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4359,7 +4421,10 @@
           "id": "16.06",
           "requirement": "Obvious current run",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "Obvious current run: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4377,7 +4442,10 @@
           "id": "16.07",
           "requirement": "No historical overwrite",
           "status": "PASS",
-          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
+          "evidence": [
+            "tests/competition.test.ts",
+            "tests/intake.test.ts"
+          ],
           "note": "No historical overwrite: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4422,7 +4490,10 @@
           "id": "17.01",
           "requirement": "Authoritative contract",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Authoritative contract: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4440,7 +4511,10 @@
           "id": "17.02",
           "requirement": "Schema version",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Schema version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4458,7 +4532,10 @@
           "id": "17.03",
           "requirement": "Repository identity",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Repository identity: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4476,7 +4553,10 @@
           "id": "17.04",
           "requirement": "Challenge and evaluation version",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Challenge and evaluation version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4494,7 +4574,10 @@
           "id": "17.05",
           "requirement": "Baseline",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Baseline: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4512,7 +4595,10 @@
           "id": "17.06",
           "requirement": "Assigned issues",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Assigned issues: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4530,7 +4616,10 @@
           "id": "17.07",
           "requirement": "Mandatory requirements",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Mandatory requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4548,7 +4637,10 @@
           "id": "17.08",
           "requirement": "Optional requirements",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Optional requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4566,7 +4658,10 @@
           "id": "17.09",
           "requirement": "Acceptance criteria",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Acceptance criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4584,7 +4679,10 @@
           "id": "17.10",
           "requirement": "Constraints",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Constraints: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4642,7 +4740,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -4712,7 +4810,10 @@
           "id": "17.16",
           "requirement": "Additional categories",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Additional categories: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4730,7 +4831,10 @@
           "id": "17.17",
           "requirement": "Forbidden actions",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Forbidden actions: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4748,7 +4852,10 @@
           "id": "17.18",
           "requirement": "Schema validation",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Schema validation: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4766,7 +4873,10 @@
           "id": "17.19",
           "requirement": "No AI-invented criteria",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "No AI-invented criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4784,7 +4894,10 @@
           "id": "17.20",
           "requirement": "Participant cannot override policy",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/competition.test.ts"
+          ],
           "note": "Participant cannot override policy: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -5066,7 +5179,10 @@
           "id": "18.12",
           "requirement": "Credit attributable to diff",
           "status": "PARTIAL",
-          "evidence": ["src/evaluate.ts", "src/competition-completion.ts"],
+          "evidence": [
+            "src/evaluate.ts",
+            "src/competition-completion.ts"
+          ],
           "note": "Credit attributable to diff: No automatic additional credit exists; reviewed completion is evidence-gated, but functional extra-contribution attribution is incomplete.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5089,121 +5205,141 @@
         {
           "id": "19.01",
           "requirement": "Build reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "19.02",
           "requirement": "Test reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "19.03",
           "requirement": "Lint reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "19.04",
           "requirement": "Type-check reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "19.05",
           "requirement": "Security reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5233,25 +5369,29 @@
         {
           "id": "19.07",
           "requirement": "Coverage reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5274,7 +5414,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5297,7 +5437,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -5326,7 +5466,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5381,7 +5521,10 @@
           "id": "20.04",
           "requirement": "Integration tests",
           "status": "PARTIAL",
-          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "src/runner-policy.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5447,7 +5590,10 @@
           "id": "20.07",
           "requirement": "Type check",
           "status": "PARTIAL",
-          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "src/runner-policy.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5465,7 +5611,10 @@
           "id": "20.08",
           "requirement": "Formatting where relevant",
           "status": "PARTIAL",
-          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "src/runner-policy.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5483,7 +5632,10 @@
           "id": "20.09",
           "requirement": "Coverage",
           "status": "PARTIAL",
-          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "src/runner-policy.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5784,7 +5936,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5808,7 +5960,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -5863,7 +6015,10 @@
           "id": "22.02",
           "requirement": "Isolation architecture",
           "status": "PARTIAL",
-          "evidence": ["src/local-docker.ts", "docs/local-docker-runner.md"],
+          "evidence": [
+            "src/local-docker.ts",
+            "docs/local-docker-runner.md"
+          ],
           "note": "Isolation architecture: Deliberate Docker VM isolation is implemented for development; suitable production hostile-code capacity remains unprovisioned.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6153,19 +6308,25 @@
         {
           "id": "22.16",
           "requirement": "Artifacts",
-          "status": "PARTIAL",
-          "evidence": ["src/workflow.ts", "docs/qa/readiness-live-access.json"],
-          "note": "Artifacts: Bounded execution records are available; large retained guest artifacts need account-enabled object storage.",
+          "status": "PASS",
+          "evidence": [
+            "src/workflow.ts",
+            "docs/qa/readiness-live-access.json",
+            "docs/qa/current-judge-preview.json",
+            "docs/qa/current-grounding-calibration.md",
+            "docs/qa/current-stabilization-runtime.md"
+          ],
+          "note": "Actual original-run judge Preview views expose protected typed artifacts, source-derived solution approach, explicit unverified interpretations and direct evidence, with current/historical context and attention actions. ActualAI executed; qualitative prose is not certified as factual truth.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -6193,7 +6354,10 @@
           "id": "22.18",
           "requirement": "Redaction",
           "status": "PARTIAL",
-          "evidence": ["tests/domain.test.ts", "src/security.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "src/security.ts"
+          ],
           "note": "Redaction: Known credential formats are redacted; arbitrary secret recognition and binary artifact scanning are not exhaustive.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6260,19 +6424,24 @@
         {
           "id": "23.03",
           "requirement": "Memory exhaustion",
-          "status": "PARTIAL",
-          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
-          "note": "Memory exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
+          "status": "PASS",
+          "evidence": [
+            "src/local-docker.ts",
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-resource-exhaustion.json",
+            "docs/qa/current-stabilization-runtime.md"
+          ],
+          "note": "Real isolated guest memory/tmpfs exhaustion yielded structuredFAIL while trusted acceptance checks and independent following build survived. Actual network/metadata probes failed in the nonroot network-denied guest. Not a production capacity certification.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -6322,37 +6491,48 @@
         {
           "id": "23.06",
           "requirement": "Disk exhaustion",
-          "status": "PARTIAL",
-          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
-          "note": "Disk exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
+          "status": "PASS",
+          "evidence": [
+            "src/local-docker.ts",
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-resource-exhaustion.json",
+            "docs/qa/current-stabilization-runtime.md"
+          ],
+          "note": "Real isolated guest memory/tmpfs exhaustion yielded structuredFAIL while trusted acceptance checks and independent following build survived. Actual network/metadata probes failed in the nonroot network-denied guest. Not a production capacity certification.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "23.07",
           "requirement": "Malicious install scripts",
-          "status": "PARTIAL",
-          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
-          "note": "Malicious install scripts: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
+          "status": "PASS",
+          "evidence": [
+            "src/local-docker.ts",
+            "docs/qa/docker-evidence.json",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md",
+            "tests/runner.test.ts"
+          ],
+          "note": "Real disposableDocker dependency rehearsal verifies organizer-pinned offline npm preparation with lifecycle scripts disabled, participant configuration suppressed, perguest cache isolation and structured failure. No untrusted install runs in control plane.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
+            "method": "LOCAL_EXECUTION",
             "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -6380,19 +6560,24 @@
         {
           "id": "23.09",
           "requirement": "Internal network probing",
-          "status": "PARTIAL",
-          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
-          "note": "Internal network probing: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
+          "status": "PASS",
+          "evidence": [
+            "src/local-docker.ts",
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-resource-exhaustion.json",
+            "docs/qa/current-stabilization-runtime.md"
+          ],
+          "note": "Real isolated guest memory/tmpfs exhaustion yielded structuredFAIL while trusted acceptance checks and independent following build survived. Actual network/metadata probes failed in the nonroot network-denied guest. Not a production capacity certification.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -6662,7 +6847,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -6751,7 +6936,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -7100,22 +7285,27 @@
         {
           "id": "25.16",
           "requirement": "Objective support",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "docs/qa/current-grounding-calibration.md",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json",
+            "tests/claim-grounding.test.ts"
           ],
-          "note": "Objective support: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review.",
+          "note": "Original reference, partial and protected-test payment scenarios executed actual AI with consistent objective statuses, no unknown citations or unsupported OBSERVED claims. Qualitative interpretation stays UNVERIFIED with human attention; protected-test manipulation remainsFAIL. Incomplete qualitative analysis is never fabricated. See original live calibration evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -7584,19 +7774,24 @@
         {
           "id": "26.09",
           "requirement": "PARTIAL",
-          "status": "PARTIAL",
-          "evidence": ["src/domain.ts"],
-          "note": "PARTIAL: PARTIAL is accepted structurally for supported source/contextual assessments; calibrated per-requirement partial aggregation is not implemented.",
+          "status": "PASS",
+          "evidence": [
+            "src/domain.ts",
+            "docs/qa/current-requirement-partial.md",
+            "docs/qa/current-payment-grounding-8.json",
+            "tests/requirement-assessment.test.ts"
+          ],
+          "note": "Existing production requirement aggregation exercised with actual original partial replay and focused integration fixtures: mixed PASS/FAIL or PASS/UNVERIFIED yieldsPARTIAL, mandatory failure remainsFAIL in overall check and AI cannot override it.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -8915,7 +9110,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -8938,7 +9133,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9079,7 +9274,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9104,7 +9299,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9129,7 +9324,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9154,7 +9349,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9179,7 +9374,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9204,7 +9399,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9232,14 +9427,16 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "32.08",
           "requirement": "Cheap trivial classification",
           "status": "PASS",
-          "evidence": ["tests/issue-taxonomy.test.ts"],
+          "evidence": [
+            "tests/issue-taxonomy.test.ts"
+          ],
           "note": "Cheap trivial classification: Trivial issue classification runs deterministic rules without a paid model call.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9263,7 +9460,10 @@
           "id": "33.01",
           "requirement": "Category",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Category: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9281,7 +9481,10 @@
           "id": "33.02",
           "requirement": "Severity",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Severity: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9299,7 +9502,10 @@
           "id": "33.03",
           "requirement": "Claim",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Claim: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9317,7 +9523,10 @@
           "id": "33.04",
           "requirement": "Evidence",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Evidence: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9335,7 +9544,10 @@
           "id": "33.05",
           "requirement": "Verification",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Verification: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9353,7 +9565,10 @@
           "id": "33.06",
           "requirement": "Source",
           "status": "PASS",
-          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
+          "evidence": [
+            "src/domain.ts",
+            "tests/engineering-review.test.ts"
+          ],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9364,14 +9579,17 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "33.07",
           "requirement": "Requirement",
           "status": "PASS",
-          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
+          "evidence": [
+            "src/domain.ts",
+            "tests/engineering-review.test.ts"
+          ],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9382,14 +9600,17 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "33.08",
           "requirement": "Fact versus inference",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Fact versus inference: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9406,33 +9627,40 @@
         {
           "id": "33.09",
           "requirement": "No unsupported claims",
-          "status": "FAIL",
+          "status": "PASS",
           "evidence": [
-            "docs/qa/payment-calibration-evidence.json",
             "docs/qa/payment-calibration-evidence.json",
             "src/claim-grounding.ts",
             "src/competition-completion.ts",
             "public/competition.js",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "docs/qa/current-grounding-calibration.md",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json",
+            "tests/claim-grounding.test.ts"
           ],
-          "note": "Live CallMissed calibration previously emitted unsupported coverage prose despite valid citation IDs. New source replaces criterion outcomes with objective projections, permits only exact known objective text as OBSERVED, flags contextual narratives and historical reviews for human attention, and prevents conflicting criterion PASS/FAIL evidence from yielding acceptance. The known INFERENCE false-coverage sentence is flagged rather than semantically auto-detected. FAIL remains until the exact real-provider calibration and deployed judge behavior are executed and verified.",
+          "note": "Original reference, partial and protected-test payment scenarios executed actual AI with consistent objective statuses, no unknown citations or unsupported OBSERVED claims. Qualitative interpretation stays UNVERIFIED with human attention; protected-test manipulation remainsFAIL. Incomplete qualitative analysis is never fabricated. See original live calibration evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "FAIL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "33.10",
           "requirement": "Unverified state",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "tests/runner.test.ts"
+          ],
           "note": "Unverified state: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9632,7 +9860,10 @@
           "id": "34.09",
           "requirement": "Context redaction",
           "status": "PARTIAL",
-          "evidence": ["tests/domain.test.ts", "src/security.ts"],
+          "evidence": [
+            "tests/domain.test.ts",
+            "src/security.ts"
+          ],
           "note": "Context redaction: Known credentials are redacted from stored/model context; unknown secret formats require stronger scanners.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -9739,7 +9970,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9927,23 +10158,26 @@
         {
           "id": "36.03",
           "requirement": "Backoff",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/local-runner.test.ts",
-            "tests/reviewer-capacity.test.ts"
+            "tests/reviewer-capacity.test.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Backoff: Executed idempotency, durable outbox and expiring capacity fixtures retain history, timeout and failure visibility. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
             "method": "FIXTURE_TEST",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -9993,19 +10227,27 @@
         {
           "id": "36.06",
           "requirement": "Cancellation",
-          "status": "PARTIAL",
-          "evidence": ["src/store.ts", "src/workflow.ts"],
-          "note": "Cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
+          "status": "PASS",
+          "evidence": [
+            "src/store.ts",
+            "src/workflow.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts",
+            "tests/intake.test.ts",
+            "tests/reviewer-capacity.test.ts"
+          ],
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10033,19 +10275,27 @@
         {
           "id": "36.08",
           "requirement": "Priority",
-          "status": "PARTIAL",
-          "evidence": ["src/store.ts", "src/workflow.ts"],
-          "note": "Priority: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
+          "status": "PASS",
+          "evidence": [
+            "src/store.ts",
+            "src/workflow.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts",
+            "tests/intake.test.ts",
+            "tests/reviewer-capacity.test.ts"
+          ],
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10074,7 +10324,10 @@
           "id": "36.10",
           "requirement": "Horizontal capacity",
           "status": "PARTIAL",
-          "evidence": ["src/store.ts", "src/workflow.ts"],
+          "evidence": [
+            "src/store.ts",
+            "src/workflow.ts"
+          ],
           "note": "Horizontal capacity: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10091,19 +10344,27 @@
         {
           "id": "36.11",
           "requirement": "Obsolete cancellation",
-          "status": "PARTIAL",
-          "evidence": ["src/store.ts", "src/workflow.ts"],
-          "note": "Obsolete cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
+          "status": "PASS",
+          "evidence": [
+            "src/store.ts",
+            "src/workflow.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts",
+            "tests/intake.test.ts",
+            "tests/reviewer-capacity.test.ts"
+          ],
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -10115,62 +10376,80 @@
         {
           "id": "37.01",
           "requirement": "Content-addressed cache",
-          "status": "PARTIAL",
-          "evidence": ["tests/preview.test.ts", "src/preview-evaluate.ts"],
-          "note": "Content-addressed cache: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache.",
+          "status": "PASS",
+          "evidence": [
+            "tests/preview.test.ts",
+            "src/preview-evaluate.ts",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
+          ],
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "37.02",
           "requirement": "Commit config tool identities",
-          "status": "PARTIAL",
-          "evidence": ["tests/preview.test.ts", "src/preview-evaluate.ts"],
-          "note": "Commit config tool identities: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache.",
+          "status": "PASS",
+          "evidence": [
+            "tests/preview.test.ts",
+            "src/preview-evaluate.ts",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
+          ],
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "37.03",
           "requirement": "Safe reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/preview.test.ts",
             "src/preview-evaluate.ts",
             "src/execution-cache.ts",
             "src/runner.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10193,7 +10472,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10216,38 +10495,45 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "37.06",
           "requirement": "Baseline reuse",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/execution-cache.ts",
             "tests/execution-cache-sqlite.test.ts",
-            "docs/qa/completeness-progress.md"
+            "docs/qa/completeness-progress.md",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "37.07",
           "requirement": "Prepared environments",
           "status": "PASS",
-          "evidence": ["runner/Dockerfile", "docs/qa/docker-evidence.json"],
+          "evidence": [
+            "runner/Dockerfile",
+            "docs/qa/docker-evidence.json"
+          ],
           "note": "Prepared environments: Actual development jobs use a prepared immutable image rather than rebuilding participant environments.",
           "verification": {
             "method": "LOCAL_EXECUTION",
@@ -10265,7 +10551,9 @@
           "id": "37.08",
           "requirement": "Warm capacity decision",
           "status": "PARTIAL",
-          "evidence": ["docs/local-docker-runner.md"],
+          "evidence": [
+            "docs/local-docker-runner.md"
+          ],
           "note": "Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10320,7 +10608,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10343,7 +10631,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10371,7 +10659,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10399,14 +10687,16 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "37.14",
           "requirement": "Risk routing",
           "status": "PASS",
-          "evidence": ["tests/domain.test.ts"],
+          "evidence": [
+            "tests/domain.test.ts"
+          ],
           "note": "Risk routing: Deterministic risk signals are tested; they are routing metadata, not scores.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -10442,7 +10732,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10470,7 +10760,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10495,7 +10785,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -10523,95 +10813,107 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "38.02",
           "requirement": "Latest priority",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Latest priority: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "38.03",
           "requirement": "Obsolete capacity release",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Obsolete capacity release: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "38.04",
           "requirement": "Backpressure",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Backpressure: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "38.05",
           "requirement": "Queue metrics",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Queue metrics: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -10633,29 +10935,32 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "38.07",
           "requirement": "Separate AI capacity when needed",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/intake.test.ts",
             "tests/reviewer-capacity.test.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Separate AI capacity when needed: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -11328,7 +11633,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -11614,7 +11919,10 @@
           "id": "40.13",
           "requirement": "Latest-time sorting",
           "status": "PARTIAL",
-          "evidence": ["src/competition.ts", "public/competition.js"],
+          "evidence": [
+            "src/competition.ts",
+            "public/competition.js"
+          ],
           "note": "Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -11911,7 +12219,10 @@
           "id": "41.13",
           "requirement": "Source filter",
           "status": "PARTIAL",
-          "evidence": ["src/competition.ts", "public/competition.js"],
+          "evidence": [
+            "src/competition.ts",
+            "public/competition.js"
+          ],
           "note": "Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -11929,7 +12240,10 @@
           "id": "41.14",
           "requirement": "Related PR",
           "status": "PARTIAL",
-          "evidence": ["src/competition.ts", "public/competition.js"],
+          "evidence": [
+            "src/competition.ts",
+            "public/competition.js"
+          ],
           "note": "Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -11947,7 +12261,10 @@
           "id": "41.15",
           "requirement": "Evaluation state",
           "status": "PARTIAL",
-          "evidence": ["src/competition.ts", "public/competition.js"],
+          "evidence": [
+            "src/competition.ts",
+            "public/competition.js"
+          ],
           "note": "Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -12301,7 +12618,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -12349,7 +12666,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -12478,7 +12795,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -12820,45 +13137,51 @@
         {
           "id": "45.16",
           "requirement": "Artifacts",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
             "src/workflow.ts",
-            "migrations/0001_foundation.sql"
+            "migrations/0001_foundation.sql",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json"
           ],
-          "note": "Artifacts: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete.",
+          "note": "Original live calibration persists protected typed artifacts and bounded reviewer traces, including actual model, evaluator policyv9, hashes, usage, tool/budget and immutable run/head provenance. Checksum downloads succeed and anonymous access is denied. Large arbitrary guest binaries are not implicitly harvested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "45.17",
           "requirement": "Reviewer traces",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
             "src/workflow.ts",
-            "migrations/0001_foundation.sql"
+            "migrations/0001_foundation.sql",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json"
           ],
-          "note": "Reviewer traces: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete.",
+          "note": "Original live calibration persists protected typed artifacts and bounded reviewer traces, including actual model, evaluator policyv9, hashes, usage, tool/budget and immutable run/head provenance. Checksum downloads succeed and anonymous access is denied. Large arbitrary guest binaries are not implicitly harvested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -12908,23 +13231,27 @@
         {
           "id": "45.20",
           "requirement": "Baseline results",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
             "src/workflow.ts",
-            "migrations/0001_foundation.sql"
+            "migrations/0001_foundation.sql",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Baseline results: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete.",
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -12999,7 +13326,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13024,7 +13351,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13049,7 +13376,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13074,7 +13401,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13099,7 +13426,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13124,7 +13451,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13149,7 +13476,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13174,7 +13501,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13199,7 +13526,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13224,7 +13551,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13249,7 +13576,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -13389,7 +13716,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13457,7 +13784,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13485,19 +13812,25 @@
         {
           "id": "47.11",
           "requirement": "Reviewer version",
-          "status": "PARTIAL",
-          "evidence": ["src/workflow.ts", "src/runner.ts"],
-          "note": "Reviewer version: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete.",
+          "status": "PASS",
+          "evidence": [
+            "src/workflow.ts",
+            "src/runner.ts",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json"
+          ],
+          "note": "Original live calibration persists protected typed artifacts and bounded reviewer traces, including actual model, evaluator policyv9, hashes, usage, tool/budget and immutable run/head provenance. Checksum downloads succeed and anonymous access is denied. Large arbitrary guest binaries are not implicitly harvested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13575,163 +13908,192 @@
         {
           "id": "48.01",
           "requirement": "Webhook latency",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/competition-overview.ts",
             "src/index.ts",
             "src/operational-telemetry.ts",
             "migrations/0014_operational_telemetry.sql",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Both webhook routes record fixed request/error/latency aggregates asynchronously in shared UTC-minute metrics, with a bounded organizer view and seven-day retention. Static checks and local SQLite schema smoke passed; recorded request measurements, export/alerts, outage behavior and live deployment remain unverified or absent.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.02",
           "requirement": "GitHub errors",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/competition-overview.ts",
             "src/github.ts",
             "src/operational-telemetry.ts",
             "src/organization.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Authenticated GitHub API requests record bounded numeric error/request/latency metrics without secret/request content; organizer-only metric access and maintenance exist. Runtime API failure injection, persistence failure, exports/alerts and deployed visibility are unverified; raw public file fetches are outside this instrumentation.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.03",
           "requirement": "GitHub limits",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/competition-overview.ts",
             "src/github.ts",
             "src/operational-telemetry.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "GitHub API metrics identify HTTP429, exhausted primary rate headers and secondary403 Retry-After responses. This does not change retry behavior. Runtime primary/secondary rate-limit scenarios, exports/alerts and live observation remain unverified.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.04",
           "requirement": "Queue depth",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts",
+            "tests/intake.test.ts",
+            "tests/reviewer-capacity.test.ts"
           ],
-          "note": "Queue depth: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.05",
           "requirement": "Queue wait",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluation-metrics.ts",
             "src/competition.ts",
             "public/competition.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Adversary source review cleared; static checks only, no unit/runtime execution."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C15 implementation and independent source review; runtime remains unverified."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.06",
           "requirement": "Evaluation duration",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Evaluation duration: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.07",
           "requirement": "Stage duration",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluation-metrics.ts",
             "src/competition.ts",
             "public/competition.js",
-            "docs/completeness-contracts.md"
+            "docs/completeness-contracts.md",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Adversary source review cleared; static checks only, no unit/runtime execution."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "C15 implementation and independent source review; runtime remains unverified."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13755,7 +14117,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13779,7 +14141,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13803,7 +14165,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13827,7 +14189,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13851,7 +14213,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13875,49 +14237,57 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.14",
           "requirement": "AI latency",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "AI latency: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.15",
           "requirement": "AI tokens",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "AI tokens: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13941,7 +14311,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13964,7 +14334,7 @@
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Cost estimate implementation and tests complete; full billing scope remains absent."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -13988,49 +14358,58 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.19",
           "requirement": "Retries",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-telemetry-validation.md",
+            "docs/qa/current-review-runtime.json",
+            "tests/operational-telemetry.test.ts",
+            "tests/run-measurements.test.ts"
           ],
-          "note": "Retries: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Actual isolated deployed D1 observations and bounded organizer metrics are recorded. Failure/rate-limit injection, numeric retention, idempotent samples and fresh-vs-reused timing boundaries passed targeted tests. This proves configured observations, not complete provider invoices or production SLA.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "48.20",
           "requirement": "Superseded count",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-overview.ts",
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts",
+            "tests/intake.test.ts",
+            "tests/reviewer-capacity.test.ts"
           ],
-          "note": "Superseded count: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14054,7 +14433,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         }
       ]
@@ -14090,47 +14469,53 @@
         {
           "id": "49.02",
           "requirement": "GitHub outage",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/github.test.ts",
             "tests/intake.test.ts",
             "tests/local-runner.test.ts",
-            "tests/reviewer-capacity.test.ts"
+            "tests/reviewer-capacity.test.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "GitHub outage: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
           "id": "49.03",
           "requirement": "GitHub limits",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/github.test.ts",
             "tests/intake.test.ts",
             "tests/local-runner.test.ts",
-            "tests/reviewer-capacity.test.ts"
+            "tests/reviewer-capacity.test.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "GitHub limits: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14296,7 +14681,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14399,24 +14784,27 @@
         {
           "id": "49.15",
           "requirement": "Worker crash",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/github.test.ts",
             "tests/intake.test.ts",
             "tests/local-runner.test.ts",
-            "tests/reviewer-capacity.test.ts"
+            "tests/reviewer-capacity.test.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Worker crash: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14438,7 +14826,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14517,7 +14905,10 @@
           "id": "49.20",
           "requirement": "Database fail",
           "status": "PARTIAL",
-          "evidence": ["tests/intake.test.ts", "src/index.ts"],
+          "evidence": [
+            "tests/intake.test.ts",
+            "src/index.ts"
+          ],
           "note": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -14534,24 +14925,27 @@
         {
           "id": "49.21",
           "requirement": "Queue fail",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/github.test.ts",
             "tests/intake.test.ts",
             "tests/local-runner.test.ts",
-            "tests/reviewer-capacity.test.ts"
+            "tests/reviewer-capacity.test.ts",
+            "docs/qa/current-stabilization-runtime.md",
+            "docs/qa/current-runtime-operations.json",
+            "tests/workflow-capacity-runtime.test.ts"
           ],
-          "note": "Queue fail: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified.",
+          "note": "Executed production workflow real engine backoff/recovery, latest-five bounded dispatch/obsolete skip, stage supersession lease release, independent provider slots and sharedD1 two-worker crash fencing.48signed-event burst preserved12latest heads and36superseded records. Controlled outages prove bounded behavior, not production-scale availability.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed isolated deployed review, local Docker or controlled runtime fixtures as listed; no production operation or exhaustive semantic guarantee."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14573,7 +14967,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14604,7 +14998,9 @@
           "id": "49.24",
           "requirement": "Preview fail",
           "status": "PASS",
-          "evidence": ["https://github.com/daksh1403/judge-c2c/pull/4"],
+          "evidence": [
+            "https://github.com/daksh1403/judge-c2c/pull/4"
+          ],
           "note": "Preview fail: A real native build failure was investigated and repaired; later builds passed.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -14919,7 +15315,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14943,7 +15339,7 @@
           "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -14974,19 +15370,25 @@
         {
           "id": "50.14",
           "requirement": "Cache keys",
-          "status": "PARTIAL",
-          "evidence": ["tests/preview.test.ts"],
-          "note": "Cache keys: Frozen preview context integrity/cache identity is tested; execution cache does not exist.",
+          "status": "PASS",
+          "evidence": [
+            "tests/preview.test.ts",
+            "docs/qa/execution-cache-live-evidence.json",
+            "docs/qa/current-stabilization-runtime.md",
+            "tests/execution-cache.test.ts",
+            "tests/runner.test.ts"
+          ],
+          "note": "Exact frozen input execution cache validated with deployed baselineMISS/HIT provenance and independent head executions, plus D1 identity/invalidation/corruption/incomplete-result fixtures. Configured command kinds remain typed; cached timestamps are historical. Benchmarks bypass cache; live OSV advisory fetching is not claimed as reused.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -15739,22 +16141,27 @@
         {
           "id": "51.17",
           "requirement": "Actual AI review",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "docs/qa/docker-evidence.json"
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-grounding-calibration.md",
+            "docs/qa/current-payment-grounding-8.json",
+            "docs/qa/current-payment-grounding-9.json",
+            "docs/qa/current-payment-grounding-11.json",
+            "tests/claim-grounding.test.ts"
           ],
-          "note": "Actual AI review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates.",
+          "note": "Original reference, partial and protected-test payment scenarios executed actual AI with consistent objective statuses, no unknown citations or unsupported OBSERVED claims. Qualitative interpretation stays UNVERIFIED with human attention; protected-test manipulation remainsFAIL. Incomplete qualitative analysis is never fabricated. See original live calibration evidence.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {
@@ -15783,22 +16190,25 @@
         {
           "id": "51.19",
           "requirement": "Approach review",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "docs/qa/payment-calibration-evidence.json",
-            "docs/qa/docker-evidence.json"
+            "docs/qa/docker-evidence.json",
+            "docs/qa/current-judge-preview.json",
+            "docs/qa/current-grounding-calibration.md",
+            "docs/qa/current-stabilization-runtime.md"
           ],
-          "note": "Approach review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates.",
+          "note": "Actual original-run judge Preview views expose protected typed artifacts, source-derived solution approach, explicit unverified interpretations and direct evidence, with current/historical context and attention actions. ActualAI executed; qualitative prose is not certified as factual truth.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Actual isolated review API/model/GitHub/D1 and judge Preview evidence, plus controlled focused fixtures; production is not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "2026-10-04 targeted workstream tests and recorded runtime evidence; boundary limitations remain explicit."
           }
         },
         {

@@ -1,9 +1,9 @@
 {
-  "at": "2026-10-04T03:29:22.457Z",
-  "mode": "REAL_GITHUB_DOCKER_CALLMISSED",
+  "at": "2026-10-04T07:45:29.666Z",
+  "mode": "REAL_GITHUB_DOCKER_CLOUDFLARE",
   "identity": "One actual authenticated operator; replay code persona, not multiple independent accounts",
   "pr": 11,
-  "runId": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
+  "runId": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
   "state": "COMPLETED",
   "aiStatus": "COMPLETED",
   "publication": "PUBLISHED",
@@ -172,13 +172,12 @@
     }
   ],
   "trace": {
-    "attemptFailures": [
-      "AI_APPROACH_CITATION_UNLISTED"
-    ],
-    "attempts": 2,
+    "attemptFailures": [],
+    "attempts": 1,
     "contextBudget": {
-      "contextBytes": 38262,
-      "estimatedInputTokens": 11832,
+      "contextBytes": 37748,
+      "estimatedInputTokens": 11978,
+      "finalContextBytes": 37748,
       "inputTokenEstimateMethod": "[REDACTED]",
       "maxContextBytes": 48000,
       "omittedDiffPaths": [],
@@ -187,9 +186,14 @@
         "README.md",
         "server.mjs"
       ],
-      "reservedInputBytes": 9065,
-      "reservedOutputTokens": 4500,
+      "reservedInputBytes": 10163,
+      "reservedOutputTokens": 4096,
       "version": "bounded-review-context-v1"
+    },
+    "cost": {
+      "reason": "Known rates and actual provider token usage are required; this is not total review billing.",
+      "scope": "successful-final-response",
+      "status": "UNAVAILABLE"
     },
     "downgradedObservationPaths": [
       "solution_approach.problem_understanding",
@@ -199,12 +203,9 @@
       "solution_approach.maintainability",
       "solution_approach.architecture_fit",
       "solution_approach.strengths[0]",
-      "solution_approach.strengths[1]",
-      "solution_approach.strengths[2]",
-      "solution_approach.weaknesses[0]",
-      "solution_approach.tradeoffs[1]"
+      "solution_approach.strengths[1]"
     ],
-    "durationMs": 84246,
+    "durationMs": 70927,
     "evaluationPlan": {
       "depth": "STANDARD",
       "maxChangedFiles": 30,
@@ -226,17 +227,22 @@
       "version": "adaptive-review-v1"
     },
     "groundingPolicy": "objective-facts-unverified-narratives-v1",
-    "inputHash": "a1da8b36f9168851c55da61d3c4be7c43359f51b50f50891b29f374273d2797f",
-    "model": "kimi-k2.6",
+    "inputHash": "3195ae93f8499d8b4e7bab847432a38d0e77c38bc44c617545f5ea31f81066b8",
+    "model": "@cf/meta/llama-3.3-70b-json",
     "modelRouting": {
-      "model": "kimi-k2.6",
-      "reason": "CALLMISSED_MODEL retained; no depth override is configured.",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "reason": "AI_MODEL retained; no depth override is configured.",
       "version": "server-model-routing-v1"
     },
-    "policy": "requirements-and-approach-v8",
-    "provider": "callmissed",
+    "objectiveCriterionRecovery": [],
+    "policy": "requirements-and-approach-v9",
+    "provider": "cloudflare",
+    "qualitativeCriterionAnalysis": {
+      "missingCriterionIds": [],
+      "status": "PRESENT"
+    },
     "requiresHumanAttention": true,
-    "responseId": "resp_a81732a58ec74508b4fd33bffd109d9c",
+    "responseId": null,
     "unverifiedNarrativePaths": [
       "solution_approach.problem_understanding",
       "solution_approach.approach_summary",
@@ -246,25 +252,19 @@
       "solution_approach.architecture_fit",
       "solution_approach.strengths[0]",
       "solution_approach.strengths[1]",
-      "solution_approach.strengths[2]",
       "solution_approach.weaknesses[0]",
       "solution_approach.tradeoffs[0]",
-      "solution_approach.tradeoffs[1]",
       "solution_approach.unverified_assumptions[0]",
-      "findings[0]",
-      "findings[1]"
+      "findings[0]"
     ],
     "usage": {
-      "input_tokens": 14136,
-      "input_tokens_details": {
-        "cache_write_tokens": 0,
-        "cached_tokens": 14016
+      "completion_tokens": 2048,
+      "neurons": 795.2154541015625,
+      "prompt_tokens": 14091,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
       },
-      "output_tokens": 1828,
-      "output_tokens_details": {
-        "reasoning_tokens": 0
-      },
-      "total_tokens": 15964
+      "total_tokens": 16139
     }
   },
   "unsupportedObserved": 0,
@@ -274,20 +274,21 @@
     {
       "field": "approach_summary",
       "evidenceIds": [
-        "diff",
+        "context-source-1",
+        "context-source-2",
         "context-source-3"
       ],
-      "text": "Replace single-attempt logic with bounded iteration slicing outcomes to maxAttempts, returning immediately on success, breaking on permanent, and returning failed status when loop completes without success.",
+      "text": "The submission implements a retry mechanism with bounded temporary failures and edge cases.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "architecture_fit",
       "evidenceIds": [
-        "context-source-3",
-        "criterion-health-preserved",
-        "criterion-payment-created"
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
       ],
-      "text": "Pure function retryPayment integrates with existing server route handlers without modifying payment state management or health endpoint behavior.",
+      "text": "The submission fits the existing architecture by preserving the payment APIs and baseline tests.",
       "verification": "UNVERIFIED"
     },
     {
@@ -297,49 +298,7 @@
         "criterion-retry-bounded",
         "criterion-retry-permanent",
         "criterion-retry-immediate",
-        "criterion-retry-exhausted"
-      ],
-      "text": "All five success-path execution cases and three stopping conditions pass trusted runner verification.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "maintainability",
-      "evidenceIds": [
-        "context-source-3",
-        "context-source-1"
-      ],
-      "text": "Loop-based implementation is compact and readable; separate retry.test.mjs covers unit scenarios but requires synchronization if contract changes.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "problem_understanding",
-      "evidenceIds": [
-        "diff",
-        "context-source-2"
-      ],
-      "text": "Challenge requires bounded temporary-failure retries up to maxAttempts, immediate stop on success/permanent, and input validation, while preserving existing payment APIs.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "solution_design",
-      "evidenceIds": [
-        "context-source-3"
-      ],
-      "text": "retryPayment validates inputs, iterates over outcomes.slice(0, maxAttempts), increments attempts, returns on success, breaks on permanent, and yields {status:'failed', attempts} after loop termination.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "strengths[0]",
-      "evidenceIds": [
-        "criterion-retry-transient",
-        "criterion-retry-bounded"
-      ],
-      "text": "Correctly implements bounded retry semantics with O(n) complexity where n is capped by maxAttempts and outcomes length.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "strengths[1]",
-      "evidenceIds": [
+        "criterion-retry-exhausted",
         "criterion-retry-invalid-zero",
         "criterion-retry-invalid-large",
         "criterion-retry-invalid-fraction",
@@ -348,71 +307,282 @@
         "criterion-retry-outcomes-unknown",
         "criterion-retry-outcomes-null"
       ],
-      "text": "Comprehensive input validation with explicit error codes for all invalid edge cases.",
+      "text": "The submission is correct as it passes all the retry functionality tests.",
       "verification": "UNVERIFIED"
     },
     {
-      "field": "strengths[2]",
+      "field": "maintainability",
       "evidenceIds": [
-        "criterion-health-preserved",
-        "criterion-payment-created",
-        "criterion-payment-idempotency",
-        "criterion-payment-read",
-        "criterion-payment-conflict",
-        "criterion-payment-invalid"
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
       ],
-      "text": "Zero regression on preserved payment and health endpoints.",
+      "text": "The submission is maintainable as it includes tests and preserves the existing architecture.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "problem_understanding",
+      "evidenceIds": [
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "text": "The submission demonstrates an understanding of the problem by implementing a retry mechanism with bounded temporary failures and edge cases.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "solution_design",
+      "evidenceIds": [
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "text": "The submission designs a solution that preserves the existing payment APIs and baseline tests.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[0]",
+      "evidenceIds": [
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "text": "The submission includes tests for retry functionality.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[1]",
+      "evidenceIds": [
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "text": "The submission preserves the existing architecture.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "tradeoffs[0]",
       "evidenceIds": [
-        "context-source-3",
-        "context-source-1"
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
       ],
-      "text": "Synchronous in-memory simulation avoids external dependencies but does not model async gateway latency or actual retry delays.",
+      "text": "The submission trades off complexity for simplicity by using a bounded retry mechanism.",
       "verification": "INFERENCE"
-    },
-    {
-      "field": "tradeoffs[1]",
-      "evidenceIds": [
-        "context-source-1"
-      ],
-      "text": "Unit tests call retryPayment directly, gaining speed but losing HTTP middleware and routing coverage.",
-      "verification": "UNVERIFIED"
     },
     {
       "field": "unverified_assumptions[0]",
       "evidenceIds": [],
-      "text": "No evidence verifies behavior when outcomes contains mixed-case or whitespace strings beyond the three allowed values.",
+      "text": "The submission assumes that the payment gateway will always return a success or failure response.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "weaknesses[0]",
       "evidenceIds": [
+        "context-source-1",
+        "context-source-2",
         "context-source-3"
       ],
-      "text": "No explicit handling for negative maxAttempts beyond Number.isInteger check; validation relies on maxAttempts < 1 clause.",
-      "verification": "UNVERIFIED"
+      "text": "The submission does not handle cases where the payment gateway returns an unknown response.",
+      "verification": "INFERENCE"
     }
   ],
+  "assessments": [
+    {
+      "criterionId": "retry-transient",
+      "evidenceIds": [
+        "criterion-retry-transient"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-bounded",
+      "evidenceIds": [
+        "criterion-retry-bounded"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-permanent",
+      "evidenceIds": [
+        "criterion-retry-permanent"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-immediate",
+      "evidenceIds": [
+        "criterion-retry-immediate"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-exhausted",
+      "evidenceIds": [
+        "criterion-retry-exhausted"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-zero",
+      "evidenceIds": [
+        "criterion-retry-invalid-zero"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-large",
+      "evidenceIds": [
+        "criterion-retry-invalid-large"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-fraction",
+      "evidenceIds": [
+        "criterion-retry-invalid-fraction"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-string",
+      "evidenceIds": [
+        "criterion-retry-invalid-string"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-empty",
+      "evidenceIds": [
+        "criterion-retry-outcomes-empty"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-unknown",
+      "evidenceIds": [
+        "criterion-retry-outcomes-unknown"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-null",
+      "evidenceIds": [
+        "criterion-retry-outcomes-null"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "health-preserved",
+      "evidenceIds": [
+        "criterion-health-preserved"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-created",
+      "evidenceIds": [
+        "criterion-payment-created"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-idempotency",
+      "evidenceIds": [
+        "criterion-payment-idempotency"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-read",
+      "evidenceIds": [
+        "criterion-payment-read"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-conflict",
+      "evidenceIds": [
+        "criterion-payment-conflict"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-invalid",
+      "evidenceIds": [
+        "criterion-payment-invalid"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    }
+  ],
+  "knownEvidenceIds": [
+    "diff",
+    "context-source-1",
+    "context-source-2",
+    "context-source-3",
+    "policy-4",
+    "policy-5",
+    "criterion-retry-transient",
+    "criterion-retry-bounded",
+    "criterion-retry-permanent",
+    "criterion-retry-immediate",
+    "criterion-retry-exhausted",
+    "criterion-retry-invalid-zero",
+    "criterion-retry-invalid-large",
+    "criterion-retry-invalid-fraction",
+    "criterion-retry-invalid-string",
+    "criterion-retry-outcomes-empty",
+    "criterion-retry-outcomes-unknown",
+    "criterion-retry-outcomes-null",
+    "criterion-health-preserved",
+    "criterion-payment-created",
+    "criterion-payment-idempotency",
+    "criterion-payment-read",
+    "criterion-payment-conflict",
+    "criterion-payment-invalid",
+    "execution-build",
+    "execution-repository-tests",
+    "execution-lint"
+  ],
+  "unknownCitations": [],
+  "protectedEvidence": [],
+  "executionFailures": [],
+  "humanAttention": true,
   "artifactRecapture": {
     "status": 200,
     "result": {
-      "runId": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
+      "runId": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
       "status": "CAPTURED",
       "artifacts": [
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/evidence/46f4e9d648a434945dded265fb3b315b50f235c88efbd848454d8f162ef013d5",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "46f4e9d648a434945dded265fb3b315b50f235c88efbd848454d8f162ef013d5",
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/evidence/01a0876c2df6a41888a1f259dd2c8f7dac0852ca586f17bc4e704a82dfb714a2",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "01a0876c2df6a41888a1f259dd2c8f7dac0852ca586f17bc4e704a82dfb714a2",
           "bytes": 14315,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:27:51",
+          "created_at": "2026-10-04 07:42:00",
           "kind": "evidence",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860471792,
+          "expires_at": 1798875720815,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -421,16 +591,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/context/6f94722edab4902c17625ca29ca90224e346e750c4831019e1b6c53f016e183b",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "6f94722edab4902c17625ca29ca90224e346e750c4831019e1b6c53f016e183b",
-          "bytes": 17610,
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/context/027b9dac23a52306062896dcc4f7e6efa0b0da3915ee13045d8597782e1a84a4",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "027b9dac23a52306062896dcc4f7e6efa0b0da3915ee13045d8597782e1a84a4",
+          "bytes": 19593,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:27:52",
+          "created_at": "2026-10-04 07:42:01",
           "kind": "context",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860472225,
+          "expires_at": 1798875721267,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -439,16 +609,34 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/execution-baseline-0/06563823fc5ff8278c66cb04d27add5ee6be738261293980698916a16c2f167f",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "06563823fc5ff8278c66cb04d27add5ee6be738261293980698916a16c2f167f",
-          "bytes": 5891,
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/diff/4b4d24033789996d82aa86dc6d1489eacb9e9c8fa28584ac1c6bdac37ad1fa02",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "4b4d24033789996d82aa86dc6d1489eacb9e9c8fa28584ac1c6bdac37ad1fa02",
+          "bytes": 3079,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:27:52",
+          "created_at": "2026-10-04 07:42:01",
+          "kind": "diff",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875721798,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/execution-baseline-0/2306d007d28a2e79c55451036d7525a266f9fc614c94fe9e02cc452641872486",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "2306d007d28a2e79c55451036d7525a266f9fc614c94fe9e02cc452641872486",
+          "bytes": 6474,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:02",
           "kind": "execution-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860472656,
+          "expires_at": 1798875722269,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -457,52 +645,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/execution-submission-1/4547e58cd3bd80ae324bab61049681e2028c1d4923fed190ca2a289304b47b6e",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "4547e58cd3bd80ae324bab61049681e2028c1d4923fed190ca2a289304b47b6e",
-          "bytes": 6386,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 03:27:53",
-          "kind": "execution-submission-1",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798860473955,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "bytes": 628,
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/stdout-baseline-0/4df6dbf2365cf94c55973e80a639946d9894a8bbeffec7de4eff4cfe1b8e074c",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "4df6dbf2365cf94c55973e80a639946d9894a8bbeffec7de4eff4cfe1b8e074c",
+          "bytes": 1628,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:27:53",
-          "kind": "stderr-baseline-0",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798860473546,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/stdout-baseline-0/917de2b5d1775d2b7096bd0c53de36e95c09c183fcf268724ce8d65a96273006",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "917de2b5d1775d2b7096bd0c53de36e95c09c183fcf268724ce8d65a96273006",
-          "bytes": 1629,
-          "content_type": "text/plain",
-          "created_at": "2026-10-04 03:27:53",
+          "created_at": "2026-10-04 07:42:02",
           "kind": "stdout-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860473111,
+          "expires_at": 1798875722744,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -511,16 +663,430 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
           "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
           "bytes": 628,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:27:54",
+          "created_at": "2026-10-04 07:42:03",
+          "kind": "stderr-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875723188,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-0/9c0dfbaacfcf3ffe178af87fdf42d2c4dcc8027a9d4a027a668d08d0211c601e",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "9c0dfbaacfcf3ffe178af87fdf42d2c4dcc8027a9d4a027a668d08d0211c601e",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:04",
+          "kind": "check-baseline-0-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875723981,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-1/cfc3a1244eb1b0bef1a0f1c22b28b691cbba296483f1b362004744663fac91ad",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "cfc3a1244eb1b0bef1a0f1c22b28b691cbba296483f1b362004744663fac91ad",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:04",
+          "kind": "check-baseline-0-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875724429,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-2/0a78e311271dec3f5efa82c11159a85a0a6325e583bd2b7a07a5431c5c31a15e",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "0a78e311271dec3f5efa82c11159a85a0a6325e583bd2b7a07a5431c5c31a15e",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:04",
+          "kind": "check-baseline-0-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875724932,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-3/121beb0accdc3e4e514fc532a58893b5f3a4722d103768bd33a6a31085607a4d",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "121beb0accdc3e4e514fc532a58893b5f3a4722d103768bd33a6a31085607a4d",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:05",
+          "kind": "check-baseline-0-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875725403,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-4/9146c1cbdbfeed8e4adf5af1573fc7c2101d03ce0cdd7dc640b03ac4de8a8706",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "9146c1cbdbfeed8e4adf5af1573fc7c2101d03ce0cdd7dc640b03ac4de8a8706",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:06",
+          "kind": "check-baseline-0-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875725965,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-5/ad84324b1d8f5c35409ba5ffcbc0e2bce3e77fd5026abfe0b09e7fa8e9d1c2c1",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "ad84324b1d8f5c35409ba5ffcbc0e2bce3e77fd5026abfe0b09e7fa8e9d1c2c1",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:06",
+          "kind": "check-baseline-0-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875726427,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-6/0a8f5aeafa63f3c86567828419df5655ab10e93ff1260eb9d2ab8bf6013be8ee",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "0a8f5aeafa63f3c86567828419df5655ab10e93ff1260eb9d2ab8bf6013be8ee",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:06",
+          "kind": "check-baseline-0-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875726885,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-7/dfb2c1026d009b0d4d65e646132a4f1e5ec6a2b83e924b0ad76672fe6e234f17",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "dfb2c1026d009b0d4d65e646132a4f1e5ec6a2b83e924b0ad76672fe6e234f17",
+          "bytes": 930,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:07",
+          "kind": "check-baseline-0-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875727321,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-8/9f0bca49e44a4406bc4fa6ac374d65e234f6be2ade7a64a3dd720204417dc06b",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "9f0bca49e44a4406bc4fa6ac374d65e234f6be2ade7a64a3dd720204417dc06b",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:07",
+          "kind": "check-baseline-0-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875727762,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-10/26209f1b45dcaad01b99108ffa9003a415fcdfc932b7cb89f4dd2076b091a184",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "26209f1b45dcaad01b99108ffa9003a415fcdfc932b7cb89f4dd2076b091a184",
+          "bytes": 931,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:08",
+          "kind": "check-baseline-0-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875728645,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-9/4416606b1824d7cd21df7a4395a46ecf1771da8c1f1587038fe74a36498d2485",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "4416606b1824d7cd21df7a4395a46ecf1771da8c1f1587038fe74a36498d2485",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:08",
+          "kind": "check-baseline-0-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875728199,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-11/5240f18291f0ceb6a8274eeed06ea689aa7041e724b708302bd9e1ed0a806a56",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "5240f18291f0ceb6a8274eeed06ea689aa7041e724b708302bd9e1ed0a806a56",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:09",
+          "kind": "check-baseline-0-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875729085,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-12/0bc95fb765546a0133be16c1cc43be20a95420fd708e0fdd4ff70d9427bae563",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "0bc95fb765546a0133be16c1cc43be20a95420fd708e0fdd4ff70d9427bae563",
+          "bytes": 900,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:09",
+          "kind": "check-baseline-0-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875729524,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-13/4055c50ea201e0a83354a4780a24a0652e4f5d2e8d8a6776ad7458cc3951c69a",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "4055c50ea201e0a83354a4780a24a0652e4f5d2e8d8a6776ad7458cc3951c69a",
+          "bytes": 1005,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:10",
+          "kind": "check-baseline-0-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875729967,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-14/78313b667004a911f4331b7f3f5e208279839e856cb97474349d5c6b8ade0faa",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "78313b667004a911f4331b7f3f5e208279839e856cb97474349d5c6b8ade0faa",
+          "bytes": 1013,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:10",
+          "kind": "check-baseline-0-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875730426,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-15/a8e62efc59c03217588ca0acc4c19c65155a86c65fe39756cdf4238e066b8b89",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "a8e62efc59c03217588ca0acc4c19c65155a86c65fe39756cdf4238e066b8b89",
+          "bytes": 999,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:10",
+          "kind": "check-baseline-0-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875730877,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-16/4cfa3f703a0037a36b9e59554e930022b0751f8cb7dde77d7a800b9e087ab492",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "4cfa3f703a0037a36b9e59554e930022b0751f8cb7dde77d7a800b9e087ab492",
+          "bytes": 921,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:11",
+          "kind": "check-baseline-0-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875731363,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-17/51f5d87bda3ad2f94537a9adba5af0531f0ebc6337e1b79a5437b2432aa386f2",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "51f5d87bda3ad2f94537a9adba5af0531f0ebc6337e1b79a5437b2432aa386f2",
+          "bytes": 916,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:11",
+          "kind": "check-baseline-0-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875731823,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-18/f9e9eb429e134f5d5e486fc636a304c6380a339b1b70b6833f6b2f7e848f2118",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "f9e9eb429e134f5d5e486fc636a304c6380a339b1b70b6833f6b2f7e848f2118",
+          "bytes": 882,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:12",
+          "kind": "check-baseline-0-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875732256,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/tests-baseline-0-19/e45694c31120d3e1b15dd022207f96a72ed8621c48de8043eef707efad9a0650",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "e45694c31120d3e1b15dd022207f96a72ed8621c48de8043eef707efad9a0650",
+          "bytes": 1171,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:12",
+          "kind": "tests-baseline-0-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875732708,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-baseline-0-20/f9532ae634cdb890af30fb9d1905c469be1ae27ffa3f628ed689f6cd65baea1d",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "f9532ae634cdb890af30fb9d1905c469be1ae27ffa3f628ed689f6cd65baea1d",
+          "bytes": 880,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:13",
+          "kind": "check-baseline-0-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875733160,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/execution-submission-1/ccc2198058839369af62330c4f62d5b60c580f29b66906f4a8f2105c7df1fe7c",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "ccc2198058839369af62330c4f62d5b60c580f29b66906f4a8f2105c7df1fe7c",
+          "bytes": 6971,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:13",
+          "kind": "execution-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875733607,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 07:42:14",
           "kind": "stderr-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860474804,
+          "expires_at": 1798875734534,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -529,16 +1095,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/stdout-submission-1/5938264dd87ca8f195b63c2fcd0c02be508f51bab5698eb6454b24bf1dca7730",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "5938264dd87ca8f195b63c2fcd0c02be508f51bab5698eb6454b24bf1dca7730",
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/stdout-submission-1/90ed3341184416f3dc861704a1c1c3cfbe220cfcf80b13c1199b16ca4b834906",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "90ed3341184416f3dc861704a1c1c3cfbe220cfcf80b13c1199b16ca4b834906",
           "bytes": 2111,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:27:54",
+          "created_at": "2026-10-04 07:42:14",
           "kind": "stdout-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860474377,
+          "expires_at": 1798875734070,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -547,16 +1113,394 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec/report/6af71b7ba31ca6063ec5c92f354ec367413e04b2ed7cee38ba9b9eaaa80c3b14",
-          "run_id": "81b05be35328f96e2744d588a42d05fcce9e5da5dd9458c38a32f255c54055ec",
-          "sha256": "6af71b7ba31ca6063ec5c92f354ec367413e04b2ed7cee38ba9b9eaaa80c3b14",
-          "bytes": 10213,
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-0/062a097c428c4d5fe87f75a677c05d9bd7a0bfa081436944d55e3c8d7c882514",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "062a097c428c4d5fe87f75a677c05d9bd7a0bfa081436944d55e3c8d7c882514",
+          "bytes": 925,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:29:19",
+          "created_at": "2026-10-04 07:42:15",
+          "kind": "check-submission-1-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875734998,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-1/a7fe72521e1e53f834fcebc2f1c869ac0553a91d1efe1cfafe0330a0b0543c01",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "a7fe72521e1e53f834fcebc2f1c869ac0553a91d1efe1cfafe0330a0b0543c01",
+          "bytes": 920,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:15",
+          "kind": "check-submission-1-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875735448,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-2/dad4b73a05657766b69b4c5d5ad3d20df5c599b2c3d8ab8d5f6de657dc4cc1d9",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "dad4b73a05657766b69b4c5d5ad3d20df5c599b2c3d8ab8d5f6de657dc4cc1d9",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:15",
+          "kind": "check-submission-1-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875735916,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-3/0cb6a4f03ec8618c2b5ca458c0c4bf79a45358ea1b237e98a80d0febbf0feea6",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "0cb6a4f03ec8618c2b5ca458c0c4bf79a45358ea1b237e98a80d0febbf0feea6",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:16",
+          "kind": "check-submission-1-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875736389,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-4/5b5c89a2c5e412785b1301bfba7b95a1bce9cec39b45c47704407e9402ad462e",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "5b5c89a2c5e412785b1301bfba7b95a1bce9cec39b45c47704407e9402ad462e",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:16",
+          "kind": "check-submission-1-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875736845,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-5/3b56e63e59948b3a9d45be97c0852649d7694c0477a4b152045d54597150847d",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "3b56e63e59948b3a9d45be97c0852649d7694c0477a4b152045d54597150847d",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:17",
+          "kind": "check-submission-1-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875737293,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-6/db968157845e18aab4ea3b69d04799925738b2db9c9530870a54a602bcda1f62",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "db968157845e18aab4ea3b69d04799925738b2db9c9530870a54a602bcda1f62",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:17",
+          "kind": "check-submission-1-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875737743,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-7/2798d2a7f731fdd348c440ced2befa7603170ccfb04797cf687ada8e63db1759",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "2798d2a7f731fdd348c440ced2befa7603170ccfb04797cf687ada8e63db1759",
+          "bytes": 932,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:18",
+          "kind": "check-submission-1-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875738199,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-8/1fb457d298093f33c12bc7ea52fe29e82f0dbc023e65dbfdc0b297ca8d19e404",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "1fb457d298093f33c12bc7ea52fe29e82f0dbc023e65dbfdc0b297ca8d19e404",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:18",
+          "kind": "check-submission-1-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875738703,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-10/b24519a6c62f77ec38577cff2e9a65417db3663d893a2fa1e4b6339a0c9eb979",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "b24519a6c62f77ec38577cff2e9a65417db3663d893a2fa1e4b6339a0c9eb979",
+          "bytes": 933,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:19",
+          "kind": "check-submission-1-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875739590,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-9/d77704b7650b04d04a410b43e44e7f4154b4adda31f024021514790ee2ca152e",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "d77704b7650b04d04a410b43e44e7f4154b4adda31f024021514790ee2ca152e",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:19",
+          "kind": "check-submission-1-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875739147,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-11/84b0dfed9ab583be320145654775983c4ec3b99a5741f7f3ec2342de52d1c7dc",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "84b0dfed9ab583be320145654775983c4ec3b99a5741f7f3ec2342de52d1c7dc",
+          "bytes": 927,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:20",
+          "kind": "check-submission-1-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875740063,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-12/778d006ef00c700cedb2cf022dd02aef50e3f538dc96f6a18fed1c3d85df1d4f",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "778d006ef00c700cedb2cf022dd02aef50e3f538dc96f6a18fed1c3d85df1d4f",
+          "bytes": 902,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:20",
+          "kind": "check-submission-1-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875740831,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-13/db41f266970d772a7cee5f013babfaf4a0fb75f88ddfef348a7803e006bb5cc2",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "db41f266970d772a7cee5f013babfaf4a0fb75f88ddfef348a7803e006bb5cc2",
+          "bytes": 1007,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:21",
+          "kind": "check-submission-1-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875741301,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-14/fe3a67431438c996ca1f996e7479376678d16fc19e98d388b3b26c59f2d3b5ac",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "fe3a67431438c996ca1f996e7479376678d16fc19e98d388b3b26c59f2d3b5ac",
+          "bytes": 1015,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:21",
+          "kind": "check-submission-1-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875741753,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-15/d53269422b9a5f77a0b1f674cfeac1b9583a446babe9cc566c8eba12996223f1",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "d53269422b9a5f77a0b1f674cfeac1b9583a446babe9cc566c8eba12996223f1",
+          "bytes": 1001,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:22",
+          "kind": "check-submission-1-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875742197,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-16/a57a498834b595fab75147a15de19bfc27766ecc4cf97499eaa46b9b7983d0df",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "a57a498834b595fab75147a15de19bfc27766ecc4cf97499eaa46b9b7983d0df",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:22",
+          "kind": "check-submission-1-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875742653,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-17/ac79f668051f45148afd3ccc932c9d7c0d1ebef5087a67ba810e2dffac462fa4",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "ac79f668051f45148afd3ccc932c9d7c0d1ebef5087a67ba810e2dffac462fa4",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:23",
+          "kind": "check-submission-1-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875743195,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-18/3e5a413fc2edb20ba65ffe89db1265f64860b1ee0aa48e86d4e3cce7d09f368c",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "3e5a413fc2edb20ba65ffe89db1265f64860b1ee0aa48e86d4e3cce7d09f368c",
+          "bytes": 884,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:23",
+          "kind": "check-submission-1-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875743634,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/check-submission-1-20/6e41a297724af62982de4a38677a66f9dceb83c228b173427ed1373a1cdfb4c6",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "6e41a297724af62982de4a38677a66f9dceb83c228b173427ed1373a1cdfb4c6",
+          "bytes": 882,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:24",
+          "kind": "check-submission-1-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875744663,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/tests-submission-1-19/01582e4f5ddf837c67625ced74b096864649a03cfe0189f083b8d13698a46809",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "01582e4f5ddf837c67625ced74b096864649a03cfe0189f083b8d13698a46809",
+          "bytes": 1669,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:24",
+          "kind": "tests-submission-1-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875744088,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0/report/a8da0f0b3b2a280de5e938bb796b3d89805a319250217f82dd38ecea7c713f8b",
+          "run_id": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+          "sha256": "a8da0f0b3b2a280de5e938bb796b3d89805a319250217f82dd38ecea7c713f8b",
+          "bytes": 17027,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:43:36",
           "kind": "report",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860559826,
+          "expires_at": 1798875816519,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,

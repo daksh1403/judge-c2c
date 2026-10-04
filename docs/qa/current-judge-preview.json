@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-04T07:53:13.243Z",
+  "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+  "role": "judge",
+  "records": [
+    {
+      "pr": 8,
+      "runId": "c1584d2443a439da1c3424138ac26675ee05424facf450e8cb72b1645ec5e342",
+      "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+      "sections": [
+        "Authoritative requirements",
+        "Needs attention",
+        "Evidence ledger",
+        "Baseline and head check comparison",
+        "Isolated execution",
+        "Protected artifacts",
+        "Evaluation history",
+        "Additional contributions"
+      ],
+      "evidenceLinks": 51,
+      "unverifiedQualitativeVisible": true
+    },
+    {
+      "pr": 9,
+      "runId": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+      "head": "628436f51c897930e2c902c2051c185259ef95c8",
+      "sections": [
+        "Authoritative requirements",
+        "Needs attention",
+        "Evidence ledger",
+        "Baseline and head check comparison",
+        "Isolated execution",
+        "Protected artifacts",
+        "Evaluation history",
+        "Additional contributions"
+      ],
+      "evidenceLinks": 54,
+      "unverifiedQualitativeVisible": true
+    },
+    {
+      "pr": 11,
+      "runId": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+      "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+      "sections": [
+        "Authoritative requirements",
+        "Needs attention",
+        "Evidence ledger",
+        "Baseline and head check comparison",
+        "Isolated execution",
+        "Protected artifacts",
+        "Evaluation history",
+        "Additional contributions"
+      ],
+      "evidenceLinks": 63,
+      "unverifiedQualitativeVisible": true
+    }
+  ],
+  "mobileFits": true,
+  "errors": []
+}

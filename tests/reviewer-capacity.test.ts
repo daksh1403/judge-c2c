@@ -106,3 +106,13 @@ export default {async fetch(request,env){const input=await request.json();const 
     await runtime.dispose();
   }
 }, 30000);
+
+it('keeps provider leases independent across provider identities', async () => {
+  const occupied = await acquireReviewer(db, 'callmissed', 1000);
+  expect(occupied).not.toBeNull();
+  const other = await acquireReviewer(db, 'cloudflare', 1000);
+  expect(other).not.toBeNull();
+  expect(await acquireReviewer(db, 'callmissed', 1001)).toBeNull();
+  await releaseReviewer(db, other!);
+  await releaseReviewer(db, occupied!);
+});

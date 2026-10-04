@@ -84,7 +84,9 @@ try {
   );
   const result = {
     at: new Date().toISOString(),
-    mode: 'REAL_GITHUB_DOCKER_CALLMISSED',
+    mode:
+      'REAL_GITHUB_DOCKER_' +
+      String(trace?.provider ?? 'UNKNOWN').toUpperCase(),
     identity:
       'One actual authenticated operator; replay code persona, not multiple independent accounts',
     pr,
@@ -102,6 +104,13 @@ try {
     ),
     summary: report.summary,
     observations,
+    assessments: report.assessments,
+    knownEvidenceIds: evidence.map((e) => e.id),
+    unknownCitations: [
+      ...report.assessments.flatMap((a) => a.evidenceIds),
+      ...observations.flatMap((o) => o.evidenceIds ?? []),
+      ...report.findings.flatMap((f) => f.evidenceIds),
+    ].filter((id) => !evidence.some((e) => e.id === id)),
     protectedEvidence: evidence.filter(
       (e) => e.kind === 'policy' && e.status === 'FAIL',
     ),
@@ -159,6 +168,7 @@ try {
     result.state !== 'COMPLETED' ||
     !['COMPLETED', 'NEEDS_REVIEW'].includes(result.aiStatus) ||
     result.unsupportedObserved ||
+    result.unknownCitations.length ||
     !result.criterionConsistency ||
     !trace?.groundingPolicy ||
     !result.artifactDownload?.integrity

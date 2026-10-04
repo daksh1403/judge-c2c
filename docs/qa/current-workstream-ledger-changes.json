@@ -432,6 +432,306 @@
       "before": "NOT_IMPLEMENTED",
       "after": "PARTIAL",
       "previousNote": "AI cost: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "23.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Malicious install scripts: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+    },
+    {
+      "id": "25.16",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Objective support: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+    },
+    {
+      "id": "26.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "PARTIAL: PARTIAL is accepted structurally for supported source/contextual assessments; calibrated per-requirement partial aggregation is not implemented."
+    },
+    {
+      "id": "33.09",
+      "before": "FAIL",
+      "after": "PASS",
+      "previousNote": "Live CallMissed calibration previously emitted unsupported coverage prose despite valid citation IDs. New source replaces criterion outcomes with objective projections, permits only exact known objective text as OBSERVED, flags contextual narratives and historical reviews for human attention, and prevents conflicting criterion PASS/FAIL evidence from yielding acceptance. The known INFERENCE false-coverage sentence is flagged rather than semantically auto-detected. FAIL remains until the exact real-provider calibration and deployed judge behavior are executed and verified."
+    },
+    {
+      "id": "45.16",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Artifacts: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+    },
+    {
+      "id": "45.17",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Reviewer traces: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+    },
+    {
+      "id": "47.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Reviewer version: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete."
+    },
+    {
+      "id": "48.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Both webhook routes record fixed request/error/latency aggregates asynchronously in shared UTC-minute metrics, with a bounded organizer view and seven-day retention. Static checks and local SQLite schema smoke passed; recorded request measurements, export/alerts, outage behavior and live deployment remain unverified or absent."
+    },
+    {
+      "id": "48.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Authenticated GitHub API requests record bounded numeric error/request/latency metrics without secret/request content; organizer-only metric access and maintenance exist. Runtime API failure injection, persistence failure, exports/alerts and deployed visibility are unverified; raw public file fetches are outside this instrumentation."
+    },
+    {
+      "id": "48.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "GitHub API metrics identify HTTP429, exhausted primary rate headers and secondary403 Retry-After responses. This does not change retry behavior. Runtime primary/secondary rate-limit scenarios, exports/alerts and live observation remain unverified."
+    },
+    {
+      "id": "48.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified."
+    },
+    {
+      "id": "48.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Evaluation duration: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "48.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified."
+    },
+    {
+      "id": "48.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "AI latency: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "48.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "AI tokens: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "48.19",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Retries: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "51.17",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Actual AI review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
+    },
+    {
+      "id": "01.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Reproducible engineer setup: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+    },
+    {
+      "id": "19.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "19.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "19.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "19.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "19.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "19.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "22.16",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Artifacts: Bounded execution records are available; large retained guest artifacts need account-enabled object storage."
+    },
+    {
+      "id": "23.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Memory exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+    },
+    {
+      "id": "23.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Disk exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+    },
+    {
+      "id": "23.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Internal network probing: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+    },
+    {
+      "id": "36.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Backoff: Executed idempotency, durable outbox and expiring capacity fixtures retain history, timeout and failure visibility. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+    },
+    {
+      "id": "36.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+    },
+    {
+      "id": "36.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Priority: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+    },
+    {
+      "id": "36.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Obsolete cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+    },
+    {
+      "id": "37.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Content-addressed cache: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache."
+    },
+    {
+      "id": "37.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Commit config tool identities: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache."
+    },
+    {
+      "id": "37.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "37.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+    },
+    {
+      "id": "38.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Latest priority: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+    },
+    {
+      "id": "38.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Obsolete capacity release: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+    },
+    {
+      "id": "38.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Backpressure: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+    },
+    {
+      "id": "38.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Queue metrics: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+    },
+    {
+      "id": "38.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Separate AI capacity when needed: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+    },
+    {
+      "id": "45.20",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Baseline results: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+    },
+    {
+      "id": "48.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Queue depth: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "48.20",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Superseded count: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+    },
+    {
+      "id": "49.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "GitHub outage: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+    },
+    {
+      "id": "49.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "GitHub limits: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+    },
+    {
+      "id": "49.15",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Worker crash: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+    },
+    {
+      "id": "49.21",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Queue fail: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+    },
+    {
+      "id": "50.14",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Cache keys: Frozen preview context integrity/cache identity is tested; execution cache does not exist."
+    },
+    {
+      "id": "51.19",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Approach review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
     }
   ]
 }

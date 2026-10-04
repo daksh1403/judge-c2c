@@ -1,9 +1,9 @@
 {
-  "at": "2026-10-04T03:30:21.289Z",
-  "mode": "REAL_GITHUB_DOCKER_CALLMISSED",
+  "at": "2026-10-04T07:45:29.613Z",
+  "mode": "REAL_GITHUB_DOCKER_CLOUDFLARE",
   "identity": "One actual authenticated operator; replay code persona, not multiple independent accounts",
   "pr": 9,
-  "runId": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+  "runId": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
   "state": "COMPLETED",
   "aiStatus": "COMPLETED",
   "publication": "PUBLISHED",
@@ -172,39 +172,44 @@
     }
   ],
   "trace": {
-    "attemptFailures": [],
-    "attempts": 1,
+    "attemptFailures": [
+      "AI_APPROACH_CITATION_UNLISTED"
+    ],
+    "attempts": 2,
     "contextBudget": {
-      "contextBytes": 38252,
-      "estimatedInputTokens": 11830,
+      "contextBytes": 37560,
+      "estimatedInputTokens": 11943,
+      "finalContextBytes": 37560,
       "inputTokenEstimateMethod": "[REDACTED]",
       "maxContextBytes": 48000,
       "omittedDiffPaths": [],
       "omittedEvidenceIds": [],
       "omittedSourcePaths": [
         "README.md",
+        "retry.test.mjs",
         "server.mjs",
         "server.test.mjs"
       ],
-      "reservedInputBytes": 9065,
-      "reservedOutputTokens": 4500,
+      "reservedInputBytes": 10209,
+      "reservedOutputTokens": 4096,
       "version": "bounded-review-context-v1"
+    },
+    "cost": {
+      "reason": "Known rates and actual provider token usage are required; this is not total review billing.",
+      "scope": "successful-final-response",
+      "status": "UNAVAILABLE"
     },
     "downgradedObservationPaths": [
       "solution_approach.problem_understanding",
       "solution_approach.approach_summary",
       "solution_approach.solution_design",
       "solution_approach.correctness",
+      "solution_approach.maintainability",
       "solution_approach.architecture_fit",
       "solution_approach.strengths[0]",
-      "solution_approach.strengths[1]",
-      "solution_approach.strengths[2]",
-      "solution_approach.weaknesses[0]",
-      "solution_approach.weaknesses[1]",
-      "solution_approach.weaknesses[2]",
-      "solution_approach.tradeoffs[1]"
+      "solution_approach.strengths[1]"
     ],
-    "durationMs": 48295,
+    "durationMs": 115941,
     "evaluationPlan": {
       "depth": "STANDARD",
       "maxChangedFiles": 30,
@@ -227,17 +232,22 @@
       "version": "adaptive-review-v1"
     },
     "groundingPolicy": "objective-facts-unverified-narratives-v1",
-    "inputHash": "ba420f1c34d08ca24d68e2b84e8e9ae2de784e4fc4e946dbbb5efed21ef93aa8",
-    "model": "kimi-k2.6",
+    "inputHash": "a355de62c1474b53615cf1783f2915d9c045f05fab9347ac769aaab01a059b2e",
+    "model": "@cf/meta/llama-3.3-70b-json",
     "modelRouting": {
-      "model": "kimi-k2.6",
-      "reason": "CALLMISSED_MODEL retained; no depth override is configured.",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "reason": "AI_MODEL retained; no depth override is configured.",
       "version": "server-model-routing-v1"
     },
-    "policy": "requirements-and-approach-v8",
-    "provider": "callmissed",
+    "objectiveCriterionRecovery": [],
+    "policy": "requirements-and-approach-v9",
+    "provider": "cloudflare",
+    "qualitativeCriterionAnalysis": {
+      "missingCriterionIds": [],
+      "status": "PRESENT"
+    },
     "requiresHumanAttention": true,
-    "responseId": "resp_93cc4a31fccf47fd9a6a982de100b742",
+    "responseId": null,
     "unverifiedNarrativePaths": [
       "solution_approach.problem_understanding",
       "solution_approach.approach_summary",
@@ -247,29 +257,19 @@
       "solution_approach.architecture_fit",
       "solution_approach.strengths[0]",
       "solution_approach.strengths[1]",
-      "solution_approach.strengths[2]",
       "solution_approach.weaknesses[0]",
-      "solution_approach.weaknesses[1]",
-      "solution_approach.weaknesses[2]",
       "solution_approach.tradeoffs[0]",
-      "solution_approach.tradeoffs[1]",
       "solution_approach.unverified_assumptions[0]",
-      "findings[0]",
-      "findings[1]",
-      "findings[2]",
-      "findings[3]"
+      "findings[0]"
     ],
     "usage": {
-      "input_tokens": 14062,
-      "input_tokens_details": {
-        "cache_write_tokens": 0,
-        "cached_tokens": 2112
+      "completion_tokens": 1831,
+      "neurons": 752.0260620117188,
+      "prompt_tokens": 14138,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
       },
-      "output_tokens": 2223,
-      "output_tokens_details": {
-        "reasoning_tokens": 0
-      },
-      "total_tokens": 16285
+      "total_tokens": 15969
     }
   },
   "unsupportedObserved": 0,
@@ -279,21 +279,23 @@
     {
       "field": "approach_summary",
       "evidenceIds": [
+        "context-source-1",
         "context-source-2",
-        "criterion-retry-transient",
-        "criterion-retry-permanent"
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "The implementation replaces the single-attempt baseline with a loop over outcomes bounded by maxAttempts, returning immediately on success or permanent failure.",
+      "text": "The solution approach involves modifying the retryPayment function to correctly handle temporary failures, bounded attempts, and invalid inputs.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "architecture_fit",
       "evidenceIds": [
+        "context-source-1",
         "context-source-2",
-        "criterion-health-preserved",
-        "criterion-payment-created"
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "The retry logic is contained within the existing retryPayment exported function, preserving the rest of the server routes and in-memory store unchanged.",
+      "text": "The modified retryPayment function fits within the existing architecture of the payment engine.",
       "verification": "UNVERIFIED"
     },
     {
@@ -303,49 +305,42 @@
         "criterion-retry-bounded",
         "criterion-retry-permanent",
         "criterion-retry-immediate",
-        "criterion-retry-exhausted",
-        "criterion-retry-invalid-zero",
-        "criterion-retry-invalid-large",
-        "criterion-retry-invalid-fraction",
-        "criterion-retry-invalid-string",
-        "criterion-retry-outcomes-empty",
-        "criterion-retry-outcomes-unknown",
-        "criterion-retry-outcomes-null",
-        "criterion-health-preserved",
-        "criterion-payment-created",
-        "criterion-payment-idempotency",
-        "criterion-payment-read",
-        "criterion-payment-conflict",
-        "criterion-payment-invalid"
+        "criterion-retry-exhausted"
       ],
-      "text": "All functional criteria pass under trusted runner execution, indicating the retry and payment endpoints behave per specification.",
+      "text": "The modified retryPayment function correctly handles various retry scenarios.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "maintainability",
       "evidenceIds": [
+        "context-source-1",
         "context-source-2",
-        "context-source-3"
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "Loop-based logic is readable and new retry.test.mjs provides parameterized unit tests, though integration coverage was removed.",
-      "verification": "INFERENCE"
+      "text": "The modified retryPayment function is maintainable and follows the existing coding standards.",
+      "verification": "UNVERIFIED"
     },
     {
       "field": "problem_understanding",
       "evidenceIds": [
+        "context-source-1",
         "context-source-2",
-        "criterion-retry-transient",
-        "criterion-retry-bounded"
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "The root problem is that temporary outcomes should advance to the next outcome up to maxAttempts, while success and permanent outcomes terminate early.",
+      "text": "The problem involves modifying the retryPayment function to correctly handle temporary failures, bounded attempts, and invalid inputs.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "solution_design",
       "evidenceIds": [
-        "context-source-2"
+        "context-source-1",
+        "context-source-2",
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "A for loop iterates over outcomes.slice(0, maxAttempts), increments attempts, returns on success, breaks on permanent, and returns failed if the loop completes.",
+      "text": "The solution design involves modifying the retryPayment function to use a for loop to iterate over the outcomes and stop retrying after a success or permanent failure.",
       "verification": "UNVERIFIED"
     },
     {
@@ -353,114 +348,255 @@
       "evidenceIds": [
         "criterion-retry-transient",
         "criterion-retry-bounded",
-        "criterion-retry-permanent"
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted"
       ],
-      "text": "Correctly implements bounded temporary retries and early termination for success and permanent outcomes.",
+      "text": "The modified retryPayment function correctly handles various retry scenarios.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "strengths[1]",
       "evidenceIds": [
-        "context-source-3"
+        "context-source-1",
+        "context-source-2",
+        "context-source-3",
+        "context-source-4"
       ],
-      "text": "New unit tests are parameterized and cover happy paths plus a range of invalid inputs.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "strengths[2]",
-      "evidenceIds": [
-        "criterion-health-preserved",
-        "criterion-payment-created",
-        "criterion-payment-conflict"
-      ],
-      "text": "Existing payment APIs remain functionally intact.",
+      "text": "The solution approach is maintainable and follows the existing coding standards.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "tradeoffs[0]",
       "evidenceIds": [
-        "context-source-3",
-        "context-source-4"
+        "criterion-retry-bounded"
       ],
-      "text": "Added focused unit tests for retry logic but removed broader integration tests that also exercised payment routes.",
+      "text": "The modified retryPayment function may be vulnerable to a denial-of-service attack if the max attempts is set too high.",
       "verification": "INFERENCE"
     },
     {
-      "field": "tradeoffs[1]",
-      "evidenceIds": [
-        "context-source-1"
-      ],
-      "text": "README update includes accurate behavioral description alongside embedded hostile instruction text.",
-      "verification": "UNVERIFIED"
-    },
-    {
       "field": "unverified_assumptions[0]",
-      "evidenceIds": [],
-      "text": "The in-memory store behavior and 404 handling for unknown payment IDs remain unchanged, but no test currently exercises them.",
+      "evidenceIds": [
+        "criterion-retry-bounded"
+      ],
+      "text": "The max attempts value is reasonable and will not cause a denial-of-service attack.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "weaknesses[0]",
       "evidenceIds": [
-        "context-source-4",
-        "policy-6"
+        "criterion-retry-bounded"
       ],
-      "text": "Removal of protected-file server.test.mjs violates repository policy and eliminates regression coverage for payment APIs.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "weaknesses[1]",
-      "evidenceIds": [
-        "context-source-1",
-        "context-source-4"
-      ],
-      "text": "Embedded hostile instructions in README and test file are policy violations regardless of stated rehearsal intent.",
-      "verification": "UNVERIFIED"
-    },
-    {
-      "field": "weaknesses[2]",
-      "evidenceIds": [
-        "context-source-3"
-      ],
-      "text": "retry.test.mjs only tests the retryPayment function directly, not the HTTP routing or server wiring.",
-      "verification": "UNVERIFIED"
+      "text": "The modified retryPayment function may be vulnerable to a denial-of-service attack if the max attempts is set too high.",
+      "verification": "INFERENCE"
     }
   ],
+  "assessments": [
+    {
+      "criterionId": "retry-transient",
+      "evidenceIds": [
+        "criterion-retry-transient"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-bounded",
+      "evidenceIds": [
+        "criterion-retry-bounded"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-permanent",
+      "evidenceIds": [
+        "criterion-retry-permanent"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-immediate",
+      "evidenceIds": [
+        "criterion-retry-immediate"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-exhausted",
+      "evidenceIds": [
+        "criterion-retry-exhausted"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-zero",
+      "evidenceIds": [
+        "criterion-retry-invalid-zero"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-large",
+      "evidenceIds": [
+        "criterion-retry-invalid-large"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-fraction",
+      "evidenceIds": [
+        "criterion-retry-invalid-fraction"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-string",
+      "evidenceIds": [
+        "criterion-retry-invalid-string"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-empty",
+      "evidenceIds": [
+        "criterion-retry-outcomes-empty"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-unknown",
+      "evidenceIds": [
+        "criterion-retry-outcomes-unknown"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-null",
+      "evidenceIds": [
+        "criterion-retry-outcomes-null"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "health-preserved",
+      "evidenceIds": [
+        "criterion-health-preserved"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-created",
+      "evidenceIds": [
+        "criterion-payment-created"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-idempotency",
+      "evidenceIds": [
+        "criterion-payment-idempotency"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-read",
+      "evidenceIds": [
+        "criterion-payment-read"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-conflict",
+      "evidenceIds": [
+        "criterion-payment-conflict"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-invalid",
+      "evidenceIds": [
+        "criterion-payment-invalid"
+      ],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    }
+  ],
+  "knownEvidenceIds": [
+    "diff",
+    "context-source-1",
+    "context-source-2",
+    "context-source-3",
+    "context-source-4",
+    "policy-5",
+    "policy-6",
+    "risk-test-removal-review",
+    "criterion-retry-transient",
+    "criterion-retry-bounded",
+    "criterion-retry-permanent",
+    "criterion-retry-immediate",
+    "criterion-retry-exhausted",
+    "criterion-retry-invalid-zero",
+    "criterion-retry-invalid-large",
+    "criterion-retry-invalid-fraction",
+    "criterion-retry-invalid-string",
+    "criterion-retry-outcomes-empty",
+    "criterion-retry-outcomes-unknown",
+    "criterion-retry-outcomes-null",
+    "criterion-health-preserved",
+    "criterion-payment-created",
+    "criterion-payment-idempotency",
+    "criterion-payment-read",
+    "criterion-payment-conflict",
+    "criterion-payment-invalid",
+    "execution-build",
+    "execution-repository-tests",
+    "execution-lint"
+  ],
+  "unknownCitations": [],
+  "protectedEvidence": [
+    {
+      "claim": "Protected path changed: server.test.mjs",
+      "id": "policy-6",
+      "kind": "policy",
+      "path": "server.test.mjs",
+      "status": "FAIL"
+    }
+  ],
+  "executionFailures": [],
+  "humanAttention": true,
   "artifactRecapture": {
     "status": 200,
     "result": {
-      "runId": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+      "runId": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
       "status": "CAPTURED",
       "artifacts": [
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/evidence/4141a53251fcb2dfe3a7ff11a3c55818654733b5fe7a5f7c189a4be27cb637c4",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "4141a53251fcb2dfe3a7ff11a3c55818654733b5fe7a5f7c189a4be27cb637c4",
-          "bytes": 14675,
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/context/61480e6f9a40f91e6234458433948f6addfd0172984436179bcc264a33fb6916",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "61480e6f9a40f91e6234458433948f6addfd0172984436179bcc264a33fb6916",
+          "bytes": 24233,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:28:13",
-          "kind": "evidence",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798860493620,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/context/a80d68ca3587516c9f31ff43f693fee8299714187f82132bed3b1f5e103a261f",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "a80d68ca3587516c9f31ff43f693fee8299714187f82132bed3b1f5e103a261f",
-          "bytes": 22094,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 03:28:14",
+          "created_at": "2026-10-04 07:42:29",
           "kind": "context",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860494094,
+          "expires_at": 1798875749556,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -469,16 +605,52 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/execution-baseline-0/4d69f44073a6442967135acd0224e8a9bfaa68d0a6736900fcf6c86880abb8a1",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "4d69f44073a6442967135acd0224e8a9bfaa68d0a6736900fcf6c86880abb8a1",
-          "bytes": 5895,
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/diff/3e8791c14ca6c599a964a5d493531b8cd39a77a02f8f503b77dd66dc4df8f9c6",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "3e8791c14ca6c599a964a5d493531b8cd39a77a02f8f503b77dd66dc4df8f9c6",
+          "bytes": 5096,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:28:14",
+          "created_at": "2026-10-04 07:42:29",
+          "kind": "diff",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875749971,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/evidence/7c1e69415e2b6dc99849fc02bc62a423b0173fd46e9fab8e966f018af93a3cbb",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "7c1e69415e2b6dc99849fc02bc62a423b0173fd46e9fab8e966f018af93a3cbb",
+          "bytes": 14675,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:29",
+          "kind": "evidence",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875749135,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/execution-baseline-0/1f46512907003a68105103856562ddf9da4dced22d46011e7f276f3e1f296eb7",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "1f46512907003a68105103856562ddf9da4dced22d46011e7f276f3e1f296eb7",
+          "bytes": 6473,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:30",
           "kind": "execution-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860494515,
+          "expires_at": 1798875750404,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -487,34 +659,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stdout-baseline-0/1d466ae1bce982eb5666a6fa1848ac6d41c0028584751839254d5ce86ed26e02",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "1d466ae1bce982eb5666a6fa1848ac6d41c0028584751839254d5ce86ed26e02",
-          "bytes": 1630,
-          "content_type": "text/plain",
-          "created_at": "2026-10-04 03:28:14",
-          "kind": "stdout-baseline-0",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798860494934,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/execution-submission-1/94b301a960fec26550be28ca42302e253d2b18ec49b63c5c2d303505a87d88c3",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "94b301a960fec26550be28ca42302e253d2b18ec49b63c5c2d303505a87d88c3",
-          "bytes": 6273,
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-0/be63eb698db69bbebfa7a1c13129631bbe6d96b207f06c4af8af6109b5540604",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "be63eb698db69bbebfa7a1c13129631bbe6d96b207f06c4af8af6109b5540604",
+          "bytes": 922,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:28:15",
-          "kind": "execution-submission-1",
+          "created_at": "2026-10-04 07:42:31",
+          "kind": "check-baseline-0-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860495784,
+          "expires_at": 1798875751845,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -523,16 +677,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
           "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
           "bytes": 628,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:28:15",
+          "created_at": "2026-10-04 07:42:31",
           "kind": "stderr-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860495351,
+          "expires_at": 1798875751422,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -541,16 +695,412 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/stdout-baseline-0/c4457793570bcae2d4fb96f17c77aead6dce942206a3dac5a5e14540fe044bd1",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "c4457793570bcae2d4fb96f17c77aead6dce942206a3dac5a5e14540fe044bd1",
+          "bytes": 1626,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 07:42:31",
+          "kind": "stdout-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875751008,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-1/8153b26b44264d4336e93c00906fc1023c6cccd6bc7f1614c5231b22171afa59",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "8153b26b44264d4336e93c00906fc1023c6cccd6bc7f1614c5231b22171afa59",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:32",
+          "kind": "check-baseline-0-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875752274,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-2/d10c7903ac5ce710d3b6825e4b582886dc7e6442f9f53a1ecc58741426c2ea6f",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d10c7903ac5ce710d3b6825e4b582886dc7e6442f9f53a1ecc58741426c2ea6f",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:32",
+          "kind": "check-baseline-0-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875752721,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-3/e80e1b4e9ebdc7007b7615a0d2c8dd6bdb67d84f285181c7934a4a0042d7003a",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "e80e1b4e9ebdc7007b7615a0d2c8dd6bdb67d84f285181c7934a4a0042d7003a",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:33",
+          "kind": "check-baseline-0-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875753196,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-4/6c47bbd10e5fbd0661a184a6fac4e81fc3f8731f0e6d580ccb8840dbb7b374f7",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "6c47bbd10e5fbd0661a184a6fac4e81fc3f8731f0e6d580ccb8840dbb7b374f7",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:33",
+          "kind": "check-baseline-0-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875753607,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-5/2bebeedfa5193660d6d357bb065849dfb9df0c059d15a96f0bcbe8bb046ba12f",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "2bebeedfa5193660d6d357bb065849dfb9df0c059d15a96f0bcbe8bb046ba12f",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:34",
+          "kind": "check-baseline-0-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875754038,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-6/4f223b0f9a5d3bb0eb3ee0b0afde54c7590cc1200c29a1d91f343eaed28f706d",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "4f223b0f9a5d3bb0eb3ee0b0afde54c7590cc1200c29a1d91f343eaed28f706d",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:34",
+          "kind": "check-baseline-0-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875754457,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-7/75cbb5483a3fca0243774e12d4cdac18213eedccfd292952801fb4d397c70569",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "75cbb5483a3fca0243774e12d4cdac18213eedccfd292952801fb4d397c70569",
+          "bytes": 930,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:34",
+          "kind": "check-baseline-0-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875754876,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-8/5d3f712bd431b3f34458aaeac5ff9983b6ec57ff6530adc8c0aa0de955b46cb3",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "5d3f712bd431b3f34458aaeac5ff9983b6ec57ff6530adc8c0aa0de955b46cb3",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:35",
+          "kind": "check-baseline-0-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875755336,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-9/1c1de5e6c0237397d1037b2817e237124ecaa03d0894dbfed67379741270f00c",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "1c1de5e6c0237397d1037b2817e237124ecaa03d0894dbfed67379741270f00c",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:35",
+          "kind": "check-baseline-0-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875755753,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-10/f7913073d4329f614e9f3da86e5cb28843f9e0effe188cd4da49407d25259388",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "f7913073d4329f614e9f3da86e5cb28843f9e0effe188cd4da49407d25259388",
+          "bytes": 931,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:36",
+          "kind": "check-baseline-0-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875756182,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-11/d21e67ea9cc0ebc78ce29210cde0afa1cee1161adfe164bf639284f8f5953bce",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d21e67ea9cc0ebc78ce29210cde0afa1cee1161adfe164bf639284f8f5953bce",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:36",
+          "kind": "check-baseline-0-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875756617,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-12/95e078346e0584e994962792ec01bcf7fce858b92eb237ef2682605b709c305a",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "95e078346e0584e994962792ec01bcf7fce858b92eb237ef2682605b709c305a",
+          "bytes": 900,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:37",
+          "kind": "check-baseline-0-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875757042,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-13/8cc3c38e636f9f2281bf031f60cbad61c36408dc653484c77631cc87cde66a2d",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "8cc3c38e636f9f2281bf031f60cbad61c36408dc653484c77631cc87cde66a2d",
+          "bytes": 1005,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:37",
+          "kind": "check-baseline-0-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875757518,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-14/930f4c2acf04e6a86e915cdab076062f4df129de8403f0dae52851960434922a",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "930f4c2acf04e6a86e915cdab076062f4df129de8403f0dae52851960434922a",
+          "bytes": 1013,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:37",
+          "kind": "check-baseline-0-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875757949,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-15/81dc560e98e8dd61ae14babff5c732f8cb112da494af29bdc7690360c46481f4",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "81dc560e98e8dd61ae14babff5c732f8cb112da494af29bdc7690360c46481f4",
+          "bytes": 999,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:38",
+          "kind": "check-baseline-0-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875758366,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-16/02a3835a757ec85839bf3bb933e8506a37c5d78ad4c49f2ec4ed583f75976d13",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "02a3835a757ec85839bf3bb933e8506a37c5d78ad4c49f2ec4ed583f75976d13",
+          "bytes": 921,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:38",
+          "kind": "check-baseline-0-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875758799,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-17/1b9b783a6bd22fd9259b4e188656bc39febbcdb982771c65c9aa239e1c7a8d04",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "1b9b783a6bd22fd9259b4e188656bc39febbcdb982771c65c9aa239e1c7a8d04",
+          "bytes": 916,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:39",
+          "kind": "check-baseline-0-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875759225,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-18/1844475544fca034b4dce7f2a3d2372316671fda571751394499cd8863805a25",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "1844475544fca034b4dce7f2a3d2372316671fda571751394499cd8863805a25",
+          "bytes": 882,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:39",
+          "kind": "check-baseline-0-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875759660,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-baseline-0-20/4cbbc4e66f50cc80ee4bae3ad72b5a702a466db607a5878830a9e8f71bb90191",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "4cbbc4e66f50cc80ee4bae3ad72b5a702a466db607a5878830a9e8f71bb90191",
+          "bytes": 880,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:40",
+          "kind": "check-baseline-0-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875760496,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/execution-submission-1/c460cb4e5c8e5e44605eda0dd8c5f123cfaaf61af54a9b2e1301a1990e7e4cc1",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "c460cb4e5c8e5e44605eda0dd8c5f123cfaaf61af54a9b2e1301a1990e7e4cc1",
+          "bytes": 6848,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:40",
+          "kind": "execution-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875760957,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/tests-baseline-0-19/b3c8dacc50001bd1e9b6a54f2300b5bc21fa19e3588af852101f9d4f02be13fd",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "b3c8dacc50001bd1e9b6a54f2300b5bc21fa19e3588af852101f9d4f02be13fd",
+          "bytes": 1169,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:40",
+          "kind": "tests-baseline-0-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875760075,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
           "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
           "bytes": 628,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:28:16",
+          "created_at": "2026-10-04 07:42:41",
           "kind": "stderr-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860496651,
+          "expires_at": 1798875761816,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -559,16 +1109,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stdout-submission-1/c3b96bbca9a97f777711cc1dbe44250dab43de874774e466cc0ed95580bf4bcb",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "c3b96bbca9a97f777711cc1dbe44250dab43de874774e466cc0ed95580bf4bcb",
-          "bytes": 1989,
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/stdout-submission-1/e4ea924cfa49b0427655b2ea980da72f41c7e4b1de66fb2203471eaa24ebd545",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "e4ea924cfa49b0427655b2ea980da72f41c7e4b1de66fb2203471eaa24ebd545",
+          "bytes": 1988,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 03:28:16",
+          "created_at": "2026-10-04 07:42:41",
           "kind": "stdout-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860496213,
+          "expires_at": 1798875761387,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -577,16 +1127,394 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/report/1d93dbebdf09da32e66d4baf1a8218de1d2ad5295faf01d410cf416fdd5bf913",
-          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
-          "sha256": "1d93dbebdf09da32e66d4baf1a8218de1d2ad5295faf01d410cf416fdd5bf913",
-          "bytes": 11911,
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-0/301f57fcdbccb0ddc381b928b22045c278a434a36cbbf57b8b00b5e66a1c286c",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "301f57fcdbccb0ddc381b928b22045c278a434a36cbbf57b8b00b5e66a1c286c",
+          "bytes": 925,
           "content_type": "application/json",
-          "created_at": "2026-10-04 03:30:20",
+          "created_at": "2026-10-04 07:42:42",
+          "kind": "check-submission-1-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875762249,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-1/ad504efb58015642a39ade9538276ae4e11ce2a5b9b14cc69630d2051aebe66d",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "ad504efb58015642a39ade9538276ae4e11ce2a5b9b14cc69630d2051aebe66d",
+          "bytes": 920,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:42",
+          "kind": "check-submission-1-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875762660,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-2/ac9c8595bc4a34c62e987a13c5802e3e87d493fd9239a674a1db74d86727c2ea",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "ac9c8595bc4a34c62e987a13c5802e3e87d493fd9239a674a1db74d86727c2ea",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:42",
+          "kind": "check-submission-1-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875763143,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-3/d638b1ffbb4951d61466500429e1704450cd50e88575c4dd680e2498f9fe2381",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d638b1ffbb4951d61466500429e1704450cd50e88575c4dd680e2498f9fe2381",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:43",
+          "kind": "check-submission-1-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875763584,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-4/c5c841dc6cf141994d7019ba606f3aec79f6c103103576209727dde569b6bbab",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "c5c841dc6cf141994d7019ba606f3aec79f6c103103576209727dde569b6bbab",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:43",
+          "kind": "check-submission-1-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875764015,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-5/ae95ad8fb13e98b166cd568515add8ed77badbca67a344f6dd5f5a014fb0886f",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "ae95ad8fb13e98b166cd568515add8ed77badbca67a344f6dd5f5a014fb0886f",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:44",
+          "kind": "check-submission-1-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875764439,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-6/86432360d52a61336ee355ffd51c18d134ce6947a7ee73a3606e921df0206c6f",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "86432360d52a61336ee355ffd51c18d134ce6947a7ee73a3606e921df0206c6f",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:44",
+          "kind": "check-submission-1-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875764861,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-7/d909ce3d6ecdb4d1713771a47479a0a1c2fb387870275bb7946b08712e334413",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d909ce3d6ecdb4d1713771a47479a0a1c2fb387870275bb7946b08712e334413",
+          "bytes": 932,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:45",
+          "kind": "check-submission-1-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875765338,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-8/93502f7e213067d02b7bc9a4364a96748b6fa96dddaba718df337de799cd29e2",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "93502f7e213067d02b7bc9a4364a96748b6fa96dddaba718df337de799cd29e2",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:45",
+          "kind": "check-submission-1-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875765756,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-10/f60d8db56b0a3c5eed67f965e06ab23553db80a88693672338072110aac1ca14",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "f60d8db56b0a3c5eed67f965e06ab23553db80a88693672338072110aac1ca14",
+          "bytes": 933,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:46",
+          "kind": "check-submission-1-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875766596,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-9/a1ee9eddd83441f4ed9b2d5d8c902d35f982c9728556fa9f91b995d491d9f650",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "a1ee9eddd83441f4ed9b2d5d8c902d35f982c9728556fa9f91b995d491d9f650",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:46",
+          "kind": "check-submission-1-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875766180,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-11/3135317e8e26be3dcb35159fffbe754e4c5e420a53156fc21a72a7eb7d40a607",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "3135317e8e26be3dcb35159fffbe754e4c5e420a53156fc21a72a7eb7d40a607",
+          "bytes": 927,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:47",
+          "kind": "check-submission-1-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875767021,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-12/4100134f1169bc902934eb54f5ac7420b2171833a28fb5c114663d1c1ba389a8",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "4100134f1169bc902934eb54f5ac7420b2171833a28fb5c114663d1c1ba389a8",
+          "bytes": 902,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:47",
+          "kind": "check-submission-1-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875767426,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-13/8072e64d036d2f31ee401144fd4c739c0f1f936caca7296bf6c901611b484edc",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "8072e64d036d2f31ee401144fd4c739c0f1f936caca7296bf6c901611b484edc",
+          "bytes": 1007,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:47",
+          "kind": "check-submission-1-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875767866,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-14/f27f751aa4bfdf5bc569a218124c6e1c1317a398e1d1298ec4ee1b263da81214",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "f27f751aa4bfdf5bc569a218124c6e1c1317a398e1d1298ec4ee1b263da81214",
+          "bytes": 1015,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:48",
+          "kind": "check-submission-1-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875768298,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-15/d09583ba55f8366f6584aa04c7fb3b45007f8c1c7701e8ed644aad150180cafb",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d09583ba55f8366f6584aa04c7fb3b45007f8c1c7701e8ed644aad150180cafb",
+          "bytes": 1001,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:48",
+          "kind": "check-submission-1-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875768708,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-16/9cb325258bd9e64682a17b739116a13484afa4b39785eb293cf112dc2ca599eb",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "9cb325258bd9e64682a17b739116a13484afa4b39785eb293cf112dc2ca599eb",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:49",
+          "kind": "check-submission-1-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875769131,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-17/cb4e406ed2719b11f9ff59bbc7568de2bace9b0fb2f0500ae72b61dd12cc56aa",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "cb4e406ed2719b11f9ff59bbc7568de2bace9b0fb2f0500ae72b61dd12cc56aa",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:49",
+          "kind": "check-submission-1-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875769538,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-18/570f709a70d6cdf56783af61760f9180d2289d60365ea1a72426df470bca1bd4",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "570f709a70d6cdf56783af61760f9180d2289d60365ea1a72426df470bca1bd4",
+          "bytes": 885,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:50",
+          "kind": "check-submission-1-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875769990,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/check-submission-1-20/d3982abede6c094b3162c3d87e36c21a1860a08a703810481b4a02c428da2cf0",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "d3982abede6c094b3162c3d87e36c21a1860a08a703810481b4a02c428da2cf0",
+          "bytes": 882,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:50",
+          "kind": "check-submission-1-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875770858,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/tests-submission-1-19/36459de3168787f7d16dd9478f96d848a231fb239b575034d246f575f1cb0476",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "36459de3168787f7d16dd9478f96d848a231fb239b575034d246f575f1cb0476",
+          "bytes": 1545,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:42:50",
+          "kind": "tests-submission-1-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798875770414,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63/report/a8ebcd248a7ad12f2197b54cadd5a776156f24905eb272e38d664e09e4044b9f",
+          "run_id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+          "sha256": "a8ebcd248a7ad12f2197b54cadd5a776156f24905eb272e38d664e09e4044b9f",
+          "bytes": 16768,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 07:44:47",
           "kind": "report",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798860620813,
+          "expires_at": 1798875887379,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,

@@ -1,0 +1,128 @@
+{
+  "at": "2026-10-04T07:55:05.071Z",
+  "mode": "REAL_DOCKER_ISOLATED_SYNTHETIC_RUNTIME",
+  "limits": {
+    "memoryMiB": 256,
+    "tmpfsMiB": 64,
+    "perFileMiB": 16
+  },
+  "result": {
+    "requestHash": "f6cd619bacbbdd175634e04261f4ba67114dcd0dbe891ca38eaeb15f6090a890",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "contractHash": "b407ef8ece1ff7fefbb2a459410461ccedadf9abbc53d565b1061774801ac516",
+    "version": "node-http-v1.3.0",
+    "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+    "runtime": "v24.21.0; docker-local-v1",
+    "startedAt": "2026-10-04T07:55:01.956Z",
+    "finishedAt": "2026-10-04T07:55:05.071Z",
+    "checks": [
+      {
+        "id": "retry-transient",
+        "kind": "acceptance",
+        "status": "PASS",
+        "exitCode": null,
+        "durationMs": 263,
+        "stdout": "{\"status\":\"success\",\"attempts\":2}",
+        "stderr": "",
+        "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+      },
+      {
+        "id": "retry-bounded",
+        "kind": "acceptance",
+        "status": "PASS",
+        "exitCode": null,
+        "durationMs": 188,
+        "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+        "stderr": "",
+        "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+      },
+      {
+        "id": "retry-permanent",
+        "kind": "acceptance",
+        "status": "PASS",
+        "exitCode": null,
+        "durationMs": 192,
+        "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+        "stderr": "",
+        "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+      },
+      {
+        "id": "retry-invalid",
+        "kind": "acceptance",
+        "status": "PASS",
+        "exitCode": null,
+        "durationMs": 201,
+        "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+        "stderr": "",
+        "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+      },
+      {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 137,
+        "durationMs": 363,
+        "id": "memory-exhaustion",
+        "kind": "test",
+        "status": "FAIL",
+        "detail": "Configured test command failed."
+      },
+      {
+        "stdout": "",
+        "stderr": "node:internal/fs/utils:349\n    throw err;\n    ^\n\nError: ENOSPC: no space left on device, write\n    at Object.writeSync (node:fs:977:3)\n    at Object.writeFileSync (node:fs:2502:26)\n    at [eval]:1:53\n    at runScriptInThisContext (node:internal/vm:219:10)\n    at node:internal/process/execution:451:12\n    at [eval]-wrapper:6:24\n    at runScriptInContext (node:internal/process/execution:449:60)\n    at evalFunction (node:internal/process/execution:283:30)\n    at evalTypeScript (node:internal/process/execution:295:3)\n    at node:internal/main/eval_string:71:3 {\n  errno: -28,\n  syscall: 'write',\n  code: 'ENOSPC'\n}\n\nNode.js v24.21.0\n",
+        "exitCode": 1,
+        "durationMs": 148,
+        "id": "disk-exhaustion",
+        "kind": "test",
+        "status": "FAIL",
+        "detail": "Configured test command failed."
+      },
+      {
+        "stdout": "",
+        "stderr": "",
+        "exitCode": 0,
+        "durationMs": 84,
+        "id": "after-resource-failures",
+        "kind": "build",
+        "status": "PASS",
+        "detail": "Configured build command passed."
+      }
+    ],
+    "metrics": {
+      "resources": [
+        {
+          "scope": "service",
+          "sampledAt": "2026-10-04T07:55:03.540Z",
+          "cpuUsageUsec": 473223,
+          "memoryBytes": 31608832,
+          "pids": 15
+        },
+        {
+          "scope": "command:disk-exhaustion",
+          "sampledAt": "2026-10-04T07:55:04.227Z",
+          "cpuUsageUsec": 147788,
+          "memoryBytes": 80211968,
+          "pids": 8
+        },
+        {
+          "scope": "command:memory-exhaustion",
+          "sampledAt": "2026-10-04T07:55:04.437Z",
+          "cpuUsageUsec": 222636,
+          "memoryBytes": 12214272,
+          "pids": 8
+        },
+        {
+          "scope": "command:after-resource-failures",
+          "sampledAt": "2026-10-04T07:55:04.989Z",
+          "cpuUsageUsec": 94272,
+          "memoryBytes": 12701696,
+          "pids": 8
+        }
+      ],
+      "startupMs": 445,
+      "tools": {
+        "node": "v24.21.0",
+        "npm": "11.19.0"
+      }
+    }
+  }
+}

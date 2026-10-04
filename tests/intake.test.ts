@@ -661,3 +661,117 @@ it('retains twelve submissions and authoritative latest heads during a signed 48
     deferred.mockRestore();
   }
 }, 30000);
+
+it('dispatches only the latest five queued items per recovery sweep, skips obsolete work, and exposes authoritative queue counts', async () => {
+  const { competitionOverview } = await import('../src/competition-overview');
+  const { acquireReviewer, releaseReviewer } =
+    await import('../src/reviewer-capacity');
+  const aiSlot = await acquireReviewer(env.DB, 'callmissed');
+  expect(aiSlot).not.toBeNull();
+  await env.DB.prepare(
+    'UPDATE outbox SET dispatched_at=CURRENT_TIMESTAMP',
+  ).run();
+  const before = await competitionOverview(env.DB);
+  const real = env.EVALUATOR;
+  const dispatched: string[] = [];
+  const expected = new Map<number, string>();
+  const originalHash = await digest(canonical(demoContract));
+  const deferred = vi.spyOn(console, 'error').mockImplementation(() => {});
+  env.EVALUATOR = {
+    create: async () => {
+      throw Error('fixture outage');
+    },
+    get: async () => {
+      throw Error('fixture outage');
+    },
+  } as unknown as Env['EVALUATOR'];
+  try {
+    for (let index = 0; index < 8; index++) {
+      const prNumber = 200 + index;
+      expect(
+        (
+          await api(
+            new Request('https://test/api/assignments', {
+              method: 'POST',
+              headers: { authorization: 'Bearer ' + admin },
+              body: canonical({
+                repositoryId: 1,
+                prNumber,
+                teamId: 'priority-' + index,
+                teamName: 'Priority fixture ' + index,
+                issueNumbers: [12],
+                contractHash: originalHash,
+              }),
+            }),
+            env,
+          )
+        ).status,
+      ).toBe(201);
+      const sha = (index + 200).toString(16).padStart(40, '0'),
+        updated = `2026-10-04T12:00:0${index}Z`;
+      const response = await webhook(
+        await signed(sha, undefined, updated, {
+          pull_request: {
+            number: prNumber,
+            head: { sha },
+            base: { repo: { id: 1 } },
+            updated_at: updated,
+            state: 'open',
+          },
+        }),
+        env,
+        ctx,
+      );
+      expect(response.status).toBe(202);
+      const runId = ((await response.json()) as { runId: string }).runId;
+      expected.set(prNumber, runId);
+      await env.DB.prepare('UPDATE outbox SET created_at=? WHERE run_id=?')
+        .bind(updated, runId)
+        .run();
+    }
+    await Promise.allSettled(pending);
+    await env.DB.prepare("UPDATE evaluations SET state='SUPERSEDED' WHERE id=?")
+      .bind(expected.get(207))
+      .run();
+    env.EVALUATOR = {
+      create: async (input: { id: string }) => {
+        dispatched.push(input.id);
+        return {};
+      },
+      get: async () => {
+        throw Error('fixture missing');
+      },
+    } as unknown as Env['EVALUATOR'];
+    const metrics = await competitionOverview(env.DB);
+    expect(metrics!.queuedRuns).toBe(before!.queuedRuns! + 7);
+    expect(metrics!.supersededRuns).toBe(before!.supersededRuns! + 1);
+    await reconcile(env);
+    expect(dispatched).toHaveLength(5);
+    expect(new Set(dispatched)).toEqual(
+      new Set([202, 203, 204, 205, 206].map((pr) => expected.get(pr)!)),
+    );
+    expect(dispatched).not.toContain(expected.get(207));
+    expect(
+      (await env.DB.prepare(
+        "SELECT count(*) AS n FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE e.pr_number BETWEEN 200 AND 207 AND e.state='QUEUED' AND o.dispatched_at IS NULL",
+      ).first<{ n: number }>())!.n,
+    ).toBe(2);
+    await reconcile(env);
+    expect(dispatched).toHaveLength(7);
+    expect(new Set(dispatched).size).toBe(7);
+    expect(
+      (await env.DB.prepare(
+        "SELECT owner FROM reviewer_slots WHERE provider='callmissed'",
+      ).first<{ owner: string }>())!.owner,
+    ).toBe(aiSlot!.owner);
+    expect(
+      (await env.DB.prepare(
+        "SELECT count(*) AS n FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE e.pr_number BETWEEN 200 AND 207 AND e.state='QUEUED' AND o.dispatched_at IS NULL",
+      ).first<{ n: number }>())!.n,
+    ).toBe(0);
+  } finally {
+    await releaseReviewer(env.DB, aiSlot!);
+    env.EVALUATOR = real;
+    deferred.mockRestore();
+  }
+}, 30000);
