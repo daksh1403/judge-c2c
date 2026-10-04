@@ -1,0 +1,1469 @@
+{
+  "at": "2026-10-04T07:46:27.373Z",
+  "mode": "REAL_REVIEW_API",
+  "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+  "status": 200,
+  "role": "organizer",
+  "runner": {
+    "enabled": true,
+    "reason": "Development Docker runner through authenticated tunnel. Availability depends on the organizer machine."
+  },
+  "ai": {
+    "provider": "cloudflare",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "enabled": true
+  },
+  "issuesWrite": true,
+  "events": [
+    "check_run",
+    "check_suite",
+    "commit_comment",
+    "create",
+    "delete",
+    "issues",
+    "issue_comment",
+    "issue_dependencies",
+    "issue_relates_to",
+    "label",
+    "pull_request",
+    "pull_request_review",
+    "pull_request_review_comment",
+    "pull_request_review_thread",
+    "push",
+    "release",
+    "repository_dispatch",
+    "sub_issues"
+  ],
+  "metricsStatus": 200,
+  "metrics": {
+    "windowMinutes": 60,
+    "retentionDays": 7,
+    "buckets": [
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.latencyMs",
+        "count": 25,
+        "sum": 12846,
+        "max": 1294
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.request",
+        "count": 25,
+        "sum": 25,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 511,
+        "max": 511
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1116,
+        "max": 651
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 995,
+        "max": 504
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097560000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 758,
+        "max": 426
+      },
+      {
+        "bucketUtcMinute": 1791097560000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.latencyMs",
+        "count": 23,
+        "sum": 10990,
+        "max": 952
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.request",
+        "count": 23,
+        "sum": 23,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 485,
+        "max": 485
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1081,
+        "max": 659
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 965,
+        "max": 484
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097860000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 684,
+        "max": 346
+      },
+      {
+        "bucketUtcMinute": 1791097860000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097920000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 955,
+        "max": 536
+      },
+      {
+        "bucketUtcMinute": 1791097920000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "github.latencyMs",
+        "count": 33,
+        "sum": 13789,
+        "max": 763
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "github.request",
+        "count": 33,
+        "sum": 33,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "webhook.latencyMs",
+        "count": 3,
+        "sum": 1526,
+        "max": 520
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "webhook.request",
+        "count": 3,
+        "sum": 3,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098280000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098280000,
+        "metric": "github.latencyMs",
+        "count": 33,
+        "sum": 13228,
+        "max": 882
+      },
+      {
+        "bucketUtcMinute": 1791098280000,
+        "metric": "github.request",
+        "count": 33,
+        "sum": 33,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098280000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 486,
+        "max": 486
+      },
+      {
+        "bucketUtcMinute": 1791098280000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1034,
+        "max": 563
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 995,
+        "max": 501
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098520000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 686,
+        "max": 373
+      },
+      {
+        "bucketUtcMinute": 1791098520000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098880000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098880000,
+        "metric": "github.latencyMs",
+        "count": 31,
+        "sum": 14109,
+        "max": 1153
+      },
+      {
+        "bucketUtcMinute": 1791098880000,
+        "metric": "github.request",
+        "count": 31,
+        "sum": 31,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098880000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 495,
+        "max": 495
+      },
+      {
+        "bucketUtcMinute": 1791098880000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "github.latencyMs",
+        "count": 4,
+        "sum": 1898,
+        "max": 665
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "github.request",
+        "count": 4,
+        "sum": 4,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 1030,
+        "max": 520
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099600000,
+        "metric": "github.latencyMs",
+        "count": 8,
+        "sum": 4613,
+        "max": 1133
+      },
+      {
+        "bucketUtcMinute": 1791099600000,
+        "metric": "github.request",
+        "count": 8,
+        "sum": 8,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099600000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 489,
+        "max": 489
+      },
+      {
+        "bucketUtcMinute": 1791099600000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099660000,
+        "metric": "github.error",
+        "count": 3,
+        "sum": 3,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099660000,
+        "metric": "github.latencyMs",
+        "count": 79,
+        "sum": 33508,
+        "max": 839
+      },
+      {
+        "bucketUtcMinute": 1791099660000,
+        "metric": "github.request",
+        "count": 79,
+        "sum": 79,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099660000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 1025,
+        "max": 542
+      },
+      {
+        "bucketUtcMinute": 1791099660000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "github.latencyMs",
+        "count": 18,
+        "sum": 7326,
+        "max": 976
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "github.request",
+        "count": 18,
+        "sum": 18,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 973,
+        "max": 487
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1408,
+        "max": 811
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 1004,
+        "max": 518
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "github.latencyMs",
+        "count": 4,
+        "sum": 1872,
+        "max": 752
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "github.request",
+        "count": 4,
+        "sum": 4,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 982,
+        "max": 492
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099960000,
+        "metric": "github.latencyMs",
+        "count": 4,
+        "sum": 1190,
+        "max": 317
+      },
+      {
+        "bucketUtcMinute": 1791099960000,
+        "metric": "github.request",
+        "count": 4,
+        "sum": 4,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 54331,
+        "max": 54331
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.inputTokens",
+        "count": 1,
+        "sum": 11034,
+        "max": 11034
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.outputTokens",
+        "count": 1,
+        "sum": 1855,
+        "max": 1855
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.toolCalls",
+        "count": 1,
+        "sum": 4,
+        "max": 4
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 88000,
+        "max": 88000
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 225,
+        "max": 225
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "cache.context.miss",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 198,
+        "max": 198
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 849,
+        "max": 849
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 1035,
+        "max": 1035
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 31000,
+        "max": 31000
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 4238658,
+        "max": 4238658
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32153600,
+        "max": 32153600
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791098160000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 712,
+        "max": 712
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 60658,
+        "max": 60658
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "cache.context.hit",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 206,
+        "max": 206
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 906,
+        "max": 906
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 1029,
+        "max": 1029
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 108000,
+        "max": 108000
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 4241213,
+        "max": 4241213
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "runner.durationMs",
+        "count": 1,
+        "sum": 11765,
+        "max": 11765
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32432128,
+        "max": 32432128
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791098400000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 765,
+        "max": 765
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 66983,
+        "max": 66983
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "cache.context.hit",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 196,
+        "max": 196
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 873,
+        "max": 873
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 1101,
+        "max": 1101
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 118000,
+        "max": 118000
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 4306263,
+        "max": 4306263
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "runner.durationMs",
+        "count": 1,
+        "sum": 11130,
+        "max": 11130
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32223232,
+        "max": 32223232
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791099000000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 712,
+        "max": 712
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 50770,
+        "max": 50770
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "ai.inputTokens",
+        "count": 1,
+        "sum": 14084,
+        "max": 14084
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "ai.outputTokens",
+        "count": 1,
+        "sum": 1585,
+        "max": 1585
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "cache.context.hit",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 251,
+        "max": 251
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 1006,
+        "max": 1006
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 1261,
+        "max": 1261
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 108000,
+        "max": 108000
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "queue.waitMs",
+        "count": 1,
+        "sum": 3000,
+        "max": 3000
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 5886616,
+        "max": 5886616
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "runner.durationMs",
+        "count": 1,
+        "sum": 16342,
+        "max": 16342
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32432128,
+        "max": 32432128
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 1728,
+        "max": 1728
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "stage.checking.durationMs",
+        "count": 1,
+        "sum": 49000,
+        "max": 49000
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "stage.fetching.durationMs",
+        "count": 1,
+        "sum": 5000,
+        "max": 5000
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "stage.reviewing.durationMs",
+        "count": 1,
+        "sum": 51000,
+        "max": 51000
+      },
+      {
+        "bucketUtcMinute": 1791099720000,
+        "metric": "stage.synthesizing.durationMs",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 70927,
+        "max": 70927
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "ai.inputTokens",
+        "count": 1,
+        "sum": 14091,
+        "max": 14091
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "ai.outputTokens",
+        "count": 1,
+        "sum": 2048,
+        "max": 2048
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "cache.context.miss",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 185,
+        "max": 185
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 917,
+        "max": 917
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 997,
+        "max": 997
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 120000,
+        "max": 120000
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "queue.waitMs",
+        "count": 1,
+        "sum": 3000,
+        "max": 3000
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 4274991,
+        "max": 4274991
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "runner.durationMs",
+        "count": 1,
+        "sum": 10979,
+        "max": 10979
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32366592,
+        "max": 32366592
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 597,
+        "max": 597
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "stage.checking.durationMs",
+        "count": 1,
+        "sum": 42000,
+        "max": 42000
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "stage.fetching.durationMs",
+        "count": 1,
+        "sum": 4000,
+        "max": 4000
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "stage.reviewing.durationMs",
+        "count": 1,
+        "sum": 71000,
+        "max": 71000
+      },
+      {
+        "bucketUtcMinute": 1791099780000,
+        "metric": "stage.synthesizing.durationMs",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 115941,
+        "max": 115941
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "ai.inputTokens",
+        "count": 1,
+        "sum": 14138,
+        "max": 14138
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "ai.outputTokens",
+        "count": 1,
+        "sum": 1831,
+        "max": 1831
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "cache.bypass",
+        "count": 1,
+        "sum": 2,
+        "max": 2
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "cache.context.miss",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "check.build.durationMs",
+        "count": 1,
+        "sum": 200,
+        "max": 200
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "check.lint.durationMs",
+        "count": 1,
+        "sum": 863,
+        "max": 863
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "check.test.durationMs",
+        "count": 1,
+        "sum": 851,
+        "max": 851
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 182000,
+        "max": 182000
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "queue.waitMs",
+        "count": 1,
+        "sum": 3000,
+        "max": 3000
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "runner.cpuUsageUsec",
+        "count": 1,
+        "sum": 4145975,
+        "max": 4145975
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "runner.durationMs",
+        "count": 1,
+        "sum": 10869,
+        "max": 10869
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "runner.sampledMemoryBytes",
+        "count": 1,
+        "sum": 32415744,
+        "max": 32415744
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "runner.sampledPids",
+        "count": 1,
+        "sum": 15,
+        "max": 15
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "runner.startupMs",
+        "count": 1,
+        "sum": 560,
+        "max": 560
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "stage.checking.durationMs",
+        "count": 1,
+        "sum": 58000,
+        "max": 58000
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "stage.fetching.durationMs",
+        "count": 1,
+        "sum": 5000,
+        "max": 5000
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "stage.reviewing.durationMs",
+        "count": 1,
+        "sum": 116000,
+        "max": 116000
+      },
+      {
+        "bucketUtcMinute": 1791099840000,
+        "metric": "stage.synthesizing.durationMs",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      }
+    ],
+    "alerts": [
+      {
+        "metric": "github.error",
+        "observed": 8,
+        "title": "GitHub requests failed",
+        "action": "Inspect synchronization/check publication state and retry after service recovery."
+      },
+      {
+        "metric": "ai.retries",
+        "observed": 4,
+        "title": "AI review needed recovery",
+        "action": "Inspect provider/validation traces and unresolved qualitative analysis; objective results remain authoritative."
+      }
+    ],
+    "unavailable": [
+      "disk usage and application cold-start",
+      "provider cost without authoritative pricing",
+      "peak resource consumption (only sampled guest counters are measured)"
+    ]
+  },
+  "pr7": {
+    "status": 200,
+    "latestRun": "6b15772153dc2c2058281a7c2249fd79957ec1da57bedf05b835cc277761ebd3",
+    "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+    "evaluations": [
+      {
+        "id": "6b15772153dc2c2058281a7c2249fd79957ec1da57bedf05b835cc277761ebd3",
+        "head_sha": "749b414d1036a0c1b734af807e681e4894d2345e",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 12:37:10"
+      }
+    ]
+  },
+  "pr8": {
+    "status": 200,
+    "latestRun": "c1584d2443a439da1c3424138ac26675ee05424facf450e8cb72b1645ec5e342",
+    "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+    "evaluations": [
+      {
+        "id": "c1584d2443a439da1c3424138ac26675ee05424facf450e8cb72b1645ec5e342",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:40:53"
+      },
+      {
+        "id": "a070a409d92514c80bceb41f6124c37b7198a0057667c603da779588d5e2079b",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-04 07:28:07"
+      },
+      {
+        "id": "9885fa22d0febf6504c3782de84f5628d07e3ace06c9130736a05b360808066c",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-04 07:18:40"
+      },
+      {
+        "id": "47dc65469c3d7118751deea834ceab5c8a1e6a5aa057684a68d2e1960aed3e8f",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-04 07:16:06"
+      },
+      {
+        "id": "438884fcc16aa081f92273e4a70a6be076cf7047677c4f53e69874507a91fcce",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:09:28"
+      },
+      {
+        "id": "1ddbf090fefbf03f367dcc0872402fdc4b86bfd9afaa9b6d5e4561b30915bb50",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:02:37"
+      },
+      {
+        "id": "b737307fbaa947ac85f3397259add4f22c67e4666c346c7a6c438f2de637af69",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 18:06:44"
+      },
+      {
+        "id": "9273b681fffa36c66f12d9fbc8f2db3990a2cfbd1d9e22f6c782f9331f59738b",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:59:39"
+      },
+      {
+        "id": "fb355c70e4f1e300ad2acaae3ad28906f758e98842be3c2e5cf9fa8976d6abc5",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:49:24"
+      },
+      {
+        "id": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 13:19:53"
+      }
+    ]
+  },
+  "pr9": {
+    "status": 200,
+    "latestRun": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+    "head": "628436f51c897930e2c902c2051c185259ef95c8",
+    "evaluations": [
+      {
+        "id": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:41:45"
+      },
+      {
+        "id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 03:27:31"
+      },
+      {
+        "id": "83265316e53fd6a2eaea434708aeb45f030941b6e80c1bf9dc928abfc7e24675",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "SKIPPED_CONTEXT_LIMIT",
+        "created_at": "2026-10-04 03:25:35"
+      },
+      {
+        "id": "41b69d99d1d9c93957ae3ff6176e8b0482b744b0e0cfca1cad31af9e8314a668",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 17:59:42"
+      },
+      {
+        "id": "c076bac6c4d96cc5a7c30cdb766cd38998ced1772496c56c26c56dabe3be7ef1",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:49:28"
+      },
+      {
+        "id": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 13:19:55"
+      }
+    ]
+  }
+}

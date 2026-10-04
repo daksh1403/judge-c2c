@@ -1,0 +1,13 @@
+{
+  "mode": "REAL_OSV_API_PUBLIC_PACKAGE_METADATA_ONLY",
+  "baseline": "lodash@4.17.20",
+  "submission": "lodash@4.17.21",
+  "evidence": [
+    {
+      "id": "dependency-audit",
+      "kind": "source",
+      "status": "UNVERIFIED",
+      "claim": "Declared npm dependency audit unavailable: INVALID_OR_UNAVAILABLE_INPUT. No package installation or scripts were executed."
+    }
+  ]
+}

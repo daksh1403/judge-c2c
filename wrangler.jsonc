@@ -1,0 +1,175 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "judge-c2c",
+  "preview_urls": true,
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/health", "/webhooks/*", "/auth/github/*"],
+  },
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "ENVIRONMENT": "review",
+    "DEMO_MODE": "true",
+    "PREVIEW_TESTING": "true",
+  },
+  "previews": {
+    "vars": {
+      "ENVIRONMENT": "review",
+      "DEMO_MODE": "true",
+      "PREVIEW_TESTING": "true",
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "judge-c2c-review",
+        "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+        "migrations_dir": "migrations",
+      },
+    ],
+    "workflows": [
+      {
+        "binding": "PREVIEW_EVALUATOR",
+        "name": "judge-c2c-public-preview-evaluator",
+        "class_name": "PublicPreviewWorkflow",
+        "script_name": "judge-c2c-review",
+      },
+    ],
+    "services": [
+      {
+        "binding": "ORG_SERVICE",
+        "service": "judge-c2c-review",
+      },
+    ],
+  },
+  "env": {
+    "local": {
+      "name": "judge-c2c-local",
+      "vars": {
+        "ENVIRONMENT": "local",
+        "DEMO_MODE": "true",
+        "PREVIEW_TESTING": "true",
+        "ORG_NAME": "Daksh-Codebase",
+        "ORG_PUBLIC_ORIGIN": "http://127.0.0.1:8787",
+        "RUNNER_ENABLED": "false",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "judge-c2c-local",
+          "database_id": "local-only",
+          "migrations_dir": "migrations",
+        },
+        {
+          "binding": "ORG_DB",
+          "database_name": "judge-c2c-organization-local",
+          "database_id": "organization-local",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "workflows": [
+        {
+          "binding": "EVALUATOR",
+          "name": "judge-c2c-local-evaluator",
+          "class_name": "EvaluationWorkflow",
+        },
+        {
+          "binding": "PREVIEW_EVALUATOR",
+          "name": "judge-c2c-local-preview-evaluator",
+          "class_name": "PublicPreviewWorkflow",
+        },
+        {
+          "binding": "ORG_EVALUATOR",
+          "name": "judge-c2c-organization-local-evaluator",
+          "class_name": "OrganizationEvaluationWorkflow",
+        },
+      ],
+      "services": [],
+    },
+    "review": {
+      "name": "judge-c2c-review",
+      "kv_namespaces": [
+        { "binding": "ARTIFACT_KV", "id": "2bfcf7ac70ba405e906f7d3e7c161868" },
+      ],
+      "vars": {
+        "ENVIRONMENT": "review",
+        "DEMO_MODE": "true",
+        "PREVIEW_TESTING": "true",
+        "ORG_NAME": "Daksh-Codebase",
+        "ORG_PUBLIC_ORIGIN": "https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev",
+        "ORG_REVIEW_ORIGINS": "https://feat-team-issue-workflow-judge-c2c.dakshx.workers.dev,https://test-hackathon-rehearsal-judge-c2c.dakshx.workers.dev,https://feat-hackathon-readiness-judge-c2c.dakshx.workers.dev,https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev,https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev,https://feat-frontend-polish-judge-c2c.dakshx.workers.dev",
+        "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "AI_PROVIDER": "callmissed",
+        "CALLMISSED_MODEL": "kimi-k2.6",
+        "RUNNER_ENABLED": "false",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "judge-c2c-review",
+          "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+          "migrations_dir": "migrations",
+        },
+        {
+          "binding": "ORG_DB",
+          "database_name": "judge-c2c-organization",
+          "database_id": "35f5053d-1fa5-49a7-89b9-4751e1c7a895",
+          "migrations_dir": "migrations",
+        },
+      ],
+      "workflows": [
+        {
+          "binding": "EVALUATOR",
+          "name": "judge-c2c-review-evaluator",
+          "class_name": "EvaluationWorkflow",
+        },
+        {
+          "binding": "PREVIEW_EVALUATOR",
+          "name": "judge-c2c-public-preview-evaluator",
+          "class_name": "PublicPreviewWorkflow",
+        },
+        {
+          "binding": "ORG_EVALUATOR",
+          "name": "judge-c2c-organization-evaluator",
+          "class_name": "OrganizationEvaluationWorkflow",
+        },
+      ],
+      "workers_dev": false,
+      "preview_urls": false,
+      "triggers": {
+        "crons": ["*/2 * * * *"],
+      },
+      "services": [],
+      "ai": {
+        "binding": "AI",
+      },
+    },
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "judge-c2c-review",
+      "database_id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "workflows": [
+    {
+      "binding": "PREVIEW_EVALUATOR",
+      "name": "judge-c2c-public-preview-evaluator",
+      "class_name": "PublicPreviewWorkflow",
+      "script_name": "judge-c2c-review",
+    },
+  ],
+  "services": [
+    {
+      "binding": "ORG_SERVICE",
+      "service": "judge-c2c-review",
+    },
+  ],
+}

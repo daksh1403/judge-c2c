@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-04T07:25:00.846Z",
+  "profile": "LIVE_OSV_READ_ONLY",
+  "scope": "Exact declared npm inventory/advisory delta only; not exploitability or comprehensive source security.",
+  "durationMs": 10017,
+  "evidence": [
+    {
+      "id": "dependency-audit",
+      "kind": "source",
+      "status": "UNVERIFIED",
+      "claim": "Declared npm dependency audit unavailable: INVALID_OR_UNAVAILABLE_INPUT. No package installation or scripts were executed."
+    }
+  ]
+}

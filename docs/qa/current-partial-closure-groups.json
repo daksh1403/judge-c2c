@@ -1,0 +1,890 @@
+{
+  "at": "2026-10-04T07:47:18.299Z",
+  "baseline": "7c688d20c64853b77172258247cb2c3fe0d47fbe",
+  "method": "Group existing unresolved ledger notes once; not a new repository audit.",
+  "groups": {
+    "governance": [
+      {
+        "id": "01.04",
+        "requirement": "Main is production branch",
+        "remainingCondition": "Main is production branch: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+      },
+      {
+        "id": "01.05",
+        "requirement": "No normal feature work on main",
+        "remainingCondition": "No normal feature work on main: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+      },
+      {
+        "id": "01.12",
+        "requirement": "Local preview production separation",
+        "remainingCondition": "Local preview production separation: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+      },
+      {
+        "id": "01.13",
+        "requirement": "No committed secrets",
+        "remainingCondition": "No committed secrets: Recognized credentials are redacted and local secret files ignored; exhaustive Git history and arbitrary-secret scanning are not proven."
+      },
+      {
+        "id": "01.14",
+        "requirement": "Reproducible engineer setup",
+        "remainingCondition": "Reproducible engineer setup: Workflow configuration was inspected; governance and clean independent setup require separate operational proof."
+      },
+      {
+        "id": "02.06",
+        "requirement": "Preview production separation",
+        "remainingCondition": "Preview production separation: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+      },
+      {
+        "id": "02.07",
+        "requirement": "No production data copied",
+        "remainingCondition": "No production data copied: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+      },
+      {
+        "id": "02.08",
+        "requirement": "No production secrets exposed",
+        "remainingCondition": "No production secrets exposed: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists."
+      },
+      {
+        "id": "03.01",
+        "requirement": "GitHub App production credentials",
+        "remainingCondition": "GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup."
+      },
+      {
+        "id": "03.03",
+        "requirement": "Least privilege",
+        "remainingCondition": "Least privilege: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup."
+      }
+    ],
+    "intakeAndLifecycle": [
+      {
+        "id": "04.06",
+        "requirement": "Issue edited",
+        "remainingCondition": "Issue edited: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised."
+      },
+      {
+        "id": "04.08",
+        "requirement": "Issue assigned and unassigned",
+        "remainingCondition": "Issue assigned and unassigned: Supported events are routed through a signed durable inbox; every event/action ordering has not been independently exercised."
+      },
+      {
+        "id": "07.03",
+        "requirement": "Mandatory optional bonus and non-scored scopes",
+        "remainingCondition": "Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence."
+      },
+      {
+        "id": "09.01",
+        "requirement": "Bug template",
+        "remainingCondition": "Bug template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+      },
+      {
+        "id": "09.02",
+        "requirement": "Feature template",
+        "remainingCondition": "Feature template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+      },
+      {
+        "id": "09.04",
+        "requirement": "Performance template",
+        "remainingCondition": "Performance template: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+      },
+      {
+        "id": "09.05",
+        "requirement": "Clarification workflow",
+        "remainingCondition": "Clarification workflow: Structured templates are supplied for Judge-C2C; they have not been deployed and tested in every challenge repository."
+      },
+      {
+        "id": "09.10",
+        "requirement": "Spam limits",
+        "remainingCondition": "Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection."
+      },
+      {
+        "id": "09.11",
+        "requirement": "Gaming controls",
+        "remainingCondition": "Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection."
+      },
+      {
+        "id": "10.06",
+        "requirement": "Multi-team assignment",
+        "remainingCondition": "Multi-team assignment: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered."
+      },
+      {
+        "id": "10.07",
+        "requirement": "Reservation when configured",
+        "remainingCondition": "Reservation when configured: Shared capacity and reservations are modeled; expiry is exercised, but all shared-claim and reservation-activation races are not yet covered."
+      },
+      {
+        "id": "11.06",
+        "requirement": "In progress",
+        "remainingCondition": "In progress: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+      },
+      {
+        "id": "11.07",
+        "requirement": "PR opened",
+        "remainingCondition": "PR opened: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+      },
+      {
+        "id": "11.08",
+        "requirement": "Evaluating",
+        "remainingCondition": "Evaluating: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+      },
+      {
+        "id": "11.10",
+        "requirement": "Blocked",
+        "remainingCondition": "Blocked: Native GitHub state, organizer review, assignment progress and run status remain separate; lifecycle projection exists but every transition permutation is not exercised."
+      }
+    ],
+    "executionAndContracts": [
+      {
+        "id": "17.11",
+        "requirement": "Regression requirements",
+        "remainingCondition": "Regression requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+      },
+      {
+        "id": "17.13",
+        "requirement": "Security requirements",
+        "remainingCondition": "Security requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+      },
+      {
+        "id": "17.14",
+        "requirement": "Testing requirements",
+        "remainingCondition": "Testing requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+      },
+      {
+        "id": "17.15",
+        "requirement": "Performance requirements",
+        "remainingCondition": "Performance requirements: These expectations can be expressed as criteria/trusted checks; category-specific policy schemas and comprehensive scanner/benchmark profiles remain incomplete."
+      },
+      {
+        "id": "18.08",
+        "requirement": "Pre-existing vulnerabilities",
+        "remainingCondition": "Pre-existing vulnerabilities: Bounded source patterns and declared npm advisory comparisons distinguish deltas; exploitability and comprehensive vulnerability analysis are not proven."
+      },
+      {
+        "id": "18.09",
+        "requirement": "New vulnerabilities",
+        "remainingCondition": "New vulnerabilities: Bounded source patterns and declared npm advisory comparisons distinguish deltas; exploitability and comprehensive vulnerability analysis are not proven."
+      },
+      {
+        "id": "18.12",
+        "requirement": "Credit attributable to diff",
+        "remainingCondition": "Credit attributable to diff: No automatic additional credit exists; reviewed completion is evidence-gated, but functional extra-contribution attribution is incomplete."
+      },
+      {
+        "id": "20.04",
+        "requirement": "Integration tests",
+        "remainingCondition": "Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+      },
+      {
+        "id": "20.07",
+        "requirement": "Type check",
+        "remainingCondition": "Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+      },
+      {
+        "id": "20.08",
+        "requirement": "Formatting where relevant",
+        "remainingCondition": "Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+      },
+      {
+        "id": "20.09",
+        "requirement": "Coverage",
+        "remainingCondition": "Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness."
+      },
+      {
+        "id": "20.10",
+        "requirement": "Security scans",
+        "remainingCondition": "Security scans: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent."
+      },
+      {
+        "id": "20.11",
+        "requirement": "Dependency audit",
+        "remainingCondition": "Dependency audit: Bounded source patterns and exact npm OSV fixture normalization exist; live OSV timed out and full scanners remain absent."
+      },
+      {
+        "id": "22.02",
+        "requirement": "Isolation architecture",
+        "remainingCondition": "Isolation architecture: Deliberate Docker VM isolation is implemented for development; suitable production hostile-code capacity remains unprovisioned."
+      },
+      {
+        "id": "22.16",
+        "requirement": "Artifacts",
+        "remainingCondition": "Artifacts: Bounded execution records are available; large retained guest artifacts need account-enabled object storage."
+      },
+      {
+        "id": "22.18",
+        "requirement": "Redaction",
+        "remainingCondition": "Redaction: Known credential formats are redacted; arbitrary secret recognition and binary artifact scanning are not exhaustive."
+      },
+      {
+        "id": "23.03",
+        "requirement": "Memory exhaustion",
+        "remainingCondition": "Memory exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+      },
+      {
+        "id": "23.06",
+        "requirement": "Disk exhaustion",
+        "remainingCondition": "Disk exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+      },
+      {
+        "id": "23.07",
+        "requirement": "Malicious install scripts",
+        "remainingCondition": "Malicious install scripts: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+      },
+      {
+        "id": "23.09",
+        "requirement": "Internal network probing",
+        "remainingCondition": "Internal network probing: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed."
+      },
+      {
+        "id": "23.13",
+        "requirement": "Prompt injection",
+        "remainingCondition": "Prompt injection: Hostile README and forged AI outputs did not override objective statuses; semantic narrative accuracy still fails calibration in some claims."
+      }
+    ],
+    "groundingAndQualitative": [
+      {
+        "id": "25.01",
+        "requirement": "Observable problem",
+        "remainingCondition": "Observable problem: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.02",
+        "requirement": "Observable approach",
+        "remainingCondition": "Observable approach: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.03",
+        "requirement": "Changed components",
+        "remainingCondition": "Changed components: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.04",
+        "requirement": "Root problem",
+        "remainingCondition": "Root problem: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.05",
+        "requirement": "Symptom masking",
+        "remainingCondition": "Symptom masking: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.06",
+        "requirement": "Unnecessary complexity",
+        "remainingCondition": "Unnecessary complexity: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.07",
+        "requirement": "Duplication",
+        "remainingCondition": "Duplication: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.08",
+        "requirement": "Architecture fit",
+        "remainingCondition": "Architecture fit: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.09",
+        "requirement": "Tradeoffs",
+        "remainingCondition": "Tradeoffs: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.10",
+        "requirement": "Assumptions",
+        "remainingCondition": "Assumptions: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.11",
+        "requirement": "Edge cases",
+        "remainingCondition": "Edge cases: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.12",
+        "requirement": "Maintainability",
+        "remainingCondition": "Maintainability: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.13",
+        "requirement": "Scalability",
+        "remainingCondition": "Scalability: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.14",
+        "requirement": "Security risk",
+        "remainingCondition": "Security risk: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.15",
+        "requirement": "Regression",
+        "remainingCondition": "Regression: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.16",
+        "requirement": "Objective support",
+        "remainingCondition": "Objective support: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "25.18",
+        "requirement": "No private intention claims",
+        "remainingCondition": "No private intention claims: Structured approach observations exist, but real partial/manipulated reports included false test-coverage claims; narrative conclusions require judge review."
+      },
+      {
+        "id": "26.09",
+        "requirement": "PARTIAL",
+        "remainingCondition": "PARTIAL: PARTIAL is accepted structurally for supported source/contextual assessments; calibrated per-requirement partial aggregation is not implemented."
+      },
+      {
+        "id": "27.01",
+        "requirement": "Maintainability",
+        "remainingCondition": "Maintainability: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.02",
+        "requirement": "Separation of concerns",
+        "remainingCondition": "Separation of concerns: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.03",
+        "requirement": "Duplication",
+        "remainingCondition": "Duplication: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.04",
+        "requirement": "Error handling",
+        "remainingCondition": "Error handling: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.05",
+        "requirement": "Naming",
+        "remainingCondition": "Naming: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.06",
+        "requirement": "Structure",
+        "remainingCondition": "Structure: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.07",
+        "requirement": "Complexity",
+        "remainingCondition": "Complexity: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.08",
+        "requirement": "API design",
+        "remainingCondition": "API design: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.09",
+        "requirement": "Architectural consistency",
+        "remainingCondition": "Architectural consistency: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.10",
+        "requirement": "Technical debt",
+        "remainingCondition": "Technical debt: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "27.11",
+        "requirement": "Testability",
+        "remainingCondition": "Testability: General evidence-cited AI findings can discuss this dimension; no dimension-specific deterministic analyzer or comprehensive semantic calibration proves reliable judgments."
+      },
+      {
+        "id": "28.01",
+        "requirement": "Hardcoded secrets",
+        "remainingCondition": "Hardcoded secrets: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.02",
+        "requirement": "Input validation",
+        "remainingCondition": "Input validation: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.03",
+        "requirement": "Authentication regression",
+        "remainingCondition": "Authentication regression: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.04",
+        "requirement": "Authorization regression",
+        "remainingCondition": "Authorization regression: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.05",
+        "requirement": "Injection",
+        "remainingCondition": "Injection: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.06",
+        "requirement": "Sensitive data",
+        "remainingCondition": "Sensitive data: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.07",
+        "requirement": "Dependencies",
+        "remainingCondition": "Dependencies: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.08",
+        "requirement": "Command execution",
+        "remainingCondition": "Command execution: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.09",
+        "requirement": "File handling",
+        "remainingCondition": "File handling: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.10",
+        "requirement": "Permission bypass",
+        "remainingCondition": "Permission bypass: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "28.11",
+        "requirement": "Network behavior",
+        "remainingCondition": "Network behavior: Source/advisory signals and general AI context exist; comprehensive security scanning and confirmed exploitability review are not implemented."
+      },
+      {
+        "id": "29.01",
+        "requirement": "Consistency",
+        "remainingCondition": "Consistency: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.02",
+        "requirement": "Boundaries",
+        "remainingCondition": "Boundaries: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.03",
+        "requirement": "Coupling",
+        "remainingCondition": "Coupling: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.04",
+        "requirement": "Cohesion",
+        "remainingCondition": "Cohesion: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.05",
+        "requirement": "Data flow",
+        "remainingCondition": "Data flow: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.06",
+        "requirement": "Scalability",
+        "remainingCondition": "Scalability: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.07",
+        "requirement": "Extensibility",
+        "remainingCondition": "Extensibility: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.08",
+        "requirement": "Unnecessary rewrite",
+        "remainingCondition": "Unnecessary rewrite: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.09",
+        "requirement": "Layer bypass",
+        "remainingCondition": "Layer bypass: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "29.10",
+        "requirement": "Responsibility placement",
+        "remainingCondition": "Responsibility placement: Architecture-fit observations are structured and cited; complete architectural context, dependency graphs and trustworthy semantic calibration remain incomplete."
+      },
+      {
+        "id": "34.01",
+        "requirement": "README hostile",
+        "remainingCondition": "README hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+      },
+      {
+        "id": "34.02",
+        "requirement": "Comments hostile",
+        "remainingCondition": "Comments hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+      },
+      {
+        "id": "34.03",
+        "requirement": "Issue body hostile",
+        "remainingCondition": "Issue body hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+      },
+      {
+        "id": "34.04",
+        "requirement": "Test output hostile",
+        "remainingCondition": "Test output hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+      },
+      {
+        "id": "34.05",
+        "requirement": "Logs hostile",
+        "remainingCondition": "Logs hostile: Policy treats participant text/logs as hostile and provides no privileged tools; tested objective invariants hold, but this is not exhaustive semantic injection containment."
+      },
+      {
+        "id": "34.09",
+        "requirement": "Context redaction",
+        "remainingCondition": "Context redaction: Known credentials are redacted from stored/model context; unknown secret formats require stronger scanners."
+      },
+      {
+        "id": "51.14",
+        "requirement": "Safe objective execution",
+        "remainingCondition": "Safe objective execution: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
+      },
+      {
+        "id": "51.17",
+        "requirement": "Actual AI review",
+        "remainingCondition": "Actual AI review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
+      },
+      {
+        "id": "51.19",
+        "requirement": "Approach review",
+        "remainingCondition": "Approach review: Development isolation and actual structured model review run; production capacity and accurate prose calibration remain release gates."
+      }
+    ],
+    "additionalContributions": [
+      {
+        "id": "30.01",
+        "requirement": "Feature",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.02",
+        "requirement": "Performance",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.03",
+        "requirement": "Security",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.04",
+        "requirement": "Tests",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.05",
+        "requirement": "Analytics",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.06",
+        "requirement": "Architecture",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.07",
+        "requirement": "Documentation",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.08",
+        "requirement": "AI-ML",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.09",
+        "requirement": "Language conversion",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.10",
+        "requirement": "Approved other category",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.11",
+        "requirement": "Introduced in diff",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.12",
+        "requirement": "Functional verification",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.13",
+        "requirement": "Relevance",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.14",
+        "requirement": "Evidence",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      },
+      {
+        "id": "30.15",
+        "requirement": "Regression safety",
+        "remainingCondition": "Immutable organizer-proposed additional work uses frozen category allowlist, known diff paths/evidence and optional criteria. Verified configured criterion improvement requires objective baseline FAIL to head PASS of proper kind; design/location attribution remains organizer judgment. Atomic audited recognition requires current eligible completed open head without policy failure/regression. Automated discovery and deployed behavior remain unverified."
+      }
+    ],
+    "cache": [
+      {
+        "id": "19.01",
+        "requirement": "Build reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.02",
+        "requirement": "Test reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.03",
+        "requirement": "Lint reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.04",
+        "requirement": "Type-check reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.05",
+        "requirement": "Security reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.06",
+        "requirement": "Dependency audit reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "19.07",
+        "requirement": "Coverage reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "37.01",
+        "requirement": "Content-addressed cache",
+        "remainingCondition": "Content-addressed cache: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache."
+      },
+      {
+        "id": "37.02",
+        "requirement": "Commit config tool identities",
+        "remainingCondition": "Commit config tool identities: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache."
+      },
+      {
+        "id": "37.03",
+        "requirement": "Safe reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "37.06",
+        "requirement": "Baseline reuse",
+        "remainingCondition": "Opt-in exact-input execution reuse is implemented with immutable origin provenance and socket-free SQLite verification executed before the no-unit-test instruction. Benchmark reuse is deliberately bypassed. Cloudflare runtime and live baseline reuse remain unverified; this is not a production PASS."
+      },
+      {
+        "id": "37.08",
+        "requirement": "Warm capacity decision",
+        "remainingCondition": "Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned."
+      },
+      {
+        "id": "50.14",
+        "requirement": "Cache keys",
+        "remainingCondition": "Cache keys: Frozen preview context integrity/cache identity is tested; execution cache does not exist."
+      }
+    ],
+    "queueAndFailures": [
+      {
+        "id": "36.03",
+        "requirement": "Backoff",
+        "remainingCondition": "Backoff: Executed idempotency, durable outbox and expiring capacity fixtures retain history, timeout and failure visibility. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+      },
+      {
+        "id": "36.06",
+        "requirement": "Cancellation",
+        "remainingCondition": "Cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+      },
+      {
+        "id": "36.08",
+        "requirement": "Priority",
+        "remainingCondition": "Priority: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+      },
+      {
+        "id": "36.10",
+        "requirement": "Horizontal capacity",
+        "remainingCondition": "Horizontal capacity: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+      },
+      {
+        "id": "36.11",
+        "requirement": "Obsolete cancellation",
+        "remainingCondition": "Obsolete cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified."
+      },
+      {
+        "id": "38.02",
+        "requirement": "Latest priority",
+        "remainingCondition": "Latest priority: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+      },
+      {
+        "id": "38.03",
+        "requirement": "Obsolete capacity release",
+        "remainingCondition": "Obsolete capacity release: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+      },
+      {
+        "id": "38.04",
+        "requirement": "Backpressure",
+        "remainingCondition": "Backpressure: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+      },
+      {
+        "id": "38.05",
+        "requirement": "Queue metrics",
+        "remainingCondition": "Queue metrics: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+      },
+      {
+        "id": "38.07",
+        "requirement": "Separate AI capacity when needed",
+        "remainingCondition": "Separate AI capacity when needed: Latest-head fencing, bounded recovery, queue counts and a separate serialized AI slot are implemented/tested; high-load latency and capacity are unmeasured."
+      },
+      {
+        "id": "49.02",
+        "requirement": "GitHub outage",
+        "remainingCondition": "GitHub outage: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+      },
+      {
+        "id": "49.03",
+        "requirement": "GitHub limits",
+        "remainingCondition": "GitHub limits: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+      },
+      {
+        "id": "49.11",
+        "requirement": "Baseline build fail",
+        "remainingCondition": "Baseline build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+      },
+      {
+        "id": "49.12",
+        "requirement": "Submission build fail",
+        "remainingCondition": "Submission build fail: Executed boundary/provider/runner fixtures exercise this failure class and preserve objective/historical state; test scope does not cover every external outage ordering. Independent evidence review: current citations do not execute this exact failure/backoff scenario; configured behavior alone does not prove operational recovery."
+      },
+      {
+        "id": "49.15",
+        "requirement": "Worker crash",
+        "remainingCondition": "Worker crash: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+      },
+      {
+        "id": "49.20",
+        "requirement": "Database fail",
+        "remainingCondition": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested."
+      },
+      {
+        "id": "49.21",
+        "requirement": "Queue fail",
+        "remainingCondition": "Queue fail: Fixture API limits, dispatch failure and crash/cleanup/lease recovery are exercised; genuine service outages and production recovery drills remain unverified."
+      }
+    ],
+    "judgeUIAndPersistence": [
+      {
+        "id": "16.08",
+        "requirement": "Obsolete view warning",
+        "remainingCondition": "Obsolete view warning: Submission history labels CURRENT/Historical; every obsolete deep-link/view race is not independently verified."
+      },
+      {
+        "id": "39.29",
+        "requirement": "Additional work",
+        "remainingCondition": "Additional-work records and organizer decisions are now displayed separately, with scoped criterion-improvement verification, evidence links and read-only judge access. Current code has static and independent source review only; deployed UI and live decision flows still require validation."
+      },
+      {
+        "id": "40.13",
+        "requirement": "Latest-time sorting",
+        "remainingCondition": "Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified."
+      },
+      {
+        "id": "41.13",
+        "requirement": "Source filter",
+        "remainingCondition": "Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+      },
+      {
+        "id": "41.14",
+        "requirement": "Related PR",
+        "remainingCondition": "Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+      },
+      {
+        "id": "41.15",
+        "requirement": "Evaluation state",
+        "remainingCondition": "Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state."
+      },
+      {
+        "id": "45.01",
+        "requirement": "Organizations",
+        "remainingCondition": "Organizations: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+      },
+      {
+        "id": "45.16",
+        "requirement": "Artifacts",
+        "remainingCondition": "Artifacts: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+      },
+      {
+        "id": "45.17",
+        "requirement": "Reviewer traces",
+        "remainingCondition": "Reviewer traces: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+      },
+      {
+        "id": "45.20",
+        "requirement": "Baseline results",
+        "remainingCondition": "Baseline results: Single configured organization, bounded artifacts/AI traces and per-run baseline evidence exist; multi-event organization models, full traces/object storage and reusable baseline records remain incomplete."
+      },
+      {
+        "id": "47.11",
+        "requirement": "Reviewer version",
+        "remainingCondition": "Reviewer version: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete."
+      }
+    ],
+    "telemetry": [
+      {
+        "id": "48.01",
+        "requirement": "Webhook latency",
+        "remainingCondition": "Both webhook routes record fixed request/error/latency aggregates asynchronously in shared UTC-minute metrics, with a bounded organizer view and seven-day retention. Static checks and local SQLite schema smoke passed; recorded request measurements, export/alerts, outage behavior and live deployment remain unverified or absent."
+      },
+      {
+        "id": "48.02",
+        "requirement": "GitHub errors",
+        "remainingCondition": "Authenticated GitHub API requests record bounded numeric error/request/latency metrics without secret/request content; organizer-only metric access and maintenance exist. Runtime API failure injection, persistence failure, exports/alerts and deployed visibility are unverified; raw public file fetches are outside this instrumentation."
+      },
+      {
+        "id": "48.03",
+        "requirement": "GitHub limits",
+        "remainingCondition": "GitHub API metrics identify HTTP429, exhausted primary rate headers and secondary403 Retry-After responses. This does not change retry behavior. Runtime primary/secondary rate-limit scenarios, exports/alerts and live observation remain unverified."
+      },
+      {
+        "id": "48.04",
+        "requirement": "Queue depth",
+        "remainingCondition": "Queue depth: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      },
+      {
+        "id": "48.05",
+        "requirement": "Queue wait",
+        "remainingCondition": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified."
+      },
+      {
+        "id": "48.06",
+        "requirement": "Evaluation duration",
+        "remainingCondition": "Evaluation duration: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      },
+      {
+        "id": "48.07",
+        "requirement": "Stage duration",
+        "remainingCondition": "Bounded recent-run timeline intervals with sample counts, unavailable values, truncation disclosure and judge visibility; live timings not verified."
+      },
+      {
+        "id": "48.14",
+        "requirement": "AI latency",
+        "remainingCondition": "AI latency: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      },
+      {
+        "id": "48.15",
+        "requirement": "AI tokens",
+        "remainingCondition": "AI tokens: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      },
+      {
+        "id": "48.17",
+        "requirement": "AI cost",
+        "remainingCondition": "Known organizer-supplied model rates and actual provider token usage produce a scoped successful-final-response USD estimate. Missing rates/usage remain unavailable; retrieval, failed-request and whole-provider invoice accounting are not certified."
+      },
+      {
+        "id": "48.19",
+        "requirement": "Retries",
+        "remainingCondition": "Retries: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      },
+      {
+        "id": "48.20",
+        "requirement": "Superseded count",
+        "remainingCondition": "Superseded count: Current counts, run timestamps and AI usage/duration/retries are recorded; aggregated historical metrics, dashboards and alerts remain incomplete."
+      }
+    ]
+  }
+}

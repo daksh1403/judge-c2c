@@ -1,0 +1,1343 @@
+{
+  "at": "2026-10-04T07:50:24.492Z",
+  "mode": "REAL_DEPLOYED_REVIEW_SIGNED_DOCKER_CACHE",
+  "synthetic": true,
+  "scope": "Separate NOT_SCORED fixtures using actual original immutable payment baseline/head. Original contracts and completion decisions are unchanged. Cached timestamps are historical observations, not fresh execution timings.",
+  "fixture": {
+    "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+    "repositoryId": 1371407339,
+    "repository": "Daksh-Codebase/payment-engine",
+    "issue": 12,
+    "issueUrl": "https://github.com/Daksh-Codebase/payment-engine/issues/12",
+    "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+    "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+    "teamId": "team-67b28fd4-8d8a-4920-b861-ae42fc0ae980",
+    "original": [
+      {
+        "pr": 8,
+        "runId": "c1584d2443a439da1c3424138ac26675ee05424facf450e8cb72b1645ec5e342",
+        "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "snapshotHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73"
+      },
+      {
+        "pr": 9,
+        "runId": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+        "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "snapshotHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73"
+      },
+      {
+        "pr": 11,
+        "runId": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+        "contractHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "snapshotHash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73"
+      }
+    ],
+    "prs": [
+      {
+        "number": 13,
+        "url": "https://github.com/Daksh-Codebase/payment-engine/pull/13",
+        "branch": "qa/cache-proof-12-1",
+        "head": "749b414d1036a0c1b734af807e681e4894d2345e"
+      },
+      {
+        "number": 14,
+        "url": "https://github.com/Daksh-Codebase/payment-engine/pull/14",
+        "branch": "qa/cache-proof-12-2",
+        "head": "749b414d1036a0c1b734af807e681e4894d2345e"
+      }
+    ],
+    "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+    "assignmentId": "assignment-f5e7b010-4c88-4f57-8e90-2a7c677b969c"
+  },
+  "assertions": {
+    "baselineMissThenHit": true,
+    "immutableOrigin": true,
+    "sameCacheIdentity": true,
+    "sameOriginalResult": true,
+    "historicalTimingPreserved": true,
+    "headNotReused": true,
+    "headSeparateFromBaseline": true,
+    "originalSnapshotsUnchanged": true
+  },
+  "records": [
+    {
+      "runId": "ea69335b7b1259e561f156d0964b3513431a046b093a0dd8543179294e6951d9",
+      "pr": 13,
+      "stateAtCapture": "CHECKING",
+      "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+      "execution": [
+        {
+          "id": "10423896-4b84-4490-8938-3fddb8464f80",
+          "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+          "cacheStatus": "MISS",
+          "cacheKey": "eaa1f08f47db07be4c2f3cde028edfdcae0c9b376efb96c8365add552ea28b1b",
+          "requestHash": "cd8378b1836540405bbaa864fcf7b08ae69f4707364651946d9ffd93c8505fc2",
+          "resultHash": "f4e1e6bbe33799fc3533dad2119f00b9315fabe4c0eff55cb1f06ae37f1fc0a3",
+          "originRunId": null,
+          "originExecutionId": null,
+          "recordedAt": "2026-10-04 07:49:46",
+          "request": {
+            "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "files": [
+              {
+                "bytes": 442,
+                "path": ".github/workflows/verify.yml",
+                "sha256": "794affcba58e86c76c5a631b4b11d6de10ea941bc9184aa36a934d17910b5844"
+              },
+              {
+                "bytes": 39,
+                "path": ".gitignore",
+                "sha256": "36d29dad0b140f9e2851481bd37ef7da5c3663f27abb222b96bbda52aa3ba83e"
+              },
+              {
+                "bytes": 1735,
+                "path": "README.md",
+                "sha256": "96a3eb3ad0805b3f61de636776e8307cd4c3fd5d9c23db1d44d73bc0d7ea6a56"
+              },
+              {
+                "bytes": 248,
+                "path": "package.json",
+                "sha256": "6836964e0465f1d56525d069cc97cff9791f9cca502a209742474683b8b79dc4"
+              },
+              {
+                "bytes": 3490,
+                "path": "server.mjs",
+                "sha256": "f45582c60abba48e80693ecdba4c3ef966898ee80948f8b7d23674d92428b208"
+              },
+              {
+                "bytes": 1591,
+                "path": "server.test.mjs",
+                "sha256": "a8c75685f7cca0a9fc4b35da1a90b23e9e48ea9b9bd154f9d86b69ce96dd3159"
+              }
+            ],
+            "memoryMiB": 256,
+            "policyHash": "031e2cbed565a859059dd6173c6fdc00c268c08c005a4d7e4439a42344547185",
+            "runId": "ea69335b7b1259e561f156d0964b3513431a046b093a0dd8543179294e6951d9",
+            "schemaVersion": 1,
+            "timeoutSeconds": 60
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: FAIL. Expected status 200; observed 200.",
+                "durationMs": 224,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200.",
+                "durationMs": 181,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 191,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200.",
+                "durationMs": 126,
+                "exitCode": null,
+                "id": "retry-immediate",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "retry-exhausted",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400.",
+                "durationMs": 193,
+                "exitCode": null,
+                "id": "retry-invalid-zero",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400.",
+                "durationMs": 125,
+                "exitCode": null,
+                "id": "retry-invalid-large",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400.",
+                "durationMs": 175,
+                "exitCode": null,
+                "id": "retry-invalid-fraction",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400.",
+                "durationMs": 120,
+                "exitCode": null,
+                "id": "retry-invalid-string",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400.",
+                "durationMs": 187,
+                "exitCode": null,
+                "id": "retry-outcomes-empty",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400.",
+                "durationMs": 196,
+                "exitCode": null,
+                "id": "retry-outcomes-unknown",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400.",
+                "durationMs": 127,
+                "exitCode": null,
+                "id": "retry-outcomes-null",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200.",
+                "durationMs": 182,
+                "exitCode": null,
+                "id": "health-preserved",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"ok\":true}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "payment-created",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200.",
+                "durationMs": 126,
+                "exitCode": null,
+                "id": "payment-idempotency",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200.",
+                "durationMs": 173,
+                "exitCode": null,
+                "id": "payment-read",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409.",
+                "durationMs": 125,
+                "exitCode": null,
+                "id": "payment-conflict",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"REFERENCE_CONFLICT\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 183,
+                "exitCode": null,
+                "id": "payment-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_PAYMENT\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 111,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 494,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "✔ preserves immediate success and validates retry input (1.048625ms)\n✔ payment creation, idempotency, conflicts, lookup and invalid input (163.617875ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 310.198375\n"
+              },
+              {
+                "detail": "Configured lint command passed.",
+                "durationMs": 476,
+                "exitCode": 0,
+                "id": "lint",
+                "kind": "lint",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "finishedAt": "2026-10-04T07:49:45.977Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "metrics": {
+              "resources": [
+                {
+                  "cpuUsageUsec": 1442818,
+                  "memoryBytes": 31596544,
+                  "pids": 15,
+                  "sampledAt": "2026-10-04T07:49:43.979Z",
+                  "scope": "service"
+                },
+                {
+                  "cpuUsageUsec": 101127,
+                  "memoryBytes": 12677120,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:44.581Z",
+                  "scope": "command:build"
+                },
+                {
+                  "cpuUsageUsec": 284695,
+                  "memoryBytes": 12939264,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:44.959Z",
+                  "scope": "command:repository-tests"
+                },
+                {
+                  "cpuUsageUsec": 298353,
+                  "memoryBytes": 14815232,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:45.893Z",
+                  "scope": "command:lint"
+                }
+              ],
+              "startupMs": 459,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            },
+            "requestHash": "cd8378b1836540405bbaa864fcf7b08ae69f4707364651946d9ffd93c8505fc2",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T07:49:40.231Z",
+            "version": "node-http-v1.3.0"
+          }
+        },
+        {
+          "id": "4a55e559-50ff-47e1-9d7b-bcba782958cf",
+          "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+          "cacheStatus": "MISS",
+          "cacheKey": "f3d62c046803dfa8496c76c02f9541800c0a61798519dbdfd14de89182e8b78f",
+          "requestHash": "49fafe2b7f35702caf102e92e368220f3e5f6f4e84a19212ae3ea4eea13bde7a",
+          "resultHash": "9412c5a96f606eaff109d0d87171cd98d3a9bd8d3f7f588ff06392545d91b588",
+          "originRunId": null,
+          "originExecutionId": null,
+          "recordedAt": "2026-10-04 07:49:54",
+          "request": {
+            "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "files": [
+              {
+                "bytes": 442,
+                "path": ".github/workflows/verify.yml",
+                "sha256": "794affcba58e86c76c5a631b4b11d6de10ea941bc9184aa36a934d17910b5844"
+              },
+              {
+                "bytes": 39,
+                "path": ".gitignore",
+                "sha256": "36d29dad0b140f9e2851481bd37ef7da5c3663f27abb222b96bbda52aa3ba83e"
+              },
+              {
+                "bytes": 1969,
+                "path": "README.md",
+                "sha256": "9908f49491e40715c23910d4ac5489c3968234209cc4dca579b681049105ce08"
+              },
+              {
+                "bytes": 248,
+                "path": "package.json",
+                "sha256": "6836964e0465f1d56525d069cc97cff9791f9cca502a209742474683b8b79dc4"
+              },
+              {
+                "bytes": 1048,
+                "path": "retry.test.mjs",
+                "sha256": "3b88fd11659bebe1b66bb0a570f0ab309bbc5e373808d14eb6b1165e9fcef655"
+              },
+              {
+                "bytes": 3601,
+                "path": "server.mjs",
+                "sha256": "ff24615f80a6fb77120877475856abc6d9b9ca61caf4ef649df1a2c600b02e0b"
+              },
+              {
+                "bytes": 1591,
+                "path": "server.test.mjs",
+                "sha256": "a8c75685f7cca0a9fc4b35da1a90b23e9e48ea9b9bd154f9d86b69ce96dd3159"
+              }
+            ],
+            "memoryMiB": 256,
+            "policyHash": "031e2cbed565a859059dd6173c6fdc00c268c08c005a4d7e4439a42344547185",
+            "runId": "ea69335b7b1259e561f156d0964b3513431a046b093a0dd8543179294e6951d9",
+            "schemaVersion": 1,
+            "timeoutSeconds": 60
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 196,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200.",
+                "durationMs": 186,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200.",
+                "durationMs": 191,
+                "exitCode": null,
+                "id": "retry-immediate",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200.",
+                "durationMs": 135,
+                "exitCode": null,
+                "id": "retry-exhausted",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400.",
+                "durationMs": 190,
+                "exitCode": null,
+                "id": "retry-invalid-zero",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400.",
+                "durationMs": 203,
+                "exitCode": null,
+                "id": "retry-invalid-large",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400.",
+                "durationMs": 195,
+                "exitCode": null,
+                "id": "retry-invalid-fraction",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400.",
+                "durationMs": 198,
+                "exitCode": null,
+                "id": "retry-invalid-string",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400.",
+                "durationMs": 193,
+                "exitCode": null,
+                "id": "retry-outcomes-empty",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "retry-outcomes-unknown",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400.",
+                "durationMs": 136,
+                "exitCode": null,
+                "id": "retry-outcomes-null",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200.",
+                "durationMs": 177,
+                "exitCode": null,
+                "id": "health-preserved",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"ok\":true}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201.",
+                "durationMs": 125,
+                "exitCode": null,
+                "id": "payment-created",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200.",
+                "durationMs": 179,
+                "exitCode": null,
+                "id": "payment-idempotency",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200.",
+                "durationMs": 192,
+                "exitCode": null,
+                "id": "payment-read",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409.",
+                "durationMs": 210,
+                "exitCode": null,
+                "id": "payment-conflict",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"REFERENCE_CONFLICT\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 211,
+                "exitCode": null,
+                "id": "payment-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_PAYMENT\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 100,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 755,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "✔ temporary then success (1.126416ms)\n✔ bounded temporary failures (0.101667ms)\n✔ permanent stops (0.06875ms)\n✔ success stops (0.084292ms)\n✔ outcomes exhausted (0.094958ms)\n✔ reject invalid max 0 (0.087417ms)\n✔ reject invalid max 11 (0.059875ms)\n✔ reject invalid max 1.5 (0.057792ms)\n✔ reject invalid max 3 (0.103083ms)\n✔ reject invalid outcomes [] (0.19ms)\n✔ reject invalid outcomes [\"unknown\"] (0.078458ms)\n✔ reject invalid outcomes null (0.055583ms)\n✔ preserves immediate success and validates retry input (0.949583ms)\n✔ payment creation, idempotency, conflicts, lookup and invalid input (184.994292ms)\nℹ tests 14\nℹ suites 0\nℹ pass 14\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 643.841459\n"
+              },
+              {
+                "detail": "Configured lint command passed.",
+                "durationMs": 475,
+                "exitCode": 0,
+                "id": "lint",
+                "kind": "lint",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "finishedAt": "2026-10-04T07:49:54.745Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "metrics": {
+              "resources": [
+                {
+                  "cpuUsageUsec": 1517795,
+                  "memoryBytes": 30064640,
+                  "pids": 15,
+                  "sampledAt": "2026-10-04T07:49:52.436Z",
+                  "scope": "service"
+                },
+                {
+                  "cpuUsageUsec": 91846,
+                  "memoryBytes": 12918784,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:53.048Z",
+                  "scope": "command:build"
+                },
+                {
+                  "cpuUsageUsec": 463591,
+                  "memoryBytes": 10833920,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:53.708Z",
+                  "scope": "command:repository-tests"
+                },
+                {
+                  "cpuUsageUsec": 298102,
+                  "memoryBytes": 14446592,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:54.656Z",
+                  "scope": "command:lint"
+                }
+              ],
+              "startupMs": 266,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            },
+            "requestHash": "49fafe2b7f35702caf102e92e368220f3e5f6f4e84a19212ae3ea4eea13bde7a",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T07:49:48.576Z",
+            "version": "node-http-v1.3.0"
+          }
+        }
+      ]
+    },
+    {
+      "runId": "2929444a43522ea744b358c025f2a1f7584ecbf13419863e7e4e6e2c5f2cb4ed",
+      "pr": 14,
+      "stateAtCapture": "CHECKING",
+      "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+      "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+      "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+      "execution": [
+        {
+          "id": "47d1c2cb-34c1-4575-a7a8-eee2e82b1830",
+          "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+          "cacheStatus": "HIT",
+          "cacheKey": "eaa1f08f47db07be4c2f3cde028edfdcae0c9b376efb96c8365add552ea28b1b",
+          "requestHash": "cd8378b1836540405bbaa864fcf7b08ae69f4707364651946d9ffd93c8505fc2",
+          "resultHash": "f4e1e6bbe33799fc3533dad2119f00b9315fabe4c0eff55cb1f06ae37f1fc0a3",
+          "originRunId": "ea69335b7b1259e561f156d0964b3513431a046b093a0dd8543179294e6951d9",
+          "originExecutionId": "10423896-4b84-4490-8938-3fddb8464f80",
+          "recordedAt": "2026-10-04 07:49:46",
+          "request": {
+            "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "files": [
+              {
+                "bytes": 442,
+                "path": ".github/workflows/verify.yml",
+                "sha256": "794affcba58e86c76c5a631b4b11d6de10ea941bc9184aa36a934d17910b5844"
+              },
+              {
+                "bytes": 39,
+                "path": ".gitignore",
+                "sha256": "36d29dad0b140f9e2851481bd37ef7da5c3663f27abb222b96bbda52aa3ba83e"
+              },
+              {
+                "bytes": 1735,
+                "path": "README.md",
+                "sha256": "96a3eb3ad0805b3f61de636776e8307cd4c3fd5d9c23db1d44d73bc0d7ea6a56"
+              },
+              {
+                "bytes": 248,
+                "path": "package.json",
+                "sha256": "6836964e0465f1d56525d069cc97cff9791f9cca502a209742474683b8b79dc4"
+              },
+              {
+                "bytes": 3490,
+                "path": "server.mjs",
+                "sha256": "f45582c60abba48e80693ecdba4c3ef966898ee80948f8b7d23674d92428b208"
+              },
+              {
+                "bytes": 1591,
+                "path": "server.test.mjs",
+                "sha256": "a8c75685f7cca0a9fc4b35da1a90b23e9e48ea9b9bd154f9d86b69ce96dd3159"
+              }
+            ],
+            "memoryMiB": 256,
+            "policyHash": "031e2cbed565a859059dd6173c6fdc00c268c08c005a4d7e4439a42344547185",
+            "runId": "ea69335b7b1259e561f156d0964b3513431a046b093a0dd8543179294e6951d9",
+            "schemaVersion": 1,
+            "timeoutSeconds": 60
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: FAIL. Expected status 200; observed 200.",
+                "durationMs": 224,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200.",
+                "durationMs": 181,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "FAIL",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 191,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200.",
+                "durationMs": 126,
+                "exitCode": null,
+                "id": "retry-immediate",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "retry-exhausted",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400.",
+                "durationMs": 193,
+                "exitCode": null,
+                "id": "retry-invalid-zero",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400.",
+                "durationMs": 125,
+                "exitCode": null,
+                "id": "retry-invalid-large",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400.",
+                "durationMs": 175,
+                "exitCode": null,
+                "id": "retry-invalid-fraction",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400.",
+                "durationMs": 120,
+                "exitCode": null,
+                "id": "retry-invalid-string",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400.",
+                "durationMs": 187,
+                "exitCode": null,
+                "id": "retry-outcomes-empty",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400.",
+                "durationMs": 196,
+                "exitCode": null,
+                "id": "retry-outcomes-unknown",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400.",
+                "durationMs": 127,
+                "exitCode": null,
+                "id": "retry-outcomes-null",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200.",
+                "durationMs": 182,
+                "exitCode": null,
+                "id": "health-preserved",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"ok\":true}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201.",
+                "durationMs": 189,
+                "exitCode": null,
+                "id": "payment-created",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200.",
+                "durationMs": 126,
+                "exitCode": null,
+                "id": "payment-idempotency",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200.",
+                "durationMs": 173,
+                "exitCode": null,
+                "id": "payment-read",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409.",
+                "durationMs": 125,
+                "exitCode": null,
+                "id": "payment-conflict",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"REFERENCE_CONFLICT\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 183,
+                "exitCode": null,
+                "id": "payment-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_PAYMENT\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 111,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 494,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "✔ preserves immediate success and validates retry input (1.048625ms)\n✔ payment creation, idempotency, conflicts, lookup and invalid input (163.617875ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 310.198375\n"
+              },
+              {
+                "detail": "Configured lint command passed.",
+                "durationMs": 476,
+                "exitCode": 0,
+                "id": "lint",
+                "kind": "lint",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "commit": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "finishedAt": "2026-10-04T07:49:45.977Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "metrics": {
+              "resources": [
+                {
+                  "cpuUsageUsec": 1442818,
+                  "memoryBytes": 31596544,
+                  "pids": 15,
+                  "sampledAt": "2026-10-04T07:49:43.979Z",
+                  "scope": "service"
+                },
+                {
+                  "cpuUsageUsec": 101127,
+                  "memoryBytes": 12677120,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:44.581Z",
+                  "scope": "command:build"
+                },
+                {
+                  "cpuUsageUsec": 284695,
+                  "memoryBytes": 12939264,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:44.959Z",
+                  "scope": "command:repository-tests"
+                },
+                {
+                  "cpuUsageUsec": 298353,
+                  "memoryBytes": 14815232,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:49:45.893Z",
+                  "scope": "command:lint"
+                }
+              ],
+              "startupMs": 459,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            },
+            "requestHash": "cd8378b1836540405bbaa864fcf7b08ae69f4707364651946d9ffd93c8505fc2",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T07:49:40.231Z",
+            "version": "node-http-v1.3.0"
+          }
+        },
+        {
+          "id": "086af907-4c41-4021-8572-ea62b83d94fb",
+          "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+          "cacheStatus": "MISS",
+          "cacheKey": "f3d62c046803dfa8496c76c02f9541800c0a61798519dbdfd14de89182e8b78f",
+          "requestHash": "f520f98985c36c315e727b6ea664cb2ffb8fb3eca33d97b87bdf47ec21a0669d",
+          "resultHash": "5c086850a33c5215a89686d4761b334bb8c09787b1439d31980506d0025e981f",
+          "originRunId": null,
+          "originExecutionId": null,
+          "recordedAt": "2026-10-04 07:50:22",
+          "request": {
+            "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "files": [
+              {
+                "bytes": 442,
+                "path": ".github/workflows/verify.yml",
+                "sha256": "794affcba58e86c76c5a631b4b11d6de10ea941bc9184aa36a934d17910b5844"
+              },
+              {
+                "bytes": 39,
+                "path": ".gitignore",
+                "sha256": "36d29dad0b140f9e2851481bd37ef7da5c3663f27abb222b96bbda52aa3ba83e"
+              },
+              {
+                "bytes": 1969,
+                "path": "README.md",
+                "sha256": "9908f49491e40715c23910d4ac5489c3968234209cc4dca579b681049105ce08"
+              },
+              {
+                "bytes": 248,
+                "path": "package.json",
+                "sha256": "6836964e0465f1d56525d069cc97cff9791f9cca502a209742474683b8b79dc4"
+              },
+              {
+                "bytes": 1048,
+                "path": "retry.test.mjs",
+                "sha256": "3b88fd11659bebe1b66bb0a570f0ab309bbc5e373808d14eb6b1165e9fcef655"
+              },
+              {
+                "bytes": 3601,
+                "path": "server.mjs",
+                "sha256": "ff24615f80a6fb77120877475856abc6d9b9ca61caf4ef649df1a2c600b02e0b"
+              },
+              {
+                "bytes": 1591,
+                "path": "server.test.mjs",
+                "sha256": "a8c75685f7cca0a9fc4b35da1a90b23e9e48ea9b9bd154f9d86b69ce96dd3159"
+              }
+            ],
+            "memoryMiB": 256,
+            "policyHash": "031e2cbed565a859059dd6173c6fdc00c268c08c005a4d7e4439a42344547185",
+            "runId": "2929444a43522ea744b358c025f2a1f7584ecbf13419863e7e4e6e2c5f2cb4ed",
+            "schemaVersion": 1,
+            "timeoutSeconds": 60
+          },
+          "result": {
+            "checks": [
+              {
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200.",
+                "durationMs": 223,
+                "exitCode": null,
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200.",
+                "durationMs": 190,
+                "exitCode": null,
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200.",
+                "durationMs": 128,
+                "exitCode": null,
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-immediate: PASS. Expected status 200; observed 200.",
+                "durationMs": 188,
+                "exitCode": null,
+                "id": "retry-immediate",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"success\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-exhausted: PASS. Expected status 200; observed 200.",
+                "durationMs": 188,
+                "exitCode": null,
+                "id": "retry-exhausted",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-zero: PASS. Expected status 400; observed 400.",
+                "durationMs": 200,
+                "exitCode": null,
+                "id": "retry-invalid-zero",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-large: PASS. Expected status 400; observed 400.",
+                "durationMs": 192,
+                "exitCode": null,
+                "id": "retry-invalid-large",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-fraction: PASS. Expected status 400; observed 400.",
+                "durationMs": 137,
+                "exitCode": null,
+                "id": "retry-invalid-fraction",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-invalid-string: PASS. Expected status 400; observed 400.",
+                "durationMs": 173,
+                "exitCode": null,
+                "id": "retry-invalid-string",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-empty: PASS. Expected status 400; observed 400.",
+                "durationMs": 186,
+                "exitCode": null,
+                "id": "retry-outcomes-empty",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-unknown: PASS. Expected status 400; observed 400.",
+                "durationMs": 197,
+                "exitCode": null,
+                "id": "retry-outcomes-unknown",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance retry-outcomes-null: PASS. Expected status 400; observed 400.",
+                "durationMs": 133,
+                "exitCode": null,
+                "id": "retry-outcomes-null",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_OUTCOMES\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance health-preserved: PASS. Expected status 200; observed 200.",
+                "durationMs": 186,
+                "exitCode": null,
+                "id": "health-preserved",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"ok\":true}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-created: PASS. Expected status 201; observed 201.",
+                "durationMs": 195,
+                "exitCode": null,
+                "id": "payment-created",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-idempotency: PASS. Expected status 200; observed 200.",
+                "durationMs": 199,
+                "exitCode": null,
+                "id": "payment-idempotency",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-read: PASS. Expected status 200; observed 200.",
+                "durationMs": 192,
+                "exitCode": null,
+                "id": "payment-read",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"id\":\"pay_1\",\"clientReference\":\"frozen-order\",\"amountMinor\":1000,\"currency\":\"INR\",\"status\":\"pending\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-conflict: PASS. Expected status 409; observed 409.",
+                "durationMs": 128,
+                "exitCode": null,
+                "id": "payment-conflict",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"REFERENCE_CONFLICT\"}"
+              },
+              {
+                "detail": "Trusted HTTP acceptance payment-invalid: PASS. Expected status 400; observed 400.",
+                "durationMs": 182,
+                "exitCode": null,
+                "id": "payment-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "{\"error\":\"INVALID_PAYMENT\"}"
+              },
+              {
+                "detail": "Configured build command passed.",
+                "durationMs": 98,
+                "exitCode": 0,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              },
+              {
+                "detail": "Configured test command passed.",
+                "durationMs": 544,
+                "exitCode": 0,
+                "id": "repository-tests",
+                "kind": "test",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": "✔ temporary then success (1.095166ms)\n✔ bounded temporary failures (0.095417ms)\n✔ permanent stops (0.072292ms)\n✔ success stops (0.080834ms)\n✔ outcomes exhausted (0.084667ms)\n✔ reject invalid max 0 (0.086166ms)\n✔ reject invalid max 11 (0.059291ms)\n✔ reject invalid max 1.5 (0.060125ms)\n✔ reject invalid max 3 (0.57425ms)\n✔ reject invalid outcomes [] (0.156458ms)\n✔ reject invalid outcomes [\"unknown\"] (0.068875ms)\n✔ reject invalid outcomes null (0.052667ms)\n✔ preserves immediate success and validates retry input (0.960042ms)\n✔ payment creation, idempotency, conflicts, lookup and invalid input (92.844583ms)\nℹ tests 14\nℹ suites 0\nℹ pass 14\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 440.137583\n"
+              },
+              {
+                "detail": "Configured lint command passed.",
+                "durationMs": 413,
+                "exitCode": 0,
+                "id": "lint",
+                "kind": "lint",
+                "status": "PASS",
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "commit": "749b414d1036a0c1b734af807e681e4894d2345e",
+            "contractHash": "b56f4f9003bf2a9dcfe07b998a9c70c2b3c6a8ee4c3f6216a9fe33ba2127d2ad",
+            "finishedAt": "2026-10-04T07:50:22.055Z",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "metrics": {
+              "resources": [
+                {
+                  "cpuUsageUsec": 1407006,
+                  "memoryBytes": 31645696,
+                  "pids": 15,
+                  "sampledAt": "2026-10-04T07:50:20.016Z",
+                  "scope": "service"
+                },
+                {
+                  "cpuUsageUsec": 95307,
+                  "memoryBytes": 13230080,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:50:20.606Z",
+                  "scope": "command:build"
+                },
+                {
+                  "cpuUsageUsec": 342209,
+                  "memoryBytes": 10858496,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:50:21.055Z",
+                  "scope": "command:repository-tests"
+                },
+                {
+                  "cpuUsageUsec": 285426,
+                  "memoryBytes": 15233024,
+                  "pids": 8,
+                  "sampledAt": "2026-10-04T07:50:21.948Z",
+                  "scope": "command:lint"
+                }
+              ],
+              "startupMs": 324,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            },
+            "requestHash": "f520f98985c36c315e727b6ea664cb2ffb8fb3eca33d97b87bdf47ec21a0669d",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T07:50:16.219Z",
+            "version": "node-http-v1.3.0"
+          }
+        }
+      ]
+    }
+  ],
+  "benchmarkBoundary": {
+    "liveProfileHasBenchmarks": false,
+    "liveBenchmarkReuse": "UNVERIFIED: this original payment profile has no benchmarks.",
+    "separateRealDockerEvidence": "docs/qa/dependency-docker-evidence.json validates fresh benchmark measurements and rejects result reuse."
+  }
+}

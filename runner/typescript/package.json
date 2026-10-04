@@ -1,0 +1,8 @@
+{
+  "name": "judge-c2c-typescript-tools",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "capturedAt": "2026-10-04T08:16:25.794212+00:00",
+  "profile": "synthetic-local-signed-webhooks-real-D1-and-source-templates",
+  "ids": [
+    "04.06",
+    "04.08",
+    "07.03",
+    "09.01",
+    "09.02",
+    "09.04",
+    "09.05",
+    "09.10",
+    "09.11",
+    "10.06",
+    "10.07",
+    "11.06",
+    "11.07",
+    "11.08",
+    "11.10"
+  ],
+  "command": "npx vitest run tests/issue-lifecycle-runtime.test.ts tests/reservation-lifecycle.test.ts tests/competition.test.ts",
+  "typecheck": "PASS",
+  "tests": {
+    "total": 45,
+    "passed": 45,
+    "failed": 0
+  },
+  "reportSha256": "77be10917e76ebf039cabc00a4cb93c54b53fbc1fb98d6437d027383066a57c6",
+  "scenarios": [
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "processes signed issue edit/assign/unassign/close/reopen while preserving frozen controlled assignment history",
+      "status": "passed",
+      "durationMs": 1981.060709
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "persists immutable MANDATORY evaluation scope and generates only its controlled category labels",
+      "status": "passed",
+      "durationMs": 926.5900409999999
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "persists immutable OPTIONAL evaluation scope and generates only its controlled category labels",
+      "status": "passed",
+      "durationMs": 673.1946250000001
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "persists immutable BONUS evaluation scope and generates only its controlled category labels",
+      "status": "passed",
+      "durationMs": 698.0287920000001
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "persists immutable NOT_SCORED evaluation scope and generates only its controlled category labels",
+      "status": "passed",
+      "durationMs": 670.688709
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "flags a bounded twenty-one-report burst for organizer moderation without automatic approval, discovery recognition or challenge credit",
+      "status": "passed",
+      "durationMs": 1546.3598339999999
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "projects organizer in-progress, signed PR opened/evaluating and blocked challenge state without conflating native closure or frozen history",
+      "status": "passed",
+      "durationMs": 2171.9139159999995
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "expires an exclusive reservation and releases capacity without deleting its frozen history",
+      "status": "passed",
+      "durationMs": 3077.3879579999993
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "ships the bug native issue template with required fields and routes submitted markdown through nonauthoritative triage",
+      "status": "passed",
+      "durationMs": 637.5406669999993
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "ships the feature native issue template with required fields and routes submitted markdown through nonauthoritative triage",
+      "status": "passed",
+      "durationMs": 800.2584580000002
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "ships the performance native issue template with required fields and routes submitted markdown through nonauthoritative triage",
+      "status": "passed",
+      "durationMs": 939.106416999999
+    },
+    {
+      "file": "tests/issue-lifecycle-runtime.test.ts",
+      "name": "ships the clarification native issue template with required fields and routes submitted markdown through nonauthoritative triage",
+      "status": "passed",
+      "durationMs": 1058.0907910000005
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite activates an eligible reservation without changing its frozen identity or expiry",
+      "status": "passed",
+      "durationMs": 21.128834000000012
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite preserves a valid frozen contract when the organizer publishes a newer version",
+      "status": "passed",
+      "durationMs": 1.4692499999999882
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite rejects missing, non-reserved and already expired reservations without audit or sync",
+      "status": "passed",
+      "durationMs": 2.490916000000027
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite requires an active event, team and repository eligibility plus an approved open challenge",
+      "status": "passed",
+      "durationMs": 8.936749999999961
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite rejects malformed frozen policy and a missing frozen contract without rebinding",
+      "status": "passed",
+      "durationMs": 2.667250000000024
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite allows RESERVED challenge availability while retaining the original challenge version",
+      "status": "passed",
+      "durationMs": 3.0486250000000155
+    },
+    {
+      "file": "tests/reservation-lifecycle.test.ts",
+      "name": "reservation activation lifecycle with SQLite audits only the winning transition under duplicate activation and a revoke race",
+      "status": "passed",
+      "durationMs": 2.7822079999999687
+    }
+  ],
+  "scope": [
+    "Actual HMAC signed organization issue edit/assigned/unassigned/closed/reopened events pass the production signature gate and durable inbox before native GitHub fixture fetch.",
+    "Native assignee/state changes remain distinct from frozen controlled assignment, contract and policy history.",
+    "All4 evaluationKind scopes are immutable challenge metadata and produce their matching controlled category labels.",
+    "21same-author same-repository reports in one hour trigger reversible possible-spam and possible-duplicate moderation flags without approval, recognition or challenge assignment.",
+    "Signed PR opened -> evaluating; organizer REOPENED -> in-progress; closed/reopened submission retains evaluation history and frozen assignment; blocked availability prevents assignment.",
+    "Exclusive reservation expiry releases capacity and allows fresh assignment while retaining expired frozen policy history.",
+    "Existing concurrent shared/exclusive claim and7reservation activation tests pass in the same focused run.",
+    "Bug/feature/performance/clarification source templates have mandatory fields; fixture native markdown enters advisory triage, never automatically creates an authoritative contract."
+  ],
+  "productionLimits": [
+    "GitHub API responses and account identities are controlled fixtures; signatures use a local synthetic App webhook secret.",
+    "Evaluation scope metadata is verified for all4categories; this does not prove organizer event scoring policy for OPTIONAL/BONUS submissions.",
+    "Templates are supplied in Judge-C2C source and tested with representative markdown; deployment/native rendering in every challenge repository is not claimed.",
+    "Spam control is a reversible per-author/per-repository reporting flag, not account-wide ingestion throttling or semantic gaming detection.",
+    "Finite lifecycle sequences, concurrency races and reservation recovery are covered; every possible external GitHub event permutation remains outside this evidence."
+  ]
+}

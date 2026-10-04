@@ -1,0 +1,8 @@
+{
+  "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "origin": "https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev",
+  "repositoryFilter": true,
+  "labelFilter": true,
+  "participantIssue10Visible": true,
+  "errors": []
+}

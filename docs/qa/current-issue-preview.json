@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-04T08:02:45.444Z",
+  "mode": "REAL_DEPLOYED_JUDGE_BROWSER_NO_MOCKS",
+  "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+  "issue": 6,
+  "sourceFilter": "PARTICIPANT",
+  "relatedSubmissions": [
+    {
+      "pr": 11,
+      "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+      "evaluationState": "COMPLETED"
+    },
+    {
+      "pr": 9,
+      "head": "628436f51c897930e2c902c2051c185259ef95c8",
+      "evaluationState": "COMPLETED"
+    },
+    {
+      "pr": 8,
+      "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+      "evaluationState": "COMPLETED"
+    },
+    {
+      "pr": 7,
+      "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+      "evaluationState": "COMPLETED"
+    }
+  ],
+  "errors": []
+}

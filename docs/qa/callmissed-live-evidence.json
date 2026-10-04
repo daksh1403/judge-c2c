@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-02T12:05:56.272Z",
+  "previous": {
+    "at": "2026-10-02T12:03:04.965Z",
+    "previous": {
+      "synthetic": true,
+      "status": "FAILED",
+      "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+      "trace": {
+        "policy": "requirements-and-approach-v4",
+        "provider": "callmissed",
+        "model": "gpt-5.6-sol",
+        "inputHash": "f8b12da879f4b2a68893f5bf0c53b7a49555c012f57b1c8a6a76c6465af5ab2a",
+        "durationMs": 185,
+        "attempts": 2,
+        "failureCode": "CALLMISSED_HTTP_403_MODEL_NOT_AVAILABLE"
+      }
+    },
+    "current": {
+      "synthetic": true,
+      "status": "FAILED",
+      "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+      "trace": {
+        "policy": "requirements-and-approach-v4",
+        "provider": "callmissed",
+        "model": "kimi-k2.6",
+        "inputHash": "f8b12da879f4b2a68893f5bf0c53b7a49555c012f57b1c8a6a76c6465af5ab2a",
+        "durationMs": 130000,
+        "attempts": 2,
+        "failureCode": "AI_OUTPUT_INVALID"
+      }
+    }
+  },
+  "current": {
+    "synthetic": true,
+    "status": "FAILED",
+    "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+    "trace": {
+      "policy": "requirements-and-approach-v4",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "inputHash": "f8b12da879f4b2a68893f5bf0c53b7a49555c012f57b1c8a6a76c6465af5ab2a",
+      "durationMs": 50785,
+      "attempts": 2,
+      "failureCode": "AI_OUTPUT_INVALID"
+    }
+  }
+}

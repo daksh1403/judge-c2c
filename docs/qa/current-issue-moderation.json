@@ -1,0 +1,44 @@
+{
+  "capturedAt": "2026-10-04T07:16:39.040801+00:00",
+  "profile": "local-synthetic-D1-and-GitHub-fixtures",
+  "command": "npx vitest run tests/competition.test.ts tests/issue-taxonomy.test.ts",
+  "totalTests": 28,
+  "passed": 28,
+  "failed": 0,
+  "reportSha256": "3906035ef642c4b6e0ee88c06e0078cd362a588a8b57bbeca5327b2593665510",
+  "affectedIds": ["08.01", "08.30", "08.31", "08.32", "09.05"],
+  "changes": [
+    "Controlled organizer suppression/preservation decisions available through review API and issue detail UI.",
+    "Explicit null override controls prevent participant re-inference after organizer clearance.",
+    "Organizer clarification and decision reasons appear in existing append-only audit-backed review history."
+  ],
+  "scenarios": [
+    {
+      "name": "GitHub synchronization and competitive decisions applies only missing taxonomy labels and preserves human labels",
+      "status": "passed",
+      "durationMs": 530.9592499999999
+    },
+    {
+      "name": "organizer label overrides and clarification history rejects uncontrolled or conflicting label decisions before changing organizer state",
+      "status": "passed",
+      "durationMs": 507.5678749999988
+    },
+    {
+      "name": "organizer label overrides and clarification history rejects conflicts with retained suppression while allowing an explicit reset",
+      "status": "passed",
+      "durationMs": 534.3470420000012
+    },
+    {
+      "name": "organizer label overrides and clarification history preserves human label decisions, clears inference explicitly and keeps clarified frozen contracts immutable across delayed sync",
+      "status": "passed",
+      "durationMs": 774.4344999999994
+    }
+  ],
+  "boundary": [
+    "Fixture GitHub responses with real D1 SQL and production services; not native GitHub repository operation.",
+    "Stale-native ordering and no-op repeat synchronization are tested, not every possible concurrent GitHub ordering.",
+    "Organizer clarifications remain in the authenticated console and do not change frozen requirements or automatically publish GitHub comments.",
+    "Templates have not been deployed to every challenge repository.",
+    "No new account-wide spam throttle or semantic gaming detector is claimed."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-04T08:43:34.931Z",
+  "repository": {
+    "defaultBranch": "main",
+    "private": true
+  },
+  "branch": "feat/evaluation-completeness",
+  "pr": {
+    "baseRefName": "main",
+    "headRefName": "feat/evaluation-completeness",
+    "headRefOid": "2f7ce0379ecf6fa77bce72c8d8a04ae043e03858",
+    "number": 6,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-04T08:00:38Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/daksh1403/judge-c2c/actions/runs/37187531835/job/111392580739",
+        "name": "preview",
+        "startedAt": "2026-10-04T08:00:45Z",
+        "status": "COMPLETED",
+        "workflowName": "Cloudflare deployment"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-04T08:07:00Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/daksh1403/judge-c2c/actions/runs/37187531814/job/111392805698",
+        "name": "quality",
+        "startedAt": "2026-10-04T08:02:06Z",
+        "status": "COMPLETED",
+        "workflowName": "Validate"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-04T08:00:38Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/daksh1403/judge-c2c/actions/runs/37187531835/job/111392562488",
+        "name": "production",
+        "startedAt": "2026-10-04T08:00:38Z",
+        "status": "COMPLETED",
+        "workflowName": "Cloudflare deployment"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-04T08:00:57Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://dash.cloudflare.com/713d4d5582d97de233c0ada5926ef25e/workers/services/view/judge-c2c/production/previews/feat-evaluation-completeness/builds/1a9e7ae2-4935-4306-8ea6-ea60d8ce39d7",
+        "name": "Workers Builds: judge-c2c",
+        "startedAt": "2026-10-04T08:00:57Z",
+        "status": "COMPLETED",
+        "workflowName": ""
+      }
+    ],
+    "url": "https://github.com/daksh1403/judge-c2c/pull/6"
+  },
+  "boundary": "Live authenticated GitHub PR/branch/check state before stabilization publication. Feature work resides on an open feature PR targeting main; production job is gated on main push plus protected environment enablement, and no merge is authorized. This is current workflow practice, not a guarantee against every future privileged actor."
+}

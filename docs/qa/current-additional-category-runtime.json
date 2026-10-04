@@ -1,0 +1,66 @@
+{
+  "mode": "REAL_SQLITE_GENERIC_ADDITIONAL_CONTRIBUTIONS_WITH_SYNTHETIC_FROZEN_EVIDENCE",
+  "checklistIds": [
+    "30.01",
+    "30.02",
+    "30.03",
+    "30.04",
+    "30.05",
+    "30.06",
+    "30.07",
+    "30.08",
+    "30.09",
+    "30.10",
+    "30.11",
+    "30.12",
+    "30.13",
+    "30.14",
+    "30.15"
+  ],
+  "validation": {
+    "command": "npx vitest run tests/additional-contributions.test.ts",
+    "passed": 30,
+    "failed": 0,
+    "typecheck": "npm run typecheck: passed"
+  },
+  "categories": [
+    "feature",
+    "performance",
+    "security",
+    "testing",
+    "analytics",
+    "architecture",
+    "documentation",
+    "AI-ML",
+    "language-conversion",
+    "other"
+  ],
+  "proven": [
+    "Each contract-allowed category uses the same production creation/review functions, immutable changed paths and optional functional criterion with execution PASS and baseline FAIL.",
+    "No decisions are created on candidate creation. Named organizer recognition requires an explicit rationale; decision stores exact cited evidence snapshot.",
+    "Functional source-only PASS, baseline PASS, and missing baseline evidence remain UNVERIFIED and recognition is denied.",
+    "Unknown category, unknown evidence citation, paths outside frozen diff, and mandatory-only criteria are denied.",
+    "Manual recognition rejects policy FAIL, observed baseline-PASS/head-FAIL regression, stale head, closed PR, and identical baseline/head without deleting candidate history.",
+    "Existing discovery tests prove bounded five suggestions, total twenty cap, stable idempotent replay, required-path exclusion, no automatic recognition, and policy/regression blocking."
+  ],
+  "fix": "Manual candidate verification and atomic recognition now refuse identical baseline/head; automatic discovery already refused this.",
+  "existingExecutionEvidence": [
+    {
+      "path": "docs/qa/docker-evidence.json",
+      "scope": "Existing real Docker execution of controlled HTTP acceptance fixtures. Not a new ten-category execution campaign."
+    },
+    {
+      "path": "docs/qa/payment-calibration-evidence.json",
+      "scope": "Existing real GitHub/App/Docker frozen payment baseline/head comparison; objective evidence independent of failed AI."
+    },
+    {
+      "path": "docs/qa/current-grounding-calibration.md",
+      "scope": "Existing reference/partial/protected-test replay evidence; no universal category novelty assertion."
+    }
+  ],
+  "limits": [
+    "Frozen execution evidence in the ten category matrix is synthetic; these tests prove category-agnostic server gates, not ten genuine independent software innovations.",
+    "Category selection, usefulness, novelty, causal attribution and relevance require organizer inspection. AI or automatic suggestions cannot establish category truth or confer credit.",
+    "No new live Docker benchmark/calibration or deployed recognition was run in this wave. Existing UI capture is separate evidence owned by the lead/intelligence agent."
+  ]
+}

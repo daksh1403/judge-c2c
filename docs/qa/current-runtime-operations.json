@@ -1,0 +1,166 @@
+{
+  "capturedAt": "2026-10-04T07:11:10.421783+00:00",
+  "profile": "synthetic-local-runtime",
+  "command": "npx vitest run tests/intake.test.ts tests/reviewer-capacity.test.ts tests/artifact-store.test.ts tests/dependency-audit.test.ts tests/local-runner.test.ts",
+  "typecheck": "PASS",
+  "totalTests": 52,
+  "passed": 52,
+  "failed": 0,
+  "reportSha256": "a4500863d229bc03dab21a35a68554fc738e71cb7137d215a24b1d2c98a3a188",
+  "suites": [
+    {
+      "file": "tests/artifact-store.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "file": "tests/dependency-audit.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "file": "tests/intake.test.ts",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "file": "tests/local-runner.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "file": "tests/reviewer-capacity.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0
+    }
+  ],
+  "scenarios": [
+    {
+      "ids": ["04.15", "38.01"],
+      "runtime": "real Miniflare/D1 plus fixture GitHub signatures and workflow binding",
+      "signedEvents": 48,
+      "submissions": 12,
+      "historyRuns": 48,
+      "supersededRuns": 36,
+      "authoritativeCurrentRuns": 12,
+      "outboxPendingDuringDispatchOutage": 12,
+      "outboxPendingAfterRecovery": 0,
+      "test": {
+        "name": "retains twelve submissions and authoritative latest heads during a signed 48-event burst with dispatch outage and recovery",
+        "status": "passed",
+        "durationMs": 1470.7869589999998
+      }
+    },
+    {
+      "ids": ["38.06"],
+      "runtime": "two real Worker isolates bundle production reviewer lease code and share one D1 database",
+      "concurrentRequests": 24,
+      "successfulOwners": 1,
+      "crashLeaseExpiry": "recovered",
+      "staleOwnerRenewal": "denied",
+      "staleOwnerRelease": "fenced",
+      "test": {
+        "name": "fences a 24-request provider burst across two real Worker isolates sharing D1, including crash recovery",
+        "status": "passed",
+        "durationMs": 643.5716249999998
+      }
+    },
+    {
+      "ids": ["49.16"],
+      "runtime": "controlled scanner fetch failure injection; no real OSV outage",
+      "httpFailures": [429, 500, 503, 504],
+      "transportAndOversizeFailures": "UNVERIFIED",
+      "recovery": "advisory delta FAIL and audit completion PASS, distinguishing scan completion from package security"
+    },
+    {
+      "ids": ["49.22"],
+      "runtime": "real SQLite artifact SQL with controlled backing-store failure injection",
+      "failedReportUpload": "PARTIAL / FAILED; sanitized error",
+      "earlierEvidenceAndStoredBytes": "preserved",
+      "recovery": "CAPTURED, report attempt 2",
+      "test": {
+        "name": "preserves authoritative evidence and earlier stored bytes through partial provider failure and recovery",
+        "status": "passed",
+        "durationMs": 3.1768339999999853
+      }
+    }
+  ],
+  "boundary": [
+    "Synthetic signatures and fixtures are not independent hackathon participant accounts.",
+    "The burst demonstrates bounded intake integrity and durable recovery, not a production latency or deadline capacity guarantee.",
+    "Two local Worker isolates verify shared-D1 lease fencing, not deployed autoscaling or regional resilience.",
+    "Docker/container argument and bridge tests do not prove live container capacity.",
+    "Storage and scanner outages are controlled injections, not production provider failures."
+  ],
+  "queueRuntime": {
+    "capturedAt": "2026-10-04T08:10:01.549650+00:00",
+    "ids": [
+      "36.03",
+      "36.06",
+      "36.08",
+      "36.10",
+      "36.11",
+      "38.02",
+      "38.03",
+      "38.04",
+      "38.05",
+      "38.07"
+    ],
+    "command": "npx vitest run tests/workflow-capacity-runtime.test.ts tests/intake.test.ts tests/reviewer-capacity.test.ts",
+    "tests": {
+      "passed": 20,
+      "failed": 0,
+      "total": 20
+    },
+    "reportSha256": "cf6ee7790c505cae39678165d8b87cd9def0e7532cc029e4f3907b6a4c632b96",
+    "scenarios": [
+      {
+        "file": "tests/intake.test.ts",
+        "name": "dispatches only the latest five queued items per recovery sweep, skips obsolete work, and exposes authoritative queue counts",
+        "status": "passed",
+        "durationMs": 424.7425830000002
+      },
+      {
+        "file": "tests/reviewer-capacity.test.ts",
+        "name": "fences a 24-request provider burst across two real Worker isolates sharing D1, including crash recovery",
+        "status": "passed",
+        "durationMs": 687.397917
+      },
+      {
+        "file": "tests/reviewer-capacity.test.ts",
+        "name": "keeps provider leases independent across provider identities",
+        "status": "passed",
+        "durationMs": 21.00912500000004
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "executes production prepare backoff and recovery in the real Miniflare Workflow engine",
+        "status": "passed",
+        "durationMs": 31152.381167
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "releases an acquired AI lease when newer authoritative work supersedes the run before reasoning",
+        "status": "passed",
+        "durationMs": 687.7813330000026
+      },
+      {
+        "file": "tests/workflow-capacity-runtime.test.ts",
+        "name": "fences obsolete active provider output and releases its lease after the active request returns",
+        "status": "passed",
+        "durationMs": 687.6861250000002
+      }
+    ],
+    "productionLimits": [
+      "Real Miniflare Workflow engine verifies configured exponential delays and recovery locally, not Cloudflare production scheduling or provider SLA.",
+      "Cancellation is cooperative at stage boundaries; an active external provider request holds its lease until it returns. Obsolete output is fenced and lease then released.",
+      "Latest-first recovery dispatches at most five queued items per sweep; queued outbox history is preserved during outage.",
+      "Two local Worker isolates share one D1 database; horizontal multi-host throughput, autoscaling and high-load latency remain unmeasured."
+    ]
+  }
+}

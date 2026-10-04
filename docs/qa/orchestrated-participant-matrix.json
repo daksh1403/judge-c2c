@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "shard": "teams-issues-mapping-fairness",
+  "asOf": "2026-10-03",
+  "method": "Historical evidence review only; no unit tests, live GitHub calls, browser or new execution.",
+  "classificationRule": "REAL_GITHUB means preserved real GitHub evidence, not fresh verification. SIMULATED means historical fixtures, never independent accounts.",
+  "sectionIds": [
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "40",
+    "41",
+    "43",
+    "44",
+    "45",
+    "47"
+  ],
+  "rows": [
+    {
+      "scenario": "ideal",
+      "ids": ["05", "06", "12", "13.01", "13.02", "13.04", "43"],
+      "expectation": "Eligible member PR maps to frozen official assignment; trusted criteria determine acceptance; organizer decision remains separate.",
+      "classification": "REAL_GITHUB",
+      "observed": "Payment issue6/PR7, frozen head749b414d1036a0c1b734af807e681e4894d2345e, completed run6b15772153dc2c2058281a7c2249fd79957ec1da57bedf05b835cc277761ebd3, published Check110840780853; one real QA operator.",
+      "evidence": [
+        "docs/qa/payment-live-evidence.json",
+        "docs/qa/payment-readiness-report.md"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "other_team_member",
+      "ids": ["05.05", "13.01", "13.02", "13.07"],
+      "expectation": "Another active registered member submits for the same stable team without creating a second team.",
+      "classification": "SIMULATED",
+      "observed": "Historical twelve-team rehearsal records successful second-member attribution. Independent real-account submission not established.",
+      "evidence": [
+        "docs/qa/rehearsal-report.md#Participant scenarios",
+        "tests/hackathon-rehearsal.test.ts"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "unknown_member",
+      "ids": ["13.11"],
+      "expectation": "Visible NEEDS_TEAM_MAPPING; no evaluation until authorized mapping.",
+      "classification": "SIMULATED",
+      "observed": "Historical fixture H and QA-014 record NEEDS_TEAM_MAPPING/no evaluation and not-submitted team remains visible.",
+      "evidence": [
+        "docs/qa/rehearsal-report.md#Participant scenarios",
+        "docs/qa/test-matrix.json#QA-014"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "wrong_repository",
+      "ids": ["06", "13.03"],
+      "expectation": "WRONG_REPOSITORY attention; no unauthorized evaluation/assignment.",
+      "classification": "SIMULATED",
+      "observed": "Historical fixture G and QA-005 exercise incorrect eligibility.",
+      "evidence": [
+        "docs/qa/rehearsal-report.md#Participant scenarios",
+        "docs/qa/test-matrix.json#QA-005"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "wrong_issue",
+      "ids": ["13.04", "13.08", "13.09", "13.10"],
+      "expectation": "Missing/conflicting/unassigned issue stays explicit mapping attention; never adopts participant judging rules.",
+      "classification": "SIMULATED",
+      "observed": "Historical fixture I records NEEDS_ISSUE_MAPPING. Broad wrong-issue permutations and independent real participant submission remain unverified.",
+      "evidence": ["docs/qa/rehearsal-report.md#Participant scenarios"],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "multiple_issues",
+      "ids": ["14.01", "14.02"],
+      "expectation": "Keep legitimate assigned issue IDs and separable frozen criteria in one PR.",
+      "classification": "SIMULATED",
+      "observed": "Historical fixture J retains both legitimate issue IDs; this does not prove stacked PR policy.",
+      "evidence": ["docs/qa/rehearsal-report.md#Participant scenarios"],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "repeated_commits",
+      "ids": ["16.03", "16.04", "16.05", "16.07"],
+      "expectation": "New exact-head run; superseded/failed evidence retained, obsolete work cannot count as current acceptance.",
+      "classification": "REAL_GITHUB",
+      "observed": "QA repository live evidence before/after includes distinct heads and runs for same PRs plus signed events; fixture K separately checks history semantics.",
+      "evidence": [
+        "docs/qa/live-evidence.json#before",
+        "docs/qa/live-evidence.json#after",
+        "docs/qa/rehearsal-report.md#Participant scenarios"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    },
+    {
+      "scenario": "test_manipulation",
+      "ids": ["12", "13", "16", "43"],
+      "expectation": "Participant tests/protected-file edits cannot waive frozen authoritative criteria; report policy findings separately from functional checks.",
+      "classification": "REAL_GITHUB",
+      "observed": "Payment manipulated PR9 run58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8 records policy-6 FAIL despite trusted acceptance PASS; aiStatusFAILED, preserved objective evidence. No semantic narrative success asserted.",
+      "evidence": [
+        "docs/qa/payment-calibration-evidence.json#rows/persona=manipulated",
+        "docs/qa/test-matrix.json#QA-027"
+      ],
+      "currentLiveVerification": "UNVERIFIED"
+    }
+  ],
+  "newConfirmedDefects": [],
+  "requiredFlowsWithoutFreshProof": [
+    "Independent real-account second-member, unknown-member, wrong-repository, wrong-issue and multi-issue scenarios",
+    "Participant/team-scoped access and cross-team denial in a live console"
+  ],
+  "launchBlockers": [
+    "Current GitHub auth and writable Git metadata unavailable; no fresh authoritative account/head/permission checks possible",
+    "Loopback blocked, preventing local browser/integration rehearsal",
+    "Historical fixture evidence does not establish independent participant identities or event-scale fairness"
+  ],
+  "ledgerMutation": false
+}

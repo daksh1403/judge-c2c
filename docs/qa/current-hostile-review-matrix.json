@@ -1,0 +1,52 @@
+{
+  "checklistIds": [
+    "34.01",
+    "34.02",
+    "34.03",
+    "34.04",
+    "34.05",
+    "34.09",
+    "23.13",
+    "22.18"
+  ],
+  "mode": "LOCAL_PRODUCTION_AI_CONTEXT_AND_VALIDATION_FUNCTIONS_WITH_CONTROLLED_MODEL_RESPONSES",
+  "validation": {
+    "command": "npx vitest run tests/claim-grounding.test.ts tests/review-context.test.ts tests/security.test.ts tests/callmissed-review.test.ts tests/domain.test.ts",
+    "passed": 60,
+    "failed": 0,
+    "typecheck": "passed"
+  },
+  "newChannelMatrix": [
+    "README source text",
+    "source code comment",
+    "PR description",
+    "native issue body excluded as unsupported Context field",
+    "test-output text normalized into execution evidence claim",
+    "log text normalized into execution evidence claim"
+  ],
+  "assertions": [
+    "Untrusted participant text stays below the fixed system policy, never modifies trusted instructions.",
+    "Native issue body is omitted from serialized AI context; this proves exclusion, not native issue-context ingestion.",
+    "Fabricated evidence citations are rejected by validateReview for every channel.",
+    "Controlled model responses contradicting authoritative FAIL are rejected twice and return deterministic FAIL.",
+    "Missing maintainability context remains UNVERIFIED; no inferred quality PASS.",
+    "Provider requests contain no tools; existing CallMissed tests also prove fixed endpoint, no stored conversation and strict schema.",
+    "Recognized fixture credential redacted from outbound context and returned report without changing input objects.",
+    "Existing allowlisted context-read tests reject unknown paths/traversal, retain authoritative failures, and enforce UTF8 bounds."
+  ],
+  "credentialFormats": [
+    "GitHub ghp token",
+    "GitHub github_pat token",
+    "AWS AKIA access key",
+    "sk-prefixed token",
+    "quoted api_key assignment",
+    "PEM private key block"
+  ],
+  "limits": [
+    "Controlled model responses exercise deterministic safety gates; no claim that all live models resist every arbitrary instruction.",
+    "Test-output/log matrix starts at normalized evidence claims; separate runner tests govern output ingestion.",
+    "Source comments and PR descriptions are tested; native GitHub comment fetching is not implemented or claimed.",
+    "Recognized pattern/property redaction is proven; arbitrary unlabeled secrets cannot be exhaustively detected."
+  ],
+  "productionChanges": []
+}

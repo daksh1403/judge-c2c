@@ -1,0 +1,9 @@
+{
+  "mode": "REAL_DEPLOYED_BROWSER_NO_MOCKS",
+  "team": true,
+  "submission": true,
+  "exactCurrentHead": true,
+  "history": true,
+  "mobileFits": true,
+  "errors": []
+}

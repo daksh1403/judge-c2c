@@ -1,0 +1,28 @@
+name: Participant-discovered engineering problem
+description: Report a reproducible problem for organizer review; reporting does not award credit.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and affected component
+      description: For vulnerabilities use the repository Security tab and private reporting. Do not include public exploit details or secrets.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and environment
+    validations:
+      required: true

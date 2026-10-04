@@ -1,0 +1,69 @@
+{
+  "at": "2026-10-04T08:13:49.755Z",
+  "pricingSource": "https://developers.cloudflare.com/workers-ai/models/llama-3.3-70b-instruct-fp8-fast/",
+  "rates": {
+    "inputUsdPerMillion": 0.293,
+    "outputUsdPerMillion": 2.253
+  },
+  "mode": "REAL_PRESERVED_PROVIDER_USAGE_WITH_VERIFIED_LIST_PRICES",
+  "historicalReportsUnchanged": true,
+  "results": [
+    {
+      "pr": 8,
+      "runId": "c1584d2443a439da1c3424138ac26675ee05424facf450e8cb72b1645ec5e342",
+      "invokedModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "providerReportedModel": "@cf/meta/llama-3.3-70b-json",
+      "usage": {
+        "completion_tokens": 1585,
+        "neurons": 700.2039184570312,
+        "prompt_tokens": 14084,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 15669
+      },
+      "microUsd": 7698,
+      "status": "ESTIMATE",
+      "scope": "successful-final-response-list-price",
+      "excludes": "Retrieval, failed requests, discounts/free quota and provider invoice"
+    },
+    {
+      "pr": 9,
+      "runId": "886dfcbfc1463637494b65fe8a6ec3e5ae05aa157c29b54f30c37157f53e7a63",
+      "invokedModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "providerReportedModel": "@cf/meta/llama-3.3-70b-json",
+      "usage": {
+        "completion_tokens": 1831,
+        "neurons": 752.0260620117188,
+        "prompt_tokens": 14138,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 15969
+      },
+      "microUsd": 8268,
+      "status": "ESTIMATE",
+      "scope": "successful-final-response-list-price",
+      "excludes": "Retrieval, failed requests, discounts/free quota and provider invoice"
+    },
+    {
+      "pr": 11,
+      "runId": "190c202511e8184284585b8e8a230c2d03108e1ac9a46f77dc4b66d9cd29f4b0",
+      "invokedModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "providerReportedModel": "@cf/meta/llama-3.3-70b-json",
+      "usage": {
+        "completion_tokens": 2048,
+        "neurons": 795.2154541015625,
+        "prompt_tokens": 14091,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "total_tokens": 16139
+      },
+      "microUsd": 8743,
+      "status": "ESTIMATE",
+      "scope": "successful-final-response-list-price",
+      "excludes": "Retrieval, failed requests, discounts/free quota and provider invoice"
+    }
+  ]
+}

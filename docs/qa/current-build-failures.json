@@ -1,0 +1,369 @@
+{
+  "at": "2026-10-04T08:12:21.135Z",
+  "mode": "REAL_DOCKER_BOUNDED_SYNTHETIC_BUILD_FAILURES",
+  "scope": "Pinned image; independent failed build command on baseline or head; trusted acceptance evidence is preserved. No production or full TypeScript compiler claim.",
+  "result": [
+    {
+      "scenario": "baseline-build-failure",
+      "pair": [
+        {
+          "side": "baseline",
+          "result": {
+            "requestHash": "f8539cda499650a30eef61c520e02b04a504602bd37db59658f35ad32c124fa7",
+            "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "contractHash": "b850302e644883263d3afcf509704c71ee26b2df314b5c5bef3e86015d7f9917",
+            "version": "node-http-v1.3.0",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T08:12:13.487Z",
+            "finishedAt": "2026-10-04T08:12:15.391Z",
+            "checks": [
+              {
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 227,
+                "stdout": "{\"status\":\"success\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 176,
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 195,
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 128,
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+              },
+              {
+                "stdout": "",
+                "stderr": "/work/build-input.mjs:1\nconst = ;\n      ^\n\nSyntaxError: Unexpected token '='\n    at checkSyntax (node:internal/main/check_syntax:84:5)\n\nNode.js v24.21.0\n",
+                "exitCode": 1,
+                "durationMs": 94,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "detail": "Configured build command failed."
+              }
+            ],
+            "metrics": {
+              "resources": [
+                {
+                  "scope": "service",
+                  "sampledAt": "2026-10-04T08:12:14.740Z",
+                  "cpuUsageUsec": 442647,
+                  "memoryBytes": 29368320,
+                  "pids": 15
+                },
+                {
+                  "scope": "command:build",
+                  "sampledAt": "2026-10-04T08:12:15.314Z",
+                  "cpuUsageUsec": 95878,
+                  "memoryBytes": 10559488,
+                  "pids": 8
+                }
+              ],
+              "startupMs": 274,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            }
+          }
+        },
+        {
+          "side": "submission",
+          "result": {
+            "requestHash": "5a6977cccfabef33b636e91676c81c6e7db6c2cbf1d9c480fe0ed441b354475b",
+            "commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "contractHash": "b850302e644883263d3afcf509704c71ee26b2df314b5c5bef3e86015d7f9917",
+            "version": "node-http-v1.3.0",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T08:12:15.392Z",
+            "finishedAt": "2026-10-04T08:12:17.275Z",
+            "checks": [
+              {
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 194,
+                "stdout": "{\"status\":\"success\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 185,
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 191,
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 132,
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+              },
+              {
+                "stdout": "",
+                "stderr": "",
+                "exitCode": 0,
+                "durationMs": 91,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "detail": "Configured build command passed."
+              }
+            ],
+            "metrics": {
+              "resources": [
+                {
+                  "scope": "service",
+                  "sampledAt": "2026-10-04T08:12:16.626Z",
+                  "cpuUsageUsec": 434896,
+                  "memoryBytes": 29667328,
+                  "pids": 15
+                },
+                {
+                  "scope": "command:build",
+                  "sampledAt": "2026-10-04T08:12:17.191Z",
+                  "cpuUsageUsec": 93827,
+                  "memoryBytes": 13135872,
+                  "pids": 8
+                }
+              ],
+              "startupMs": 281,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "submission-build-failure",
+      "pair": [
+        {
+          "side": "baseline",
+          "result": {
+            "requestHash": "aebf860ff09846718c4426521c5641f0f9fd2c4f563521081ce9e15185adbf09",
+            "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "contractHash": "b850302e644883263d3afcf509704c71ee26b2df314b5c5bef3e86015d7f9917",
+            "version": "node-http-v1.3.0",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T08:12:17.276Z",
+            "finishedAt": "2026-10-04T08:12:19.168Z",
+            "checks": [
+              {
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 180,
+                "stdout": "{\"status\":\"success\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 192,
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 189,
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 127,
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+              },
+              {
+                "stdout": "",
+                "stderr": "",
+                "exitCode": 0,
+                "durationMs": 90,
+                "id": "build",
+                "kind": "build",
+                "status": "PASS",
+                "detail": "Configured build command passed."
+              }
+            ],
+            "metrics": {
+              "resources": [
+                {
+                  "scope": "service",
+                  "sampledAt": "2026-10-04T08:12:18.520Z",
+                  "cpuUsageUsec": 439868,
+                  "memoryBytes": 31330304,
+                  "pids": 15
+                },
+                {
+                  "scope": "command:build",
+                  "sampledAt": "2026-10-04T08:12:19.090Z",
+                  "cpuUsageUsec": 96964,
+                  "memoryBytes": 12959744,
+                  "pids": 8
+                }
+              ],
+              "startupMs": 287,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            }
+          }
+        },
+        {
+          "side": "submission",
+          "result": {
+            "requestHash": "28f180653ae2c3257a05c4ec7467472c4ec6b73f541ad88cfd3b7f07f7eac0ce",
+            "commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "contractHash": "b850302e644883263d3afcf509704c71ee26b2df314b5c5bef3e86015d7f9917",
+            "version": "node-http-v1.3.0",
+            "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+            "runtime": "v24.21.0; docker-local-v1",
+            "startedAt": "2026-10-04T08:12:19.168Z",
+            "finishedAt": "2026-10-04T08:12:21.135Z",
+            "checks": [
+              {
+                "id": "retry-transient",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 184,
+                "stdout": "{\"status\":\"success\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-bounded",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 191,
+                "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-permanent",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 205,
+                "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+              },
+              {
+                "id": "retry-invalid",
+                "kind": "acceptance",
+                "status": "PASS",
+                "exitCode": null,
+                "durationMs": 201,
+                "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+                "stderr": "",
+                "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+              },
+              {
+                "stdout": "",
+                "stderr": "/work/build-input.mjs:1\nconst = ;\n      ^\n\nSyntaxError: Unexpected token '='\n    at checkSyntax (node:internal/main/check_syntax:84:5)\n\nNode.js v24.21.0\n",
+                "exitCode": 1,
+                "durationMs": 84,
+                "id": "build",
+                "kind": "build",
+                "status": "FAIL",
+                "detail": "Configured build command failed."
+              }
+            ],
+            "metrics": {
+              "resources": [
+                {
+                  "scope": "service",
+                  "sampledAt": "2026-10-04T08:12:20.511Z",
+                  "cpuUsageUsec": 448848,
+                  "memoryBytes": 31580160,
+                  "pids": 15
+                },
+                {
+                  "scope": "command:build",
+                  "sampledAt": "2026-10-04T08:12:21.052Z",
+                  "cpuUsageUsec": 100788,
+                  "memoryBytes": 11341824,
+                  "pids": 8
+                }
+              ],
+              "startupMs": 289,
+              "tools": {
+                "node": "v24.21.0",
+                "npm": "11.19.0"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

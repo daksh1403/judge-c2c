@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-04",
+  "branch": "feat/evaluation-completeness",
+  "browser": {
+    "passed": 12,
+    "failed": 0,
+    "boundary": "Local application and explicit HTTP fixtures; includes four engineering finding categories, artifact recovery, judge roles and contribution controls"
+  },
+  "dockerRehearsal": {
+    "boundary": "Actual local Docker and controlled source personas; one real GitHub operator",
+    "results": [
+      {
+        "actor": "ideal",
+        "statuses": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      {
+        "actor": "partial",
+        "statuses": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS"
+        ]
+      },
+      {
+        "actor": "hardcoded",
+        "statuses": [
+          "PASS",
+          "FAIL",
+          "FAIL",
+          "FAIL"
+        ]
+      },
+      {
+        "actor": "validated-benchmark",
+        "status": "PASS"
+      },
+      {
+        "actor": "containment",
+        "actual": {
+          "network": false,
+          "metadata": false,
+          "root": false,
+          "secret": false,
+          "boundedProcesses": true,
+          "otherSubmission": false,
+          "uid": 65534
+        }
+      }
+    ]
+  },
+  "remoteMigrations": {
+    "DB": "through0015",
+    "ORG_DB": "through0015"
+  },
+  "runtimeEvidence": "docs/qa/current-review-runtime.json",
+  "unitTests": "Not run locally at user instruction"
+}

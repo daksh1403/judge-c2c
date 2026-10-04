@@ -1,0 +1,8 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!Dockerfile.typescript
+!typescript/
+!typescript/package.json
+!typescript/package-lock.json

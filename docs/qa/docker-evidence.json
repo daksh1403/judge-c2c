@@ -1,0 +1,463 @@
+{
+  "mode": "REAL_DOCKER_SIMULATED_CODE",
+  "at": "2026-10-02T13:15:49.400Z",
+  "results": [
+    {
+      "actor": "ideal",
+      "result": {
+        "requestHash": "55369610ba680042857ec3de033c33b6fffa93dabadb5e20afbf46e7724d35eb",
+        "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "contractHash": "5bfcf888ca61f55e12a0ad57d2825969f9937cc8c9c743fd8244a50800a27b49",
+        "version": "node-http-v1.1.0",
+        "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+        "runtime": "v24.21.0; docker-local-v1",
+        "startedAt": "2026-10-02T13:15:28.293Z",
+        "finishedAt": "2026-10-02T13:15:30.246Z",
+        "checks": [
+          {
+            "id": "retry-transient",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 149,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-bounded",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 91,
+            "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-permanent",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 89,
+            "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-invalid",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 103,
+            "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 67,
+            "id": "build",
+            "kind": "build",
+            "status": "PASS",
+            "detail": "Configured build command passed."
+          },
+          {
+            "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 4.435\n",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 72,
+            "id": "repository-tests",
+            "kind": "test",
+            "status": "PASS",
+            "detail": "Configured test command passed."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 222,
+            "id": "lint",
+            "kind": "lint",
+            "status": "PASS",
+            "detail": "Configured lint command passed."
+          }
+        ]
+      }
+    },
+    {
+      "actor": "partial",
+      "result": {
+        "requestHash": "a3dc77a8e192eca159ac03754e6f09c4675a7249b70b66a4b03ef1de4d9848cd",
+        "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "contractHash": "5bfcf888ca61f55e12a0ad57d2825969f9937cc8c9c743fd8244a50800a27b49",
+        "version": "node-http-v1.1.0",
+        "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+        "runtime": "v24.21.0; docker-local-v1",
+        "startedAt": "2026-10-02T13:15:30.247Z",
+        "finishedAt": "2026-10-02T13:15:32.034Z",
+        "checks": [
+          {
+            "id": "retry-transient",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 80,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-bounded",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 91,
+            "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-permanent",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 87,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-invalid",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 106,
+            "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 62,
+            "id": "build",
+            "kind": "build",
+            "status": "PASS",
+            "detail": "Configured build command passed."
+          },
+          {
+            "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3.510083\n",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 66,
+            "id": "repository-tests",
+            "kind": "test",
+            "status": "PASS",
+            "detail": "Configured test command passed."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 206,
+            "id": "lint",
+            "kind": "lint",
+            "status": "PASS",
+            "detail": "Configured lint command passed."
+          }
+        ]
+      }
+    },
+    {
+      "actor": "hardcoded",
+      "result": {
+        "requestHash": "66471ef32d775e8c5ac4cb6d7c2a3111678c03b39081e8de7b2973f2c3269657",
+        "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "contractHash": "5bfcf888ca61f55e12a0ad57d2825969f9937cc8c9c743fd8244a50800a27b49",
+        "version": "node-http-v1.1.0",
+        "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+        "runtime": "v24.21.0; docker-local-v1",
+        "startedAt": "2026-10-02T13:15:32.035Z",
+        "finishedAt": "2026-10-02T13:15:33.955Z",
+        "checks": [
+          {
+            "id": "retry-transient",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 130,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-bounded",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 104,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-permanent",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 98,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-invalid",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 114,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-invalid: FAIL. Expected status 400; observed 200."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 65,
+            "id": "build",
+            "kind": "build",
+            "status": "PASS",
+            "detail": "Configured build command passed."
+          },
+          {
+            "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3.713208\n",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 86,
+            "id": "repository-tests",
+            "kind": "test",
+            "status": "PASS",
+            "detail": "Configured test command passed."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 197,
+            "id": "lint",
+            "kind": "lint",
+            "status": "PASS",
+            "detail": "Configured lint command passed."
+          }
+        ]
+      }
+    },
+    {
+      "actor": "validated-benchmark",
+      "result": {
+        "requestHash": "8be93e0f73c15c049a26bc83c9f55576e6acb0cc5f962f3c5107bac8e9a04415",
+        "commit": "cccccccccccccccccccccccccccccccccccccccc",
+        "contractHash": "adbfb0ea541621b76d84663b30121cb27cb8a9c3232e2bdb4174fc9a6f5069e7",
+        "version": "node-http-v1.1.0",
+        "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+        "runtime": "v24.21.0; docker-local-v1",
+        "startedAt": "2026-10-02T13:15:33.956Z",
+        "finishedAt": "2026-10-02T13:15:36.850Z",
+        "checks": [
+          {
+            "id": "retry-transient",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 90,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-transient: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-bounded",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 111,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-permanent",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 100,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-permanent: FAIL. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-invalid",
+            "kind": "acceptance",
+            "status": "FAIL",
+            "exitCode": null,
+            "durationMs": 92,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-invalid: FAIL. Expected status 400; observed 200."
+          },
+          {
+            "id": "retry-latency",
+            "kind": "benchmark",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 989,
+            "stdout": "{\"budgetMs\":5000,\"p95Ms\":109.001,\"protocol\":\"http-latency-v1\",\"samplesMs\":[88.867,89.79,98.707,92.412,109.001,97.549,76.865,95.833,80.015,73.68],\"scope\":\"End-to-end HTTP including evaluator transport overhead; development capacity only.\",\"warmup\":1}",
+            "stderr": "",
+            "detail": "Trusted HTTP latency benchmark: p95 109.001 ms over 10 validated samples, budget 5000 ms. Includes transport overhead; environment-specific."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 65,
+            "id": "build",
+            "kind": "build",
+            "status": "PASS",
+            "detail": "Configured build command passed."
+          },
+          {
+            "stdout": "ℹ tests 0\nℹ suites 0\nℹ pass 0\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 3.463084\n",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 74,
+            "id": "repository-tests",
+            "kind": "test",
+            "status": "PASS",
+            "detail": "Configured test command passed."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 279,
+            "id": "lint",
+            "kind": "lint",
+            "status": "PASS",
+            "detail": "Configured lint command passed."
+          }
+        ]
+      }
+    },
+    {
+      "actor": "bounded-abuse",
+      "result": {
+        "requestHash": "51ab8637c14243a1d2688710e73b6affa5b5435753e1b2db55aea9c48687ae2f",
+        "commit": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "contractHash": "345a766632e0785740a7fe8f5c8c390168c59b5346f8b7c5cd7733f6917aa9f5",
+        "version": "node-http-v1.1.0",
+        "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+        "runtime": "v24.21.0; docker-local-v1",
+        "startedAt": "2026-10-02T13:15:36.850Z",
+        "finishedAt": "2026-10-02T13:15:48.839Z",
+        "checks": [
+          {
+            "id": "retry-transient",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 79,
+            "stdout": "{\"status\":\"success\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-transient: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-bounded",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 94,
+            "stdout": "{\"status\":\"failed\",\"attempts\":2}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-bounded: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-permanent",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 88,
+            "stdout": "{\"status\":\"failed\",\"attempts\":1}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-permanent: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "retry-invalid",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 94,
+            "stdout": "{\"error\":\"INVALID_ATTEMPTS\"}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance retry-invalid: PASS. Expected status 400; observed 400."
+          },
+          {
+            "id": "output-limit",
+            "kind": "test",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Command unavailable or exceeded resource/time/output limits."
+          },
+          {
+            "id": "cpu-timeout",
+            "kind": "test",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Command unavailable or exceeded resource/time/output limits."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 2,
+            "durationMs": 75,
+            "id": "crash",
+            "kind": "test",
+            "status": "FAIL",
+            "detail": "Configured test command failed."
+          },
+          {
+            "stdout": "",
+            "stderr": "",
+            "exitCode": 0,
+            "durationMs": 76,
+            "id": "after-failures",
+            "kind": "build",
+            "status": "PASS",
+            "detail": "Configured build command passed."
+          }
+        ]
+      }
+    },
+    {
+      "actor": "containment",
+      "actual": {
+        "network": false,
+        "metadata": false,
+        "root": false,
+        "secret": false,
+        "boundedProcesses": true,
+        "otherSubmission": false,
+        "uid": 65534
+      }
+    }
+  ]
+}

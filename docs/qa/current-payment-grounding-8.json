@@ -1,0 +1,2698 @@
+{
+  "at": "2026-10-04T08:24:06.788Z",
+  "mode": "REAL_GITHUB_DOCKER_CLOUDFLARE",
+  "identity": "One actual authenticated operator; replay code persona, not multiple independent accounts",
+  "pr": 8,
+  "runId": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+  "state": "COMPLETED",
+  "aiStatus": "COMPLETED",
+  "publication": "PUBLISHED",
+  "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+  "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+  "requirements": [
+    {
+      "requirementId": "bounded-retry",
+      "mandatory": true,
+      "status": "PARTIAL",
+      "needsAttention": true,
+      "criteria": [
+        {
+          "criterionId": "retry-transient",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-transient"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-bounded",
+          "status": "FAIL",
+          "evidenceIds": ["criterion-retry-bounded"],
+          "reason": "An objective criterion check failed."
+        },
+        {
+          "criterionId": "retry-permanent",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-permanent"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-immediate",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-immediate"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-exhausted",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-exhausted"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-zero",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-invalid-zero"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-large",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-invalid-large"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-fraction",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-invalid-fraction"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-string",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-invalid-string"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-empty",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-outcomes-empty"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-unknown",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-outcomes-unknown"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-null",
+          "status": "PASS",
+          "evidenceIds": ["criterion-retry-outcomes-null"],
+          "reason": "A relevant objective criterion check passed."
+        }
+      ]
+    },
+    {
+      "requirementId": "payment-regression",
+      "mandatory": true,
+      "status": "PASS",
+      "needsAttention": false,
+      "criteria": [
+        {
+          "criterionId": "health-preserved",
+          "status": "PASS",
+          "evidenceIds": ["criterion-health-preserved"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-created",
+          "status": "PASS",
+          "evidenceIds": ["criterion-payment-created"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-idempotency",
+          "status": "PASS",
+          "evidenceIds": ["criterion-payment-idempotency"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-read",
+          "status": "PASS",
+          "evidenceIds": ["criterion-payment-read"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-conflict",
+          "status": "PASS",
+          "evidenceIds": ["criterion-payment-conflict"],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-invalid",
+          "status": "PASS",
+          "evidenceIds": ["criterion-payment-invalid"],
+          "reason": "A relevant objective criterion check passed."
+        }
+      ]
+    }
+  ],
+  "trace": {
+    "attemptFailures": ["AI_APPROACH_CITATION_UNLISTED"],
+    "attempts": 2,
+    "contextBudget": {
+      "contextBytes": 37597,
+      "estimatedInputTokens": 11940,
+      "finalContextBytes": 37597,
+      "inputTokenEstimateMethod": "[REDACTED]",
+      "maxContextBytes": 48000,
+      "omittedDiffPaths": [],
+      "omittedEvidenceIds": [],
+      "omittedSourcePaths": ["README.md", "server.mjs"],
+      "reservedInputBytes": 10163,
+      "reservedOutputTokens": 4096,
+      "version": "bounded-review-context-v1"
+    },
+    "cost": {
+      "currency": "USD",
+      "excludes": "Retrieval, failed requests and other provider billing.",
+      "inputTokens": 14185,
+      "microUsd": 10724,
+      "outputTokens": 2915,
+      "rates": {
+        "inputUsdPerMillion": 0.293,
+        "outputUsdPerMillion": 2.253
+      },
+      "scope": "successful-final-response",
+      "status": "ESTIMATE"
+    },
+    "downgradedObservationPaths": [
+      "solution_approach.problem_understanding",
+      "solution_approach.approach_summary",
+      "solution_approach.solution_design",
+      "solution_approach.correctness",
+      "solution_approach.maintainability",
+      "solution_approach.architecture_fit",
+      "solution_approach.strengths[0]",
+      "solution_approach.strengths[1]"
+    ],
+    "durationMs": 134027,
+    "evaluationPlan": {
+      "depth": "STANDARD",
+      "maxChangedFiles": 30,
+      "maxContextBytes": 48000,
+      "reasons": [
+        "All frozen contract criteria remain required at every review depth.",
+        "Authoritative execution checks are unchanged by this advisory plan.",
+        "Changes require standard source review or have no changed-path evidence.",
+        "Functional criteria or trusted runner checks require objective verification."
+      ],
+      "reviewAreas": [
+        "correctness",
+        "policy",
+        "requirements",
+        "solution-approach",
+        "source-review",
+        "testing"
+      ],
+      "version": "adaptive-review-v1"
+    },
+    "groundingPolicy": "objective-facts-unverified-narratives-v1",
+    "inputHash": "1423ab9cd85c9b4211d38645540b8befce0504fd68b8dccb5c7298f668b2dc27",
+    "invokedModel": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "model": "@cf/meta/llama-3.3-70b-json",
+    "modelRouting": {
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "reason": "AI_MODEL retained; no depth override is configured.",
+      "version": "server-model-routing-v1"
+    },
+    "objectiveCriterionRecovery": [],
+    "policy": "requirements-and-approach-v10",
+    "provider": "cloudflare",
+    "qualitativeCriterionAnalysis": {
+      "missingCriterionIds": [],
+      "status": "PRESENT"
+    },
+    "requiresHumanAttention": true,
+    "responseId": null,
+    "unverifiedNarrativePaths": [
+      "solution_approach.problem_understanding",
+      "solution_approach.approach_summary",
+      "solution_approach.solution_design",
+      "solution_approach.correctness",
+      "solution_approach.maintainability",
+      "solution_approach.architecture_fit",
+      "solution_approach.strengths[0]",
+      "solution_approach.strengths[1]",
+      "solution_approach.weaknesses[0]",
+      "solution_approach.tradeoffs[0]",
+      "solution_approach.unverified_assumptions[0]",
+      "findings[0]"
+    ],
+    "usage": {
+      "completion_tokens": 2915,
+      "neurons": 975.2883911132812,
+      "prompt_tokens": 14185,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "total_tokens": 17100
+    }
+  },
+  "unsupportedObserved": 0,
+  "criterionConsistency": true,
+  "summary": "Objective criteria: 17 PASS, 1 FAIL, 0 UNVERIFIED. Contextual AI narratives are unverified interpretation and require human review; citations do not prove their semantic truth.",
+  "observations": [
+    {
+      "field": "approach_summary",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution approach includes implementing retry payment with various outcomes and max attempts, and preserving existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "architecture_fit",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution architecture fits the requirements as it implements retry payment with various outcomes and max attempts, and preserves existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "correctness",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution is correct as it passes the trusted HTTP acceptance tests for retry payment with various outcomes and max attempts, and preserves existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "maintainability",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution is maintainable as it includes tests for retry payment with various outcomes and max attempts, and preserves existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "problem_understanding",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The problem is understood as the solution implements retry payment with various outcomes and max attempts, and preserves existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "solution_design",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution design includes implementing retry payment with various outcomes and max attempts, and preserving existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[0]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution includes tests for retry payment with various outcomes and max attempts.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[1]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution preserves existing payment behavior.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "tradeoffs[0]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution includes a tradeoff between implementing retry payment with various outcomes and max attempts, and preserving existing payment behavior.",
+      "verification": "INFERENCE"
+    },
+    {
+      "field": "unverified_assumptions[0]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution assumes that the retry payment with various outcomes and max attempts will work as expected.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "weaknesses[0]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
+      ],
+      "text": "The solution does not handle all possible edge cases for retry payment with various outcomes and max attempts.",
+      "verification": "INFERENCE"
+    }
+  ],
+  "assessments": [
+    {
+      "criterionId": "retry-transient",
+      "evidenceIds": ["criterion-retry-transient"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-bounded",
+      "evidenceIds": ["criterion-retry-bounded"],
+      "explanation": "An objective criterion check failed.",
+      "status": "FAIL"
+    },
+    {
+      "criterionId": "retry-permanent",
+      "evidenceIds": ["criterion-retry-permanent"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-immediate",
+      "evidenceIds": ["criterion-retry-immediate"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-exhausted",
+      "evidenceIds": ["criterion-retry-exhausted"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-zero",
+      "evidenceIds": ["criterion-retry-invalid-zero"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-large",
+      "evidenceIds": ["criterion-retry-invalid-large"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-fraction",
+      "evidenceIds": ["criterion-retry-invalid-fraction"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-invalid-string",
+      "evidenceIds": ["criterion-retry-invalid-string"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-empty",
+      "evidenceIds": ["criterion-retry-outcomes-empty"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-unknown",
+      "evidenceIds": ["criterion-retry-outcomes-unknown"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "retry-outcomes-null",
+      "evidenceIds": ["criterion-retry-outcomes-null"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "health-preserved",
+      "evidenceIds": ["criterion-health-preserved"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-created",
+      "evidenceIds": ["criterion-payment-created"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-idempotency",
+      "evidenceIds": ["criterion-payment-idempotency"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-read",
+      "evidenceIds": ["criterion-payment-read"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-conflict",
+      "evidenceIds": ["criterion-payment-conflict"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    },
+    {
+      "criterionId": "payment-invalid",
+      "evidenceIds": ["criterion-payment-invalid"],
+      "explanation": "A relevant objective criterion check passed.",
+      "status": "PASS"
+    }
+  ],
+  "knownEvidenceIds": [
+    "diff",
+    "context-source-1",
+    "context-source-2",
+    "context-source-3",
+    "policy-4",
+    "policy-5",
+    "criterion-retry-transient",
+    "criterion-retry-bounded",
+    "criterion-retry-permanent",
+    "criterion-retry-immediate",
+    "criterion-retry-exhausted",
+    "criterion-retry-invalid-zero",
+    "criterion-retry-invalid-large",
+    "criterion-retry-invalid-fraction",
+    "criterion-retry-invalid-string",
+    "criterion-retry-outcomes-empty",
+    "criterion-retry-outcomes-unknown",
+    "criterion-retry-outcomes-null",
+    "criterion-health-preserved",
+    "criterion-payment-created",
+    "criterion-payment-idempotency",
+    "criterion-payment-read",
+    "criterion-payment-conflict",
+    "criterion-payment-invalid",
+    "execution-build",
+    "execution-repository-tests",
+    "execution-lint"
+  ],
+  "unknownCitations": [],
+  "protectedEvidence": [],
+  "executionFailures": [
+    {
+      "baselineStatus": "FAIL",
+      "claim": "Trusted HTTP acceptance retry-bounded: FAIL. Expected status 200; observed 200. Baseline FAIL → submission FAIL. Execution provenance: baseline BYPASS from run e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e, execution 19b36240-deec-44ea-8e21-86bbfc891467, cache ec53bbb9b9dae23e99418afc3320b28dbbfcc135018335ee63458d1564de4997; submission BYPASS from run e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e, execution a9b57b8a-ab97-402a-b0eb-281cfebe39ef, cache d0a40ad28bc4c7c4bc7b1b68bfaa75aa590f55e8c5f2ce7328229325d3c8cc4c.",
+      "criterionId": "retry-bounded",
+      "id": "criterion-retry-bounded",
+      "kind": "execution",
+      "status": "FAIL"
+    },
+    {
+      "baselineStatus": "PASS",
+      "claim": "test: Configured test command failed. Baseline PASS → submission FAIL. Repository commands are supplemental evidence.",
+      "id": "execution-repository-tests",
+      "kind": "execution",
+      "status": "FAIL"
+    }
+  ],
+  "humanAttention": true,
+  "engineeringReviewVersion": "judge-engineering-dimensions-v1",
+  "engineeringDimensions": [
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [
+        {
+          "baselineStatus": "PASS",
+          "checkId": "build",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["execution-build"],
+          "kind": "build",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "lint",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["execution-lint"],
+          "kind": "lint",
+          "status": "PASS"
+        }
+      ],
+      "contextualEvidenceIds": [],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 2,
+        "UNVERIFIED": 0
+      },
+      "dimension": "QUALITY",
+      "findingIndexes": [],
+      "missingCapabilities": [
+        {
+          "reason": "Duplication, semantic error handling, naming and complexity are not established by these checks.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "CHECK_RESULTS_AVAILABLE",
+      "summary": "Configured checks: 2 PASS, 0 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall quality verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": [],
+          "evidenceIds": [],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "UNVERIFIED",
+          "text": "No deterministic adverse-check or missing-check assessment is supported; broader engineering interpretation remains unverified."
+        },
+        "facts": {
+          "evidenceIds": ["execution-build", "execution-lint"],
+          "scope": "configured-check-outcomes-only",
+          "status": "SUPPORTED_FACT"
+        }
+      }
+    },
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [],
+      "contextualEvidenceIds": [
+        "diff",
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 0,
+        "UNVERIFIED": 0
+      },
+      "dimension": "ARCHITECTURE",
+      "findingIndexes": [],
+      "missingCapabilities": [
+        {
+          "reason": "Architectural boundaries, coupling, cohesion and data flow require dedicated analysis; source presence is context only.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "UNVERIFIED",
+      "summary": "Configured checks: 0 PASS, 0 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall architecture verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": [],
+          "evidenceIds": [],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "UNVERIFIED",
+          "text": "No deterministic adverse-check or missing-check assessment is supported; broader engineering interpretation remains unverified."
+        },
+        "facts": {
+          "evidenceIds": [],
+          "scope": "configured-check-outcomes-only",
+          "status": "UNVERIFIED"
+        }
+      }
+    },
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [],
+      "contextualEvidenceIds": [],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 0,
+        "UNVERIFIED": 0
+      },
+      "dimension": "SECURITY",
+      "findingIndexes": [],
+      "missingCapabilities": [
+        {
+          "reason": "Exploitability, authentication/authorization regression, injection, sensitive data and permission bypass require dedicated tests; scanner/advisory matches are not exploit proof.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "UNVERIFIED",
+      "summary": "Configured checks: 0 PASS, 0 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall security verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": [],
+          "evidenceIds": [],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "UNVERIFIED",
+          "text": "No deterministic adverse-check or missing-check assessment is supported; broader engineering interpretation remains unverified."
+        },
+        "facts": {
+          "evidenceIds": [],
+          "scope": "configured-check-outcomes-only",
+          "status": "UNVERIFIED"
+        }
+      }
+    },
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [],
+      "contextualEvidenceIds": [],
+      "counts": {
+        "FAIL": 0,
+        "PASS": 0,
+        "UNVERIFIED": 0
+      },
+      "dimension": "PERFORMANCE",
+      "findingIndexes": [],
+      "missingCapabilities": [
+        {
+          "reason": "Scalability, memory bounds and production performance are unverified outside configured measurements.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "UNVERIFIED",
+      "summary": "Configured checks: 0 PASS, 0 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall performance verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": [],
+          "evidenceIds": [],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "UNVERIFIED",
+          "text": "No deterministic adverse-check or missing-check assessment is supported; broader engineering interpretation remains unverified."
+        },
+        "facts": {
+          "evidenceIds": [],
+          "scope": "configured-check-outcomes-only",
+          "status": "UNVERIFIED"
+        }
+      }
+    },
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [
+        {
+          "baselineStatus": "PASS",
+          "checkId": "repository-tests",
+          "delta": "REGRESSION",
+          "evidenceIds": ["execution-repository-tests"],
+          "kind": "test",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "checkId": "retry-transient",
+          "delta": "IMPROVEMENT",
+          "evidenceIds": ["criterion-retry-transient"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "FAIL",
+          "checkId": "retry-bounded",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-bounded"],
+          "kind": "acceptance",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-permanent",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-permanent"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-immediate",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-immediate"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-exhausted",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-exhausted"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-invalid-zero",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-invalid-zero"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-invalid-large",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-invalid-large"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-invalid-fraction",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-invalid-fraction"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-invalid-string",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-invalid-string"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-outcomes-empty",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-outcomes-empty"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-outcomes-unknown",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-outcomes-unknown"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "retry-outcomes-null",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-retry-outcomes-null"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "health-preserved",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-health-preserved"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "payment-created",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-payment-created"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "payment-idempotency",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-payment-idempotency"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "payment-read",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-payment-read"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "payment-conflict",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-payment-conflict"],
+          "kind": "acceptance",
+          "status": "PASS"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "payment-invalid",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["criterion-payment-invalid"],
+          "kind": "acceptance",
+          "status": "PASS"
+        }
+      ],
+      "contextualEvidenceIds": [],
+      "counts": {
+        "FAIL": 2,
+        "PASS": 17,
+        "UNVERIFIED": 0
+      },
+      "dimension": "TESTING",
+      "findingIndexes": [0],
+      "missingCapabilities": [
+        {
+          "reason": "Passing configured cases does not prove comprehensive edge-case coverage or test quality.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "CHECK_RESULTS_AVAILABLE",
+      "summary": "Configured checks: 17 PASS, 2 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall testing verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [0],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": ["repository-tests"],
+          "evidenceIds": ["execution-repository-tests"],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "SUPPORTED_ENGINEERING_ASSESSMENT",
+          "text": "Configured check regression requires inspecting baseline/head evidence before judging this dimension."
+        },
+        "facts": {
+          "evidenceIds": [
+            "execution-repository-tests",
+            "criterion-retry-transient",
+            "criterion-retry-bounded",
+            "criterion-retry-permanent",
+            "criterion-retry-immediate",
+            "criterion-retry-exhausted",
+            "criterion-retry-invalid-zero",
+            "criterion-retry-invalid-large",
+            "criterion-retry-invalid-fraction",
+            "criterion-retry-invalid-string",
+            "criterion-retry-outcomes-empty",
+            "criterion-retry-outcomes-unknown",
+            "criterion-retry-outcomes-null",
+            "criterion-health-preserved",
+            "criterion-payment-created",
+            "criterion-payment-idempotency",
+            "criterion-payment-read",
+            "criterion-payment-conflict",
+            "criterion-payment-invalid"
+          ],
+          "scope": "configured-check-outcomes-only",
+          "status": "SUPPORTED_FACT"
+        }
+      }
+    },
+    {
+      "assessmentOrigin": "AI_ASSESSMENT",
+      "assessmentVerification": "UNVERIFIED",
+      "checks": [
+        {
+          "baselineStatus": "PASS",
+          "checkId": "repository-tests",
+          "delta": "REGRESSION",
+          "evidenceIds": ["execution-repository-tests"],
+          "kind": "test",
+          "status": "FAIL"
+        },
+        {
+          "baselineStatus": "PASS",
+          "checkId": "lint",
+          "delta": "UNCHANGED",
+          "evidenceIds": ["execution-lint"],
+          "kind": "lint",
+          "status": "PASS"
+        }
+      ],
+      "contextualEvidenceIds": [
+        "diff",
+        "context-source-1",
+        "context-source-2",
+        "context-source-3"
+      ],
+      "counts": {
+        "FAIL": 1,
+        "PASS": 1,
+        "UNVERIFIED": 0
+      },
+      "dimension": "MAINTAINABILITY",
+      "findingIndexes": [],
+      "missingCapabilities": [
+        {
+          "reason": "Technical debt, separation of concerns, extensibility and testability require contextual human assessment.",
+          "status": "UNVERIFIED"
+        }
+      ],
+      "status": "CHECK_RESULTS_AVAILABLE",
+      "summary": "Configured checks: 1 PASS, 1 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall maintainability verdict.",
+      "supportMatrix": {
+        "contextualAi": {
+          "findingIndexes": [],
+          "origin": "AI_ASSESSMENT",
+          "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
+          "status": "UNVERIFIED"
+        },
+        "engineeringAssessment": {
+          "checkIds": ["repository-tests"],
+          "evidenceIds": ["execution-repository-tests"],
+          "origin": "SERVER_EVIDENCE_COVERAGE_ASSESSMENT",
+          "requiresHumanInspection": true,
+          "status": "SUPPORTED_ENGINEERING_ASSESSMENT",
+          "text": "Configured check regression requires inspecting baseline/head evidence before judging this dimension."
+        },
+        "facts": {
+          "evidenceIds": ["execution-repository-tests", "execution-lint"],
+          "scope": "configured-check-outcomes-only",
+          "status": "SUPPORTED_FACT"
+        }
+      }
+    }
+  ],
+  "engineeringRubric": [
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "25.01",
+      "inspectReason": "Inspect the authoritative problem and cited participant artifacts; prose cannot prove problem understanding.",
+      "label": "Observable problem",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "25.02",
+      "inspectReason": "Compare described approach with the immutable changed source; reconstruct only observable behavior.",
+      "label": "Observable approach",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "25.03",
+      "inspectReason": "Inspect the immutable diff and repository inventory for actual changed components and omitted paths.",
+      "label": "Changed components",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "25.04",
+      "inspectReason": "Compare implementation and authoritative cases with the root requirement; a passing subset cannot prove root-cause resolution.",
+      "label": "Root problem",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "25.05",
+      "inspectReason": "Inspect workaround paths and authoritative negative cases for symptom masking.",
+      "label": "Symptom masking",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "25.06",
+      "inspectReason": "Inspect algorithms and alternatives; lint results do not measure unnecessary complexity.",
+      "label": "Unnecessary complexity",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "25.07",
+      "inspectReason": "Inspect repeated implementations or run a configured duplication analyzer.",
+      "label": "Duplication",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "25.08",
+      "inspectReason": "Inspect repository conventions and component boundaries; no architecture analyzer is implied.",
+      "label": "Architecture fit",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "25.09",
+      "inspectReason": "Inspect cited design choices and alternatives; tradeoff interpretation remains human assessment.",
+      "label": "Tradeoffs",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "25.10",
+      "inspectReason": "Inspect and test each stated assumption; repository prose cannot verify it.",
+      "label": "Assumptions",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "TESTING",
+      "evidenceIds": [],
+      "id": "25.11",
+      "inspectReason": "Inspect configured case coverage and missing boundaries; passing existing cases does not imply missing cases passed.",
+      "label": "Edge cases",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "25.12",
+      "inspectReason": "Inspect responsibilities, complexity and change cost; check outcomes cover only their own scope.",
+      "label": "Maintainability",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "PERFORMANCE",
+      "evidenceIds": [],
+      "id": "25.13",
+      "inspectReason": "Inspect reproducible load and resource measurements at stated scale; absent benchmarks remain unverified.",
+      "label": "Scalability",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "25.14",
+      "inspectReason": "Inspect dedicated threat-model tests and advisory relevance; scanner matches do not establish exploitability.",
+      "label": "Security risk",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [
+        "execution-repository-tests",
+        "criterion-retry-transient"
+      ],
+      "id": "25.15",
+      "inspectReason": "Inspect compatible baseline/head execution outcomes; missing baseline measurements cannot prove no regression.",
+      "label": "Regression",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "configured-baseline-head-check-deltas-only",
+      "status": "SUPPORTED_FACT"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "TESTING",
+      "evidenceIds": [
+        "execution-build",
+        "execution-repository-tests",
+        "execution-lint",
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null",
+        "criterion-health-preserved",
+        "criterion-payment-created",
+        "criterion-payment-idempotency",
+        "criterion-payment-read",
+        "criterion-payment-conflict",
+        "criterion-payment-invalid"
+      ],
+      "id": "25.16",
+      "inspectReason": "Inspect citations against configured trusted check scope; arbitrary model claims remain unverified.",
+      "label": "Objective support",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "configured-check-outcomes-only",
+      "status": "SUPPORTED_FACT"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "25.18",
+      "inspectReason": "Private participant intentions are unknown and are never inferred from code, prose, check outcomes or citations.",
+      "label": "No private intention claims",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "27.01",
+      "inspectReason": "Inspect change cost and responsibilities; lint PASS is not maintainability proof.",
+      "label": "Maintainability",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "27.02",
+      "inspectReason": "Inspect module responsibilities and interfaces; typecheck PASS does not prove separation.",
+      "label": "Separation of concerns",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "27.03",
+      "inspectReason": "Inspect repeated code or dedicated duplication analysis.",
+      "label": "Duplication",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "27.04",
+      "inspectReason": "Inspect failure paths and dedicated error-case executions.",
+      "label": "Error handling",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "QUALITY",
+      "evidenceIds": [],
+      "id": "27.05",
+      "inspectReason": "Inspect naming against repository conventions; no naming analyzer is configured.",
+      "label": "Naming",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "27.06",
+      "inspectReason": "Inspect changed file organization and dependency boundaries.",
+      "label": "Structure",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "27.07",
+      "inspectReason": "Inspect a dedicated complexity measure and relevant source.",
+      "label": "Complexity",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "27.08",
+      "inspectReason": "Inspect API inventory, compatibility tests and intended call sites.",
+      "label": "API design",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "27.09",
+      "inspectReason": "Inspect repository conventions and layer interactions.",
+      "label": "Architectural consistency",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "MAINTAINABILITY",
+      "evidenceIds": [],
+      "id": "27.10",
+      "inspectReason": "Inspect concrete debt introduced or removed and future change costs.",
+      "label": "Technical debt",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "TESTING",
+      "evidenceIds": [],
+      "id": "27.11",
+      "inspectReason": "Inspect seams and deterministic test isolation; test PASS does not prove testability.",
+      "label": "Testability",
+      "parentFactStatus": "SUPPORTED_FACT",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.01",
+      "inspectReason": "Inspect redacted secret-scan results and credential handling; never reproduce secret values.",
+      "label": "Hardcoded secrets",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.02",
+      "inspectReason": "Inspect boundary validation and dedicated invalid-input tests.",
+      "label": "Input validation",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.03",
+      "inspectReason": "Inspect authentication-specific baseline/head negative tests.",
+      "label": "Authentication regression",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.04",
+      "inspectReason": "Inspect role/ownership denial cases on baseline and head.",
+      "label": "Authorization regression",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.05",
+      "inspectReason": "Inspect dedicated injection threat-model cases and tainted data paths.",
+      "label": "Injection",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.06",
+      "inspectReason": "Inspect redaction, storage and disclosure boundaries without exposing sensitive values.",
+      "label": "Sensitive data",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.07",
+      "inspectReason": "Inspect pinned inventory and dated advisory metadata; matching metadata alone is not exploitability proof.",
+      "label": "Dependencies",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.08",
+      "inspectReason": "Inspect subprocess boundaries and dedicated command-injection tests.",
+      "label": "Command execution",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.09",
+      "inspectReason": "Inspect path traversal, symlink and file-permission cases.",
+      "label": "File handling",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.10",
+      "inspectReason": "Inspect explicit deny-path and privilege-boundary executions.",
+      "label": "Permission bypass",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "SECURITY",
+      "evidenceIds": [],
+      "id": "28.11",
+      "inspectReason": "Inspect configured isolation and network-denial measurements.",
+      "label": "Network behavior",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.01",
+      "inspectReason": "Inspect conventions across changed and existing components.",
+      "label": "Consistency",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.02",
+      "inspectReason": "Inspect dependencies and ownership across module boundaries.",
+      "label": "Boundaries",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.03",
+      "inspectReason": "Inspect dependency relationships; no coupling analyzer is configured.",
+      "label": "Coupling",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.04",
+      "inspectReason": "Inspect how each component groups related responsibilities.",
+      "label": "Cohesion",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.05",
+      "inspectReason": "Trace validated input, transformations and storage/output boundaries.",
+      "label": "Data flow",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "PERFORMANCE",
+      "evidenceIds": [],
+      "id": "29.06",
+      "inspectReason": "Inspect bounded resource measurements and reproducible load tests.",
+      "label": "Scalability",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.07",
+      "inspectReason": "Inspect extension points and concrete anticipated changes.",
+      "label": "Extensibility",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.08",
+      "inspectReason": "Inspect the diff against requirement scope and existing components.",
+      "label": "Unnecessary rewrite",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.09",
+      "inspectReason": "Inspect direct dependencies and calls that bypass established interfaces.",
+      "label": "Layer bypass",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [],
+      "id": "29.10",
+      "inspectReason": "Inspect which component owns each changed responsibility.",
+      "label": "Responsibility placement",
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    }
+  ],
+  "engineeringSupport": {
+    "rubricCount": 49,
+    "parentStatuses": [
+      {
+        "dimension": "QUALITY",
+        "facts": "SUPPORTED_FACT",
+        "engineeringAssessment": "UNVERIFIED",
+        "contextualAi": "UNVERIFIED"
+      },
+      {
+        "dimension": "ARCHITECTURE",
+        "facts": "UNVERIFIED",
+        "engineeringAssessment": "UNVERIFIED",
+        "contextualAi": "UNVERIFIED"
+      },
+      {
+        "dimension": "SECURITY",
+        "facts": "UNVERIFIED",
+        "engineeringAssessment": "UNVERIFIED",
+        "contextualAi": "UNVERIFIED"
+      },
+      {
+        "dimension": "PERFORMANCE",
+        "facts": "UNVERIFIED",
+        "engineeringAssessment": "UNVERIFIED",
+        "contextualAi": "UNVERIFIED"
+      },
+      {
+        "dimension": "TESTING",
+        "facts": "SUPPORTED_FACT",
+        "engineeringAssessment": "SUPPORTED_ENGINEERING_ASSESSMENT",
+        "contextualAi": "UNVERIFIED"
+      },
+      {
+        "dimension": "MAINTAINABILITY",
+        "facts": "SUPPORTED_FACT",
+        "engineeringAssessment": "SUPPORTED_ENGINEERING_ASSESSMENT",
+        "contextualAi": "UNVERIFIED"
+      }
+    ],
+    "arbitraryNarrativesUnverified": true,
+    "unknownFactCitations": [],
+    "semanticFacetsNotPromotedByLint": true,
+    "privateIntentionUnknown": true,
+    "criticalMissingAnalysisAttention": null
+  },
+  "artifactRecapture": {
+    "status": 200,
+    "result": {
+      "runId": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+      "status": "CAPTURED",
+      "artifacts": [
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/evidence/7896e7ff931016d661a4bf9c62c0cd1f0c15bcaaabad2994c4269cc41c69b9da",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "7896e7ff931016d661a4bf9c62c0cd1f0c15bcaaabad2994c4269cc41c69b9da",
+          "bytes": 14315,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:37",
+          "kind": "evidence",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877977837,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/context/5c0ca04472f946bf265f5b52e438f5db27fd1336f7b0988837172a9e8eb81761",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "5c0ca04472f946bf265f5b52e438f5db27fd1336f7b0988837172a9e8eb81761",
+          "bytes": 19419,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:38",
+          "kind": "context",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877978309,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/diff/9651d66b745747a045beb8dcb3d2eaf7449eaaa77d1dbbcfb78505e04a208353",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "9651d66b745747a045beb8dcb3d2eaf7449eaaa77d1dbbcfb78505e04a208353",
+          "bytes": 3057,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:38",
+          "kind": "diff",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877978753,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/execution-baseline-0/955e5738177c9a6ca26caa90b2eda575b64b47eaf1e7a601437f1e34438ad185",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "955e5738177c9a6ca26caa90b2eda575b64b47eaf1e7a601437f1e34438ad185",
+          "bytes": 6477,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:39",
+          "kind": "execution-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877979219,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/stdout-baseline-0/dd3fe0dc3fdf3fd998ebc2d5cc3679dd27fb8b4be334f9bcebb91cd5d990dc07",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "dd3fe0dc3fdf3fd998ebc2d5cc3679dd27fb8b4be334f9bcebb91cd5d990dc07",
+          "bytes": 1630,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 08:19:39",
+          "kind": "stdout-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877979673,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-0/7397182ab4ac014accba812d3e268b9c1fb393a897837036ecf9dd478734102e",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "7397182ab4ac014accba812d3e268b9c1fb393a897837036ecf9dd478734102e",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:40",
+          "kind": "check-baseline-0-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877980572,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 08:19:40",
+          "kind": "stderr-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877980119,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-1/b0146115cd94c5f735d07a7dbde3586561f9fdcfd2b62ba490d1455c8e1ee075",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "b0146115cd94c5f735d07a7dbde3586561f9fdcfd2b62ba490d1455c8e1ee075",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:41",
+          "kind": "check-baseline-0-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877981018,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-2/8ec027b0a2a241171dd1964be950fc5b6b9169852f82883809735acb381781a7",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "8ec027b0a2a241171dd1964be950fc5b6b9169852f82883809735acb381781a7",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:41",
+          "kind": "check-baseline-0-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877981463,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-3/1aa1ce30b00b72a451c08d55c17da4aad4e5dfca375a2d8dfb032d70dcf5a3e4",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "1aa1ce30b00b72a451c08d55c17da4aad4e5dfca375a2d8dfb032d70dcf5a3e4",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:41",
+          "kind": "check-baseline-0-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877981903,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-4/0a63c5319e3ddd0641ddc9e2b0cadb25bf0ef06e95c8772c0f92e8f5ee0ca052",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "0a63c5319e3ddd0641ddc9e2b0cadb25bf0ef06e95c8772c0f92e8f5ee0ca052",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:42",
+          "kind": "check-baseline-0-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877982354,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-5/5fa7958930454bbb647abd2fd3520a217933d61ea39e7ac47a499defa86a9cb9",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "5fa7958930454bbb647abd2fd3520a217933d61ea39e7ac47a499defa86a9cb9",
+          "bytes": 922,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:42",
+          "kind": "check-baseline-0-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877982816,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-6/502c840cedbeafcf59f4c5b64ba8b822ffb9c2212b06aac3d02e60dfa0babce1",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "502c840cedbeafcf59f4c5b64ba8b822ffb9c2212b06aac3d02e60dfa0babce1",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:43",
+          "kind": "check-baseline-0-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877983291,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-7/a64c346746b53cb82d6ecb1de9f57b00cf4f12cecdd64909c4dbabcd61dec37e",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "a64c346746b53cb82d6ecb1de9f57b00cf4f12cecdd64909c4dbabcd61dec37e",
+          "bytes": 930,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:43",
+          "kind": "check-baseline-0-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877983735,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-8/ea5f8e93c6ef698a848daa3390622868955aac79cd2314c00210100fae496089",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "ea5f8e93c6ef698a848daa3390622868955aac79cd2314c00210100fae496089",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:44",
+          "kind": "check-baseline-0-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877984193,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-9/c06de64a05612f4daebb08473e82983f2c7d6ccc41403afc32cafcdef7a455b0",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "c06de64a05612f4daebb08473e82983f2c7d6ccc41403afc32cafcdef7a455b0",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:44",
+          "kind": "check-baseline-0-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877984623,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-10/b5fa1e859aebee68b61e3ea77cdeb540e9c1f50e2d6e02ba0a771796045f552e",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "b5fa1e859aebee68b61e3ea77cdeb540e9c1f50e2d6e02ba0a771796045f552e",
+          "bytes": 931,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:45",
+          "kind": "check-baseline-0-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877985155,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-11/64f8e0e98b96b4474aa203e693c3db11cc01bd46b0e1b6a85d07bc6f7a556ee9",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "64f8e0e98b96b4474aa203e693c3db11cc01bd46b0e1b6a85d07bc6f7a556ee9",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:45",
+          "kind": "check-baseline-0-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877985597,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-12/dc15eaa9dfea25f9ff48bf5685d4b8ae4e9a3fb1451f70a49919e968c3cc0304",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "dc15eaa9dfea25f9ff48bf5685d4b8ae4e9a3fb1451f70a49919e968c3cc0304",
+          "bytes": 900,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:46",
+          "kind": "check-baseline-0-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877986071,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-13/c84a248886beeaf4e3f353337c8cca87e1d30688915f6eb459299ee1bbe4b835",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "c84a248886beeaf4e3f353337c8cca87e1d30688915f6eb459299ee1bbe4b835",
+          "bytes": 1005,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:46",
+          "kind": "check-baseline-0-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877986527,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-14/549cc7be1680aafc3dcacceddc2bc2146e54e941a372c800a8890bcce1b676b1",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "549cc7be1680aafc3dcacceddc2bc2146e54e941a372c800a8890bcce1b676b1",
+          "bytes": 1013,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:46",
+          "kind": "check-baseline-0-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877986958,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-15/669b30499a8cc5bbfb5128200df975e7059c18d2492a8139e8a4c2922cab1d52",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "669b30499a8cc5bbfb5128200df975e7059c18d2492a8139e8a4c2922cab1d52",
+          "bytes": 999,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:47",
+          "kind": "check-baseline-0-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877987409,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-16/8ae944bf23f8c90c17497fe72cfa06187ddc0e5d7c772b9e204de8b2c61f711f",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "8ae944bf23f8c90c17497fe72cfa06187ddc0e5d7c772b9e204de8b2c61f711f",
+          "bytes": 921,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:47",
+          "kind": "check-baseline-0-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877987856,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-17/bf7068fc3f90430a559fc8069920aec6b7884fef47c738f14f69ee5e664d366a",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "bf7068fc3f90430a559fc8069920aec6b7884fef47c738f14f69ee5e664d366a",
+          "bytes": 916,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:48",
+          "kind": "check-baseline-0-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877988304,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-18/4f1cd181a8f2da771db845446cb923cb6dba6f431fd28dd6ba2fb9916729f732",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "4f1cd181a8f2da771db845446cb923cb6dba6f431fd28dd6ba2fb9916729f732",
+          "bytes": 883,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:48",
+          "kind": "check-baseline-0-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877988766,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-baseline-0-20/5189aa086f3ddc13b6d2f94965330c0dd42acd9c0be1bc0f13331d358fe22def",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "5189aa086f3ddc13b6d2f94965330c0dd42acd9c0be1bc0f13331d358fe22def",
+          "bytes": 880,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:49",
+          "kind": "check-baseline-0-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877989681,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/tests-baseline-0-19/b3ad2f1ebb1421b4504cb80561e51077d2b1f669b0b23a1b4a034987aa4ba9fd",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "b3ad2f1ebb1421b4504cb80561e51077d2b1f669b0b23a1b4a034987aa4ba9fd",
+          "bytes": 1173,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:49",
+          "kind": "tests-baseline-0-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877989223,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/execution-submission-1/b2ba70edc78821b19cd89982aad7b4543bd88ec4fd7d7cbd656e418ad3a57885",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "b2ba70edc78821b19cd89982aad7b4543bd88ec4fd7d7cbd656e418ad3a57885",
+          "bytes": 8060,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:50",
+          "kind": "execution-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877990780,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 08:19:51",
+          "kind": "stderr-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877991664,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/stdout-submission-1/f2c91f23cd905dbea3d4d789cf20dfb6887d156323573ca7e43f38e4e77b6c45",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "f2c91f23cd905dbea3d4d789cf20dfb6887d156323573ca7e43f38e4e77b6c45",
+          "bytes": 3167,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 08:19:51",
+          "kind": "stdout-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877991208,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-0/beb04a198c57e990cbd87b81e695bb85a47ee941fa6e5e788dd07ee9a3cff995",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "beb04a198c57e990cbd87b81e695bb85a47ee941fa6e5e788dd07ee9a3cff995",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:52",
+          "kind": "check-submission-1-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877992115,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-1/539cf51815eddf1dd0b1fab90e8d6ffa79b8689d6faf6c021a37a60d2e043986",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "539cf51815eddf1dd0b1fab90e8d6ffa79b8689d6faf6c021a37a60d2e043986",
+          "bytes": 920,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:52",
+          "kind": "check-submission-1-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877992543,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-2/cabd46c6a34702496c096bf1b3deb7d15518eca7b533eb5a17d235ae09ebab59",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "cabd46c6a34702496c096bf1b3deb7d15518eca7b533eb5a17d235ae09ebab59",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:52",
+          "kind": "check-submission-1-2",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877992973,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-3/c3f8469c92f171e8683ac1084ff9fd390776c0e6a9ea10caf69719d7f1407eb8",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "c3f8469c92f171e8683ac1084ff9fd390776c0e6a9ea10caf69719d7f1407eb8",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:53",
+          "kind": "check-submission-1-3",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877993422,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-4/56ce5fd0263188ec4c4edcd3da7046b61f941ecc64cf0e29a2fa7878b23ae1c2",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "56ce5fd0263188ec4c4edcd3da7046b61f941ecc64cf0e29a2fa7878b23ae1c2",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:53",
+          "kind": "check-submission-1-4",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877993861,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-5/85dc95dc1aae3e6eb118d38ffd2a54c7eadcb917368ab5b4eb43e2be8144bfd2",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "85dc95dc1aae3e6eb118d38ffd2a54c7eadcb917368ab5b4eb43e2be8144bfd2",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:54",
+          "kind": "check-submission-1-5",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877994298,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-6/adbc60fb32c1a3001be4b6f34a5a5aaa1441f07fd78300d08a5892f1df1e5f3c",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "adbc60fb32c1a3001be4b6f34a5a5aaa1441f07fd78300d08a5892f1df1e5f3c",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:54",
+          "kind": "check-submission-1-6",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877994751,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-7/b042d80cb3fc0f0d2be7f85ea9acf424898c2451e9d2c0cf29af19ccdd25e63b",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "b042d80cb3fc0f0d2be7f85ea9acf424898c2451e9d2c0cf29af19ccdd25e63b",
+          "bytes": 932,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:55",
+          "kind": "check-submission-1-7",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877995210,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-8/5ccfe7feb0360902c93d5d4f5cc2dd636df565f7bb042b0da2e83b3d7a6aaaa4",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "5ccfe7feb0360902c93d5d4f5cc2dd636df565f7bb042b0da2e83b3d7a6aaaa4",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:55",
+          "kind": "check-submission-1-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877995650,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-10/3a9981cd0fa63b9ad362e9307abf4f14e9ccc0633639603756cd13ea6c197295",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "3a9981cd0fa63b9ad362e9307abf4f14e9ccc0633639603756cd13ea6c197295",
+          "bytes": 933,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:56",
+          "kind": "check-submission-1-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877996544,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-9/3a3053d1f419172b44604f177beae68cb5c64ee5d05469060904e1634d594c8c",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "3a3053d1f419172b44604f177beae68cb5c64ee5d05469060904e1634d594c8c",
+          "bytes": 928,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:56",
+          "kind": "check-submission-1-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877996096,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-11/de53ebe25ad1f4e491e80736e0f6448b85affc446bf2dd148c7ed46a2c659f13",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "de53ebe25ad1f4e491e80736e0f6448b85affc446bf2dd148c7ed46a2c659f13",
+          "bytes": 927,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:57",
+          "kind": "check-submission-1-11",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877997055,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-12/2444ab0d459b4293d50452c444c94fdcefdcc9c81bc3a27a5410b6044ebca73a",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "2444ab0d459b4293d50452c444c94fdcefdcc9c81bc3a27a5410b6044ebca73a",
+          "bytes": 902,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:57",
+          "kind": "check-submission-1-12",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877997491,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-13/0844f86b6c87325021da28b770f06145b9a265d8cf53430d9d324bb8d00b87d6",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "0844f86b6c87325021da28b770f06145b9a265d8cf53430d9d324bb8d00b87d6",
+          "bytes": 1007,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:57",
+          "kind": "check-submission-1-13",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877997946,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-14/9e4b5a02d8d7efc66b664a0d41cec89dfeb8bdcd1e5f317f1f25561777ed608e",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "9e4b5a02d8d7efc66b664a0d41cec89dfeb8bdcd1e5f317f1f25561777ed608e",
+          "bytes": 1015,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:58",
+          "kind": "check-submission-1-14",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877998393,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-15/9122970a445220bba4a8bd6e3aa450ad47ef1f3c8f62fd5061cc02dd54d47814",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "9122970a445220bba4a8bd6e3aa450ad47ef1f3c8f62fd5061cc02dd54d47814",
+          "bytes": 1001,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:58",
+          "kind": "check-submission-1-15",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877998850,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-16/01fb35f2e71a81fa8224ab9993a7e5fb7c3914d9f5d0b297e5267a05387d9420",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "01fb35f2e71a81fa8224ab9993a7e5fb7c3914d9f5d0b297e5267a05387d9420",
+          "bytes": 923,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:59",
+          "kind": "check-submission-1-16",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877999316,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-17/04489d1dba23a381f61d0ec4bef3531236c23c9327e0472b1cdbd9f6ae7d54c0",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "04489d1dba23a381f61d0ec4bef3531236c23c9327e0472b1cdbd9f6ae7d54c0",
+          "bytes": 918,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:19:59",
+          "kind": "check-submission-1-17",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798877999757,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-18/4ae3fd8947108c08a20cc5e36512ddee610c29aa905b768d4dc5e9924aae1abd",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "4ae3fd8947108c08a20cc5e36512ddee610c29aa905b768d4dc5e9924aae1abd",
+          "bytes": 885,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:20:00",
+          "kind": "check-submission-1-18",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798878000212,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/tests-submission-1-19/c4a781e0d33b2bb44b2f98f92b936ce76622195ec7985634d5aa1ed39406b5b7",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "c4a781e0d33b2bb44b2f98f92b936ce76622195ec7985634d5aa1ed39406b5b7",
+          "bytes": 2757,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:20:00",
+          "kind": "tests-submission-1-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798878000658,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/check-submission-1-20/e5a382123bff524cec0b154f6bc97730630ec2bf5b8305b04300fc0c08977bf5",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "e5a382123bff524cec0b154f6bc97730630ec2bf5b8305b04300fc0c08977bf5",
+          "bytes": 882,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:20:01",
+          "kind": "check-submission-1-20",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798878001458,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e/report/60ff163df0329e6ffb3123975f786a43ae498e8f7fe65b1a461ade2dcc225327",
+          "run_id": "e8da8d90134694dd7532c9268a4197c1be628e761beb13c1e3dc6bf9b92faa6e",
+          "sha256": "60ff163df0329e6ffb3123975f786a43ae498e8f7fe65b1a461ade2dcc225327",
+          "bytes": 41686,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 08:22:16",
+          "kind": "report",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798878136220,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        }
+      ],
+      "failures": []
+    }
+  },
+  "artifactDownload": {
+    "status": 200,
+    "integrity": true,
+    "unauthorized": 401,
+    "bytes": 14315
+  }
+}
