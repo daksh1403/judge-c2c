@@ -162,6 +162,43 @@
       }
       $('#content').innerHTML =
         `<section class="panel"><div class="panel-head"><h2>${esc(status.organization)} · GitHub App</h2><button class="button" id="organization-lock">Lock organization</button></div><div class="inset"><p>${app ? `App <strong>${esc(app.slug)}</strong> · ${app.installationId ? 'Installation #' + app.installationId : 'Awaiting installation'}` : 'Create an organization-owned GitHub App. Contents and PRs: read. Issues and checks: write. No source modification permissions.'}</p>${!app ? '<button class="button primary" id="register-app">Register App on GitHub</button>' : !app.installationId ? `<a class="button primary" href="${esc(app.installUrl)}">Install on ${esc(status.organization)}</a>` : '<button class="button" id="sync-repositories">Sync installed repositories</button>'}<p class="subtle">Only repositories selected during installation are available. Functional behavior remains UNVERIFIED until isolated checks provide execution evidence.</p></div></section><section class="panel inset"><p><strong>Isolated execution: ${status.runner?.enabled ? 'configured' : 'disabled'}</strong> · AI requirement review: ${status.ai?.enabled ? 'configured' : 'disabled'}</p><p class="subtle">${esc(status.runner?.reason || 'Runtime availability has not been verified.')}</p><button class="button" id="test-runner">Test Docker runner</button><p id="runner-status" role="status"></p><button class="button" id="test-reviewer">Test AI reviewer</button><p id="reviewer-status" role="status"></p></section><div id="organization-workflow"></div><div id="organization-repositories"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
+      if (authenticatedRole === 'organizer') {
+        const panel = document.createElement('section');
+        panel.className = 'panel inset';
+        panel.innerHTML =
+          '<h3>System observations</h3><button class="button" id="load-system-metrics">Load last-hour GitHub metrics</button><p id="system-metrics-result" role="status">Metrics are operational observations, not a submission quality score.</p>';
+        $('#content').append(panel);
+        $('#load-system-metrics').addEventListener('click', async () => {
+          const target = $('#system-metrics-result');
+          target.textContent = 'Loading recorded metrics…';
+          try {
+            const data = await call('system/metrics?minutes=60');
+            const totals = new Map();
+            for (const bucket of data.buckets || []) {
+              const total = totals.get(bucket.metric) || {
+                count: 0,
+                sum: 0,
+                max: 0,
+              };
+              total.count += bucket.count;
+              total.sum += bucket.sum;
+              total.max = Math.max(total.max, bucket.max);
+              totals.set(bucket.metric, total);
+            }
+            target.textContent = totals.size
+              ? [...totals]
+                  .map(([name, item]) =>
+                    name === 'github.latencyMs'
+                      ? `GitHub latency: ${Math.round(item.sum / item.count)} ms mean, ${item.max} ms maximum (${item.count} samples)`
+                      : `${name}: ${item.sum} recorded events`,
+                  )
+                  .join(' · ') + ' · Retention: 7 days.'
+              : 'No recorded observations for this window. This is not proof of healthy or inactive services.';
+          } catch (failure) {
+            target.textContent = `Metrics unavailable${failure.status ? ' (HTTP ' + failure.status + ')' : ''}. Existing evaluation evidence is unaffected.`;
+          }
+        });
+      }
       $('#organization-lock').addEventListener('click', async () => {
         try {
           await call('logout', {});
@@ -243,10 +280,16 @@
         call('repositories'),
         call('overview'),
       ]);
-      await window.JudgeCompetition.mount(
-        $('#organization-workflow'),
-        repos.repositories,
-      );
+      try {
+        await window.JudgeCompetition.mount(
+          $('#organization-workflow'),
+          repos.repositories,
+        );
+      } catch {
+        // A management outage must not hide already-persisted judging evidence.
+        $('#organization-workflow').innerHTML =
+          '<section class="panel"><p role="status">Hackathon controls are unavailable. Evaluation evidence remains available; refresh to retry management.</p></section>';
+      }
       $('#organization-repositories').innerHTML =
         `<section class="panel"><div class="panel-head"><h2>Installed repositories</h2><span>${repos.repositories.filter((r) => r.accessible).length} available</span></div>${repos.repositories.map((r) => `<article class="repo-card"><h3>${esc(r.full_name)}</h3><p>${r.private ? 'Private' : 'Public'} · ${esc(r.default_branch)} · ${r.accessible ? 'Installation access confirmed' : 'Access removed'}</p>${r.accessible ? `<button class="button" data-configure="${r.id}">Configure issue and evaluation</button>` : ''}<div id="repository-${r.id}"></div></article>`).join('') || '<div class="empty">No repositories selected. Update the App installation on GitHub, then sync.</div>'}</section>`;
       document
@@ -332,6 +375,57 @@
         contract = JSON.parse(run.contract_snapshot),
         evidence = JSON.parse(run.evidence || '[]'),
         report = JSON.parse(run.report || 'null');
+      const expectedArtifactHtml =
+        Array.isArray(run.expectedArtifactResults) &&
+        run.expectedArtifactResults.length
+          ? '<section class="panel"><h3>Expected artifacts — availability only</h3>' +
+            run.expectedArtifactResults
+              .map(
+                (item) =>
+                  `<div class="inset"><strong>${esc(item.id)} · ${esc(item.kind)} · ${esc(item.status)}</strong><p>${item.required ? 'Required capture' : 'Optional capture'} · ${esc(item.reason)}</p></div>`,
+              )
+              .join('') +
+            '</section>'
+          : '<p class="subtle">No artifact expectations declared in this frozen contract.</p>';
+      const planHtml = run.evaluationPlan
+        ? `<p>Review depth: ${esc(run.evaluationPlan.depth)} · ${esc((run.evaluationPlan.reviewAreas || []).join(', '))}. ${esc((run.evaluationPlan.reasons || []).join(' '))} All authoritative checks remain required.</p>`
+        : '<p>Evaluation plan unavailable.</p>';
+      const routingHtml = report?.aiTrace?.modelRouting
+        ? `<p>AI model: ${esc(report.aiTrace.model || 'Unavailable')} · ${esc(report.aiTrace.modelRouting.reason)} Routing version ${esc(report.aiTrace.modelRouting.version)}.</p>`
+        : '';
+      const groundingHtml =
+        report?.aiTrace?.requiresHumanAttention ||
+        (report &&
+          report.aiTrace?.groundingPolicy !==
+            'objective-facts-unverified-narratives-v1')
+          ? '<p class="error" role="status">Needs review: contextual AI narratives are unverified interpretations. Citation validity does not establish prose truth. Objective evidence alone determines criterion outcomes.</p>'
+          : '';
+      const findings = Array.isArray(report?.findings) ? report.findings : [];
+      const engineeringHtml =
+        '<section class="panel"><h3>Engineering findings</h3><p>Quality, architecture, security, performance and testing observations are advisory. Severity is a review priority, not proof of a defect.</p>' +
+        (findings.length
+          ? findings
+              .map(
+                (finding) =>
+                  `<article class="inset engineering-finding"><strong>${esc(finding.category)} · ${esc(finding.severity)}</strong><span class="badge">UNVERIFIED AI interpretation</span><p>${esc(finding.claim)}</p>${evidenceLinks(finding.evidenceIds, new Map(evidence.map((e) => [String(e.id), e])))}</article>`,
+              )
+              .join('')
+          : '<p>No engineering findings recorded. This does not establish that these areas are free of concerns.</p>') +
+        '</section>';
+      const regressions = evidence.filter(
+        (e) => e.baselineStatus === 'PASS' && e.status === 'FAIL',
+      );
+      const regressionHtml =
+        '<section class="panel"><h3>Regressions</h3>' +
+        (regressions.length
+          ? regressions
+              .map(
+                (e) =>
+                  `<article class="inset"><strong>Baseline PASS → submission FAIL</strong><p>${esc(e.claim)}</p>${evidenceLinks([e.id], new Map(evidence.map((item) => [String(item.id), item])))}</article>`,
+              )
+              .join('')
+          : '<p>No regression is established by the recorded baseline/head results. Missing or incomplete checks do not prove regression safety.</p>') +
+        '</section>';
       const current = run.currentSubmission,
         freshness = !current
           ? '<p class="freshness unknown" role="status">Current submission status is unavailable; freshness cannot be confirmed.</p>'
@@ -567,7 +661,7 @@
           ? `<p class="artifact-capture-notice" role="status">Artifact capture ${esc(artifactCaptureResult.status)}.${(artifactCaptureResult.failures || []).map((failure) => ` ${esc(failure.kind)}: ${esc(failure.code)}.`).join('')}</p>`
           : '';
       $('#organization-detail').innerHTML =
-        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name ?? contract.repository.fullName)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset">${freshness}<p>Frozen baseline <code>${esc(run.baseline_sha)}</code><br>Evaluated head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)} · AI review: ${esc(run.ai_status || 'pending')}</p>${report?.aiTrace?.failureCode ? `<p class="error">AI review rejected: ${esc(report.aiTrace.failureCode)}. Objective evidence remains available.</p>` : ''}${run.state === 'FAILED' || (run.state === 'COMPLETED' && run.ai_status === 'FAILED') ? `<button class="button" id="retry-evaluation">Retry as a new evaluation attempt</button>` : ''}<p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p><p class="ai-notice">AI interpretation is advisory inference. It does not replace authoritative requirements or execution evidence, and it cannot mark unexecuted behavior as verified.</p><p>Functional behavior is verified only by the listed trusted execution results. Only configured checks are shown; unperformed checks remain UNVERIFIED. Source patterns and advisory matches do not establish exploitability.</p></div><p><a class="button" href="/api/organization/evaluations/${encodeURIComponent(id)}/bundle">Download reproducibility bundle</a></p><div class="panel-head"><h3>Authoritative requirements</h3></div>${requirementsHtml}${window.JudgeApproach(report)}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item" id="evidence-${encodeURIComponent(String(item.id))}"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Additional contributions</h3></div><p>Contribution records and decisions do not change evaluation results automatically.</p>${contributionsHtml}${contributionFormHtml}${contributionNoticeHtml}<div class="panel-head"><h3>Baseline and head check comparison</h3></div>${checkComparison(executions, run.baseline_sha, run.head_sha)}<div class="panel-head"><h3>Isolated execution</h3></div>${
+        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name ?? contract.repository.fullName)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset">${freshness}<p>Frozen baseline <code>${esc(run.baseline_sha)}</code><br>Evaluated head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)} · AI review: ${esc(run.ai_status || 'pending')}</p>${report?.aiTrace?.failureCode ? `<p class="error">AI review rejected: ${esc(report.aiTrace.failureCode)}. Objective evidence remains available.</p>` : ''}${run.state === 'FAILED' || (run.state === 'COMPLETED' && run.ai_status === 'FAILED') ? `<button class="button" id="retry-evaluation">Retry as a new evaluation attempt</button>` : ''}<p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p><p class="ai-notice">AI interpretation is advisory inference. It does not replace authoritative requirements or execution evidence, and it cannot mark unexecuted behavior as verified.</p><p>Functional behavior is verified only by the listed trusted execution results. Only configured checks are shown; unperformed checks remain UNVERIFIED. Source patterns and advisory matches do not establish exploitability.</p></div><p><a class="button" href="/api/organization/evaluations/${encodeURIComponent(id)}/bundle">Download reproducibility bundle</a></p><div class="panel-head"><h3>Authoritative requirements</h3></div>${requirementsHtml}${planHtml}${routingHtml}${groundingHtml}${expectedArtifactHtml}${window.JudgeApproach(report)}${engineeringHtml}${regressionHtml}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item" id="evidence-${encodeURIComponent(String(item.id))}"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Additional contributions</h3></div><p>Contribution records and decisions do not change evaluation results automatically.</p>${contributionsHtml}${contributionFormHtml}${contributionNoticeHtml}<div class="panel-head"><h3>Baseline and head check comparison</h3></div>${checkComparison(executions, run.baseline_sha, run.head_sha)}<div class="panel-head"><h3>Isolated execution</h3></div>${
           executionHtml ||
           '<div class="empty">No runtime results have been recorded. Isolated execution is disabled or unavailable.</div>'
         }<div class="panel-head"><h3>Protected artifacts</h3></div>${artifactHtml}${artifactCaptureHtml}${artifactCaptureNotice}<div class="panel-head"><h3>Evaluation history</h3></div><ol class="timeline">${(run.timeline || []).map((item) => `<li><strong>${esc(item.state)}</strong> ${esc(item.detail)}<small>${esc(item.created_at)}</small></li>`).join('')}</ol></section>`;

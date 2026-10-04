@@ -39,7 +39,16 @@
               .map(
                 (item) =>
                   '<p><strong>' +
-                  esc(item.verification) +
+                  esc(
+                    item.verification === 'INFERENCE'
+                      ? 'UNVERIFIED AI interpretation'
+                      : item.verification === 'OBSERVED'
+                        ? report.aiTrace?.groundingPolicy ===
+                          'objective-facts-unverified-narratives-v1'
+                          ? 'Objective evidence fact'
+                          : 'UNVERIFIED historical AI narrative'
+                        : 'UNVERIFIED',
+                  ) +
                   '</strong> · ' +
                   esc(item.text) +
                   '<br><small>Evidence: ' +
@@ -354,13 +363,26 @@
       });
     } else if (d.submission) {
       const s = d.submission;
-      target.innerHTML = `<h3>PR #${s.pr_number} · ${esc(s.status)}</h3><p>${esc(s.mapping_reason)}<br>Team ${esc(s.team_id || 'UNMAPPED')} · author @${esc(s.author_login)}</p><p>Issues ${esc(s.issue_numbers.join(', '))}<br>Head <code>${esc(s.head_sha)}</code></p><button class="button" id="resolve-latest">Resolve latest GitHub state</button><h4>Evaluation history</h4>${d.evaluations.map((e) => `<p>${e.id === s.latest_run_id && e.head_sha === s.head_sha && s.status !== 'CLOSED' ? 'Current submission evaluation' : 'Historical'} · ${esc(e.state)} · <code>${esc(e.head_sha)}</code><br><a href="?organization=1&amp;evaluation=${encodeURIComponent(e.id)}">Inspect requirements, approach and evidence</a></p>`).join('') || '<p>Evaluation blocked until mapping is valid.</p>'}<details><summary>Audited organizer mapping override</summary><form id="resolve-submission" class="review-form">${field('teamId', 'Stable team ID')}${field('assignmentIds', 'Active assignment IDs, comma separated')}${field('reason', 'Reason for overriding mapping')}<button class="button">Resolve mapping</button></form></details>`;
+      target.innerHTML = `<h3>PR #${s.pr_number} · ${esc(s.status)}</h3><p>${esc(s.mapping_reason)}<br>Team ${esc(s.team_id || 'UNMAPPED')} · author @${esc(s.author_login)}</p><p>Issues ${esc(s.issue_numbers.join(', '))}<br>Head <code>${esc(s.head_sha)}</code></p><button class="button" id="resolve-latest">Resolve latest GitHub state</button><h4>Evaluation history</h4>${d.evaluations.map((e) => `<p>${e.id === s.latest_run_id && e.head_sha === s.head_sha && s.status !== 'CLOSED' ? 'Current submission evaluation' : 'Historical'} · ${esc(e.state)} · <code>${esc(e.head_sha)}</code><br><a href="?organization=1&amp;evaluation=${encodeURIComponent(e.id)}">Inspect requirements, approach and evidence</a></p>`).join('') || '<p>Evaluation blocked until mapping is valid.</p>'}<h4>Related submission attempts</h4><p>Organizer annotations preserve each PR and evaluation independently. They do not award credit or change evaluation status.</p>${(d.relations || []).map((r) => `<article class="inset"><strong>PR #${r.sourcePr} ${esc(r.kind.toLowerCase())} PR #${r.targetPr}</strong><p>${esc(r.reason)}</p><small>Shared issues ${esc(r.issueNumbers.join(', '))} · ${esc(r.actor)} · ${esc(r.createdAt)}</small></article>`).join('') || '<p>No related attempts recorded.</p>'}<details><summary>Record related attempt (organizer)</summary><form id="submission-relation" class="review-form">${field('targetPr', 'Related PR number in this repository', 'number')}${select('kind', 'Relationship from this PR to related PR', ['ALTERNATE', 'DUPLICATE', 'SUPERSEDES'])}<label>Evidence-backed reason<textarea name="reason" required minlength="20" maxlength="2000"></textarea></label><button class="button">Record immutable relationship</button></form></details><details><summary>Audited organizer mapping override</summary><form id="resolve-submission" class="review-form">${field('teamId', 'Stable team ID')}${field('assignmentIds', 'Active assignment IDs, comma separated')}${field('reason', 'Reason for overriding mapping')}<button class="button">Resolve mapping</button></form></details>`;
       target.querySelector('#resolve-latest').onclick = () =>
         action(async () => {
           await api(path + '/sync', {});
           await detail(path);
           await list();
         });
+      // Retain the request identity on errors so retrying cannot duplicate an annotation.
+      const relationRequestId = crypto.randomUUID();
+      form('submission-relation', async (v) => {
+        await api('submission-relations', {
+          repositoryId: s.repository_id,
+          sourcePr: s.pr_number,
+          targetPr: Number(v.targetPr),
+          kind: v.kind,
+          reason: v.reason,
+          requestId: relationRequestId,
+        });
+        await detail(path);
+      });
       form('resolve-submission', async (v) => {
         v.assignmentIds = v.assignmentIds
           .split(',')

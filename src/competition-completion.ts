@@ -1,3 +1,5 @@
+import { assessExpectedArtifacts } from './expected-artifacts';
+import { readArtifact, type ArtifactMetadata } from './artifact-store';
 import { z } from 'zod';
 import {
   canonical,
@@ -28,6 +30,15 @@ export function completionEligibility(
     (id) =>
       review?.assessments?.find((a) => a.criterionId === id)?.status !==
         'PASS' ||
+      evidence.some(
+        (e) =>
+          e.criterionId === id &&
+          e.status === 'FAIL' &&
+          (c.requirements
+            .flatMap((r) => r.criteria)
+            .find((criterion) => criterion.id === id)?.kind !== 'functional' ||
+            e.kind === 'execution'),
+      ) ||
       !evidence.some(
         (e) =>
           e.criterionId === id &&
@@ -123,6 +134,41 @@ export async function decideCompletion(
         unverifiedOrFailed: ['NO_CURRENT_EVALUATION'],
         regressionOrPolicyFailure: false,
       };
+  if (data.decision === 'ACCEPTED' && run) {
+    const artifactContract = contractSchema.parse(
+      JSON.parse(run.contract_snapshot),
+    );
+    const prefix =
+      artifactContract.issueNumbers.length > 1
+        ? 'i' + assignment.issue_number + '-'
+        : '';
+    const expectations = (artifactContract.expectedArtifacts ?? []).filter(
+      (item) => item.required && (!prefix || item.id.startsWith(prefix)),
+    );
+    if (expectations.length) {
+      const metadata = await db
+        .prepare('SELECT * FROM artifacts WHERE run_id=?')
+        .bind(run.id)
+        .all<ArtifactMetadata>();
+      const assessed = assessExpectedArtifacts(
+        { expectedArtifacts: expectations },
+        metadata.results,
+      );
+      for (const item of assessed) {
+        if (item.status !== 'PASS')
+          throw new Error('EXPECTED_ARTIFACTS_NOT_VERIFIED');
+        let verified = false;
+        for (const key of item.evidenceKeys) {
+          const response = await readArtifact({ ...env, DB: db }, key);
+          if (response.status === 200) {
+            verified = true;
+            break;
+          }
+        }
+        if (!verified) throw new Error('EXPECTED_ARTIFACTS_NOT_VERIFIED');
+      }
+    }
+  }
   if (data.decision === 'ACCEPTED') {
     if (
       !run ||

@@ -65,6 +65,31 @@ export const contractSchema = z
     constraints: z.array(z.string().min(1).max(1000)).max(50),
     forbiddenPaths: z.array(pathSchema).max(50),
     additionalCategories: z.array(z.string().min(1).max(80)).max(20),
+    expectedArtifacts: z
+      .array(
+        z
+          .object({
+            id,
+            kind: z.enum([
+              'stdout',
+              'stderr',
+              'tests',
+              'coverage',
+              'security',
+              'benchmark',
+              'report',
+              'diff',
+            ]),
+            required: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(30)
+      .refine(
+        (items) => new Set(items.map((item) => item.id)).size === items.length,
+        'Artifact IDs must be unique',
+      )
+      .optional(),
     analysis: z
       .object({
         dependencyAudit: z.enum(['NONE', 'OSV_NPM_V1']).default('NONE'),
@@ -267,15 +292,21 @@ export function validateReview(
     const criterion = criteria.find((c) => c.id === a.criterionId)!;
     if (a.status === 'NOT_APPLICABLE')
       throw new Error('AI cannot waive authoritative criteria');
-    const objective = evidence.find((e) => e.criterionId === a.criterionId);
+    const relevant = evidence.filter(
+      (e) =>
+        e.criterionId === a.criterionId &&
+        (criterion.kind !== 'functional' || e.kind === 'execution'),
+    );
+    const objectiveFailure = relevant.some((e) => e.status === 'FAIL');
+    const objectivePass = relevant.some((e) => e.status === 'PASS');
     if (
       criterion.kind === 'functional' &&
-      objective?.kind === 'execution' &&
-      objective.status === 'PASS' &&
+      !objectiveFailure &&
+      objectivePass &&
       a.status !== 'PASS'
     )
       throw new Error('AI cannot override objective functional pass');
-    if (objective?.status === 'FAIL' && a.status !== 'FAIL')
+    if (objectiveFailure && a.status !== 'FAIL')
       throw new Error('AI cannot override objective failure');
     if (
       a.status === 'PASS' &&

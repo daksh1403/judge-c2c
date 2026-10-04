@@ -1,3 +1,7 @@
+import {
+  readOperationalMetrics,
+  expireOperationalMetrics,
+} from './operational-telemetry';
 import { createCandidate, reviewCandidate } from './additional-contributions';
 import { expireArtifacts } from './artifact-store';
 import { acquireReviewer, releaseReviewer } from './reviewer-capacity';
@@ -135,7 +139,7 @@ async function installedClient(env: Env, repositoryId?: number, write = false) {
       }),
     },
   );
-  return new GitHub(token.token);
+  return new GitHub(token.token, env.ORG_DB);
 }
 function competitionServices(env: Env): CompetitionServices {
   return {
@@ -758,6 +762,29 @@ export async function organization(
         );
     return json(result.body, result.status);
   }
+  if (
+    url.pathname === '/api/organization/system/metrics' &&
+    request.method === 'GET'
+  ) {
+    if (session.role !== 'organizer')
+      return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+    const minutes = z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(10080)
+      .safeParse(url.searchParams.get('minutes') ?? '60');
+    if (!minutes.success) return json({ error: 'INVALID_METRICS_WINDOW' }, 400);
+    try {
+      return json({
+        windowMinutes: minutes.data,
+        retentionDays: 7,
+        buckets: await readOperationalMetrics(env.ORG_DB!, minutes.data),
+      });
+    } catch {
+      return json({ error: 'METRICS_UNAVAILABLE' }, 503);
+    }
+  }
   if (url.pathname.startsWith('/api/organization/manage/'))
     return competition(
       request,
@@ -896,9 +923,12 @@ export async function organization(
       .run();
     if (!spent.meta.changes) return json({ error: 'INVALID_SETUP_STATE' }, 403);
     const value = appResponse.parse(
-      await new GitHub().api(`/app-manifests/${code}/conversions`, {
-        method: 'POST',
-      }),
+      await new GitHub(undefined, env.ORG_DB).api(
+        `/app-manifests/${code}/conversions`,
+        {
+          method: 'POST',
+        },
+      ),
     );
     if (
       value.owner.login.toLowerCase() !== env.ORG_NAME.toLowerCase() ||
@@ -1062,6 +1092,7 @@ export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
       "DELETE FROM organizer_login_limits WHERE CAST(substr(bucket,instr(bucket,':')+1) AS INTEGER)<?",
     ).bind(Math.floor(Date.now() / 60000) - 60),
   ]);
+  await expireOperationalMetrics(env.ORG_DB).catch(() => {});
   await expireArtifacts(await organizationEnv(env));
   const row = await connection(env);
   if (!row?.installation_id) return;

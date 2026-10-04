@@ -35,10 +35,12 @@ const contract = {
   requirements: [
     {
       id: 'optional-docs',
+      title: 'Optional documentation improvement',
       mandatory: false,
       criteria: [
         {
           id: 'doc-opt',
+          description: 'README includes usage instructions.',
           kind: 'source',
           verification: {
             type: 'file_contains',
@@ -50,10 +52,12 @@ const contract = {
     },
     {
       id: 'required',
+      title: 'Required documentation',
       mandatory: true,
       criteria: [
         {
           id: 'required-criterion',
+          description: 'README includes required documentation.',
           kind: 'source',
           verification: {
             type: 'file_contains',

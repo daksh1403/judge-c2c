@@ -30,7 +30,11 @@ export interface Env {
   PUBLIC_ORIGIN?: string;
   EVALUATION_DETAILS_KIND?: 'organization';
   AI_MODEL?: string;
+  AI_MODEL_LIGHT?: string;
+  AI_MODEL_DEEP?: string;
   AI_PROVIDER?: 'cloudflare' | 'callmissed';
   CALLMISSED_API_KEY?: string;
   CALLMISSED_MODEL?: string;
+  CALLMISSED_MODEL_LIGHT?: string;
+  CALLMISSED_MODEL_DEEP?: string;
 }

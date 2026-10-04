@@ -1,0 +1,151 @@
+{
+  "at": "2026-10-04T03:06:04.033Z",
+  "mode": "REAL_REVIEW_API",
+  "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
+  "status": 200,
+  "role": "organizer",
+  "runner": {
+    "enabled": true,
+    "reason": "Development Docker runner through authenticated tunnel. Availability depends on the organizer machine."
+  },
+  "ai": {
+    "provider": "callmissed",
+    "model": "kimi-k2.6",
+    "enabled": true
+  },
+  "issuesWrite": true,
+  "events": [
+    "check_run",
+    "check_suite",
+    "commit_comment",
+    "create",
+    "delete",
+    "issues",
+    "issue_comment",
+    "issue_dependencies",
+    "issue_relates_to",
+    "label",
+    "pull_request",
+    "pull_request_review",
+    "pull_request_review_comment",
+    "pull_request_review_thread",
+    "push",
+    "release",
+    "repository_dispatch",
+    "sub_issues"
+  ],
+  "metricsStatus": 200,
+  "metrics": {
+    "windowMinutes": 60,
+    "retentionDays": 7,
+    "buckets": [
+      {
+        "bucketUtcMinute": 1791083160000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 603,
+        "max": 302
+      },
+      {
+        "bucketUtcMinute": 1791083160000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      }
+    ]
+  },
+  "pr7": {
+    "status": 200,
+    "latestRun": "6b15772153dc2c2058281a7c2249fd79957ec1da57bedf05b835cc277761ebd3",
+    "head": "749b414d1036a0c1b734af807e681e4894d2345e",
+    "evaluations": [
+      {
+        "id": "6b15772153dc2c2058281a7c2249fd79957ec1da57bedf05b835cc277761ebd3",
+        "head_sha": "749b414d1036a0c1b734af807e681e4894d2345e",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 12:37:10"
+      }
+    ]
+  },
+  "pr8": {
+    "status": 200,
+    "latestRun": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+    "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+    "evaluations": [
+      {
+        "id": "b737307fbaa947ac85f3397259add4f22c67e4666c346c7a6c438f2de637af69",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 18:06:44"
+      },
+      {
+        "id": "9273b681fffa36c66f12d9fbc8f2db3990a2cfbd1d9e22f6c782f9331f59738b",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:59:39"
+      },
+      {
+        "id": "fb355c70e4f1e300ad2acaae3ad28906f758e98842be3c2e5cf9fa8976d6abc5",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:49:24"
+      },
+      {
+        "id": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 13:19:53"
+      }
+    ]
+  },
+  "pr9": {
+    "status": 200,
+    "latestRun": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+    "head": "628436f51c897930e2c902c2051c185259ef95c8",
+    "evaluations": [
+      {
+        "id": "41b69d99d1d9c93957ae3ff6176e8b0482b744b0e0cfca1cad31af9e8314a668",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-02 17:59:42"
+      },
+      {
+        "id": "c076bac6c4d96cc5a7c30cdb766cd38998ced1772496c56c26c56dabe3be7ef1",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 17:49:28"
+      },
+      {
+        "id": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "FAILED",
+        "created_at": "2026-10-02 13:19:55"
+      }
+    ]
+  }
+}

@@ -5,6 +5,7 @@ export { OrganizationEvaluationWorkflow } from './organization-workflow';
 import { api } from './api';
 import { webhook } from './intake';
 import { reconcile } from './store';
+import { observe } from './operational-telemetry';
 import { previewEnabled, previewApi, reconcilePreview } from './preview';
 export { PublicPreviewWorkflow } from './preview-workflow';
 export { EvaluationWorkflow } from './workflow';
@@ -96,6 +97,26 @@ export default {
         durationMs: Date.now() - start,
       }),
     );
+    if (
+      url.pathname === '/webhooks/github' ||
+      url.pathname === '/webhooks/organization'
+    ) {
+      const db =
+        url.pathname === '/webhooks/organization'
+          ? (env.ORG_DB ?? env.DB)
+          : env.DB;
+      try {
+        ctx.waitUntil(
+          Promise.all([
+            observe(db, 'webhook.request'),
+            observe(db, 'webhook.latencyMs', Math.max(0, Date.now() - start)),
+            ...(response.status >= 400 ? [observe(db, 'webhook.error')] : []),
+          ]).then(() => undefined),
+        );
+      } catch {
+        // Telemetry scheduling must preserve the response and its security headers.
+      }
+    }
     return response;
   },
   async scheduled(

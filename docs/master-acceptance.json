@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updated": "2026-10-03",
+  "updated": "2026-10-04",
   "scope": "Item-level audit of all 714 entries against current code, executed fixture suites and scoped real payment evidence. PASS proves only the recorded verification boundary; it is not production launch approval. External infrastructure and unsupported capabilities remain explicit gaps.",
   "sections": [
     {
@@ -4014,21 +4014,25 @@
         {
           "id": "14.04",
           "requirement": "Duplicate alternate superseding relationships",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
-            "src/competition-submissions.ts"
+            "src/competition-submissions.ts",
+            "src/submission-relations.ts",
+            "migrations/0015_submission_relations.sql",
+            "public/competition.js",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Duplicate alternate superseding relationships: Independent PR attempts are retained, but explicit alternate/superseding/stacked PR relationship types and stacked dependency evaluation are absent.",
+          "note": "Typed immutable ALTERNATE, DUPLICATE and SUPERSEDES organizer annotations now link same-team, same-repository attempts sharing structured issues; cycle/capacity/idempotency guards and judge display are implemented. Static review and schema smoke passed; concurrent service, organizer authorization and deployed UI behavior remain unexecuted. Stacked dependency policy remains separately missing at 14.05.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -4701,21 +4705,24 @@
         {
           "id": "17.12",
           "requirement": "Expected artifacts",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
-            "src/domain.ts"
+            "src/domain.ts",
+            "src/expected-artifacts.ts",
+            "src/competition-completion.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Expected artifacts: Contract has no typed expected-artifact declarations or artifact-completeness enforcement.",
+          "note": "Frozen contracts now declare typed required/optional artifact kinds; combined issue contracts preserve declarations, APIs/UI show availability, and ACCEPTED requires readable integrity-checked required artifacts. Metadata availability is not proof of content or participant functionality. Runtime completion/retention/storage-outage and deployed capture scenarios remain unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -5353,7 +5360,7 @@
             "src/runner.ts",
             "src/workflow.ts"
           ],
-          "note": "Benchmark reuse: Baseline execution is rerun for each evaluation; no versioned baseline-check cache or repository index cache is implemented.",
+          "note": "Benchmark executions deliberately bypass the new opt-in execution cache to avoid treating cached timings as a fresh reproducible measurement. A supported benchmark profile and validated safe reuse strategy have not been implemented.",
           "verification": {
             "method": "SOURCE_INSPECTION",
             "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
@@ -9292,21 +9299,25 @@
         {
           "id": "32.07",
           "requirement": "Model routing",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
-            "src/callmissed-review.ts"
+            "src/callmissed-review.ts",
+            "src/review-routing.ts",
+            "src/evaluate.ts",
+            "src/env.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Model routing: One configured CallMissed model serves all reviews; task-based model routing is absent.",
+          "note": "Server-owned LIGHT/DEEP model overrides are supported separately for CallMissed and Cloudflare, with existing model fallback, bounded identifiers, recorded routing reason and effective provider-call selection. No model catalog capability or latency/cost reduction is claimed; provider runtime and deployed routing remain unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -9506,19 +9517,24 @@
           "requirement": "No unsupported claims",
           "status": "FAIL",
           "evidence": [
-            "docs/qa/payment-calibration-evidence.json"
+            "docs/qa/payment-calibration-evidence.json",
+            "docs/qa/payment-calibration-evidence.json",
+            "src/claim-grounding.ts",
+            "src/competition-completion.ts",
+            "public/competition.js",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "No unsupported claims: Actual CallMissed reports made false coverage claims despite valid citations. Technical schema validation cannot establish prose truth; human review is required.",
+          "note": "Live CallMissed calibration previously emitted unsupported coverage prose despite valid citation IDs. New source replaces criterion outcomes with objective projections, permits only exact known objective text as OBSERVED, flags contextual narratives and historical reviews for human attention, and prevents conflicting criterion PASS/FAIL evidence from yielding acceptance. The known INFERENCE false-coverage sentence is flagged rather than semantically auto-detected. FAIL remains until the exact real-provider calibration and deployed judge behavior are executed and verified.",
           "verification": {
-            "method": "LIVE_INTEGRATION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "SOURCE_INSPECTION",
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "FAIL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -10459,43 +10475,49 @@
         {
           "id": "37.12",
           "requirement": "Fast path",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "src/evaluation-plan.ts",
+            "src/evaluate.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Fast path: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "A bounded LIGHT contextual-review path is selected for documentation-only changes without functional or runner criteria. All authoritative checks and criteria remain required; this is not a general deterministic execution fast path. Runtime provider/context-budget and deployed behavior remain unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
           "id": "37.13",
           "requirement": "Deep path",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "src/evaluation-plan.ts",
+            "src/review-routing.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Deep path: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "DEEP contextual review is selected for sensitive/dependency, architecture/large-change and authoritative benchmark/performance scope, with larger bounded context and optional configured model. No criteria are waived and deterministic execution remains unchanged. Runtime routing and deeper review quality are unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -10542,22 +10564,25 @@
         {
           "id": "37.16",
           "requirement": "Sensitive changes deeper review",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "src/evaluation-plan.ts",
+            "src/evaluate.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Sensitive changes deeper review: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Server routing metadata and fixed changed-path signals now select DEEP security review and its bounded context. An additional-category allowlist cannot force depth or redefine scope. Real sensitive-change reviewer calibration and deployed review behavior remain unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
@@ -11252,110 +11277,120 @@
         {
           "id": "39.25",
           "requirement": "Security findings",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/browser/dashboard.spec.ts",
             "public/competition.js",
-            "public/organization.js"
+            "public/organization.js",
+            "docs/qa/current-validation.json",
+            "docs/qa/readiness-live-access.json"
           ],
-          "note": "Security findings: Organizer views expose supported relationships and reports; complete field-by-field real-browser validation remains partial.",
+          "note": "Security findings: Current browser scenarios execute rendering of security, quality, architecture and performance finding cards with severity, explicit uncertainty and known evidence navigation; read-only judge navigation and disabled writes also pass. Deployed judge requests return 403 on organizer writes, 401 for unauthenticated bundle access and integrity-verified authorized bundle200. This proves the named view/role behavior, not reviewer calibration or participant authorization.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed current browser UI with controlled API fixtures plus named real review judge authorization requests. Does not attest every provider finding or participant role."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current12browserPASS and deployedjudgeaccess evidence2026-10-04."
           }
         },
         {
           "id": "39.26",
           "requirement": "Quality findings",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/browser/dashboard.spec.ts",
             "public/competition.js",
-            "public/organization.js"
+            "public/organization.js",
+            "docs/qa/current-validation.json",
+            "docs/qa/readiness-live-access.json"
           ],
-          "note": "Quality findings: Organizer views expose supported relationships and reports; complete field-by-field real-browser validation remains partial.",
+          "note": "Quality findings: Current browser scenarios execute rendering of security, quality, architecture and performance finding cards with severity, explicit uncertainty and known evidence navigation; read-only judge navigation and disabled writes also pass. Deployed judge requests return 403 on organizer writes, 401 for unauthenticated bundle access and integrity-verified authorized bundle200. This proves the named view/role behavior, not reviewer calibration or participant authorization.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed current browser UI with controlled API fixtures plus named real review judge authorization requests. Does not attest every provider finding or participant role."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current12browserPASS and deployedjudgeaccess evidence2026-10-04."
           }
         },
         {
           "id": "39.27",
           "requirement": "Architecture findings",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/browser/dashboard.spec.ts",
             "public/competition.js",
-            "public/organization.js"
+            "public/organization.js",
+            "docs/qa/current-validation.json",
+            "docs/qa/readiness-live-access.json"
           ],
-          "note": "Architecture findings: Organizer views expose supported relationships and reports; complete field-by-field real-browser validation remains partial.",
+          "note": "Architecture findings: Current browser scenarios execute rendering of security, quality, architecture and performance finding cards with severity, explicit uncertainty and known evidence navigation; read-only judge navigation and disabled writes also pass. Deployed judge requests return 403 on organizer writes, 401 for unauthenticated bundle access and integrity-verified authorized bundle200. This proves the named view/role behavior, not reviewer calibration or participant authorization.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed current browser UI with controlled API fixtures plus named real review judge authorization requests. Does not attest every provider finding or participant role."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current12browserPASS and deployedjudgeaccess evidence2026-10-04."
           }
         },
         {
           "id": "39.28",
           "requirement": "Performance",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/browser/dashboard.spec.ts",
             "public/competition.js",
-            "public/organization.js"
+            "public/organization.js",
+            "docs/qa/current-validation.json",
+            "docs/qa/readiness-live-access.json"
           ],
-          "note": "Performance: Organizer views expose supported relationships and reports; complete field-by-field real-browser validation remains partial.",
+          "note": "Performance: Current browser scenarios execute rendering of security, quality, architecture and performance finding cards with severity, explicit uncertainty and known evidence navigation; read-only judge navigation and disabled writes also pass. Deployed judge requests return 403 on organizer writes, 401 for unauthenticated bundle access and integrity-verified authorized bundle200. This proves the named view/role behavior, not reviewer calibration or participant authorization.",
+          "verification": {
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed current browser UI with controlled API fixtures plus named real review judge authorization requests. Does not attest every provider finding or participant role."
+          },
+          "assignedAgent": "dashboard",
+          "defectReference": null,
+          "relatedPR": null,
+          "lastValidationState": {
+            "status": "PASS",
+            "basis": "Current12browserPASS and deployedjudgeaccess evidence2026-10-04."
+          }
+        },
+        {
+          "id": "39.29",
+          "requirement": "Additional work",
+          "status": "PARTIAL",
+          "evidence": [
+            "public/organization.js",
+            "src/api.ts",
+            "src/additional-contributions.ts",
+            "docs/completeness-contracts.md"
+          ],
+          "note": "Additional-work records and organizer decisions are now displayed separately, with scoped criterion-improvement verification, evidence links and read-only judge access. Current code has static and independent source review only; deployed UI and live decision flows still require validation.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current revision is uncommitted and undeployed; no browser/live validation is claimed."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
-          }
-        },
-        {
-          "id": "39.29",
-          "requirement": "Additional work",
-          "status": "NOT_IMPLEMENTED",
-          "evidence": [
-            "src/domain.ts",
-            "public/app.js"
-          ],
-          "note": "Additional work: Separate validated additional-contribution records are absent; no extra credit is fabricated.",
-          "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
-          },
-          "assignedAgent": "dashboard",
-          "defectReference": null,
-          "relatedPR": null,
-          "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "basis": "Corrected stale absence claim against the newly implemented C12-C14 UI/API."
           }
         },
         {
@@ -12384,22 +12419,25 @@
         {
           "id": "44.03",
           "requirement": "Judge scope",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "tests/browser/dashboard.spec.ts",
+            "docs/qa/current-validation.json",
+            "docs/qa/readiness-live-access.json"
           ],
-          "note": "Judge scope: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent.",
+          "note": "Judge scope: Current browser scenarios execute rendering of security, quality, architecture and performance finding cards with severity, explicit uncertainty and known evidence navigation; read-only judge navigation and disabled writes also pass. Deployed judge requests return 403 on organizer writes, 401 for unauthenticated bundle access and integrity-verified authorized bundle200. This proves the named view/role behavior, not reviewer calibration or participant authorization.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed current browser UI with controlled API fixtures plus named real review judge authorization requests. Does not attest every provider finding or participant role."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current12browserPASS and deployedjudgeaccess evidence2026-10-04."
           }
         },
         {
@@ -13607,64 +13645,75 @@
         {
           "id": "48.01",
           "requirement": "Webhook latency",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "src/index.ts",
+            "src/operational-telemetry.ts",
+            "migrations/0014_operational_telemetry.sql",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "Webhook latency: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Both webhook routes record fixed request/error/latency aggregates asynchronously in shared UTC-minute metrics, with a bounded organizer view and seven-day retention. Static checks and local SQLite schema smoke passed; recorded request measurements, export/alerts, outage behavior and live deployment remain unverified or absent.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
           "id": "48.02",
           "requirement": "GitHub errors",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "src/github.ts",
+            "src/operational-telemetry.ts",
+            "src/organization.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "GitHub errors: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Authenticated GitHub API requests record bounded numeric error/request/latency metrics without secret/request content; organizer-only metric access and maintenance exist. Runtime API failure injection, persistence failure, exports/alerts and deployed visibility are unverified; raw public file fetches are outside this instrumentation.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {
           "id": "48.03",
           "requirement": "GitHub limits",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "src/github.ts",
+            "src/operational-telemetry.ts",
+            "docs/qa/zero-gap-progress.md"
           ],
-          "note": "GitHub limits: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "GitHub API metrics identify HTTP429, exhausted primary rate headers and secondary403 Retry-After responses. This does not change retry behavior. Runtime primary/secondary rate-limit scenarios, exports/alerts and live observation remain unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
           }
         },
         {

@@ -13,6 +13,8 @@ export async function migrate(
     '0011_execution_cache.sql',
     '0012_artifact_store.sql',
     '0013_additional_contributions.sql',
+    '0014_operational_telemetry.sql',
+    '0015_submission_relations.sql',
   ],
 ) {
   for (const file of files) {

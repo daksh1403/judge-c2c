@@ -93,13 +93,16 @@
     },
     "review": {
       "name": "judge-c2c-review",
+      "kv_namespaces": [
+        { "binding": "ARTIFACT_KV", "id": "2bfcf7ac70ba405e906f7d3e7c161868" },
+      ],
       "vars": {
         "ENVIRONMENT": "review",
         "DEMO_MODE": "true",
         "PREVIEW_TESTING": "true",
         "ORG_NAME": "Daksh-Codebase",
         "ORG_PUBLIC_ORIGIN": "https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev",
-        "ORG_REVIEW_ORIGINS": "https://feat-team-issue-workflow-judge-c2c.dakshx.workers.dev,https://test-hackathon-rehearsal-judge-c2c.dakshx.workers.dev,https://feat-hackathon-readiness-judge-c2c.dakshx.workers.dev,https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev",
+        "ORG_REVIEW_ORIGINS": "https://feat-team-issue-workflow-judge-c2c.dakshx.workers.dev,https://test-hackathon-rehearsal-judge-c2c.dakshx.workers.dev,https://feat-hackathon-readiness-judge-c2c.dakshx.workers.dev,https://feat-acceptance-audit-judge-c2c.dakshx.workers.dev,https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
         "AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
         "AI_PROVIDER": "callmissed",
         "CALLMISSED_MODEL": "kimi-k2.6",

@@ -704,6 +704,9 @@ test('approach review exposes separate evidence-backed observations and uncertai
   await expect(
     page.getByText('Private reasoning is unknown.', { exact: false }),
   ).toBeVisible();
+  await expect(
+    page.getByText('UNVERIFIED AI interpretation', { exact: false }).first(),
+  ).toBeVisible();
   const legacyRequirement = page.locator(
     '.requirement-group[data-requirement-id="schedule"]',
   );
@@ -807,6 +810,22 @@ test('judge detail separates stale runs, compares checks, shows provenance and g
       ]),
       report: JSON.stringify({
         summary: 'Advisory summary.',
+        findings: [
+          {
+            category: 'security',
+            severity: 'high',
+            claim: '<img src=x onerror=window.hostile=true> requires review.',
+            evidenceIds: ['objective-evidence'],
+            verification: 'inference',
+          },
+          ...['quality', 'architecture', 'performance'].map((category) => ({
+            category,
+            severity: 'medium',
+            claim: category + ' interpretation requires review.',
+            evidenceIds: ['objective-evidence'],
+            verification: 'inference',
+          })),
+        ],
         assessments: [
           {
             criterionId: 'criterion-one',
@@ -945,9 +964,7 @@ test('judge detail separates stale runs, compares checks, shows provenance and g
     r.fulfill({ json: detail }),
   );
   await page.goto('/?organization=1&evaluation=' + runId);
-  await expect(
-    page.getByText('Historical evaluation.', { exact: false }),
-  ).toBeVisible();
+  await expect(page.locator('.freshness.historical')).toBeVisible();
   const requirementGroup = page.locator(
     '.requirement-group[data-requirement-id="req"]',
   );
@@ -963,6 +980,28 @@ test('judge detail separates stale runs, compares checks, shows provenance and g
   await expect(
     requirementGroup.getByRole('link', { name: 'objective-evidence' }),
   ).toHaveAttribute('href', '#evidence-objective-evidence');
+  await expect(
+    page.getByRole('heading', { name: 'Engineering findings' }),
+  ).toBeVisible();
+  const engineeringFinding = page.locator('.engineering-finding');
+  await expect(engineeringFinding).toHaveCount(4);
+  for (const [index, category] of [
+    'security',
+    'quality',
+    'architecture',
+    'performance',
+  ].entries()) {
+    const card = engineeringFinding.nth(index);
+    await expect(card).toContainText(category);
+    await expect(card).toContainText(index === 0 ? 'high' : 'medium');
+    await expect(card).toContainText('UNVERIFIED AI interpretation');
+    await expect(
+      card.getByRole('link', { name: 'objective-evidence' }),
+    ).toHaveAttribute('href', '#evidence-objective-evidence');
+  }
+  await expect(engineeringFinding.first()).toContainText(
+    '<img src=x onerror=window.hostile=true> requires review.',
+  );
   const readContribution = page.locator(
     '[data-contribution-id="judge-read-contribution"]',
   );
@@ -1312,9 +1351,15 @@ test('organizer contribution controls use verified evidence and refresh guarded 
   await expect(page.getByLabel('Category')).toHaveValue('testing');
   await expect(page.getByLabel('src/one.ts')).toBeVisible();
   await expect(page.getByLabel(/evidence-1 · PASS/)).toBeVisible();
-  await expect(page.getByLabel('verified-criterion')).toBeVisible();
-  await expect(page.getByLabel('unknown-criterion')).toHaveCount(0);
-  await expect(page.getByLabel('mandatory-pass')).toHaveCount(0);
+  await expect(
+    page.getByRole('checkbox', { name: 'verified-criterion', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('checkbox', { name: 'unknown-criterion', exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole('checkbox', { name: 'mandatory-pass', exact: true }),
+  ).toHaveCount(0);
   await expect(page.getByLabel('Title')).toHaveAttribute('maxlength', '120');
   await expect(page.getByLabel('Description')).toHaveAttribute(
     'minlength',
@@ -1346,7 +1391,9 @@ test('organizer contribution controls use verified evidence and refresh guarded 
     .fill('Added verified regression coverage.');
   await page.getByLabel('src/one.ts').check();
   await page.getByLabel(/evidence-1 · PASS/).check();
-  await page.getByLabel('verified-criterion').check();
+  await page
+    .getByRole('checkbox', { name: 'verified-criterion', exact: true })
+    .check();
   await page.getByRole('button', { name: 'Add contribution' }).click();
   await expect(page.getByText('Tested edge case')).toBeVisible();
   expect(contributionBody).toEqual({

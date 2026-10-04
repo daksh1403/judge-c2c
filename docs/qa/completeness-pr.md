@@ -8,7 +8,15 @@ This change adds judge-facing review and evaluation safeguards while preserving 
 - Credential observations remain location-only and uncertain attribution stays UNVERIFIED; redaction handles serialized JSON and quoted credentials.
 - Judges can sort submissions oldest/newest and inspect bounded recorded queue/stage timings.
 
-Validation: TypeScript, JavaScript syntax, acceptance-ledger consistency, diff checks and Cloudflare review dry-run build passed. Independent adversary review cleared corrected source and cross-component contracts. No subsequent unit tests were run at the user's request. Browser/live evaluation of this revision remains pending; historical evidence is not claimed as proof for the new code.
+This workstream also adds:
+
+- Objective projections replace model criterion prose; unsupported OBSERVED claims are downgraded, contextual narratives and historical reports require human attention, and relevant failures cannot be hidden by another passing result. The prior false-coverage calibration remains an explicit FAIL until real-provider verification.
+- Explainable bounded contextual review plans and optional provider-specific LIGHT/DEEP model overrides preserve all frozen criteria and trusted execution checks.
+- Typed expected artifacts, judge availability status and integrity-checked required captures before organizer acceptance.
+- Immutable audited ALTERNATE/DUPLICATE/SUPERSEDES annotations between mapped same-team attempts, with atomic capacity/cycle guards and idempotency. They preserve all independent evaluations and do not award scores.
+- Fixed numeric GitHub/webhook operational aggregates with retention and organizer-only visibility.
+
+Validation: TypeScript, JavaScript syntax, acceptance-ledger consistency, diff checks and Cloudflare review dry-run build passed. All 15 migrations applied successfully to in-process SQLite with no integrity or foreign-key violations; this is not Cloudflare D1 behavioral proof. Independent adversary review cleared corrected source and cross-component contracts. No subsequent unit tests were run at the user's request. Browser/live evaluation of this revision remains pending; historical evidence is not claimed as proof for the new code.
 
 Preview: use the native Cloudflare bot-provided URL after push. No additional manual Preview deployment or URL was created. Production and event-scale hostile execution are not certified by this PR. Do not merge automatically.
 

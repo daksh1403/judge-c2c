@@ -34,6 +34,10 @@ import {
 import { resolveSubmission, resolutionSchema } from './competition-submissions';
 import { reconcileRepository, maintainCompetition } from './competition-sync';
 import { decideCompletion } from './competition-completion';
+import {
+  createSubmissionRelation,
+  listSubmissionRelations,
+} from './submission-relations';
 import type { Env } from './env';
 const issueWorkflow = `CASE WHEN i.official=0 OR i.review_status<>'APPROVED' THEN lower(replace(i.review_status,'_','-'))
  WHEN i.github_state='closed' AND NOT EXISTS(SELECT 1 FROM issue_assignments a WHERE a.repository_id=i.repository_id AND a.issue_number=i.number AND a.status='ACTIVE') THEN 'closed'
@@ -455,7 +459,7 @@ export async function competition(
         });
       const rows = await db
         .prepare(
-          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY CASE WHEN ?='oldest' THEN s.github_updated_at END ASC, CASE WHEN ?='newest' THEN s.github_updated_at END DESC,s.repository_id,s.pr_number LIMIT 200",
+          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR json_extract(coalesce(e.report,'{}'),'$.aiTrace.requiresHumanAttention')=1 OR (e.ai_status='COMPLETED' AND coalesce(json_extract(coalesce(e.report,'{}'),'$.aiTrace.groundingPolicy'),'')<>'objective-facts-unverified-narratives-v1') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY CASE WHEN ?='oldest' THEN s.github_updated_at END ASC, CASE WHEN ?='newest' THEN s.github_updated_at END DESC,s.repository_id,s.pr_number LIMIT 200",
         )
         .bind(
           like,
@@ -479,6 +483,14 @@ export async function competition(
         )
         .all<Record<string, unknown>>();
       return json({ submissions: rows.results.map(decode) });
+    }
+    if (path === '/submission-relations' && method === 'POST') {
+      const result = await createSubmissionRelation(
+        env,
+        actor,
+        await input(request),
+      );
+      return json(result.body, result.status);
     }
     const submissionPath = path.match(
       /^\/submissions\/(\d+)\/(\d+)(?:\/(resolve|sync))?$/,
@@ -517,7 +529,15 @@ export async function competition(
         )
         .bind(Number(submissionPath[1]), Number(submissionPath[2]))
         .all();
-      return json({ submission: decode(row), evaluations: runs.results });
+      return json({
+        submission: decode(row),
+        evaluations: runs.results,
+        relations: await listSubmissionRelations(
+          db,
+          Number(submissionPath[1]),
+          Number(submissionPath[2]),
+        ),
+      });
     }
     if (path === '/reconcile' && method === 'POST') {
       const data = z

@@ -25,7 +25,7 @@ export async function competitionOverview(db: D1Database) {
     (SELECT count(*) FROM evaluations WHERE state='FAILED') AS failedRuns,
     (SELECT count(*) FROM evaluations WHERE state='SUPERSEDED') AS supersededRuns,
     (SELECT count(*) FROM submissions s JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE e.state='COMPLETED') AS currentCompleted,
-    (SELECT count(*) FROM submissions s LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE s.closed=0 AND (s.status<>'VALID' OR e.state='FAILED' OR e.ai_status='FAILED' OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED')))) AS needsAttention,
+    (SELECT count(*) FROM submissions s LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE s.closed=0 AND (s.status<>'VALID' OR e.state='FAILED' OR e.ai_status='FAILED' OR json_extract(coalesce(e.report,'{}'),'$.aiTrace.requiresHumanAttention')=1 OR (e.ai_status='COMPLETED' AND coalesce(json_extract(coalesce(e.report,'{}'),'$.aiTrace.groundingPolicy'),'')<>'objective-facts-unverified-narratives-v1') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED')))) AS needsAttention,
     (SELECT count(*) FROM management_inbox WHERE status IN('PENDING','PROCESSING')) AS pendingEvents,
     (SELECT count(*) FROM github_sync_actions WHERE status IN('BLOCKED','FAILED')) AS blockedSync`,
     )

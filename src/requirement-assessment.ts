@@ -14,7 +14,7 @@ export type RequirementOutcome = {
 // This deterministic projection never consumes AI scores or additional-work credit.
 // Applicability cannot be waived: every frozen criterion remains represented.
 export function requirementOutcomes(
-  contract: Contract,
+  contract: Pick<Contract, 'requirements'>,
   evidence: Evidence[],
 ): RequirementOutcome[] {
   return contract.requirements.map((requirement) => {

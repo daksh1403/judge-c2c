@@ -1,3 +1,7 @@
+import { assessExpectedArtifacts } from './expected-artifacts';
+import { buildEvaluationPlan } from './evaluation-plan';
+import type { ArtifactMetadata } from './artifact-store';
+import type { Context } from './evaluate';
 import { listCandidates } from './additional-contributions';
 import { requirementOutcomes } from './requirement-assessment';
 import { readArtifact, captureRunArtifacts } from './artifact-store';
@@ -53,7 +57,7 @@ export async function api(request: Request, env: Env) {
       });
     const [counts, runs] = await Promise.all([
       env.DB.prepare(
-        `SELECT (SELECT count(*) FROM repositories) AS repositories,(SELECT count(*) FROM teams) AS teams,(SELECT count(*) FROM submissions WHERE closed=0) AS openSubmissions,(SELECT count(*) FROM evaluations WHERE state NOT IN ('COMPLETED','FAILED','SUPERSEDED')) AS active,(SELECT count(*) FROM evaluations WHERE state='COMPLETED') AS completed,(SELECT count(*) FROM evaluations WHERE state='FAILED') AS failed,(SELECT count(*) FROM evaluations e JOIN submissions s ON s.latest_run_id=e.id WHERE e.state='FAILED' OR (e.state='COMPLETED' AND (e.ai_status<>'COMPLETED' OR e.evidence LIKE '%UNVERIFIED%'))) AS attention`,
+        `SELECT (SELECT count(*) FROM repositories) AS repositories,(SELECT count(*) FROM teams) AS teams,(SELECT count(*) FROM submissions WHERE closed=0) AS openSubmissions,(SELECT count(*) FROM evaluations WHERE state NOT IN ('COMPLETED','FAILED','SUPERSEDED')) AS active,(SELECT count(*) FROM evaluations WHERE state='COMPLETED') AS completed,(SELECT count(*) FROM evaluations WHERE state='FAILED') AS failed,(SELECT count(*) FROM evaluations e JOIN submissions s ON s.latest_run_id=e.id WHERE e.state='FAILED' OR (e.state='COMPLETED' AND (e.ai_status<>'COMPLETED' OR json_extract(coalesce(e.report,'{}'),'$.aiTrace.requiresHumanAttention')=1 OR coalesce(json_extract(coalesce(e.report,'{}'),'$.aiTrace.groundingPolicy'),'')<>'objective-facts-unverified-narratives-v1' OR e.evidence LIKE '%UNVERIFIED%'))) AS attention`,
       ).first(),
       env.DB.prepare(
         'SELECT e.*,r.full_name FROM evaluations e JOIN repositories r ON r.id=e.repository_id ORDER BY e.created_at DESC LIMIT 100',
@@ -113,6 +117,16 @@ export async function api(request: Request, env: Env) {
       artifacts: artifacts.results,
       execution: execution.results,
       additionalContributions: await listCandidates(env, run.id),
+      evaluationPlan: run.context
+        ? buildEvaluationPlan(
+            contractSchema.parse(JSON.parse(run.contract_snapshot)),
+            JSON.parse(run.context) as Context,
+          )
+        : null,
+      expectedArtifactResults: assessExpectedArtifacts(
+        contractSchema.parse(JSON.parse(run.contract_snapshot)),
+        artifacts.results as unknown as ArtifactMetadata[],
+      ),
       requirementResults: requirementOutcomes(
         contractSchema.parse(JSON.parse(run.contract_snapshot)),
         JSON.parse(run.evidence ?? '[]'),

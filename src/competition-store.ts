@@ -193,6 +193,14 @@ export async function combinedContract(
     additionalCategories: [
       ...new Set(documents.flatMap((c) => c.additionalCategories)),
     ],
+    expectedArtifacts: documents.some((c) => c.expectedArtifacts !== undefined)
+      ? documents.flatMap((c, index) =>
+          (c.expectedArtifacts ?? []).map((artifact) => ({
+            ...artifact,
+            id: 'i' + assignmentRows[index]!.issue_number + '-' + artifact.id,
+          })),
+        )
+      : undefined,
   });
   const text = canonical(contract),
     hash = await digest(text);

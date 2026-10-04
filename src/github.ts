@@ -2,6 +2,7 @@ import { importPKCS8, SignJWT } from 'jose';
 import { pathSchema, sha, type Contract } from './domain';
 import { boundedBody } from './security';
 import type { Env } from './env';
+import { observe } from './operational-telemetry';
 export type ChangedFile = {
   filename: string;
   previous_filename?: string;
@@ -12,7 +13,10 @@ export type ChangedFile = {
   patchTruncated?: boolean;
 };
 export class GitHub {
-  constructor(private token?: string) {}
+  constructor(
+    private token?: string,
+    private db?: D1Database,
+  ) {}
   static async application(env: Env) {
     if (!env.GITHUB_APP_ID || !env.GITHUB_APP_PRIVATE_KEY)
       throw new Error('GITHUB_APP_NOT_CONFIGURED');
@@ -27,7 +31,7 @@ export class GitHub {
       .setIssuedAt(now - 60)
       .setExpirationTime(now + 540)
       .sign(key);
-    return new GitHub(jwt);
+    return new GitHub(jwt, env.DB);
   }
   static async installation(env: Env, contract: Contract) {
     const client = await GitHub.application(env);
@@ -46,34 +50,53 @@ export class GitHub {
         }),
       },
     );
-    return new GitHub(response.token);
+    return new GitHub(response.token, env.DB);
   }
   async api<T>(path: string, init: RequestInit = {}): Promise<T> {
     if (!path.startsWith('/') || path.startsWith('//'))
       throw new Error('Invalid GitHub path');
-    const response = await fetch('https://api.github.com' + path, {
-      ...init,
-      redirect: 'manual',
-      signal: AbortSignal.timeout(25_000),
-      headers: {
-        accept: 'application/vnd.github+json',
-        ...(this.token ? { authorization: 'Bearer ' + this.token } : {}),
-        'user-agent': 'Judge-C2C',
-        'x-github-api-version': '2022-11-28',
-        'content-type': 'application/json',
-      },
-    });
-    if (!response.ok) throw new Error(`GITHUB_HTTP_${response.status}`);
-    if (response.status === 204) return undefined as T;
-    const bytes = await boundedBody(
-      new Request('https://internal/', {
-        method: 'POST',
-        body: response.body,
-        duplex: 'half',
-      } as RequestInit),
-      2_000_000,
-    );
-    return JSON.parse(new TextDecoder().decode(bytes)) as T;
+    const started = Date.now();
+    let failed = false;
+    let rateLimited = false;
+    try {
+      const response = await fetch('https://api.github.com' + path, {
+        ...init,
+        redirect: 'manual',
+        signal: AbortSignal.timeout(25_000),
+        headers: {
+          accept: 'application/vnd.github+json',
+          ...(this.token ? { authorization: 'Bearer ' + this.token } : {}),
+          'user-agent': 'Judge-C2C',
+          'x-github-api-version': '2022-11-28',
+          'content-type': 'application/json',
+        },
+      });
+      rateLimited =
+        response.status === 429 ||
+        (response.status === 403 && response.headers.has('retry-after')) ||
+        response.headers.get('x-ratelimit-remaining') === '0';
+      if (!response.ok) throw new Error(`GITHUB_HTTP_${response.status}`);
+      if (response.status === 204) return undefined as T;
+      const bytes = await boundedBody(
+        new Request('https://internal/', {
+          method: 'POST',
+          body: response.body,
+          duplex: 'half',
+        } as RequestInit),
+        2_000_000,
+      );
+      return JSON.parse(new TextDecoder().decode(bytes)) as T;
+    } catch (error) {
+      failed = true;
+      throw error;
+    } finally {
+      await Promise.all([
+        observe(this.db, 'github.request'),
+        observe(this.db, 'github.latencyMs', Math.max(0, Date.now() - started)),
+        ...(failed ? [observe(this.db, 'github.error')] : []),
+        ...(rateLimited ? [observe(this.db, 'github.rateLimited')] : []),
+      ]);
+    }
   }
   async compare(contract: Contract, head: string) {
     const result = await this.api<{

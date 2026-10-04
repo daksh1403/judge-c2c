@@ -18,7 +18,12 @@ it('compares source patterns without claiming vulnerability certainty or exposin
     status: 'UNVERIFIED',
     baselineStatus: 'UNVERIFIED',
   });
-  expect(r[1]).toMatchObject({ status: 'UNVERIFIED', baselineStatus: 'PASS' });
+  // The unterminated private-key marker makes baseline/head attribution incomplete.
+  expect(r[1]).toMatchObject({
+    status: 'UNVERIFIED',
+    baselineStatus: 'UNVERIFIED',
+  });
+  expect(r[1]!.claim).toContain('comparison incomplete');
   expect(JSON.stringify(r)).not.toContain('secret-value');
   expect(r[1]!.claim).toContain('lines 2');
 });

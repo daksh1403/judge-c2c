@@ -1,6 +1,6 @@
 {
   "mode": "REAL_DEPLOYED_API_NO_FIXTURES",
-  "at": "2026-10-02T18:59:17.740Z",
+  "at": "2026-10-04T03:04:46.560Z",
   "role": "judge",
   "overviewStatus": 200,
   "counts": {
@@ -25,7 +25,7 @@
     "failedRuns": 0,
     "supersededRuns": 0,
     "currentCompleted": 6,
-    "needsAttention": 6,
+    "needsAttention": 8,
     "pendingEvents": 0,
     "blockedSync": 0
   },
