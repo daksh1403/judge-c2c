@@ -2,6 +2,9 @@ import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const origin = process.env.REVIEW_URL || 'https://feat-frontend-polish-judge-c2c.dakshx.workers.dev';
+const outputPath = process.env.PROOF_OUTPUT || 'docs/qa/current-ai-reviewer-frontend.json';
+const screenshotPrefix = outputPath.replace(/\.json$/, '');
+const seedManifest = process.env.PROOF_SEED_MANIFEST ? JSON.parse(await readFile(process.env.PROOF_SEED_MANIFEST, 'utf8')) : null;
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();
 const page = await context.newPage();
@@ -21,12 +24,13 @@ try {
   output.reviewerButton = { http: response.status(), status: check.status, code: check.error ?? check.code, trace: check.trace, summary: check.summary };
   await page.locator('#test-reviewer:enabled').waitFor({ timeout: 20000 });
   output.reviewerButton.visibleMessage = await page.locator('#reviewer-status').innerText();
-  await page.screenshot({ path: 'docs/qa/current-ai-reviewer-button.png', fullPage: true });
+  await page.screenshot({ path: screenshotPrefix + '-button.png', fullPage: true });
   assert.equal(response.status(), 200, 'Live AI reviewer button must succeed');
   assert.ok(['COMPLETED', 'NEEDS_REVIEW'].includes(check.status), 'Provider diagnostic must return a validated review');
   if (check.status === 'NEEDS_REVIEW') assert.equal(check.trace.requiresHumanAttention, true);
   for (const pr of [11, 8, 9]) {
-    const stored = JSON.parse(await readFile(`docs/qa/current-payment-grounding-${pr}.json`, 'utf8'));
+    const stored = seedManifest ? seedManifest.evaluations.find(run => run.pr === pr) : JSON.parse(await readFile(`docs/qa/current-payment-grounding-${pr}.json`, 'utf8'));
+    assert.ok(stored?.runId, 'Calibration run must be explicitly identified');
     const loaded = page.waitForResponse(r => r.url().endsWith('/api/organization/evaluations/' + stored.runId), { timeout: 20000 });
     await page.goto(origin + '/?organization=1&evaluation=' + stored.runId);
     let data = await (await loaded).json();
@@ -79,7 +83,7 @@ try {
     const rubric = report.engineeringReview.rubric;
     assert.ok(rubric.every(f => f.scope !== 'bounded-evidence-backed-analysis' || (f.status === 'UNVERIFIED' && f.needsReview)));
     output.evaluations.push({ pr, runId: data.id, state: data.state, ai: data.ai_status, provider: report.aiTrace.provider, model: report.aiTrace.model, policy: report.aiTrace.policy, publication: data.publication_status, objectiveStatuses: data.requirementResults.map(r => ({ id: r.requirementId, status: r.status })), unsupportedFacts: unsupportedObserved.length, unknownCitations: unknownCitations.length, policyFailures: protectedEvidence.length, humanAttentionVisible: text.includes('Needs attention'), evidenceCitationOpened: !!(await citation.count()) });
-    await page.screenshot({ path: `docs/qa/current-ai-reviewer-pr${pr}.png`, fullPage: true });
+    await page.screenshot({ path: `${screenshotPrefix}-pr${pr}.png`, fullPage: true });
   }
   assert.equal(errors.length, 0);
   output.status = 'PASS';
@@ -88,7 +92,7 @@ try {
   output.failure = error.message;
   throw error;
 } finally {
-  await writeFile('docs/qa/current-ai-reviewer-frontend.json', JSON.stringify(output, null, 2) + '\n');
+  await writeFile(outputPath, JSON.stringify(output, null, 2) + '\n');
   await browser.close();
 }
 console.log(JSON.stringify({ status: output.status, reviewerButton: output.reviewerButton?.status, evaluations: output.evaluations.map(e => ({ pr: e.pr, ai: e.ai, provider: e.provider })) }));
