@@ -1,3 +1,5 @@
+> Current verification update, 2026-10-04: the actual deployed PR #7 frontend now passes the reviewer diagnostic and all three original payment-engine AI replays under policy v14, with published checks and protected-test FAIL retained. Real daksh1403 participant access/revocation passes. See [current completion checkpoint](qa/current-completion-state.md), [frontend AI evidence](qa/current-ai-reviewer-frontend.json), and [production prerequisites](qa/current-production-prerequisites.md). The historical fixture/local rehearsal below is retained; its earlier claims that no real review backend/App/runner/AI was available are superseded by these live records. Production/event-scale/multiple-organization claims remain unproven.
+
 # REAL-WORLD HACKATHON REHEARSAL REPORT
 
 **Date:** 2026-10-04  
