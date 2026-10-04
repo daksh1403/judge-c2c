@@ -19,10 +19,18 @@ import {
   reapOrphanContainers,
 } from '../src/local-docker';
 const key = (await readFile('.wrangler/local-runner-key.txt', 'utf8')).trim();
+const productionKeyFile = process.env.JUDGE_PRODUCTION_RUNNER_KEY_FILE;
+const keys = productionKeyFile
+  ? [key, (await readFile(productionKeyFile, 'utf8')).trim()]
+  : [key];
 const image = (
   await readFile('.wrangler/local-runner-image.txt', 'utf8')
 ).trim();
-if (!/^[a-f0-9]{64}$/.test(key) || !/^sha256:[a-f0-9]{64}$/.test(image))
+if (
+  keys.some((secret) => !/^[a-f0-9]{64}$/.test(secret)) ||
+  new Set(keys).size !== keys.length ||
+  !/^sha256:[a-f0-9]{64}$/.test(image)
+)
   throw new Error('RUNNER_CONFIGURATION_INVALID');
 const info = await docker(['info', '--format', '{{json .SecurityOptions}}']);
 if (info.exitCode !== 0 || !info.stdout.includes('seccomp'))
@@ -37,7 +45,7 @@ const inspected = await docker([
 if (inspected.exitCode !== 0 || inspected.stdout.trim() !== image)
   throw new Error('RUNNER_IMAGE_NOT_AVAILABLE');
 await reapOrphanContainers();
-const server = createRunnerServer(key, (body) => evaluateDocker(body, image));
+const server = createRunnerServer(keys, (body) => evaluateDocker(body, image));
 server.requestTimeout = 10000;
 server.headersTimeout = 5000;
 server.maxConnections = 16;

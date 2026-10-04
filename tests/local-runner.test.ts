@@ -18,6 +18,129 @@ import type { RunnerResult, RunnerRequest } from '../src/runner';
 import type { Env } from '../src/env';
 const key = 'e'.repeat(64);
 describe('development Docker bridge', () => {
+  it('keeps independent review and production signatures on one replay guard and busy queue', async () => {
+    const production = 'b'.repeat(64),
+      wrong = 'c'.repeat(64);
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => (release = resolve));
+    const evaluate = vi.fn(async (_body: unknown) => {
+      await pending;
+      return { checks: [] } as unknown as RunnerResult;
+    });
+    const server = createRunnerServer([key, production], evaluate);
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve),
+    );
+    const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/evaluate`;
+    const body = canonical({ source: 'untrusted guest data' }),
+      hash = await digest(body);
+    const headers = async (secret: string, nonce = crypto.randomUUID()) => {
+      const timestamp = String(Date.now());
+      return {
+        'x-runner-time': timestamp,
+        'x-runner-nonce': nonce,
+        'x-runner-signature': await runnerSignature(
+          secret,
+          requestMessage(timestamp, nonce, hash),
+        ),
+      };
+    };
+    try {
+      expect(
+        (
+          await fetch(url, {
+            method: 'POST',
+            headers: await headers(wrong),
+            body,
+          })
+        ).status,
+      ).toBe(401);
+      expect(evaluate).not.toHaveBeenCalled();
+      const reviewHeaders = await headers(key);
+      const first = fetch(url, {
+        method: 'POST',
+        headers: reviewHeaders,
+        body,
+      });
+      await vi.waitFor(() => expect(evaluate).toHaveBeenCalledTimes(1));
+      expect(
+        (
+          await fetch(url, {
+            method: 'POST',
+            headers: await headers(production, reviewHeaders['x-runner-nonce']),
+            body,
+          })
+        ).status,
+      ).toBe(409);
+      const productionHeaders = await headers(production);
+      expect(
+        (await fetch(url, { method: 'POST', headers: productionHeaders, body }))
+          .status,
+      ).toBe(429);
+      release();
+      const verify = async (
+        response: Response,
+        requestHeaders: Awaited<ReturnType<typeof headers>>,
+        matched: string,
+        other: string,
+      ) => {
+        expect(response.status).toBe(200);
+        const text = await response.text();
+        const message = new TextEncoder().encode(
+          responseMessage(
+            requestHeaders['x-runner-nonce'],
+            hash,
+            await digest(text),
+          ),
+        );
+        expect(
+          await verifyWebhook(
+            message,
+            response.headers.get('x-runner-signature'),
+            matched,
+          ),
+        ).toBe(true);
+        expect(
+          await verifyWebhook(
+            message,
+            response.headers.get('x-runner-signature'),
+            other,
+          ),
+        ).toBe(false);
+      };
+      await verify(await first, reviewHeaders, key, production);
+      await verify(
+        await fetch(url, { method: 'POST', headers: productionHeaders, body }),
+        productionHeaders,
+        production,
+        key,
+      );
+      expect(
+        (await fetch(url, { method: 'POST', headers: productionHeaders, body }))
+          .status,
+      ).toBe(409);
+      expect(evaluate).toHaveBeenCalledTimes(2);
+      expect(
+        evaluate.mock.calls.every(([input]) => JSON.stringify(input) === body),
+      ).toBe(true);
+    } finally {
+      release();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  });
+  it('rejects unbounded, malformed or duplicate configured runner keys', () => {
+    const evaluate = vi.fn();
+    for (const keys of [
+      [],
+      [key, key],
+      [key, 'invalid'],
+      [key, 'a'.repeat(64), 'b'.repeat(64)],
+    ])
+      expect(() => createRunnerServer(keys, evaluate)).toThrow(
+        'RUNNER_KEYS_INVALID',
+      );
+    expect(evaluate).not.toHaveBeenCalled();
+  });
   it('distinguishes busy capacity from unavailable execution for durable retries', async () => {
     vi.stubGlobal(
       'fetch',

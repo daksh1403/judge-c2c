@@ -33,13 +33,25 @@ export function attentionItems(
       inspect: ['ai-trace'],
       action: 'Inspect the reason, review manually or retry after recovery.',
     });
-  let trace: { requiresHumanAttention?: boolean; groundingPolicy?: string } =
-    {};
+  let trace: {
+    requiresHumanAttention?: boolean;
+    groundingPolicy?: string;
+    qualitativeClaimRejections?: { path: string; reason: string }[];
+  } = {};
   try {
     trace = JSON.parse(run.report ?? '{}').aiTrace ?? {};
   } catch {
     /* Missing report */
   }
+  if (trace.qualitativeClaimRejections?.length)
+    items.push({
+      code: 'AI_CLAIMS_REJECTED',
+      what: `${trace.qualitativeClaimRejections.length} unsupported AI claim(s) were discarded.`,
+      why: 'The reviewer supplied insufficient evidence; automation cannot replace missing qualitative judgment.',
+      inspect: ['solution-approach', 'objective-checks', 'ai-trace'],
+      action:
+        'Inspect trusted evidence and record a human decision. Rejected claims remain UNVERIFIED.',
+    });
   if (
     trace.requiresHumanAttention ||
     (run.ai_status === 'COMPLETED' &&

@@ -285,7 +285,7 @@ it('repairs a known omitted approach declaration without retrying or promoting n
   expect(fetcher).toHaveBeenCalledTimes(1);
   expect(result.status).toBe('COMPLETED');
   expect(result.trace).toMatchObject({
-    policy: 'requirements-and-approach-v14',
+    policy: 'requirements-and-approach-v15',
     approachEvidenceIndexRepair: ['diff'],
     objectiveCriterionRecovery: [],
     requiresHumanAttention: true,
@@ -360,7 +360,7 @@ it.each([
   },
 );
 
-it('rejects uncited inference on retry rather than manufacturing source-only review success', async () => {
+it('discards uncited inference after retry and leaves qualitative analysis explicitly unverified', async () => {
   const first = deterministicReport(demoContract, evidence);
   first.solution_approach.maintainability = {
     text: 'Everything is maintainable.',
@@ -391,12 +391,27 @@ it('rejects uncited inference on retry rather than manufacturing source-only rev
     .mockResolvedValueOnce(envelope(second));
   vi.stubGlobal('fetch', fetcher);
   const result = await aiReview(env, demoContract, context, evidence);
-  expect(result.status).toBe('FAILED');
+  expect(result.status).toBe('NEEDS_REVIEW');
   expect(result.trace).toMatchObject({
     attempts: 2,
-    attemptFailures: ['AI_UNVERIFIED_OBSERVED', 'AI_APPROACH_UNSUPPORTED'],
-    failureCode: 'AI_APPROACH_UNSUPPORTED',
+    attemptFailures: ['AI_UNVERIFIED_OBSERVED'],
+    requiresHumanAttention: true,
+    qualitativeClaimRejections: [
+      {
+        path: 'solution_approach.maintainability',
+        reason: 'The reviewer supplied no supporting evidence.',
+      },
+    ],
   });
+  expect(result.review.solution_approach.maintainability.verification).toBe(
+    'UNVERIFIED',
+  );
+  expect(result.review.solution_approach.maintainability.evidenceIds).toEqual(
+    [],
+  );
+  expect(result.review.solution_approach.maintainability.text).not.toContain(
+    'Everything is maintainable',
+  );
   expect(
     result.review.assessments.every(
       (assessment) => assessment.status === 'UNVERIFIED',
