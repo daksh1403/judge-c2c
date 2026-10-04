@@ -266,11 +266,7 @@
           "id": "01.13",
           "requirement": "No committed secrets",
           "status": "PARTIAL",
-          "evidence": [
-            ".gitignore",
-            "src/security.ts",
-            "tests/domain.test.ts"
-          ],
+          "evidence": [".gitignore", "src/security.ts", "tests/domain.test.ts"],
           "note": "No committed secrets: Recognized credentials are redacted and local secret files ignored; exhaustive Git history and arbitrary-secret scanning are not proven.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -421,10 +417,7 @@
           "id": "02.06",
           "requirement": "Preview production separation",
           "status": "PARTIAL",
-          "evidence": [
-            "wrangler.jsonc",
-            "scripts/production-config.mjs"
-          ],
+          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
           "note": "Preview production separation: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -442,10 +435,7 @@
           "id": "02.07",
           "requirement": "No production data copied",
           "status": "PARTIAL",
-          "evidence": [
-            "wrangler.jsonc",
-            "scripts/production-config.mjs"
-          ],
+          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
           "note": "No production data copied: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -463,10 +453,7 @@
           "id": "02.08",
           "requirement": "No production secrets exposed",
           "status": "PARTIAL",
-          "evidence": [
-            "wrangler.jsonc",
-            "scripts/production-config.mjs"
-          ],
+          "evidence": ["wrangler.jsonc", "scripts/production-config.mjs"],
           "note": "No production secrets exposed: Review resources are separated by configuration; no production runtime or complete production-data isolation test exists.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -526,9 +513,7 @@
           "id": "02.11",
           "requirement": "Approved main merge deploys production",
           "status": "BLOCKED",
-          "evidence": [
-            ".github/workflows/deploy.yml"
-          ],
+          "evidence": [".github/workflows/deploy.yml"],
           "note": "Approved main merge deploys production: Production remains disabled; preview success cannot prove a production merge deploy.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -573,10 +558,7 @@
           "id": "03.01",
           "requirement": "GitHub App production credentials",
           "status": "PARTIAL",
-          "evidence": [
-            "docs/qa/payment-readiness-report.md",
-            "src/github.ts"
-          ],
+          "evidence": ["docs/qa/payment-readiness-report.md", "src/github.ts"],
           "note": "GitHub App production credentials: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -617,10 +599,7 @@
           "id": "03.03",
           "requirement": "Least privilege",
           "status": "PARTIAL",
-          "evidence": [
-            "docs/qa/payment-readiness-report.md",
-            "src/github.ts"
-          ],
+          "evidence": ["docs/qa/payment-readiness-report.md", "src/github.ts"],
           "note": "Least privilege: Review App works with downscoped minted credentials; production credentials absent and installation-level extra permissions remain an owner cleanup.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -962,9 +941,7 @@
           "id": "04.05",
           "requirement": "Issue opened",
           "status": "PASS",
-          "evidence": [
-            "docs/qa/payment-issue-triage-evidence.json"
-          ],
+          "evidence": ["docs/qa/payment-issue-triage-evidence.json"],
           "note": "Issue opened: Actual initially unlabeled GitHub issue #10 was ingested and attributed with not-scored review labels.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -1004,9 +981,7 @@
           "id": "04.07",
           "requirement": "Issue labeled and unlabeled",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue labeled and unlabeled: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1046,9 +1021,7 @@
           "id": "04.09",
           "requirement": "Issue closed and reopened",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue closed and reopened: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1175,21 +1148,23 @@
         {
           "id": "04.15",
           "requirement": "Fast intake",
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-review-runtime.json",
+            "docs/qa/current-runtime-operations.json"
           ],
-          "note": "Fast intake: Work is deferred via waitUntil after inbox insertion, but p95 webhook latency under burst load has not been measured.",
+          "note": "Live review webhook aggregates record observed request latency, while the bounded signed concurrent burst verifies durable intake/backpressure with authoritative latest heads. These measurements are not a production throughput guarantee.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "UNVERIFIED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -1434,9 +1409,7 @@
           "id": "05.11",
           "requirement": "Policy-controlled registration",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Policy-controlled registration: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1454,9 +1427,7 @@
           "id": "05.12",
           "requirement": "Approval when self-registration enabled",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Approval when self-registration enabled: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1803,9 +1774,7 @@
           "id": "07.03",
           "requirement": "Mandatory optional bonus and non-scored scopes",
           "status": "PARTIAL",
-          "evidence": [
-            "src/competition-issues.ts"
-          ],
+          "evidence": ["src/competition-issues.ts"],
           "note": "Mandatory optional bonus and non-scored scopes: All four evaluation scopes are validated in schema; only mandatory and non-scored scopes have real payment challenge evidence.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2048,22 +2017,23 @@
         {
           "id": "08.01",
           "requirement": "Missing labels trigger triage",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/acceptance-audit.test.ts",
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-issue-moderation.json"
           ],
-          "note": "Missing labels trigger triage: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified.",
+          "note": "Real-D1 moderation tests exercise controlled label suppression/preservation, explicit override clearing and delayed hostile native content without rewriting frozen challenge inputs. Organizer clarification remains in review history. Every conceivable webhook ordering is not asserted.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -2707,43 +2677,45 @@
         {
           "id": "08.31",
           "requirement": "Label provenance",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/acceptance-audit.test.ts",
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-issue-moderation.json"
           ],
-          "note": "Label provenance: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified.",
+          "note": "Real-D1 moderation tests exercise controlled label suppression/preservation, explicit override clearing and delayed hostile native content without rewriting frozen challenge inputs. Organizer clarification remains in review history. Every conceivable webhook ordering is not asserted.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "08.32",
           "requirement": "Avoid synchronization loops",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "tests/acceptance-audit.test.ts",
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-issue-moderation.json"
           ],
-          "note": "Avoid synchronization loops: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified.",
+          "note": "Real-D1 moderation tests exercise controlled label suppression/preservation, explicit override clearing and delayed hostile native content without rewriting frozen challenge inputs. Organizer clarification remains in review history. Every conceivable webhook ordering is not asserted.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -2801,22 +2773,24 @@
         {
           "id": "09.03",
           "requirement": "Security report workflow",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/config.yml",
-            "public/competition.js"
+            "public/competition.js",
+            "tests/confidential-security.test.ts",
+            "docs/confidential-security.md"
           ],
-          "note": "Security report workflow: Private reporting guidance is provided, but restricted vulnerability ingestion and per-security-role artifact access are not implemented.",
+          "note": "Restricted confidential intake/reviews/artifacts are separate from ordinary issues and AI inputs. Real-D1 permission tests deny judges, anonymous and cross-origin access; security roles access only restricted routes. Native GitHub private-report synchronization is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -2957,9 +2931,7 @@
           "id": "09.10",
           "requirement": "Spam limits",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Spam limits: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2977,9 +2949,7 @@
           "id": "09.11",
           "requirement": "Gaming controls",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Gaming controls: Repeated reports receive a reversible possible-spam moderation flag and no automatic credit; this is not account-wide throttling or semantic gaming detection.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -2996,43 +2966,47 @@
         {
           "id": "09.12",
           "requirement": "Restricted security handling",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             ".github/ISSUE_TEMPLATE/config.yml",
-            "public/competition.js"
+            "public/competition.js",
+            "tests/confidential-security.test.ts",
+            "docs/confidential-security.md"
           ],
-          "note": "Restricted security handling: Private reporting guidance is provided, but restricted vulnerability ingestion and per-security-role artifact access are not implemented.",
+          "note": "Restricted confidential intake/reviews/artifacts are separate from ordinary issues and AI inputs. Real-D1 permission tests deny judges, anonymous and cross-origin access; security roles access only restricted routes. Native GitHub private-report synchronization is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "09.13",
           "requirement": "No automated exploit disclosure",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-domain.ts",
-            "public/competition.js"
+            "public/competition.js",
+            "tests/confidential-security.test.ts",
+            "docs/confidential-security.md"
           ],
-          "note": "No automated exploit disclosure: Automation does not post exploit-body comments; native public issues remain public and private security reporting requires repository-owner setup.",
+          "note": "Restricted confidential intake/reviews/artifacts are separate from ordinary issues and AI inputs. Real-D1 permission tests deny judges, anonymous and cross-origin access; security roles access only restricted routes. Native GitHub private-report synchronization is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -3955,9 +3929,7 @@
           "id": "14.01",
           "requirement": "Multiple issues per PR",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple issues per PR: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -3975,9 +3947,7 @@
           "id": "14.02",
           "requirement": "Separable requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Separable requirements: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -3995,9 +3965,7 @@
           "id": "14.03",
           "requirement": "Multiple attempts per issue",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple attempts per issue: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4014,54 +3982,54 @@
         {
           "id": "14.04",
           "requirement": "Duplicate alternate superseding relationships",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/competition-submissions.ts",
             "src/submission-relations.ts",
             "migrations/0015_submission_relations.sql",
             "public/competition.js",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/submission-relations.test.ts"
           ],
-          "note": "Typed immutable ALTERNATE, DUPLICATE and SUPERSEDES organizer annotations now link same-team, same-repository attempts sharing structured issues; cycle/capacity/idempotency guards and judge display are implemented. Static review and schema smoke passed; concurrent service, organizer authorization and deployed UI behavior remain unexecuted. Stacked dependency policy remains separately missing at 14.05.",
+          "note": "Immutable alternate/duplicate/superseding/dependent annotations pin heads, deny foreign teams/repositories/issues and cycles, remain idempotent and preserve independent frozen-baseline evaluation without inherited credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "14.05",
           "requirement": "Stacked PR policy",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
-            "src/competition-submissions.ts"
+            "src/competition-submissions.ts",
+            "tests/submission-relations.test.ts"
           ],
-          "note": "Stacked PR policy: Independent PR attempts are retained, but explicit alternate/superseding/stacked PR relationship types and stacked dependency evaluation are absent.",
+          "note": "Immutable alternate/duplicate/superseding/dependent annotations pin heads, deny foreign teams/repositories/issues and cycles, remain idempotent and preserve independent frozen-baseline evaluation without inherited credit.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "14.06",
           "requirement": "Retained history",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Retained history: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4301,10 +4269,7 @@
           "id": "16.01",
           "requirement": "Run distinct from submission",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Run distinct from submission: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4322,10 +4287,7 @@
           "id": "16.02",
           "requirement": "Multiple runs",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Multiple runs: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4343,10 +4305,7 @@
           "id": "16.03",
           "requirement": "New run per head",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "New run per head: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4364,10 +4323,7 @@
           "id": "16.04",
           "requirement": "Previous evaluation retained",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Previous evaluation retained: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4385,10 +4341,7 @@
           "id": "16.05",
           "requirement": "Superseded state",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Superseded state: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4406,10 +4359,7 @@
           "id": "16.06",
           "requirement": "Obvious current run",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Obvious current run: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4427,10 +4377,7 @@
           "id": "16.07",
           "requirement": "No historical overwrite",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "No historical overwrite: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4475,10 +4422,7 @@
           "id": "17.01",
           "requirement": "Authoritative contract",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Authoritative contract: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4496,10 +4440,7 @@
           "id": "17.02",
           "requirement": "Schema version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4517,10 +4458,7 @@
           "id": "17.03",
           "requirement": "Repository identity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Repository identity: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4538,10 +4476,7 @@
           "id": "17.04",
           "requirement": "Challenge and evaluation version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Challenge and evaluation version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4559,10 +4494,7 @@
           "id": "17.05",
           "requirement": "Baseline",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Baseline: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4580,10 +4512,7 @@
           "id": "17.06",
           "requirement": "Assigned issues",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Assigned issues: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4601,10 +4530,7 @@
           "id": "17.07",
           "requirement": "Mandatory requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Mandatory requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4622,10 +4548,7 @@
           "id": "17.08",
           "requirement": "Optional requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Optional requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4643,10 +4566,7 @@
           "id": "17.09",
           "requirement": "Acceptance criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Acceptance criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4664,10 +4584,7 @@
           "id": "17.10",
           "requirement": "Constraints",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Constraints: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4705,24 +4622,27 @@
         {
           "id": "17.12",
           "requirement": "Expected artifacts",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/domain.ts",
             "src/expected-artifacts.ts",
             "src/competition-completion.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Frozen contracts now declare typed required/optional artifact kinds; combined issue contracts preserve declarations, APIs/UI show availability, and ACCEPTED requires readable integrity-checked required artifacts. Metadata availability is not proof of content or participant functionality. Runtime completion/retention/storage-outage and deployed capture scenarios remain unverified.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -4792,10 +4712,7 @@
           "id": "17.16",
           "requirement": "Additional categories",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Additional categories: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4813,10 +4730,7 @@
           "id": "17.17",
           "requirement": "Forbidden actions",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Forbidden actions: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4834,10 +4748,7 @@
           "id": "17.18",
           "requirement": "Schema validation",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema validation: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4855,10 +4766,7 @@
           "id": "17.19",
           "requirement": "No AI-invented criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "No AI-invented criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4876,10 +4784,7 @@
           "id": "17.20",
           "requirement": "Participant cannot override policy",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Participant cannot override policy: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -5161,10 +5066,7 @@
           "id": "18.12",
           "requirement": "Credit attributable to diff",
           "status": "PARTIAL",
-          "evidence": [
-            "src/evaluate.ts",
-            "src/competition-completion.ts"
-          ],
+          "evidence": ["src/evaluate.ts", "src/competition-completion.ts"],
           "note": "Credit attributable to diff: No automatic additional credit exists; reviewed completion is evidence-gated, but functional extra-contribution attribution is incomplete.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5355,43 +5257,47 @@
         {
           "id": "19.08",
           "requirement": "Benchmark reuse",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Benchmark executions deliberately bypass the new opt-in execution cache to avoid treating cached timings as a fresh reproducible measurement. A supported benchmark profile and validated safe reuse strategy have not been implemented.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "19.09",
           "requirement": "Repository index reuse",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "tests/repository-intelligence.test.ts",
+            "tests/review-context.test.ts"
           ],
-          "note": "Repository index reuse: Baseline execution is rerun for each evaluation; no versioned baseline-check cache or repository index cache is implemented.",
+          "note": "Versioned hash/schema-checked source inventories reuse immutable context and identify supported JS/TS/Python declarations, public methods and named exports. Removed/changed exported signatures produce explicitly UNVERIFIED compatibility warnings, not compiler or runtime compatibility proof.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -5403,22 +5309,24 @@
         {
           "id": "20.01",
           "requirement": "Controlled dependency installation",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/local-docker.ts",
-            "runner/package.json"
+            "runner/package.json",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Controlled dependency installation: Participant dependency installation is deliberately not supported; guest networking is denied and prepared tooling is organizer-controlled.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -5473,10 +5381,7 @@
           "id": "20.04",
           "requirement": "Integration tests",
           "status": "PARTIAL",
-          "evidence": [
-            "src/runner-policy.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
           "note": "Integration tests: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5542,10 +5447,7 @@
           "id": "20.07",
           "requirement": "Type check",
           "status": "PARTIAL",
-          "evidence": [
-            "src/runner-policy.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
           "note": "Type check: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5563,10 +5465,7 @@
           "id": "20.08",
           "requirement": "Formatting where relevant",
           "status": "PARTIAL",
-          "evidence": [
-            "src/runner-policy.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
           "note": "Formatting where relevant: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5584,10 +5483,7 @@
           "id": "20.09",
           "requirement": "Coverage",
           "status": "PARTIAL",
-          "evidence": [
-            "src/runner-policy.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["src/runner-policy.ts", "tests/runner.test.ts"],
           "note": "Coverage: Configurable command kinds retain bounded results; commands depend on tools in the immutable prepared image and cannot themselves establish functional correctness.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -5870,43 +5766,49 @@
         {
           "id": "21.09",
           "requirement": "Structured reports",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Structured reports: Bounded structured execution records and protected digest bundles work; arbitrary structured reports and large object artifacts are not complete.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "21.10",
           "requirement": "Artifacts",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Artifacts: Bounded structured execution records and protected digest bundles work; arbitrary structured reports and large object artifacts are not complete.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -5961,10 +5863,7 @@
           "id": "22.02",
           "requirement": "Isolation architecture",
           "status": "PARTIAL",
-          "evidence": [
-            "src/local-docker.ts",
-            "docs/local-docker-runner.md"
-          ],
+          "evidence": ["src/local-docker.ts", "docs/local-docker-runner.md"],
           "note": "Isolation architecture: Deliberate Docker VM isolation is implemented for development; suitable production hostile-code capacity remains unprovisioned.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6255,10 +6154,7 @@
           "id": "22.16",
           "requirement": "Artifacts",
           "status": "PARTIAL",
-          "evidence": [
-            "src/workflow.ts",
-            "docs/qa/readiness-live-access.json"
-          ],
+          "evidence": ["src/workflow.ts", "docs/qa/readiness-live-access.json"],
           "note": "Artifacts: Bounded execution records are available; large retained guest artifacts need account-enabled object storage.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6297,10 +6193,7 @@
           "id": "22.18",
           "requirement": "Redaction",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/domain.test.ts",
-            "src/security.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "src/security.ts"],
           "note": "Redaction: Known credential formats are redacted; arbitrary secret recognition and binary artifact scanning are not exhaustive.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6368,10 +6261,7 @@
           "id": "23.03",
           "requirement": "Memory exhaustion",
           "status": "PARTIAL",
-          "evidence": [
-            "src/local-docker.ts",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
           "note": "Memory exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6433,10 +6323,7 @@
           "id": "23.06",
           "requirement": "Disk exhaustion",
           "status": "PARTIAL",
-          "evidence": [
-            "src/local-docker.ts",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
           "note": "Disk exhaustion: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6454,10 +6341,7 @@
           "id": "23.07",
           "requirement": "Malicious install scripts",
           "status": "PARTIAL",
-          "evidence": [
-            "src/local-docker.ts",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
           "note": "Malicious install scripts: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6497,10 +6381,7 @@
           "id": "23.09",
           "requirement": "Internal network probing",
           "status": "PARTIAL",
-          "evidence": [
-            "src/local-docker.ts",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["src/local-docker.ts", "docs/qa/docker-evidence.json"],
           "note": "Internal network probing: Memory/disk/network restrictions are configured; full allocation, disk-pressure and malicious dependency-install scenarios are not all independently executed.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -6764,22 +6645,24 @@
         {
           "id": "24.06",
           "requirement": "Changed symbols and components",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/evaluate.ts"
+            "src/evaluate.ts",
+            "tests/repository-intelligence.test.ts",
+            "tests/review-context.test.ts"
           ],
-          "note": "Changed symbols and components: Changed-file/risk metadata exists; a symbol graph and deterministic public API compatibility analyzer are not implemented.",
+          "note": "Versioned hash/schema-checked source inventories reuse immutable context and identify supported JS/TS/Python declarations, public methods and named exports. Removed/changed exported signatures produce explicitly UNVERIFIED compatibility warnings, not compiler or runtime compatibility proof.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -6851,22 +6734,24 @@
         {
           "id": "24.10",
           "requirement": "API compatibility",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/evaluate.ts"
+            "src/evaluate.ts",
+            "tests/repository-intelligence.test.ts",
+            "tests/review-context.test.ts"
           ],
-          "note": "API compatibility: Changed-file/risk metadata exists; a symbol graph and deterministic public API compatibility analyzer are not implemented.",
+          "note": "Versioned hash/schema-checked source inventories reuse immutable context and identify supported JS/TS/Python declarations, public methods and named exports. Removed/changed exported signatures produce explicitly UNVERIFIED compatibility warnings, not compiler or runtime compatibility proof.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -7700,9 +7585,7 @@
           "id": "26.09",
           "requirement": "PARTIAL",
           "status": "PARTIAL",
-          "evidence": [
-            "src/domain.ts"
-          ],
+          "evidence": ["src/domain.ts"],
           "note": "PARTIAL: PARTIAL is accepted structurally for supported source/contextual assessments; calibrated per-requirement partial aggregation is not implemented.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -9015,43 +8898,47 @@
         {
           "id": "31.08",
           "requirement": "Progressive retrieval",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "src/callmissed-review.ts"
+            "src/callmissed-review.ts",
+            "tests/review-context.test.ts",
+            "tests/callmissed-review.test.ts"
           ],
-          "note": "Progressive retrieval: Reviewer receives a bounded preassembled context with no tool access; progressive controlled retrieval tools are not implemented.",
+          "note": "Progressive review starts with mandatory contract/evidence, budgets policy/output separately, and permits only four allowlisted read-only source ranges with line/byte caps and audit logs. Optional retrieval failure preserves review; unknown paths and unsupported citations are denied.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "31.09",
           "requirement": "Controlled tools",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "src/callmissed-review.ts"
+            "src/callmissed-review.ts",
+            "tests/review-context.test.ts",
+            "tests/callmissed-review.test.ts"
           ],
-          "note": "Controlled tools: Reviewer receives a bounded preassembled context with no tool access; progressive controlled retrieval tools are not implemented.",
+          "note": "Progressive review starts with mandatory contract/evidence, budgets policy/output separately, and permits only four allowlisted read-only source ranges with line/byte caps and audit logs. Optional retrieval failure preserves review; unknown paths and unsupported citations are denied.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -9173,160 +9060,186 @@
         {
           "id": "32.01",
           "requirement": "Requirement review",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Requirement review: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.02",
           "requirement": "Relevant quality review",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Relevant quality review: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.03",
           "requirement": "Sensitive security routing",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Sensitive security routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.04",
           "requirement": "Architecture routing",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Architecture routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.05",
           "requirement": "Performance routing",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Performance routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.06",
           "requirement": "Documentation fast path",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/evaluate.ts",
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Documentation fast path: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.07",
           "requirement": "Model routing",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/callmissed-review.ts",
             "src/review-routing.ts",
             "src/evaluate.ts",
             "src/env.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Server-owned LIGHT/DEEP model overrides are supported separately for CallMissed and Cloudflare, with existing model fallback, bounded identifiers, recorded routing reason and effective provider-call selection. No model catalog capability or latency/cost reduction is claimed; provider runtime and deployed routing remain unverified.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "32.08",
           "requirement": "Cheap trivial classification",
           "status": "PASS",
-          "evidence": [
-            "tests/issue-taxonomy.test.ts"
-          ],
+          "evidence": ["tests/issue-taxonomy.test.ts"],
           "note": "Cheap trivial classification: Trivial issue classification runs deterministic rules without a paid model call.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9350,10 +9263,7 @@
           "id": "33.01",
           "requirement": "Category",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Category: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9371,10 +9281,7 @@
           "id": "33.02",
           "requirement": "Severity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Severity: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9392,10 +9299,7 @@
           "id": "33.03",
           "requirement": "Claim",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Claim: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9413,10 +9317,7 @@
           "id": "33.04",
           "requirement": "Evidence",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Evidence: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9434,10 +9335,7 @@
           "id": "33.05",
           "requirement": "Verification",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Verification: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9454,51 +9352,44 @@
         {
           "id": "33.06",
           "requirement": "Source",
-          "status": "PARTIAL",
-          "evidence": [
-            "src/domain.ts"
-          ],
-          "note": "Source: Findings cite source evidence, but lack dedicated origin and related-requirement fields; relationships require following evidence IDs.",
+          "status": "PASS",
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
+          "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "33.07",
           "requirement": "Requirement",
-          "status": "PARTIAL",
-          "evidence": [
-            "src/domain.ts"
-          ],
-          "note": "Requirement: Findings cite source evidence, but lack dedicated origin and related-requirement fields; relationships require following evidence IDs.",
+          "status": "PASS",
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
+          "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "33.08",
           "requirement": "Fact versus inference",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Fact versus inference: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9541,10 +9432,7 @@
           "id": "33.10",
           "requirement": "Unverified state",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Unverified state: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9744,10 +9632,7 @@
           "id": "34.09",
           "requirement": "Context redaction",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/domain.test.ts",
-            "src/security.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "src/security.ts"],
           "note": "Context redaction: Known credentials are redacted from stored/model context; unknown secret formats require stronger scanners.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -9836,21 +9721,25 @@
         {
           "id": "35.04",
           "requirement": "Planning equivalent",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Planning equivalent: Context preparation/risk classification is the planning equivalent; no independently persisted adaptive execution plan exists.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -10105,10 +9994,7 @@
           "id": "36.06",
           "requirement": "Cancellation",
           "status": "PARTIAL",
-          "evidence": [
-            "src/store.ts",
-            "src/workflow.ts"
-          ],
+          "evidence": ["src/store.ts", "src/workflow.ts"],
           "note": "Cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10148,10 +10034,7 @@
           "id": "36.08",
           "requirement": "Priority",
           "status": "PARTIAL",
-          "evidence": [
-            "src/store.ts",
-            "src/workflow.ts"
-          ],
+          "evidence": ["src/store.ts", "src/workflow.ts"],
           "note": "Priority: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10191,10 +10074,7 @@
           "id": "36.10",
           "requirement": "Horizontal capacity",
           "status": "PARTIAL",
-          "evidence": [
-            "src/store.ts",
-            "src/workflow.ts"
-          ],
+          "evidence": ["src/store.ts", "src/workflow.ts"],
           "note": "Horizontal capacity: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10212,10 +10092,7 @@
           "id": "36.11",
           "requirement": "Obsolete cancellation",
           "status": "PARTIAL",
-          "evidence": [
-            "src/store.ts",
-            "src/workflow.ts"
-          ],
+          "evidence": ["src/store.ts", "src/workflow.ts"],
           "note": "Obsolete cancellation: Latest queued work is ordered first and obsolete work stops at stage boundaries; active provider calls are not force-cancelled and multi-host event-scale capacity is unverified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10239,10 +10116,7 @@
           "id": "37.01",
           "requirement": "Content-addressed cache",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/preview.test.ts",
-            "src/preview-evaluate.ts"
-          ],
+          "evidence": ["tests/preview.test.ts", "src/preview-evaluate.ts"],
           "note": "Content-addressed cache: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10260,10 +10134,7 @@
           "id": "37.02",
           "requirement": "Commit config tool identities",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/preview.test.ts",
-            "src/preview-evaluate.ts"
-          ],
+          "evidence": ["tests/preview.test.ts", "src/preview-evaluate.ts"],
           "note": "Commit config tool identities: Credential-free public preview reuses integrity-checked frozen GitHub context; this is not a deterministic execution cache.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10305,43 +10176,47 @@
         {
           "id": "37.04",
           "requirement": "Dependency cache",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Dependency cache: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.05",
           "requirement": "Repository context cache",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "tests/repository-intelligence.test.ts",
+            "tests/review-context.test.ts"
           ],
-          "note": "Repository context cache: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Versioned hash/schema-checked source inventories reuse immutable context and identify supported JS/TS/Python declarations, public methods and named exports. Removed/changed exported signatures produce explicitly UNVERIFIED compatibility warnings, not compiler or runtime compatibility proof.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -10372,10 +10247,7 @@
           "id": "37.07",
           "requirement": "Prepared environments",
           "status": "PASS",
-          "evidence": [
-            "runner/Dockerfile",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["runner/Dockerfile", "docs/qa/docker-evidence.json"],
           "note": "Prepared environments: Actual development jobs use a prepared immutable image rather than rebuilding participant environments.",
           "verification": {
             "method": "LOCAL_EXECUTION",
@@ -10393,9 +10265,7 @@
           "id": "37.08",
           "requirement": "Warm capacity decision",
           "status": "PARTIAL",
-          "evidence": [
-            "docs/local-docker-runner.md"
-          ],
+          "evidence": ["docs/local-docker-runner.md"],
           "note": "Warm capacity decision: Development runner stays available but each job gets fresh guests; production warm capacity has not been provisioned.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -10433,100 +10303,110 @@
         {
           "id": "37.10",
           "requirement": "Safe independent parallelism",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "tests/github.test.ts"
+            "tests/github.test.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Safe independent parallelism: Independent immutable file retrieval is bounded/parallel; objective commands are currently sequential for guest isolation.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.11",
           "requirement": "Parallel tests lint security type checks",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Parallel tests lint security type checks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.12",
           "requirement": "Fast path",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/evaluation-plan.ts",
             "src/evaluate.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "A bounded LIGHT contextual-review path is selected for documentation-only changes without functional or runner criteria. All authoritative checks and criteria remain required; this is not a general deterministic execution fast path. Runtime provider/context-budget and deployed behavior remain unverified.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.13",
           "requirement": "Deep path",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/evaluation-plan.ts",
             "src/review-routing.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "DEEP contextual review is selected for sensitive/dependency, architecture/large-change and authoritative benchmark/performance scope, with larger bounded context and optional configured model. No criteria are waived and deterministic execution remains unchanged. Runtime routing and deeper review quality are unverified.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.14",
           "requirement": "Risk routing",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts"],
           "note": "Risk routing: Deterministic risk signals are tested; they are routing metadata, not scores.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -10543,67 +10423,79 @@
         {
           "id": "37.15",
           "requirement": "Changed-file-aware checks",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Changed-file-aware checks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.16",
           "requirement": "Sensitive changes deeper review",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
             "src/workflow.ts",
             "src/evaluation-plan.ts",
             "src/evaluate.ts",
-            "docs/qa/zero-gap-progress.md"
+            "docs/qa/zero-gap-progress.md",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Server routing metadata and fixed changed-path signals now select DEEP security review and its bounded context. An additional-category allowlist cannot force depth or redefine scope. Real sensitive-change reviewer calibration and deployed review behavior remain unverified.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Current source and static gates only; authored fixtures were not executed. This does not prove runtime, provider, Cloudflare D1 or deployed behavior."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "2026-10-04 source integration, independent review, static build and SQLite migration smoke; behavioral acceptance remains pending."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "37.17",
           "requirement": "Documentation avoids benchmarks",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/runner.ts",
-            "src/workflow.ts"
+            "src/workflow.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Documentation avoids benchmarks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -10615,22 +10507,23 @@
         {
           "id": "38.01",
           "requirement": "Deadline burst",
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/store.ts"
+            "src/store.ts",
+            "docs/qa/current-runtime-operations.json"
           ],
-          "note": "Deadline burst: No event-scale burst or multi-host production capacity rehearsal has been executed.",
+          "note": "Executed bounded 48-event/12-submission burst retains all submissions and 36 superseded runs, recovers durable outbox work, and fences 24 lease contenders across two real Worker isolates sharing D1. Injected scanner/storage failures remain UNVERIFIED/FAILED, preserve earlier evidence and recover without false PASS.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "UNVERIFIED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -10724,22 +10617,23 @@
         {
           "id": "38.06",
           "requirement": "Scalable workers",
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/store.ts"
+            "src/store.ts",
+            "docs/qa/current-runtime-operations.json"
           ],
-          "note": "Scalable workers: No event-scale burst or multi-host production capacity rehearsal has been executed.",
+          "note": "Executed bounded 48-event/12-submission burst retains all submissions and 36 superseded runs, recovers durable outbox work, and fences 24 lease contenders across two real Worker isolates sharing D1. Injected scanner/storage failures remain UNVERIFIED/FAILED, preserve earlier evidence and recover without false PASS.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "UNVERIFIED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -11417,21 +11311,24 @@
         {
           "id": "39.31",
           "requirement": "Artifacts",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Artifacts: Protected bounded reproducibility bundle works; large object artifacts are unavailable while R2 remains disabled.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "dashboard",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -11717,10 +11614,7 @@
           "id": "40.13",
           "requirement": "Latest-time sorting",
           "status": "PARTIAL",
-          "evidence": [
-            "src/competition.ts",
-            "public/competition.js"
-          ],
+          "evidence": ["src/competition.ts", "public/competition.js"],
           "note": "Validated enum selects oldest/newest with stable repository/PR tie-breakers and judge control; deployed behavior not verified.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -12017,10 +11911,7 @@
           "id": "41.13",
           "requirement": "Source filter",
           "status": "PARTIAL",
-          "evidence": [
-            "src/competition.ts",
-            "public/competition.js"
-          ],
+          "evidence": ["src/competition.ts", "public/competition.js"],
           "note": "Source filter: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -12038,10 +11929,7 @@
           "id": "41.14",
           "requirement": "Related PR",
           "status": "PARTIAL",
-          "evidence": [
-            "src/competition.ts",
-            "public/competition.js"
-          ],
+          "evidence": ["src/competition.ts", "public/competition.js"],
           "note": "Related PR: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -12059,10 +11947,7 @@
           "id": "41.15",
           "requirement": "Evaluation state",
           "status": "PARTIAL",
-          "evidence": [
-            "src/competition.ts",
-            "public/competition.js"
-          ],
+          "evidence": ["src/competition.ts", "public/competition.js"],
           "note": "Evaluation state: API issue detail includes assignments/related submissions/evaluation state; UI does not fully render every relationship or filter state.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -12398,22 +12283,25 @@
         {
           "id": "44.02",
           "requirement": "Participant scope",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "docs/qa/current-console-identities.json",
+            "tests/console-identities.test.ts",
+            "tests/browser/console-identities.spec.ts"
           ],
-          "note": "Participant scope: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent.",
+          "note": "Organizer-issued named hash-only credentials and revocation are exercised. Participant lists and outcomes require own team plus immutable assignment ownership; cross-team, privileged, security and artifact routes are denied server-side. This is named console identity, not GitHub OAuth.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -12443,22 +12331,25 @@
         {
           "id": "44.04",
           "requirement": "Organizer scope",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "docs/qa/current-console-identities.json",
+            "tests/console-identities.test.ts",
+            "tests/browser/console-identities.spec.ts"
           ],
-          "note": "Organizer scope: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent.",
+          "note": "Organizer-issued named hash-only credentials and revocation are exercised. Participant lists and outcomes require own team plus immutable assignment ownership; cross-team, privileged, security and artifact routes are denied server-side. This is named console identity, not GitHub OAuth.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -12569,22 +12460,25 @@
         {
           "id": "44.10",
           "requirement": "Cross-team isolation",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/organization.ts",
-            "tests/organization.test.ts"
+            "tests/organization.test.ts",
+            "docs/qa/current-console-identities.json",
+            "tests/console-identities.test.ts",
+            "tests/browser/console-identities.spec.ts"
           ],
-          "note": "Cross-team isolation: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent.",
+          "note": "Organizer-issued named hash-only credentials and revocation are exercised. Participant lists and outcomes require own team plus immutable assignment ownership; cross-team, privileged, security and artifact routes are denied server-side. This is named console identity, not GitHub OAuth.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -13086,243 +12980,276 @@
         {
           "id": "46.01",
           "requirement": "Large output outside rows",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Large output outside rows: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.02",
           "requirement": "Stdout",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Stdout: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.03",
           "requirement": "Stderr",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Stderr: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.04",
           "requirement": "Test reports",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Test reports: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.05",
           "requirement": "Coverage",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Coverage: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.06",
           "requirement": "Security",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Security: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.07",
           "requirement": "Benchmarks",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Benchmarks: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.08",
           "requirement": "Diffs",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Diffs: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.09",
           "requirement": "Generated reports",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Generated reports: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.10",
           "requirement": "Metadata",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Metadata: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "46.11",
           "requirement": "Checksums",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
             "src/api.ts",
-            "docs/qa/readiness-live-access.json"
+            "docs/qa/readiness-live-access.json",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Checksums: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -13444,22 +13371,25 @@
         {
           "id": "47.06",
           "requirement": "Tool versions",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/runner.ts"
+            "src/runner.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Tool versions: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -13509,22 +13439,25 @@
         {
           "id": "47.09",
           "requirement": "Artifacts",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/runner.ts"
+            "src/runner.ts",
+            "tests/artifact-store.test.ts",
+            "tests/expected-artifacts.test.ts",
+            "docs/qa/current-payment-grounding-8.json"
           ],
-          "note": "Artifacts: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete.",
+          "note": "Protected checksum/retention/quota-bound object capture includes evidence/context/report, direct streams, per-check test/security/completed-benchmark/captured-coverage records and bounded diff manifests. Live review recapture downloads verify integrity and deny anonymous access. Absent coverage or measurements cannot satisfy typed expectations; arbitrary guest binary collection is not claimed.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "teams-issues-mapping-fairness",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -13553,10 +13486,7 @@
           "id": "47.11",
           "requirement": "Reviewer version",
           "status": "PARTIAL",
-          "evidence": [
-            "src/workflow.ts",
-            "src/runner.ts"
-          ],
+          "evidence": ["src/workflow.ts", "src/runner.ts"],
           "note": "Reviewer version: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -13807,127 +13737,145 @@
         {
           "id": "48.08",
           "requirement": "Worker startup",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Worker startup: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.09",
           "requirement": "Worker failure",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Worker failure: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.10",
           "requirement": "Dependency install",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Dependency install: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.11",
           "requirement": "Test duration",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Test duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.12",
           "requirement": "Scan duration",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Scan duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.13",
           "requirement": "Benchmark duration",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Benchmark duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -13975,64 +13923,72 @@
         {
           "id": "48.16",
           "requirement": "AI tools",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "AI tools: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "48.17",
           "requirement": "AI cost",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PARTIAL",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "src/review-cost.ts",
+            "tests/review-cost.test.ts"
           ],
-          "note": "AI cost: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Known organizer-supplied model rates and actual provider token usage produce a scoped successful-final-response USD estimate. Missing rates/usage remain unavailable; retrieval, failed-request and whole-provider invoice accounting are not certified.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed synthetic pricing arithmetic and missing/invalid input behavior; no complete live provider billing reconciliation."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PARTIAL",
+            "basis": "Cost estimate implementation and tests complete; full billing scope remains absent."
           }
         },
         {
           "id": "48.18",
           "requirement": "Cache hits",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Cache hits: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -14080,22 +14036,25 @@
         {
           "id": "48.21",
           "requirement": "Resources",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-overview.ts"
+            "src/competition-overview.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "tests/run-measurements.test.ts",
+            "tests/operational-alerts.test.ts"
           ],
-          "note": "Resources: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented.",
+          "note": "Validated numeric observations record actual guest startup, trusted Node/npm versions, cumulative cgroup CPU and sampled memory/PIDs, configured install/test/scan/benchmark durations, failures, bounded AI read logs and cache reuse. Immutable per-run keys prevent duplicate aggregates; reused timings are excluded. Samples are not peaks, capacity limits, or Cloudflare application cold starts.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         }
       ]
@@ -14321,21 +14280,23 @@
         {
           "id": "49.10",
           "requirement": "Install failure",
-          "status": "NOT_IMPLEMENTED",
+          "status": "PASS",
           "evidence": [
-            "src/local-docker.ts"
+            "src/local-docker.ts",
+            "docs/qa/dependency-docker-evidence.json",
+            "docs/execution-preparation.md"
           ],
-          "note": "Install failure: Participant dependency installation is unsupported, so no install-failure recovery adapter exists.",
+          "note": "Real Docker exercises frozen-lock/pinned npm offline installation from an immutable image catalogue with scripts/config suppressed, isolated per-guest cache, structured cache-miss/lock failures, overlapping independent guest commands and repeated fresh benchmark measurements. Historical timing is never reused; Cloudflare resource capacity is not attested.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "LOCAL_EXECUTION",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "NOT_IMPLEMENTED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -14461,22 +14422,23 @@
         {
           "id": "49.16",
           "requirement": "Scanner fail",
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-runtime-operations.json"
           ],
-          "note": "Scanner fail: The relevant boundaries/failure paths were inspected, but this exact external failure scenario lacks an executed fault-injection test.",
+          "note": "Executed bounded 48-event/12-submission burst retains all submissions and 36 superseded runs, recovers durable outbox work, and fences 24 lease contenders across two real Worker isolates sharing D1. Injected scanner/storage failures remain UNVERIFIED/FAILED, preserve earlier evidence and recover without false PASS.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "UNVERIFIED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -14555,10 +14517,7 @@
           "id": "49.20",
           "requirement": "Database fail",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/intake.test.ts",
-            "src/index.ts"
-          ],
+          "evidence": ["tests/intake.test.ts", "src/index.ts"],
           "note": "Database fail: Injected database failure returns 503 without acknowledging or persisting the signed delivery, dispatching work or exposing error details. After restoration the same delivery is accepted once and replay is deduplicated. Mid-workflow and live D1 outage recovery remain untested.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -14598,22 +14557,23 @@
         {
           "id": "49.22",
           "requirement": "Storage fail",
-          "status": "UNVERIFIED",
+          "status": "PASS",
           "evidence": [
             "src/workflow.ts",
-            "src/competition-sync.ts"
+            "src/competition-sync.ts",
+            "docs/qa/current-runtime-operations.json"
           ],
-          "note": "Storage fail: The relevant boundaries/failure paths were inspected, but this exact external failure scenario lacks an executed fault-injection test.",
+          "note": "Executed bounded 48-event/12-submission burst retains all submissions and 36 superseded runs, recovers durable outbox work, and fences 24 lease contenders across two real Worker isolates sharing D1. Injected scanner/storage failures remain UNVERIFIED/FAILED, preserve earlier evidence and recover without false PASS.",
           "verification": {
-            "method": "NOT_RUN",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "UNVERIFIED",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -14644,9 +14604,7 @@
           "id": "49.24",
           "requirement": "Preview fail",
           "status": "PASS",
-          "evidence": [
-            "https://github.com/daksh1403/judge-c2c/pull/4"
-          ],
+          "evidence": ["https://github.com/daksh1403/judge-c2c/pull/4"],
           "note": "Preview fail: A real native build failure was investigated and repaired; later builds passed.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -14943,41 +14901,49 @@
         {
           "id": "50.11",
           "requirement": "Risk routing",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Risk routing: Risk flags/schema are tested; adaptive evaluation planning is not implemented.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
           "id": "50.12",
           "requirement": "Planning",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
-            "tests/domain.test.ts"
+            "tests/domain.test.ts",
+            "tests/execution-routing.test.ts",
+            "tests/evaluation-plan.test.ts",
+            "tests/review-routing.test.ts",
+            "tests/runner.test.ts"
           ],
-          "note": "Planning: Risk flags/schema are tested; adaptive evaluation planning is not implemented.",
+          "note": "Server-owned risk/contract routing records LIGHT/STANDARD/DEEP focus, budget and effective model selection. Frozen change context filters only organizer-opted supplemental checks; acceptance cases and criterion-referenced commands/benchmarks always execute. Documentation-only optional benchmarks are omitted with explicit UNVERIFIED reasons and scoped cache identities.",
           "verification": {
-            "method": "SOURCE_INSPECTION",
-            "boundary": "Supported application profile only; this does not attest production operation or every participant workflow."
+            "method": "FIXTURE_TEST",
+            "boundary": "Executed supported application or isolated synthetic scenario cited here; production operation, universal analysis and measurements absent from the records are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/6",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Existing referenced evidence; current wave does not rerun unchanged checks."
+            "status": "PASS",
+            "basis": "Current executed targeted validation and recorded runtime evidence; requirements and failed evaluation history remain unchanged."
           }
         },
         {
@@ -15009,9 +14975,7 @@
           "id": "50.14",
           "requirement": "Cache keys",
           "status": "PARTIAL",
-          "evidence": [
-            "tests/preview.test.ts"
-          ],
+          "evidence": ["tests/preview.test.ts"],
           "note": "Cache keys: Frozen preview context integrity/cache identity is tested; execution cache does not exist.",
           "verification": {
             "method": "SOURCE_INSPECTION",

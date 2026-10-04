@@ -96,6 +96,70 @@ async function result(input = request): Promise<RunnerResult> {
 }
 afterEach(() => vi.restoreAllMocks());
 describe('trusted isolated execution', () => {
+  it('requires opted-in dependency evidence and refuses install false PASS', async () => {
+    const input = {
+      ...request,
+      policy: {
+        ...policy,
+        dependencies: {
+          mode: 'NPM_OFFLINE_V1' as const,
+          npmVersion: '11.19.0',
+          lockHash: 'd'.repeat(64),
+        },
+      },
+    };
+    const r = await result(input);
+    expect(() => validateRunnerResult(r, input, r.requestHash)).toThrow(
+      'CHECK_MISMATCH',
+    );
+    r.checks.push({
+      id: 'dependency-preparation',
+      kind: 'dependency',
+      status: 'PASS',
+      exitCode: 1,
+      durationMs: 20,
+      stdout: '',
+      stderr: '',
+      detail: 'Install',
+    });
+    expect(() => validateRunnerResult(r, input, r.requestHash)).toThrow(
+      'FALSE_PASS',
+    );
+    r.checks.at(-1)!.status = 'FAIL';
+    expect(validateRunnerResult(r, input, r.requestHash)).toEqual(r);
+  });
+  it('accepts bounded observations and rejects invented scopes/times/resource values', async () => {
+    const r = await result();
+    r.metrics = {
+      startupMs: 100,
+      tools: { node: 'v24.21.0', npm: '11.19.0' },
+      resources: [
+        {
+          scope: 'service',
+          sampledAt: r.startedAt,
+          cpuUsageUsec: 2000,
+          memoryBytes: 12345,
+          pids: 8,
+        },
+      ],
+    };
+    expect(validateRunnerResult(r, request, r.requestHash)).toEqual(r);
+    for (const change of [
+      { scope: 'unknown' },
+      { sampledAt: '2026-10-02T00:00:02Z' },
+      { memoryBytes: -1 },
+    ]) {
+      const invalid = structuredClone(r);
+      Object.assign(invalid.metrics!.resources[0]!, change);
+      expect(() =>
+        validateRunnerResult(invalid, request, r.requestHash),
+      ).toThrow();
+    }
+    r.metrics.startupMs = 2000;
+    expect(() => validateRunnerResult(r, request, r.requestHash)).toThrow(
+      'METRICS_MISMATCH',
+    );
+  });
   it('requires explicit valid policy and trusted acceptance IDs', () => {
     expect(contractSchema.parse(contract).execution.runner).toEqual(policy);
     expect(() =>
@@ -370,4 +434,103 @@ it('preserves configured check kinds and rejects forged kind relabeling', async 
   expect(() =>
     validateRunnerResult(forged, extendedRequest, extendedResult.requestHash),
   ).toThrow('RUNNER_CHECK_KIND_MISMATCH');
+});
+
+it('uses pinned frozen changed paths to omit optional benchmarks while executing both mandatory baseline/head acceptance', async () => {
+  const scopedContract: Contract = {
+    ...contract,
+    execution: {
+      ...contract.execution,
+      runner: {
+        ...policy,
+        commands: policy.commands.map((c) => ({
+          ...c,
+          runWhen: 'SOURCE_CHANGE',
+        })),
+        benchmarks: [
+          {
+            id: 'optional-performance',
+            path: '/',
+            method: 'GET',
+            expectedStatus: 200,
+            expectedBody: {},
+            samples: 10,
+            warmup: 1,
+            maxP95Ms: 100,
+            runWhen: 'SOURCE_CHANGE',
+          },
+        ],
+      },
+    },
+  };
+  const frozen = {
+    head_sha: request.commit,
+    baseline_sha: scopedContract.baseline,
+    contract_hash: request.contractHash,
+    context: JSON.stringify({
+      files: [{ filename: 'docs/README.md' }],
+      risk: [],
+    }),
+  };
+  const DB = {
+    prepare(query: string) {
+      const stmt = {
+        bind() {
+          return stmt;
+        },
+        async first() {
+          return query.startsWith('SELECT context')
+            ? frozen
+            : query.startsWith('SELECT e.state')
+              ? {
+                  state: 'CHECKING',
+                  repository_id: scopedContract.repository.id,
+                  latest_run_id: request.runId,
+                  head_sha: request.commit,
+                  closed: 0,
+                }
+              : null;
+        },
+        async run() {
+          return { meta: { changes: 1 } };
+        },
+      };
+      return stmt;
+    },
+  } as unknown as D1Database;
+  const execute = vi.fn(async (input: RunnerRequest) => result(input));
+  vi.spyOn(GitHub, 'installation').mockResolvedValue(new GitHub());
+  vi.spyOn(GitHub.prototype, 'api').mockResolvedValue({
+    truncated: false,
+    tree: [{ path: 'server.mjs', type: 'blob', mode: '100644', size: 32 }],
+  });
+  vi.spyOn(GitHub.prototype, 'file').mockResolvedValue('export default 1;');
+  const env = {
+    DB,
+    ENVIRONMENT: 'review',
+    RUNNER_ENABLED: 'true',
+    RUNNER: { idFromName: () => 'fixture', get: () => ({ evaluate: execute }) },
+  } as unknown as Env;
+  const evidence = await runObjective(
+    env,
+    {
+      id: request.runId,
+      head_sha: request.commit,
+      contract_hash: request.contractHash,
+    },
+    scopedContract,
+    [],
+  );
+  expect(execute).toHaveBeenCalledTimes(2);
+  for (const [input] of execute.mock.calls) {
+    expect(input.policy.commands).toEqual([]);
+    expect(input.policy.benchmarks).toEqual([]);
+    expect(input.policy.cases).toEqual(policy.cases);
+  }
+  expect(
+    evidence.find((e) => e.id === 'execution-routing-optional-performance'),
+  ).toMatchObject({ status: 'UNVERIFIED' });
+  expect(
+    evidence.filter((e) => e.criterionId).every((e) => e.status === 'PASS'),
+  ).toBe(true);
 });

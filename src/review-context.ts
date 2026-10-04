@@ -28,11 +28,14 @@ export function buildReviewContext(
   > = {};
   let pullRequest:
     { title: string; description: string; head: string } | undefined;
+  let repositoryIntelligence: Context['repositoryIntelligence'];
   const commits: { sha: string; message: string }[] = [];
   const patchFiles = context.files.filter((file) => file.patch);
   const sourcePaths = Object.keys(context.sources).sort();
   const changed = new Set(context.files.map((file) => file.filename));
   const omissions = () => ({
+    repositoryIndexOmitted:
+      !!context.repositoryIntelligence && !repositoryIntelligence,
     evidenceIds: evidence
       .filter((item) => !selected.includes(item))
       .map((item) => item.id),
@@ -97,6 +100,7 @@ export function buildReviewContext(
             .filter((item) => item.kind === 'source' && item.path)
             .map((item) => ({ path: item.path, evidenceId: item.id })),
         },
+        repositoryIntelligence,
         pullRequest,
         commits,
         files,
@@ -182,6 +186,8 @@ export function buildReviewContext(
     selected.push(item);
     if (!fits()) selected.pop();
   }
+  repositoryIntelligence = context.repositoryIntelligence;
+  if (!fits()) repositoryIntelligence = undefined;
   for (const file of patchFiles.slice(0, plan.maxChangedFiles)) {
     diffs[file.filename] = {
       excerpt: file.patch!.slice(0, 2000),
@@ -211,4 +217,100 @@ export function buildReviewContext(
     }
   }
   return finish();
+}
+
+export type ReviewReadRequest = {
+  path: string;
+  side: 'head' | 'baseline';
+  startLine: number;
+  lineCount: number;
+};
+
+/** Allowlisted immutable in-memory reads. No filesystem, network, shell or model privileges. */
+export function retrieveReviewContext(
+  context: Context,
+  evidence: Evidence[],
+  requests: ReviewReadRequest[],
+  maxBytes = 8000,
+) {
+  const encoder = new TextEncoder();
+  const log: {
+    path: string;
+    side: string;
+    startLine: number;
+    lineCount: number;
+    status: string;
+    bytes: number;
+  }[] = [];
+  const snippets: {
+    path: string;
+    side: string;
+    startLine: number;
+    text: string;
+    evidenceIds: string[];
+  }[] = [];
+  let bytes = 0;
+  for (const request of requests.slice(0, 4)) {
+    const ids = evidence
+      .filter((e) => e.kind === 'source' && e.path === request.path)
+      .map((e) => e.id);
+    const valid =
+      Object.hasOwn(context.sources, request.path) &&
+      ids.length > 0 &&
+      ['head', 'baseline'].includes(request.side) &&
+      Number.isSafeInteger(request.startLine) &&
+      request.startLine > 0 &&
+      Number.isSafeInteger(request.lineCount) &&
+      request.lineCount > 0 &&
+      request.lineCount <= 80;
+    const source = valid ? context.sources[request.path]![request.side] : null;
+    const text =
+      source === null
+        ? ''
+        : redact(
+            source
+              .split('\n')
+              .slice(
+                request.startLine - 1,
+                request.startLine - 1 + request.lineCount,
+              )
+              .join('\n'),
+          );
+    const snippet = {
+      path: request.path,
+      side: request.side,
+      startLine: request.startLine,
+      text,
+      evidenceIds: ids,
+    };
+    const size = encoder.encode(canonical(snippet)).length;
+    const status = !valid
+      ? 'DENIED'
+      : source === null
+        ? 'UNAVAILABLE'
+        : bytes + size > maxBytes
+          ? 'BUDGET_EXCEEDED'
+          : 'READ';
+    if (status === 'READ') {
+      snippets.push(snippet);
+      bytes += size;
+    }
+    log.push({
+      path: request.path.slice(0, 500),
+      side: request.side,
+      startLine: request.startLine,
+      lineCount: request.lineCount,
+      status,
+      bytes: status === 'READ' ? size : 0,
+    });
+  }
+  return {
+    version: 'bounded-source-read-v1',
+    snippets,
+    log,
+    bytes,
+    maxBytes,
+    maxReads: 4,
+    droppedRequests: Math.max(0, requests.length - 4),
+  };
 }

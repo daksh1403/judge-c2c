@@ -74,6 +74,5 @@ it('validates all 714 scoped entries without treating counts as launch approval'
   expect(result.status).toBe(0);
   const totals = JSON.parse(result.stdout) as Record<string, number>;
   expect(Object.values(totals).reduce((a, b) => a + b, 0)).toBe(714);
-  expect(totals.PARTIAL).toBeGreaterThan(0);
-  expect(totals.NOT_IMPLEMENTED).toBeGreaterThan(0);
+  expect(result.stdout).not.toMatch(/READY FOR MERGE APPROVAL|launch approved/i);
 });

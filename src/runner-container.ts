@@ -9,7 +9,13 @@ import { RUNNER_VERSION } from './runner-policy';
 import { redact } from './security';
 import { acceptance, benchmark } from './runner-http';
 import type { Env } from './env';
+import {
+  DEPENDENCY_PREPARE,
+  dependencyUnavailable,
+  validateDependencyInputs,
+} from './dependency-preparation';
 const MAX_LOG = 8192;
+const TOOLS = `console.log(JSON.stringify({node:process.version,npm:require('/usr/local/lib/node_modules/npm/package.json').version}));`;
 const INITIALIZE = `const fs=require('node:fs'); let s='';process.stdin.on('data',b=>s+=b);process.stdin.on('end',()=>{const files=JSON.parse(s);fs.mkdirSync('/work',{recursive:true});fs.chownSync('/work',65534,65534);for(const f of files){const path='/work/'+f.path;fs.mkdirSync(require('node:path').dirname(path),{recursive:true});fs.writeFileSync(path,f.text,{mode:0o644});fs.chownSync(path,65534,65534);}console.log(process.version);});`;
 function isolatedArgv(argv: string[]) {
   return [
@@ -157,7 +163,9 @@ export class IsolatedRunner extends DurableObject<Env> {
       void container.destroy().catch(() => {});
     }, request.timeoutSeconds * 1000);
     let runtime = 'unavailable';
+    const metrics: NonNullable<RunnerResult['metrics']> = { resources: [] };
     const prepare = async () => {
+      const preparingAt = Date.now();
       if (Date.now() >= deadline) throw new Error('RUNNER_DEADLINE');
       if (!(await current())) throw new Error('RUNNER_SUPERSEDED');
       container.start({
@@ -184,8 +192,54 @@ export class IsolatedRunner extends DurableObject<Env> {
       if (initialized.exitCode !== 0)
         throw new Error('RUNNER_PREPARATION_FAILED');
       runtime = initialized.stdout.trim();
+      metrics.startupMs ??= Date.now() - preparingAt;
+      if (!metrics.tools) {
+        try {
+          const tools = await captured(
+            container,
+            isolatedArgv(['node', '-e', TOOLS]),
+            remaining(),
+          );
+          const versions = JSON.parse(tools.stdout);
+          if (
+            tools.exitCode === 0 &&
+            /^v\d+\.\d+\.\d+$/.test(versions.node) &&
+            /^\d+\.\d+\.\d+$/.test(versions.npm)
+          )
+            metrics.tools = versions;
+        } catch {
+          /* No fabricated tool observation. */
+        }
+      }
+      if (request.policy.dependencies) {
+        const installed = await captured(
+          container,
+          isolatedArgv([
+            'node',
+            '-e',
+            DEPENDENCY_PREPARE,
+            request.policy.dependencies.npmVersion,
+          ]),
+          remaining(),
+        );
+        if (!checks.some((c) => c.id === 'dependency-preparation'))
+          checks.push({
+            ...installed,
+            id: 'dependency-preparation',
+            kind: 'dependency',
+            status: installed.exitCode === 0 ? 'PASS' : 'FAIL',
+            detail: `Offline npm@${request.policy.dependencies.npmVersion} ci with scripts disabled; immutable image cache ${request.policy.image}; frozen lock SHA-256 ${request.policy.dependencies.lockHash}. Setup reuse only; all benchmark timings are fresh.`,
+          });
+        if (installed.exitCode !== 0)
+          throw new Error('DEPENDENCY_PREPARATION_FAILED');
+        runtime +=
+          '; npm@' +
+          request.policy.dependencies.npmVersion +
+          '; offline-image-cache';
+      }
     };
     try {
+      await validateDependencyInputs(request);
       // Acceptance starts from the exact frozen tree before any participant test/build.
       await prepare();
       const service = await container.exec(
@@ -284,6 +338,31 @@ export class IsolatedRunner extends DurableObject<Env> {
         startedAt,
         finishedAt: new Date().toISOString(),
         checks,
+        metrics,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === 'RUNNER_SUPERSEDED')
+        throw error;
+      const detail =
+        error instanceof Error && error.message.startsWith('DEPENDENCY_')
+          ? 'Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran.'
+          : 'Isolated service preparation unavailable or exceeded resource/time/output limits.';
+      checks.push(
+        ...dependencyUnavailable(request, detail).filter(
+          (c) => !checks.some((existing) => existing.id === c.id),
+        ),
+      );
+      return {
+        requestHash: await digest(canonical(request)),
+        commit: request.commit,
+        contractHash: request.contractHash,
+        version: RUNNER_VERSION,
+        image: request.policy.image,
+        runtime,
+        startedAt,
+        finishedAt: new Date().toISOString(),
+        checks,
+        metrics,
       };
     } finally {
       clearTimeout(timer);

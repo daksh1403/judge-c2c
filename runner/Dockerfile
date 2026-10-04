@@ -8,7 +8,7 @@ RUN printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debia
     && rm -rf /var/lib/apt/lists/* \
     && test -x /usr/bin/prlimit && test -x /usr/bin/setpriv
 COPY package.json package-lock.json /opt/judge/
-RUN cd /opt/judge && npm ci --ignore-scripts --omit=dev \
+RUN cd /opt/judge && npm ci --ignore-scripts --omit=dev --cache=/opt/judge/npm-cache \
     && chmod -R go-w /opt/judge
 WORKDIR /work
 CMD ["sleep", "infinity"]

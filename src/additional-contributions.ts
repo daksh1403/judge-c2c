@@ -195,7 +195,12 @@ async function createCandidateRecord(
   runId: string,
   actor: string,
   raw: unknown,
+  stableId?: string,
 ) {
+  if (stableId) {
+    const [existing] = await listCandidates(env, runId, stableId);
+    if (existing) return existing;
+  }
   const parsed = candidateInput.safeParse(raw);
   if (!parsed.success || !actor.trim() || actor.length > 160)
     throw new AdditionalContributionError('Invalid candidate', 400);
@@ -263,12 +268,14 @@ async function createCandidateRecord(
   if (input.evidenceIds.some((id) => !evidenceById.has(id)))
     throw new AdditionalContributionError('Unknown evidence citation', 400);
   const status = verificationStatus(input, contract, evidence);
-  const id = crypto.randomUUID();
+  const id = stableId ?? crypto.randomUUID();
   const statements = await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO additional_contributions(id,run_id,actor,category,title,description,paths,evidence_ids,criterion_ids,verification_status)
        SELECT ?,id,?,?,?,?,?,?,?,? FROM evaluations WHERE id=? AND state='COMPLETED'
-         AND EXISTS(SELECT 1 FROM json_each(contract_snapshot,'$.additionalCategories') WHERE value=?)`,
+         AND EXISTS(SELECT 1 FROM json_each(contract_snapshot,'$.additionalCategories') WHERE value=?)
+         AND NOT EXISTS(SELECT 1 FROM additional_contributions WHERE id=?)
+         AND (SELECT count(*) FROM additional_contributions WHERE run_id=?)<20`,
     ).bind(
       id,
       actor,
@@ -281,6 +288,8 @@ async function createCandidateRecord(
       status,
       runId,
       input.category,
+      id,
+      runId,
     ),
     env.DB.prepare(
       `INSERT INTO audit(action,entity,actor,changes)
@@ -295,6 +304,10 @@ async function createCandidateRecord(
       }),
     ),
   ]);
+  if ((!statements[0] || statements[0].meta.changes !== 1) && stableId) {
+    const [existing] = await listCandidates(env, runId, stableId);
+    if (existing) return existing;
+  }
   if (!statements[0] || statements[0].meta.changes !== 1)
     throw new AdditionalContributionError(
       'Candidate creation lost a race',
@@ -514,4 +527,185 @@ export async function listCandidates(env: Env, runId: string, onlyId?: string) {
       : null;
     return serializeCandidate(row, decision);
   });
+}
+
+/** Bounded suggestions only. Recognition, novelty attribution and credit stay with organizers. */
+export async function discoverAdditionalContributions(env: Env, runId: string) {
+  const run = await env.DB.prepare(
+    'SELECT id,state,repository_id,pr_number,head_sha,contract_snapshot,context,evidence FROM evaluations WHERE id=?',
+  )
+    .bind(runId)
+    .first<EvaluationRow>();
+  if (!run || run.state !== 'COMPLETED')
+    return { status: 'UNAVAILABLE', candidateIds: [] as string[] };
+  const contract = contractSchema.safeParse(
+    parseJson<unknown>(run.contract_snapshot, 'Invalid frozen contract'),
+  );
+  const context = z
+    .object({
+      files: z
+        .array(
+          z.object({
+            filename: pathSchema,
+            status: z.string().optional(),
+            additions: z.number().nonnegative().optional(),
+          }),
+        )
+        .max(1000),
+    })
+    .safeParse(parseJson<unknown>(run.context, 'Invalid frozen context'));
+  const facts = evidenceSchema.safeParse(
+    parseJson<unknown>(run.evidence, 'Invalid frozen evidence'),
+  );
+  if (
+    !contract.success ||
+    !context.success ||
+    !facts.success ||
+    !unique(facts.data.map((e) => e.id))
+  )
+    return { status: 'INVALID_SNAPSHOT', candidateIds: [] as string[] };
+  const c = contract.data,
+    evidence: Evidence[] = facts.data;
+  if (
+    evidence.some(
+      (e) =>
+        (e.kind === 'policy' && e.status === 'FAIL') ||
+        (e.baselineStatus === 'PASS' && e.status === 'FAIL'),
+    )
+  )
+    return {
+      status: 'BLOCKED_POLICY_OR_REGRESSION',
+      candidateIds: [] as string[],
+    };
+  if (run.head_sha === c.baseline)
+    return { status: 'NO_SUGGESTIONS', candidateIds: [] as string[] };
+  const categories = c.additionalCategories;
+  const category = (options: string[]) =>
+    categories.find((value) => options.includes(value.trim().toLowerCase()));
+  const changed = context.data.files.filter(
+    (f) =>
+      ['added', 'modified', 'renamed'].includes(f.status ?? '') &&
+      !c.forbiddenPaths.some(
+        (p) => f.filename === p || f.filename.startsWith(p + '/'),
+      ),
+  );
+  const diff = evidence
+    .filter((e) => e.kind === 'diff' && e.status === 'PASS')
+    .map((e) => e.id);
+  if (!changed.length || !diff.length || !categories.length)
+    return { status: 'NO_SUGGESTIONS', candidateIds: [] as string[] };
+  const inputs: z.infer<typeof candidateInput>[] = [];
+  for (const requirement of c.requirements.filter((r) => !r.mandatory))
+    for (const criterion of requirement.criteria) {
+      if (
+        criterion.kind !== 'functional' ||
+        criterion.verification.type !== 'runner'
+      )
+        continue;
+      const authoritative = evidence.filter(
+        (e) => e.kind === 'execution' && e.criterionId === criterion.id,
+      );
+      if (
+        !authoritative.length ||
+        authoritative.some(
+          (e) => e.status !== 'PASS' || e.baselineStatus !== 'FAIL',
+        )
+      )
+        continue;
+      const checkId = criterion.verification.checkId;
+      const benchmark = c.execution.runner?.benchmarks?.some(
+        (b) => b.id === checkId,
+      );
+      const selectedCategory = category(
+        benchmark
+          ? ['performance']
+          : ['functionality', 'features', 'feature', 'testing'],
+      );
+      if (!selectedCategory) continue;
+      inputs.push({
+        category: selectedCategory,
+        title: 'Optional functional improvement: ' + criterion.id,
+        description:
+          'Server suggestion from a frozen optional functional criterion improving from baseline FAIL to head PASS in trusted execution. Changed paths are diff provenance, not proof of authorship or causal attribution. An organizer must assess novelty, attribution and recognition; no credit is automatic.',
+        paths: changed.slice(0, 20).map((f) => f.filename),
+        evidenceIds: [
+          ...new Set([...diff, ...authoritative.map((e) => e.id)]),
+        ].slice(0, 50),
+        criterionIds: [criterion.id],
+      });
+    }
+  const requiredPaths = new Set(
+    c.requirements
+      .filter((r) => r.mandatory)
+      .flatMap((r) =>
+        r.criteria.flatMap((k) =>
+          k.verification.type === 'file_contains' ? [k.verification.path] : [],
+        ),
+      ),
+  );
+  for (const file of changed.filter(
+    (f) =>
+      f.status === 'added' &&
+      (f.additions ?? 0) > 0 &&
+      !requiredPaths.has(f.filename),
+  )) {
+    const selectedCategory = /\.(md|mdx|rst|txt)$/i.test(file.filename)
+      ? category(['documentation', 'docs'])
+      : /(?:^|\/)(?:tests?|__tests__)(?:\/|$)|(?:\.|-)(?:test|spec)\.[cm]?[jt]sx?$/i.test(
+            file.filename,
+          )
+        ? category(['testing', 'tests'])
+        : undefined;
+    if (!selectedCategory) continue;
+    inputs.push({
+      category: selectedCategory,
+      title: 'Inspect additional ' + selectedCategory + ' path',
+      description:
+        'Server suggestion: a newly added path appears in the immutable baseline-to-head diff. Its content, usefulness, novelty, functional behavior and participant attribution remain unverified. Required-path assertions are excluded from this discovery rule. Human review is required and no credit is automatic.',
+      paths: [file.filename],
+      evidenceIds: [
+        ...new Set([
+          ...diff,
+          ...evidence
+            .filter((e) => e.kind === 'source' && e.path === file.filename)
+            .map((e) => e.id),
+        ]),
+      ].slice(0, 50),
+      criterionIds: [],
+    });
+  }
+  const candidateIds: string[] = [];
+  for (const input of inputs.slice(0, 5)) {
+    const id =
+      'discovery-' +
+      (
+        await digest(
+          canonical({
+            version: 'additional-discovery-v1',
+            runId,
+            head: run.head_sha,
+            contract: c,
+            input,
+          }),
+        )
+      ).slice(0, 48);
+    try {
+      const candidate = await createCandidateRecord(
+        env,
+        runId,
+        'system:additional-discovery-v1',
+        input,
+        id,
+      );
+      candidateIds.push(candidate.id);
+    } catch (error) {
+      if (error instanceof AdditionalContributionError && error.status === 409)
+        continue;
+      throw error;
+    }
+  }
+  return {
+    status: candidateIds.length ? 'SUGGESTED' : 'NO_SUGGESTIONS',
+    candidateIds,
+  };
 }

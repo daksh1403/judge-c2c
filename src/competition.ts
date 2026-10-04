@@ -387,6 +387,14 @@ export async function competition(
             .all(),
         ]);
       return json({
+        reviews: (
+          await db
+            .prepare(
+              "SELECT id,actor,changes,created_at FROM audit WHERE action='issue.reviewed' AND entity=? ORDER BY id",
+            )
+            .bind(repositoryId + ':' + number)
+            .all<Record<string, unknown>>()
+        ).results.map(decode),
         issue: decode(issue),
         definition,
         versions: versions.results,
@@ -459,7 +467,7 @@ export async function competition(
         });
       const rows = await db
         .prepare(
-          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR e.ai_status='FAILED' OR json_extract(coalesce(e.report,'{}'),'$.aiTrace.requiresHumanAttention')=1 OR (e.ai_status='COMPLETED' AND coalesce(json_extract(coalesce(e.report,'{}'),'$.aiTrace.groundingPolicy'),'')<>'objective-facts-unverified-narratives-v1') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY CASE WHEN ?='oldest' THEN s.github_updated_at END ASC, CASE WHEN ?='newest' THEN s.github_updated_at END DESC,s.repository_id,s.pr_number LIMIT 200",
+          "SELECT s.*,t.name AS team_name,r.full_name,e.state AS evaluation_state,e.head_sha AS evaluation_head,e.ai_status FROM submissions s LEFT JOIN teams t ON t.id=s.team_id JOIN github_repositories r ON r.id=s.repository_id LEFT JOIN evaluations e ON e.id=s.latest_run_id AND e.head_sha=s.head_sha WHERE (s.author_login LIKE ? ESCAPE '!' OR r.full_name LIKE ? ESCAPE '!' OR t.name LIKE ? ESCAPE '!') AND (? IS NULL OR s.team_id=?) AND (? IS NULL OR s.repository_id=?) AND (? IS NULL OR s.status=?) AND (? IS NULL OR e.state=?) AND (? IS NULL OR EXISTS(SELECT 1 FROM json_each(s.issue_numbers) WHERE value=?)) AND (?=0 OR s.status NOT IN('VALID','CLOSED') OR e.state='FAILED' OR (e.state='COMPLETED' AND coalesce(e.ai_status,'')<>'COMPLETED') OR json_extract(coalesce(e.report,'{}'),'$.aiTrace.requiresHumanAttention')=1 OR (e.ai_status='COMPLETED' AND coalesce(json_extract(coalesce(e.report,'{}'),'$.aiTrace.groundingPolicy'),'')<>'objective-facts-unverified-narratives-v1') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status') IN('FAIL','UNVERIFIED'))) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.report,'{}'),'$.findings') WHERE lower(json_extract(value,'$.category')) LIKE '%security%') OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE (json_extract(value,'$.id') LIKE 'security-%' OR json_extract(value,'$.id') LIKE 'dependency-%') AND json_extract(value,'$.status')<>'PASS')) AND (?=0 OR EXISTS(SELECT 1 FROM json_each(coalesce(e.evidence,'[]')) WHERE json_extract(value,'$.status')='FAIL' AND json_extract(value,'$.baselineStatus')='PASS')) ORDER BY CASE WHEN ?='oldest' THEN s.github_updated_at END ASC, CASE WHEN ?='newest' THEN s.github_updated_at END DESC,s.repository_id,s.pr_number LIMIT 200",
         )
         .bind(
           like,

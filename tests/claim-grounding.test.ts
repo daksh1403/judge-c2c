@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { groundReview, GROUNDING_POLICY } from '../src/claim-grounding';
+import {
+  groundReview,
+  GROUNDING_POLICY,
+  completeObjectiveAssessments,
+} from '../src/claim-grounding';
 import { demoContract } from '../src/demo';
-import { deterministicReport } from '../src/evaluate';
+import { deterministicReport, aiReview } from '../src/evaluate';
 import { validateReview, type Evidence } from '../src/domain';
 function fixture() {
   const contract = structuredClone(demoContract);
@@ -119,5 +123,62 @@ describe('AI facts and unverified narratives', () => {
     expect(() => validateReview(review, contract, evidence)).toThrow(
       'AI cannot override objective failure',
     );
+  });
+});
+
+it('fills missing criterion echoes from objective evidence, preserves input and rejects model contradictions', () => {
+  const { contract, evidence, review } = fixture();
+  review.assessments = [];
+  const completed = completeObjectiveAssessments(review, contract, evidence);
+  expect(completed.filledCriterionIds).toEqual(['retry-bounded']);
+  expect(
+    validateReview(completed.value, contract, evidence).assessments[0]?.status,
+  ).toBe('FAIL');
+  expect(review.assessments).toEqual([]);
+  review.assessments = [
+    {
+      criterionId: 'retry-bounded',
+      status: 'PASS',
+      explanation: 'all good',
+      evidenceIds: ['bounded'],
+    },
+  ];
+  expect(() =>
+    validateReview(
+      completeObjectiveAssessments(review, contract, evidence).value,
+      contract,
+      evidence,
+    ),
+  ).toThrow('AI cannot override objective failure');
+});
+
+it('keeps incomplete qualitative AI review NEEDS_REVIEW after objective-only recovery', async () => {
+  const { contract, evidence, review } = fixture();
+  review.assessments = [];
+  const output = await aiReview(
+    {
+      AI_PROVIDER: 'cloudflare',
+      AI_MODEL: 'synthetic/model',
+      AI: { run: async () => ({ response: review }) },
+    } as unknown as import('../src/env').Env,
+    contract,
+    {
+      files: [],
+      sources: {},
+      risk: [],
+      environment: 'test',
+      toolVersion: 'test',
+    },
+    evidence,
+  );
+  expect(output.status).toBe('NEEDS_REVIEW');
+  expect(output.review.assessments[0]?.status).toBe('FAIL');
+  expect(output.trace).toMatchObject({
+    requiresHumanAttention: true,
+    objectiveCriterionRecovery: ['retry-bounded'],
+    qualitativeCriterionAnalysis: {
+      status: 'UNVERIFIED',
+      missingCriterionIds: ['retry-bounded'],
+    },
   });
 });

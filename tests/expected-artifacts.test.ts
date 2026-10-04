@@ -27,6 +27,37 @@ function artifact(
 }
 
 describe('expected artifact availability', () => {
+  it('matches only submission check reports for typed execution artifacts', () => {
+    for (const kind of [
+      'tests',
+      'coverage',
+      'security',
+      'benchmark',
+    ] as const) {
+      const declared = {
+        expectedArtifacts: [{ id: kind, kind, required: true }],
+      };
+      expect(
+        assessExpectedArtifacts(
+          declared,
+          [artifact({ kind: `${kind}-submission-0-1` })],
+          now,
+        )[0]?.status,
+      ).toBe('PASS');
+      for (const actual of [
+        `${kind}-baseline-0-1`,
+        'check-submission-0-1',
+        'execution-submission-0',
+      ])
+        expect(
+          assessExpectedArtifacts(
+            declared,
+            [artifact({ kind: actual })],
+            now,
+          )[0]?.status,
+        ).toBe('UNVERIFIED');
+    }
+  });
   it('preserves legacy contracts without an artifact declaration', () => {
     expect(assessExpectedArtifacts({}, [artifact()], now)).toEqual([]);
   });

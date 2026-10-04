@@ -1,3 +1,4 @@
+import { routeExecution, frozenExecutionContext } from './execution-routing';
 import { z } from 'zod';
 import {
   canonical,
@@ -59,9 +60,35 @@ export const runnerResultSchema = z
     version: z.literal(RUNNER_VERSION),
     image: z.string().max(500),
     runtime: z.string().max(100),
+    metrics: z
+      .object({
+        startupMs: z.number().int().nonnegative().max(600000).optional(),
+        tools: z
+          .object({
+            node: z.string().regex(/^v\d+\.\d+\.\d+$/),
+            npm: z.string().regex(/^\d+\.\d+\.\d+$/),
+          })
+          .strict()
+          .optional(),
+        resources: z
+          .array(
+            z
+              .object({
+                scope: z.string().max(100),
+                sampledAt: z.string().datetime(),
+                cpuUsageUsec: z.number().int().nonnegative().max(1e12),
+                memoryBytes: z.number().int().nonnegative().max(1e12),
+                pids: z.number().int().nonnegative().max(100000),
+              })
+              .strict(),
+          )
+          .max(9),
+      })
+      .strict()
+      .optional(),
     startedAt: z.string().datetime(),
     finishedAt: z.string().datetime(),
-    checks: z.array(checkResultSchema).max(41),
+    checks: z.array(checkResultSchema).max(42),
   })
   .strict();
 export type RunnerResult = z.infer<typeof runnerResultSchema>;
@@ -83,11 +110,31 @@ export function validateRunnerResult(
     throw new Error('RUNNER_INPUT_MISMATCH');
   if (Date.parse(result.finishedAt) < Date.parse(result.startedAt))
     throw new Error('RUNNER_TIME_MISMATCH');
+  if (result.metrics) {
+    const scopes = [
+      'service',
+      ...request.policy.commands.map((c) => 'command:' + c.id),
+    ];
+    const resources = result.metrics.resources;
+    if (
+      new Set(resources.map((s) => s.scope)).size !== resources.length ||
+      resources.some(
+        (s) =>
+          !scopes.includes(s.scope) ||
+          Date.parse(s.sampledAt) < Date.parse(result.startedAt) ||
+          Date.parse(s.sampledAt) > Date.parse(result.finishedAt),
+      ) ||
+      (result.metrics.startupMs ?? 0) >
+        Date.parse(result.finishedAt) - Date.parse(result.startedAt)
+    )
+      throw new Error('RUNNER_METRICS_MISMATCH');
+  }
   const expected = [
     ...request.policy.commands,
     ...request.policy.cases,
     ...(request.policy.benchmarks ?? []),
   ].map((c) => c.id);
+  if (request.policy.dependencies) expected.push('dependency-preparation');
   if (
     result.checks.length !== expected.length ||
     new Set(result.checks.map((c) => c.id)).size !== expected.length ||
@@ -99,12 +146,18 @@ export function validateRunnerResult(
     if (
       check.kind !==
       (command?.kind ??
-        (request.policy.benchmarks?.some((b) => b.id === check.id)
-          ? 'benchmark'
-          : 'acceptance'))
+        (request.policy.dependencies && check.id === 'dependency-preparation'
+          ? 'dependency'
+          : request.policy.benchmarks?.some((b) => b.id === check.id)
+            ? 'benchmark'
+            : 'acceptance'))
     )
       throw new Error('RUNNER_CHECK_KIND_MISMATCH');
-    if (command && check.status === 'PASS' && check.exitCode !== 0)
+    if (
+      (command || check.kind === 'dependency') &&
+      check.status === 'PASS' &&
+      check.exitCode !== 0
+    )
       throw new Error('RUNNER_FALSE_PASS');
   }
   return result;
@@ -183,7 +236,7 @@ export async function runObjective(
   evidence: Evidence[],
 ) {
   if (!c.execution.runner) return evidence;
-  const policy = c.execution.runner;
+  const originalPolicy = c.execution.runner;
   if ((!env.RUNNER && !env.RUNNER_ENDPOINT) || env.RUNNER_ENABLED !== 'true')
     return evidence.map((e) =>
       e.criterionId &&
@@ -199,6 +252,31 @@ export async function runObjective(
           }
         : e,
     );
+  const frozen = await env.DB.prepare(
+    'SELECT context,head_sha,baseline_sha,contract_hash FROM evaluations WHERE id=?',
+  )
+    .bind(run.id)
+    .first<{
+      context: string | null;
+      head_sha: string;
+      baseline_sha: string;
+      contract_hash: string;
+    }>();
+  let context: ReturnType<typeof frozenExecutionContext> = null;
+  if (
+    frozen?.context &&
+    frozen.head_sha === run.head_sha &&
+    frozen.baseline_sha === c.baseline &&
+    frozen.contract_hash === run.contract_hash
+  ) {
+    try {
+      context = frozenExecutionContext(JSON.parse(frozen.context));
+    } catch {
+      /* Missing or invalid context preserves every check. */
+    }
+  }
+  const routing = routeExecution(c, originalPolicy, context);
+  const policy = routing.policy;
   const github = await GitHub.installation(env, c);
   const results: RunnerResult[] = [];
   const repositoryId = c.repository.id;
@@ -398,6 +476,7 @@ export async function runObjective(
   const all = [
     ...evidence.filter((e) => !replacement.some((r) => r.id === e.id)),
     ...replacement,
+    ...routing.evidence,
   ];
   for (const check of results[1]!.checks.filter(
     (x) => x.kind !== 'acceptance',

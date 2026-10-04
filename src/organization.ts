@@ -1,3 +1,13 @@
+import { operationalAlerts } from './operational-alerts';
+import {
+  credentialIdentity,
+  identitySessionQuery,
+  manageIdentities,
+  participantConsole,
+  type ConsoleSession,
+} from './console-identities';
+import { readRunMeasurements } from './run-measurements';
+import { confidentialSecurity } from './confidential-security';
 import {
   readOperationalMetrics,
   expireOperationalMetrics,
@@ -218,10 +228,11 @@ async function organizer(request: Request, env: Env) {
   const hash = await digest(token);
   return await env
     .ORG_DB!.prepare(
-      'SELECT hash,role FROM organizer_sessions WHERE hash=? AND expires_at>?',
+      "SELECT hash,role,NULL AS identity_id,'Shared ' || role AS name,NULL AS team_id FROM organizer_sessions WHERE hash=? AND expires_at>? UNION ALL SELECT hash,'security' AS role,NULL AS identity_id,'Shared security' AS name,NULL AS team_id FROM security_sessions WHERE hash=? AND expires_at>? UNION ALL " +
+        identitySessionQuery,
     )
-    .bind(hash, Date.now())
-    .first<{ hash: string; role: 'organizer' | 'judge' }>();
+    .bind(hash, Date.now(), hash, Date.now(), hash, Date.now())
+    .first<ConsoleSession>();
 }
 function cookie(token: string, origin: string) {
   return `judge_organizer=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800${origin.startsWith('https:') ? '; Secure' : ''}`;
@@ -659,18 +670,35 @@ export async function organization(
       .bind(bucket)
       .first<{ count: number }>();
     if (rate!.count > 10) return json({ error: 'LOGIN_RATE_LIMIT' }, 429);
-    const role = (await equalSecret(data.token, env.ORG_ADMIN_TOKEN))
+    const legacyRole = (await equalSecret(data.token, env.ORG_ADMIN_TOKEN))
       ? 'organizer'
       : env.ORG_JUDGE_TOKEN &&
           (await equalSecret(data.token, env.ORG_JUDGE_TOKEN))
         ? 'judge'
-        : null;
+        : env.ORG_SECURITY_TOKEN &&
+            (await equalSecret(data.token, env.ORG_SECURITY_TOKEN))
+          ? 'security'
+          : null;
+    const identity = legacyRole
+      ? null
+      : await credentialIdentity(env, data.token);
+    const role = legacyRole ?? identity?.role;
     if (!role) return json({ error: 'UNAUTHORIZED' }, 401);
     const token = random();
     await env.ORG_DB.prepare(
-      'INSERT INTO organizer_sessions(hash,expires_at,role) VALUES(?,?,?)',
+      identity
+        ? 'INSERT INTO console_identity_sessions(hash,expires_at,identity_id) VALUES(?,?,?)'
+        : role === 'security'
+          ? 'INSERT INTO security_sessions(hash,expires_at) VALUES(?,?)'
+          : 'INSERT INTO organizer_sessions(hash,expires_at,role) VALUES(?,?,?)',
     )
-      .bind(await digest(token), Date.now() + 28800000, role)
+      .bind(
+        ...(identity
+          ? [await digest(token), Date.now() + 28800000, identity.id]
+          : role === 'security'
+            ? [await digest(token), Date.now() + 28800000]
+            : [await digest(token), Date.now() + 28800000, role]),
+      )
       .run();
     return Response.json(
       { authenticated: true },
@@ -686,8 +714,22 @@ export async function organization(
   if (url.pathname === '/api/organization/status' && request.method === 'GET') {
     if (!session)
       return json({ organization: env.ORG_NAME, authenticated: false });
+    const identity = {
+      id: session.identity_id,
+      name: session.name,
+      role: session.role,
+      teamId: session.team_id,
+    };
+    if (session.role === 'participant')
+      return json({
+        organization: env.ORG_NAME,
+        authenticated: true,
+        role: session.role,
+        identity,
+      });
     const row = await connection(env);
     return json({
+      identity,
       organization: env.ORG_NAME,
       authenticated: true,
       role: session.role,
@@ -724,6 +766,32 @@ export async function organization(
     });
   }
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
+  const actor = session.role + ':' + (session.identity_id ?? session.hash);
+  if (
+    url.pathname === '/api/organization/identities' ||
+    url.pathname.startsWith('/api/organization/identities/')
+  )
+    return manageIdentities(request, env, session);
+  if (
+    url.pathname === '/api/organization/participant' ||
+    url.pathname.startsWith('/api/organization/participant/')
+  )
+    return participantConsole(request, env, session);
+  if (
+    session.role === 'participant' &&
+    url.pathname !== '/api/organization/logout'
+  )
+    return json({ error: 'PARTICIPANT_SCOPE_REQUIRED' }, 403);
+  if (
+    url.pathname === '/api/organization/security-reports' ||
+    url.pathname.startsWith('/api/organization/security-reports/')
+  )
+    return confidentialSecurity(request, env, actor);
+  if (
+    session.role === 'security' &&
+    url.pathname !== '/api/organization/logout'
+  )
+    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
   if (
     session.role === 'judge' &&
     !(
@@ -751,7 +819,6 @@ export async function organization(
     }
     // Existing session, organizer-role and same-origin guards precede this route.
     const scopedEnv = { ...env, DB: env.ORG_DB! };
-    const actor = session.role + ':' + session.hash;
     const result = contributionCreate
       ? await createCandidate(scopedEnv, contributionCreate[1]!, actor, body)
       : await reviewCandidate(
@@ -776,23 +843,34 @@ export async function organization(
       .safeParse(url.searchParams.get('minutes') ?? '60');
     if (!minutes.success) return json({ error: 'INVALID_METRICS_WINDOW' }, 400);
     try {
+      const buckets = [
+        ...(await readOperationalMetrics(env.ORG_DB!, minutes.data)),
+        ...(await readRunMeasurements(env.ORG_DB!, minutes.data)),
+      ];
       return json({
         windowMinutes: minutes.data,
         retentionDays: 7,
-        buckets: await readOperationalMetrics(env.ORG_DB!, minutes.data),
+        buckets,
+        alerts: operationalAlerts(
+          buckets as {
+            metric: string;
+            count: number;
+            sum: number;
+            max: number;
+          }[],
+        ),
+        unavailable: [
+          'disk usage and application cold-start',
+          'provider cost without authoritative pricing',
+          'peak resource consumption (only sampled guest counters are measured)',
+        ],
       });
     } catch {
       return json({ error: 'METRICS_UNAVAILABLE' }, 503);
     }
   }
   if (url.pathname.startsWith('/api/organization/manage/'))
-    return competition(
-      request,
-      env,
-      ctx,
-      competitionServices(env),
-      session.role + ':' + session.hash,
-    );
+    return competition(request, env, ctx, competitionServices(env), actor);
   if (
     url.pathname === '/api/organization/runner-check' &&
     request.method === 'POST'
@@ -885,7 +963,13 @@ export async function organization(
     url.pathname === '/api/organization/logout' &&
     request.method === 'POST'
   ) {
-    await env.ORG_DB.prepare('DELETE FROM organizer_sessions WHERE hash=?')
+    await env.ORG_DB.prepare(
+      session.identity_id
+        ? 'DELETE FROM console_identity_sessions WHERE hash=?'
+        : session.role === 'security'
+          ? 'DELETE FROM security_sessions WHERE hash=?'
+          : 'DELETE FROM organizer_sessions WHERE hash=?',
+    )
       .bind(session.hash)
       .run();
     return Response.json(
@@ -1082,6 +1166,12 @@ export async function organization(
 export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
   if (!env.ORG_DB) return;
   await env.ORG_DB.batch([
+    env.ORG_DB.prepare(
+      'DELETE FROM console_identity_sessions WHERE expires_at<?',
+    ).bind(Date.now()),
+    env.ORG_DB.prepare('DELETE FROM security_sessions WHERE expires_at<?').bind(
+      Date.now(),
+    ),
     env.ORG_DB.prepare(
       'DELETE FROM organizer_sessions WHERE expires_at<?',
     ).bind(Date.now()),

@@ -9,7 +9,7 @@ export const submissionRelationSchema = z
     repositoryId: z.number().int().positive(),
     sourcePr: z.number().int().positive(),
     targetPr: z.number().int().positive(),
-    kind: z.enum(['ALTERNATE', 'DUPLICATE', 'SUPERSEDES']),
+    kind: z.enum(['ALTERNATE', 'DUPLICATE', 'SUPERSEDES', 'DEPENDS_ON']),
     reason: z.string().trim().min(20).max(2000),
     requestId: z.string().uuid(),
   })
@@ -19,7 +19,9 @@ type RelationRow = {
   repository_id: number;
   source_pr: number;
   target_pr: number;
-  kind: 'ALTERNATE' | 'DUPLICATE' | 'SUPERSEDES';
+  kind: 'ALTERNATE' | 'DUPLICATE' | 'SUPERSEDES' | 'DEPENDS_ON';
+  source_head_sha: string | null;
+  target_head_sha: string | null;
   reason: string;
   actor: string;
   request_id: string;
@@ -35,6 +37,12 @@ function output(row: RelationRow) {
     sourcePr: row.source_pr,
     targetPr: row.target_pr,
     kind: row.kind,
+    sourceHead: row.source_head_sha,
+    targetHead: row.target_head_sha,
+    evaluationPolicy:
+      row.kind === 'DEPENDS_ON'
+        ? 'INDEPENDENT_FROZEN_BASELINE_NO_DEPENDENCY_CREDIT'
+        : 'INDEPENDENT_ATTEMPTS',
     reason: row.reason,
     actor: row.actor,
     requestId: row.request_id,
@@ -71,11 +79,11 @@ export async function createSubmissionRelation(
       .prepare(
         `WITH RECURSIVE reachable(pr) AS (
  SELECT ? UNION SELECT r.target_pr FROM submission_relations r JOIN reachable p ON r.source_pr=p.pr
- WHERE r.repository_id=? AND r.kind='SUPERSEDES'
+ WHERE r.repository_id=? AND r.kind=?
 )
 INSERT OR IGNORE INTO submission_relations
- (id,repository_id,source_pr,target_pr,kind,reason,actor,request_id,request_hash,team_id,issue_numbers)
-SELECT ?,s.repository_id,s.pr_number,t.pr_number,?,?,?,?,?,s.team_id,
+ (id,repository_id,source_pr,target_pr,kind,reason,actor,request_id,request_hash,team_id,source_head_sha,target_head_sha,issue_numbers)
+SELECT ?,s.repository_id,s.pr_number,t.pr_number,?,?,?,?,?,s.team_id,s.head_sha,t.head_sha,
  (SELECT json_group_array(issue) FROM (
   SELECT DISTINCT a.value AS issue FROM json_each(s.issue_numbers) a
   JOIN json_each(t.issue_numbers) b ON b.value=a.value
@@ -90,12 +98,13 @@ WHERE s.repository_id=? AND s.pr_number=? AND t.pr_number=?
   AND (r.source_pr=s.pr_number OR r.target_pr=s.pr_number))<20
  AND (SELECT count(*) FROM submission_relations r WHERE r.repository_id=t.repository_id
   AND (r.source_pr=t.pr_number OR r.target_pr=t.pr_number))<20
- AND (?<>'SUPERSEDES' OR NOT EXISTS(SELECT 1 FROM reachable WHERE pr=?))
+ AND (? NOT IN('SUPERSEDES','DEPENDS_ON') OR NOT EXISTS(SELECT 1 FROM reachable WHERE pr=?))
  AND NOT EXISTS(SELECT 1 FROM submission_relations WHERE request_id=?)`,
       )
       .bind(
         input.targetPr,
         input.repositoryId,
+        input.kind,
         crypto.randomUUID(),
         input.kind,
         reason,

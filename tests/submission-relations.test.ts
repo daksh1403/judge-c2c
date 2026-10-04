@@ -11,7 +11,7 @@ function fixture() {
   const sql = new DatabaseSync(':memory:');
   sql.exec('PRAGMA foreign_keys=ON');
   sql.exec(
-    'CREATE TABLE submissions(repository_id INTEGER,pr_number INTEGER,status TEXT,team_id TEXT,issue_numbers TEXT,author_id INTEGER,PRIMARY KEY(repository_id,pr_number))',
+    'CREATE TABLE submissions(repository_id INTEGER,pr_number INTEGER,status TEXT,team_id TEXT,issue_numbers TEXT,author_id INTEGER,head_sha TEXT,PRIMARY KEY(repository_id,pr_number))',
   );
   sql.exec(
     'CREATE TABLE audit(id INTEGER PRIMARY KEY,action TEXT,entity TEXT,actor TEXT,changes TEXT)',
@@ -19,10 +19,20 @@ function fixture() {
   sql.exec('CREATE TABLE evaluations(id TEXT PRIMARY KEY,state TEXT)');
   sql.exec("INSERT INTO evaluations VALUES('existing-run','COMPLETED')");
   sql.exec(readFileSync('migrations/0015_submission_relations.sql', 'utf8'));
+  sql.exec(
+    readFileSync('migrations/0019_stacked_submission_relations.sql', 'utf8'),
+  );
   for (const pr of [1, 2, 3])
     sql
-      .prepare('INSERT INTO submissions VALUES(1,?,?,?,?,?)')
-      .run(pr, pr === 2 ? 'CLOSED' : 'VALID', 'team-1', '[10,20]', pr);
+      .prepare('INSERT INTO submissions VALUES(1,?,?,?,?,?,?)')
+      .run(
+        pr,
+        pr === 2 ? 'CLOSED' : 'VALID',
+        'team-1',
+        '[10,20]',
+        pr,
+        String(pr).repeat(40),
+      );
   let beforeBatch: (() => void) | undefined;
   const DB = {
     prepare(query: string) {
@@ -79,7 +89,7 @@ function fixture() {
 function input(
   sourcePr = 1,
   targetPr = 2,
-  kind: 'ALTERNATE' | 'DUPLICATE' | 'SUPERSEDES' = 'ALTERNATE',
+  kind: 'ALTERNATE' | 'DUPLICATE' | 'SUPERSEDES' | 'DEPENDS_ON' = 'ALTERNATE',
 ) {
   return {
     repositoryId: 1,
@@ -293,5 +303,48 @@ it('rolls the relation back if its audit cannot be recorded', async () => {
     createSubmissionRelation(f.env, 'organizer', input()),
   ).rejects.toThrow(/audit unavailable/);
   expect(await listSubmissionRelations(f.db, 1, 1)).toHaveLength(0);
+  f.sql.close();
+});
+
+it('pins stacked dependencies without inherited credit and rejects transitive dependency cycles', async () => {
+  const f = fixture();
+  const first = await createSubmissionRelation(
+    f.env,
+    'organizer',
+    input(1, 2, 'DEPENDS_ON'),
+  );
+  expect(first.status).toBe(201);
+  expect(first.body).toMatchObject({
+    sourceHead: '1'.repeat(40),
+    targetHead: '2'.repeat(40),
+    evaluationPolicy: 'INDEPENDENT_FROZEN_BASELINE_NO_DEPENDENCY_CREDIT',
+  });
+  f.sql
+    .prepare('UPDATE submissions SET head_sha=? WHERE pr_number=2')
+    .run('a'.repeat(40));
+  expect((await listSubmissionRelations(f.db, 1, 1))[0]!.targetHead).toBe(
+    '2'.repeat(40),
+  );
+  expect(
+    (
+      await createSubmissionRelation(
+        f.env,
+        'organizer',
+        input(2, 3, 'DEPENDS_ON'),
+      )
+    ).status,
+  ).toBe(201);
+  expect(
+    (
+      await createSubmissionRelation(
+        f.env,
+        'organizer',
+        input(3, 1, 'DEPENDS_ON'),
+      )
+    ).status,
+  ).toBe(409);
+  expect(f.sql.prepare('SELECT state FROM evaluations').get()?.state).toBe(
+    'COMPLETED',
+  );
   f.sql.close();
 });

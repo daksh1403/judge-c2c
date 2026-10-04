@@ -1,3 +1,10 @@
+import { discoverAdditionalContributions } from './additional-contributions';
+import { enrichEngineeringReview } from './engineering-review';
+import { repositoryIndex } from './repository-intelligence';
+import {
+  captureRunMeasurements,
+  recordRunMeasurement,
+} from './run-measurements';
 import { captureRunArtifacts } from './artifact-store';
 import {
   acquireReviewer,
@@ -133,12 +140,22 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
             environment: c.execution.environment,
             toolVersion: 'judge-c2c-0.1.1',
           };
+          const indexed = await repositoryIndex(
+            this.env.DB,
+            c.repository.id,
+            c.baseline,
+            run.head_sha,
+            result,
+          );
+          result.repositoryIntelligence = indexed.index;
+          result.repositoryIndexCache = indexed.cache;
           const size = canonical(result).length;
           if (size > 750_000) throw new Error('CONTEXT_LIMIT');
           // Never persist raw source credentials. Source assertions run on the in-memory data;
           // stored context is redacted and includes raw hashes for audit without secret values.
           const evidence = objective(c, result);
-          if (c.analysis?.dependencyAudit === 'OSV_NPM_V1')
+          if (c.analysis?.dependencyAudit === 'OSV_NPM_V1') {
+            const scanStarted = Date.now();
             evidence.push(
               ...(await dependencyAudit(
                 {
@@ -151,6 +168,13 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
                 },
               )),
             );
+            await recordRunMeasurement(
+              this.env.DB,
+              id,
+              'check.scan.durationMs',
+              Date.now() - scanStarted,
+            ).catch(() => undefined);
+          }
           const stored = redact(
             canonical({
               ...result,
@@ -221,6 +245,12 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
               error instanceof Error && /^[A-Z_0-9]+$/.test(error.message)
                 ? error.message
                 : 'RUNNER_UNAVAILABLE';
+            await recordRunMeasurement(
+              this.env.DB,
+              id,
+              'runner.failure',
+              1,
+            ).catch(() => undefined);
             evidence.push({
               id: 'runner-stage',
               kind: 'execution',
@@ -282,7 +312,20 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
               "UPDATE evaluations SET report=?,ai_status=? WHERE id=? AND state='REVIEWING'",
             )
               .bind(
-                redact(canonical({ ...result.review, aiTrace: result.trace })),
+                redact(
+                  canonical({
+                    ...result.review,
+                    ...enrichEngineeringReview(
+                      parseContract(run),
+                      evidence,
+                      result.review,
+                      result.status === 'COMPLETED'
+                        ? 'AI_ASSESSMENT'
+                        : 'DETERMINISTIC_POLICY',
+                    ),
+                    aiTrace: result.trace,
+                  }),
+                ),
                 result.status,
                 id,
               )
@@ -304,6 +347,9 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           'Evidence-backed report; inspect execution availability per criterion',
         );
       });
+      await step.do('discover-additional-contributions', () =>
+        discoverAdditionalContributions(this.env, id),
+      );
     } catch (error) {
       const run = await getRun(this.env, id);
       const code =
@@ -336,6 +382,9 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           .run();
       }
     });
+    await step.do('operational-measurements', () =>
+      captureRunMeasurements(this.env.DB, id).catch(() => undefined),
+    );
     await step.do('assignment-progress', () =>
       updateAssignmentProgress(this.env, id),
     );

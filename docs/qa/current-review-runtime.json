@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-04T03:06:04.033Z",
+  "at": "2026-10-04T07:11:08.194Z",
   "mode": "REAL_REVIEW_API",
   "origin": "https://feat-evaluation-completeness-judge-c2c.dakshx.workers.dev",
   "status": 200,
@@ -40,19 +40,206 @@
     "retentionDays": 7,
     "buckets": [
       {
-        "bucketUtcMinute": 1791083160000,
-        "metric": "github.latencyMs",
-        "count": 2,
-        "sum": 603,
-        "max": 302
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
       },
       {
-        "bucketUtcMinute": 1791083160000,
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.latencyMs",
+        "count": 25,
+        "sum": 12846,
+        "max": 1294
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "github.request",
+        "count": 25,
+        "sum": 25,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 511,
+        "max": 511
+      },
+      {
+        "bucketUtcMinute": 1791097320000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1116,
+        "max": 651
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
         "metric": "github.request",
         "count": 2,
         "sum": 2,
         "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 995,
+        "max": 504
+      },
+      {
+        "bucketUtcMinute": 1791097440000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097560000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 758,
+        "max": 426
+      },
+      {
+        "bucketUtcMinute": 1791097560000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.error",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.latencyMs",
+        "count": 23,
+        "sum": 10990,
+        "max": 952
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "github.request",
+        "count": 23,
+        "sum": 23,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "webhook.latencyMs",
+        "count": 1,
+        "sum": 485,
+        "max": 485
+      },
+      {
+        "bucketUtcMinute": 1791097740000,
+        "metric": "webhook.request",
+        "count": 1,
+        "sum": 1,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 1081,
+        "max": 659
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "webhook.latencyMs",
+        "count": 2,
+        "sum": 965,
+        "max": 484
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "webhook.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097860000,
+        "metric": "github.latencyMs",
+        "count": 2,
+        "sum": 684,
+        "max": 346
+      },
+      {
+        "bucketUtcMinute": 1791097860000,
+        "metric": "github.request",
+        "count": 2,
+        "sum": 2,
+        "max": 1
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.durationMs",
+        "count": 1,
+        "sum": 54331,
+        "max": 54331
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.inputTokens",
+        "count": 1,
+        "sum": 11034,
+        "max": 11034
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.outputTokens",
+        "count": 1,
+        "sum": 1855,
+        "max": 1855
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.retries",
+        "count": 1,
+        "sum": 0,
+        "max": 0
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "ai.toolCalls",
+        "count": 1,
+        "sum": 4,
+        "max": 4
+      },
+      {
+        "bucketUtcMinute": 1791097800000,
+        "metric": "evaluation.durationMs",
+        "count": 1,
+        "sum": 88000,
+        "max": 88000
       }
+    ],
+    "unavailable": [
+      "actual CPU/memory/disk usage",
+      "provider cost without authoritative pricing",
+      "runner process startup"
     ]
   },
   "pr7": {
@@ -73,9 +260,27 @@
   },
   "pr8": {
     "status": 200,
-    "latestRun": "b3eaac3b15c204d3563a62320e017e7308432c6d1a0dc7ef375588efa1b5288e",
+    "latestRun": "438884fcc16aa081f92273e4a70a6be076cf7047677c4f53e69874507a91fcce",
     "head": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
     "evaluations": [
+      {
+        "id": "438884fcc16aa081f92273e4a70a6be076cf7047677c4f53e69874507a91fcce",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:09:28"
+      },
+      {
+        "id": "1ddbf090fefbf03f367dcc0872402fdc4b86bfd9afaa9b6d5e4561b30915bb50",
+        "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 07:02:37"
+      },
       {
         "id": "b737307fbaa947ac85f3397259add4f22c67e4666c346c7a6c438f2de637af69",
         "head_sha": "4b7fd9245a5c2c615797a864455dc1ca5fda9291",
@@ -116,9 +321,27 @@
   },
   "pr9": {
     "status": 200,
-    "latestRun": "58021d357c69ab5a6d0a718ddcf2aa4f05ef040ba6304e3a5feadbbf7144ecf8",
+    "latestRun": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
     "head": "628436f51c897930e2c902c2051c185259ef95c8",
     "evaluations": [
+      {
+        "id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "COMPLETED",
+        "created_at": "2026-10-04 03:27:31"
+      },
+      {
+        "id": "83265316e53fd6a2eaea434708aeb45f030941b6e80c1bf9dc928abfc7e24675",
+        "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",
+        "baseline_sha": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+        "contract_hash": "ad08e7d0b5772e69e717040a1662ed347f52866448f22219aa37abe9500ffd73",
+        "state": "COMPLETED",
+        "ai_status": "SKIPPED_CONTEXT_LIMIT",
+        "created_at": "2026-10-04 03:25:35"
+      },
       {
         "id": "41b69d99d1d9c93957ae3ff6176e8b0482b744b0e0cfca1cad31af9e8314a668",
         "head_sha": "628436f51c897930e2c902c2051c185259ef95c8",

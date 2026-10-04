@@ -84,3 +84,38 @@ export function groundReview(
     },
   };
 }
+
+/** Missing model criterion echoes can be recovered only from deterministic facts.
+ * Existing model entries still pass full validation; contradictions are rejected. */
+export function completeObjectiveAssessments(
+  value: unknown,
+  contract: Contract,
+  evidence: Evidence[],
+) {
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    !Array.isArray((value as { assessments?: unknown }).assessments)
+  )
+    return { value, filledCriterionIds: [] as string[] };
+  const input = value as { assessments: { criterionId?: unknown }[] };
+  const present = new Set(input.assessments.map((a) => a?.criterionId));
+  const missing = requirementOutcomes(contract, evidence)
+    .flatMap((r) => r.criteria)
+    .filter((c) => !present.has(c.criterionId));
+  return {
+    value: {
+      ...value,
+      assessments: [
+        ...input.assessments,
+        ...missing.map((c) => ({
+          criterionId: c.criterionId,
+          status: c.status,
+          explanation: c.reason,
+          evidenceIds: c.evidenceIds,
+        })),
+      ],
+    },
+    filledCriterionIds: missing.map((c) => c.criterionId),
+  };
+}

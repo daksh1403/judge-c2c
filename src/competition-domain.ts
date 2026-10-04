@@ -187,6 +187,9 @@ export const reviewIssueSchema = z
       .enum(['critical', 'high', 'medium', 'low', 'info'])
       .nullable()
       .optional(),
+    suppressedLabels: z.array(z.string().min(1).max(100)).max(100).optional(),
+    preservedLabels: z.array(z.string().min(1).max(100)).max(100).optional(),
+    clarification: z.string().trim().min(10).max(2000).optional(),
     canonicalNumber: z.number().int().positive().optional(),
     recognition: z.string().min(10).max(1000).optional(),
     reason: z.string().trim().min(10).max(1000),

@@ -193,6 +193,19 @@ export async function reviewIssue(
   )
     throw new Error('TYPE_NOT_IN_TAXONOMY');
   if (
+    [...(data.suppressedLabels ?? []), ...(data.preservedLabels ?? [])].some(
+      (name) => !settings.taxonomy.some((label) => label.name === name),
+    )
+  )
+    throw new Error('LABEL_NOT_IN_TAXONOMY');
+  const previousOverrides = JSON.parse(before.overrides);
+  const suppressedLabels: string[] =
+    data.suppressedLabels ?? previousOverrides.suppressedLabels ?? [];
+  const preservedLabels: string[] =
+    data.preservedLabels ?? previousOverrides.humanLabels ?? [];
+  if (suppressedLabels.some((name) => preservedLabels.includes(name)))
+    throw new Error('CONFLICTING_LABEL_OVERRIDE');
+  if (
     data.reviewStatus === 'DUPLICATE' &&
     (!data.canonicalNumber ||
       data.canonicalNumber === number ||
@@ -210,12 +223,18 @@ export async function reviewIssue(
   )
     throw new Error('RECOGNITION_NOT_ALLOWED');
   const override = {
-    ...JSON.parse(before.overrides),
+    ...previousOverrides,
     ...Object.fromEntries(
       ['type', 'priority', 'difficulty', 'severity']
         .filter((k) => k in data)
         .map((k) => [k, data[k as keyof typeof data]]),
     ),
+    ...(data.suppressedLabels
+      ? { suppressedLabels: [...new Set(data.suppressedLabels)] }
+      : {}),
+    ...(data.preservedLabels
+      ? { humanLabels: [...new Set(data.preservedLabels)] }
+      : {}),
     provenance: 'organizer',
     overrideActor: actor,
   };

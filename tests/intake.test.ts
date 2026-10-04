@@ -541,3 +541,123 @@ it('does not acknowledge a signed event during database outage and safely retrie
       .first())!.n,
   ).toBe(1);
 });
+
+it('retains twelve submissions and authoritative latest heads during a signed 48-event burst with dispatch outage and recovery', async () => {
+  const real = env.EVALUATOR;
+  const deferred = vi.spyOn(console, 'error').mockImplementation(() => {});
+  env.EVALUATOR = {
+    create: async () => {
+      throw Error('fixture dispatch outage');
+    },
+    get: async () => {
+      throw Error('fixture dispatch outage');
+    },
+  } as unknown as Env['EVALUATOR'];
+  const originalHash = await digest(canonical(demoContract));
+  const deliveries: string[] = [];
+  const requests: Promise<Request>[] = [];
+  try {
+    for (let team = 0; team < 12; team++) {
+      const prNumber = 100 + team;
+      const assigned = await api(
+        new Request('https://test/api/assignments', {
+          method: 'POST',
+          headers: { authorization: 'Bearer ' + admin },
+          body: canonical({
+            repositoryId: 1,
+            prNumber,
+            teamId: 'burst-' + team,
+            teamName: 'Burst team ' + team,
+            issueNumbers: [12],
+            contractHash: originalHash,
+          }),
+        }),
+        env,
+      );
+      expect(assigned.status).toBe(201);
+      // Reverse arrival timestamps model delayed delivery, not GitHub truth changing.
+      for (let revision = 3; revision >= 0; revision--) {
+        const head = (team * 4 + revision + 100).toString(16).padStart(40, '0');
+        const updated = `2026-10-03T12:00:0${revision}Z`;
+        const delivery = crypto.randomUUID();
+        deliveries.push(delivery);
+        requests.push(
+          signed(head, delivery, updated, {
+            action: 'synchronize',
+            pull_request: {
+              number: prNumber,
+              head: { sha: head },
+              base: { repo: { id: 1 } },
+              updated_at: updated,
+              state: 'open',
+            },
+          }),
+        );
+      }
+    }
+    const responses = await Promise.all(
+      (await Promise.all(requests)).map((request) =>
+        webhook(request, env, ctx),
+      ),
+    );
+    expect(responses.every((response) => response.status === 202)).toBe(true);
+    await Promise.allSettled(pending);
+    const submissions = (
+      await env.DB.prepare(
+        'SELECT s.pr_number,s.head_sha,s.latest_run_id,e.state FROM submissions s JOIN evaluations e ON e.id=s.latest_run_id WHERE s.pr_number BETWEEN 100 AND 111 ORDER BY s.pr_number',
+      ).all<{
+        pr_number: number;
+        head_sha: string;
+        latest_run_id: string;
+        state: string;
+      }>()
+    ).results;
+    expect(submissions).toHaveLength(12);
+    for (const submission of submissions) {
+      expect(submission.head_sha).toBe(
+        ((submission.pr_number - 100) * 4 + 103).toString(16).padStart(40, '0'),
+      );
+      expect(submission.state).toBe('QUEUED');
+    }
+    const history = (
+      await env.DB.prepare(
+        'SELECT state,count(*) AS n FROM evaluations WHERE pr_number BETWEEN 100 AND 111 GROUP BY state',
+      ).all<{ state: string; n: number }>()
+    ).results;
+    expect(history).toEqual(
+      expect.arrayContaining([
+        { state: 'QUEUED', n: 12 },
+        { state: 'SUPERSEDED', n: 36 },
+      ]),
+    );
+    expect(
+      (await env.DB.prepare(
+        'SELECT count(*) AS n FROM deliveries WHERE id IN (SELECT value FROM json_each(?))',
+      )
+        .bind(JSON.stringify(deliveries))
+        .first<{ n: number }>())!.n,
+    ).toBe(48);
+    expect(
+      (await env.DB.prepare(
+        "SELECT count(*) AS n FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE e.pr_number BETWEEN 100 AND 111 AND e.state='QUEUED' AND o.dispatched_at IS NULL",
+      ).first<{ n: number }>())!.n,
+    ).toBe(12);
+    env.EVALUATOR = real;
+    for (let round = 0; round < 4; round++) await reconcile(env);
+    expect(
+      (await env.DB.prepare(
+        "SELECT count(*) AS n FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE e.pr_number BETWEEN 100 AND 111 AND e.state='QUEUED' AND o.dispatched_at IS NULL",
+      ).first<{ n: number }>())!.n,
+    ).toBe(0);
+    const dispatched = await Promise.all(
+      submissions.map(async (s) => {
+        const workflow = await env.EVALUATOR.get(s.latest_run_id);
+        return workflow.status();
+      }),
+    );
+    expect(dispatched.every((status) => status.status === 'queued')).toBe(true);
+  } finally {
+    env.EVALUATOR = real;
+    deferred.mockRestore();
+  }
+}, 30000);

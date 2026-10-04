@@ -1,8 +1,10 @@
 import { canonical, digest } from './domain';
 import { redact } from './security';
 import type { Env } from './env';
+import { checkResultSchema, type RunnerResult } from './runner';
 export const MAX_ARTIFACT_BYTES = 4 * 1024 * 1024;
 export const MAX_RUN_ARTIFACT_BYTES = 20 * 1024 * 1024;
+const MAX_CAPTURE_ARTIFACTS = 128;
 const MAX_ATTEMPTS = 5;
 const UPLOAD_LEASE_MS = 5 * 60_000;
 export type ArtifactMetadata = {
@@ -294,29 +296,153 @@ export async function captureRunArtifacts(env: Env, runId: string) {
   const entries: [string, string, string][] = [];
   for (const key of ['evidence', 'context', 'report'] as const)
     if (run[key]) entries.push([key, run[key]!, 'application/json']);
+  const failures: { kind: string; code: string }[] = [];
+  // Diff context is data, never rendered/executed as code. Preserve uncertainty
+  // on omitted or truncated patches instead of inventing a complete diff.
+  if (run.context)
+    try {
+      if (encoder.encode(run.context).length > MAX_ARTIFACT_BYTES)
+        throw Error('limit');
+      const context = JSON.parse(run.context);
+      if (!Array.isArray(context.files) || context.files.length > 100)
+        throw Error('shape');
+      let budget = 1_000_000;
+      const files = context.files.map((file: Record<string, unknown>) => {
+        if (typeof file.filename !== 'string' || file.filename.length > 240)
+          throw Error('path');
+        const original = typeof file.patch === 'string' ? file.patch : null;
+        const patch =
+          original === null
+            ? null
+            : original.slice(0, Math.max(0, Math.min(16000, budget)));
+        budget -= patch?.length ?? 0;
+        return {
+          filename: file.filename,
+          previousFilename:
+            typeof file.previous_filename === 'string'
+              ? file.previous_filename.slice(0, 240)
+              : null,
+          status:
+            typeof file.status === 'string'
+              ? file.status.slice(0, 40)
+              : 'unknown',
+          patch,
+          patchTruncated:
+            file.patchTruncated === true ||
+            original === null ||
+            original.length !== patch?.length,
+        };
+      });
+      entries.push([
+        'diff',
+        canonical({
+          schemaVersion: 1,
+          runId,
+          baseline: run.baseline_sha,
+          complete: files.every(
+            (f: { patchTruncated: boolean }) => !f.patchTruncated,
+          ),
+          files,
+          scope:
+            'Captured baseline-to-head changed-path context. Missing or truncated patches are explicitly incomplete; this is not functional evidence.',
+        }),
+        'application/json',
+      ]);
+    } catch {
+      failures.push({ kind: 'diff', code: 'ARTIFACT_DIFF_CONTEXT_MALFORMED' });
+    }
   const execution = await env.DB.prepare(
-    'SELECT commit_sha,result FROM execution_results WHERE run_id=? ORDER BY created_at',
+    'SELECT commit_sha,result FROM execution_results WHERE run_id=? ORDER BY created_at LIMIT 17',
   )
     .bind(runId)
     .all<{ commit_sha: string; result: string }>();
-  const failures: { kind: string; code: string }[] = [];
   let n = 0;
-  for (const row of execution.results) {
+  if (execution.results.length > 16)
+    failures.push({ kind: 'capture', code: 'ARTIFACT_EXECUTION_COUNT_LIMIT' });
+  for (const row of execution.results.slice(0, 16)) {
     const side =
       row.commit_sha === run.baseline_sha ? 'baseline' : 'submission';
     entries.push([`execution-${side}-${n}`, row.result, 'application/json']);
     try {
-      const result = JSON.parse(row.result) as {
-        checks: { id: string; kind: string; stdout: string; stderr: string }[];
-      };
+      if (encoder.encode(row.result).length > MAX_ARTIFACT_BYTES)
+        throw Error('limit');
+      const result = JSON.parse(row.result);
+      if (
+        !Array.isArray(result.checks) ||
+        result.checks.length > 42 ||
+        (result.commit && result.commit !== row.commit_sha)
+      )
+        throw Error('shape');
+      const checks: RunnerResult['checks'] = result.checks.map(
+        (check: unknown) => checkResultSchema.parse(check),
+      );
       for (const stream of ['stdout', 'stderr'] as const)
         entries.push([
           `${stream}-${side}-${n}`,
-          result.checks
+          checks
             .map((c) => `[${c.kind}:${c.id}]\n${c[stream] ?? ''}`)
             .join('\n'),
           'text/plain',
         ]);
+      for (const [index, check] of checks.entries()) {
+        let category = 'check';
+        const executed =
+          check.status !== 'UNVERIFIED' && check.exitCode !== null;
+        if (executed && ['test', 'integration'].includes(check.kind))
+          category = 'tests';
+        if (executed && check.kind === 'security') category = 'security';
+        // An empty coverage command produces no coverage report. Its diagnostic
+        // still exists, but cannot satisfy a required coverage artifact.
+        if (executed && check.kind === 'coverage' && check.stdout.trim())
+          category = 'coverage';
+        if (check.kind === 'benchmark' && check.status !== 'UNVERIFIED') {
+          try {
+            const measured = JSON.parse(check.stdout);
+            if (
+              measured.protocol === 'http-latency-v1' &&
+              Array.isArray(measured.samplesMs) &&
+              measured.samplesMs.length >= 10 &&
+              measured.samplesMs.length <= 30 &&
+              measured.samplesMs.every(
+                (v: unknown) =>
+                  typeof v === 'number' && Number.isFinite(v) && v >= 0,
+              ) &&
+              typeof measured.p95Ms === 'number' &&
+              Number.isFinite(measured.p95Ms)
+            )
+              category = 'benchmark';
+          } catch {
+            /* Incomplete benchmark stays diagnostic, not a measured report. */
+          }
+        }
+        entries.push([
+          `${category}-${side}-${n}-${index}`,
+          canonical({
+            schemaVersion: 1,
+            runId,
+            commit: row.commit_sha,
+            side,
+            executionIndex: n,
+            checkIndex: index,
+            requestHash: result.requestHash ?? null,
+            evaluatorVersion: result.version ?? null,
+            image: result.image ?? null,
+            runtime: result.runtime ?? null,
+            startedAt: result.startedAt ?? null,
+            finishedAt: result.finishedAt ?? null,
+            check,
+            provenance:
+              check.kind === 'benchmark' || check.kind === 'acceptance'
+                ? 'Trusted runner observation'
+                : 'Configured repository command; participant output is hostile data and supplemental evidence',
+            scope:
+              category === 'coverage'
+                ? 'Captured coverage-command output; no coverage percentage or adequacy is inferred.'
+                : 'Captured check record; artifact availability is not proof of criterion correctness.',
+          }),
+          'application/json',
+        ]);
+      }
     } catch {
       failures.push({
         kind: `execution-${side}-${n}`,
@@ -325,9 +451,9 @@ export async function captureRunArtifacts(env: Env, runId: string) {
     }
     n++;
   }
-  if (entries.length > 30)
+  if (entries.length > MAX_CAPTURE_ARTIFACTS)
     failures.push({ kind: 'capture', code: 'ARTIFACT_COUNT_LIMIT' });
-  for (const [kind, text, type] of entries.slice(0, 30)) {
+  for (const [kind, text, type] of entries.slice(0, MAX_CAPTURE_ARTIFACTS)) {
     try {
       await storeArtifact(env, runId, kind, text, type);
     } catch (error) {

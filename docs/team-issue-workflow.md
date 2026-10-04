@@ -38,11 +38,18 @@ GitHub closure and labels never establish successful challenge completion or cre
   inbox; reconciliation retries and leases survive network/process failure. Label and
   assignment synchronization use an outbox. Automation recognizes its own label events;
   human labels/overrides are not repeatedly replaced.
+- Organizer issue review: controlled taxonomy labels can be suppressed or preserved
+  from the issue detail form. Blank override fields keep the current decision; explicit
+  clear controls store null instead of reusing participant inference. Conflicting
+  suppression/preservation decisions are rejected. Review reasons and organizer
+  clarifications appear in the append-only issue review history. Clarifications do
+  not rewrite frozen contracts or assignment versions, and are not automatically
+  posted as public GitHub comments.
 - Reporting: the overview includes teams with no PR, linked team/issue/submission
   detail and current-versus-historical evaluations. Completion remains an audited
   organizer decision; acceptance eligibility derives from mandatory evidence.
 - Security: participant issue text is hostile. Security reports are routed to protected
-  organizer review and GitHub private vulnerability reporting; no exploit details are
+  organizer/security confidential intake and GitHub private vulnerability reporting; no exploit details are
   republished. Labeling needs explicit GitHub App Issues-write permission; permission
   absence is visible and retries do not pretend synchronization succeeded.
 - Approach: structured problem_understanding, approach_summary, solution_design,

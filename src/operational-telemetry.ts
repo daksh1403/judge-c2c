@@ -83,6 +83,16 @@ export async function expireOperationalMetrics(
   now = Date.now(),
 ): Promise<void> {
   if (!Number.isSafeInteger(now) || now < 0) return;
+  try {
+    await db
+      .prepare('DELETE FROM run_measurements WHERE bucketUtcMinute<=?')
+      .bind(
+        Math.floor(now / 60_000) * 60_000 - OPERATIONAL_METRICS_RETENTION_MS,
+      )
+      .run();
+  } catch {
+    /* Older deployments or telemetry outages must not block maintenance. */
+  }
   await db
     .prepare('DELETE FROM operational_metrics WHERE bucketUtcMinute<=?')
     .bind(Math.floor(now / 60_000) * 60_000 - OPERATIONAL_METRICS_RETENTION_MS)

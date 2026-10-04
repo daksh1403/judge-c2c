@@ -72,6 +72,9 @@ export function cacheableResult(
     result.checks.length > 0 &&
     result.checks.every(
       (check) =>
+        // A fresh benchmark must collect fresh timings. Only immutable setup
+        // artefacts in the image are reusable, never historical measurements.
+        check.kind !== 'benchmark' &&
         check.status !== 'UNVERIFIED' &&
         check.durationMs <= timeoutSeconds * 1000,
     ) &&

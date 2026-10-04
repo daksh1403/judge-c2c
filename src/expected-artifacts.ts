@@ -29,7 +29,9 @@ function matches(kind: ExpectedArtifact['kind'], actual: string) {
   return (
     actual === kind ||
     ((kind === 'stdout' || kind === 'stderr') &&
-      new RegExp('^' + kind + '-submission-[0-9]+$').test(actual))
+      new RegExp('^' + kind + '-submission-[0-9]+$').test(actual)) ||
+    (['tests', 'coverage', 'security', 'benchmark'].includes(kind) &&
+      new RegExp('^' + kind + '-submission-[0-9]+-[0-9]+$').test(actual))
   );
 }
 

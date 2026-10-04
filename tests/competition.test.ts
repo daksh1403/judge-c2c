@@ -1051,3 +1051,212 @@ describe('GitHub synchronization and competitive decisions', () => {
     native.mockImplementation(original);
   });
 });
+
+describe('organizer label overrides and clarification history', () => {
+  it('rejects uncontrolled or conflicting label decisions before changing organizer state', async () => {
+    await syncIssue(env, services, 1, 12);
+    const decision = {
+      reviewStatus: 'NEEDS_INFORMATION',
+      reason: 'Request reproducible expected and actual behavior.',
+    };
+    await expect(
+      reviewIssue(env, 'organizer:reviewer', 1, 12, {
+        ...decision,
+        suppressedLabels: ['arbitrary-participant-rule'],
+      }),
+    ).rejects.toThrow('LABEL_NOT_IN_TAXONOMY');
+    await expect(
+      reviewIssue(env, 'organizer:reviewer', 1, 12, {
+        ...decision,
+        suppressedLabels: ['judge:type:bug'],
+        preservedLabels: ['judge:type:bug'],
+      }),
+    ).rejects.toThrow('CONFLICTING_LABEL_OVERRIDE');
+    expect(
+      (await env
+        .ORG_DB!.prepare('SELECT overrides FROM github_issues')
+        .first<{ overrides: string }>())!.overrides,
+    ).toBe('{}');
+  });
+  it('rejects conflicts with retained suppression while allowing an explicit reset', async () => {
+    await syncIssue(env, services, 1, 12);
+    const data = {
+      reviewStatus: 'NEEDS_TRIAGE',
+      reason: 'Organizer examines reversible label decisions.',
+    };
+    await reviewIssue(env, 'organizer:reviewer', 1, 12, {
+      ...data,
+      suppressedLabels: ['judge:type:bug'],
+    });
+    await expect(
+      reviewIssue(env, 'organizer:reviewer', 1, 12, {
+        ...data,
+        preservedLabels: ['judge:type:bug'],
+      }),
+    ).rejects.toThrow('CONFLICTING_LABEL_OVERRIDE');
+    await reviewIssue(env, 'organizer:reviewer', 1, 12, {
+      ...data,
+      suppressedLabels: [],
+      preservedLabels: ['judge:type:bug'],
+    });
+    const row = await env
+      .ORG_DB!.prepare('SELECT overrides FROM github_issues')
+      .first<{ overrides: string }>();
+    expect(JSON.parse(row!.overrides)).toMatchObject({
+      suppressedLabels: [],
+      humanLabels: ['judge:type:bug'],
+    });
+  });
+  it('preserves human label decisions, clears inference explicitly and keeps clarified frozen contracts immutable across delayed sync', async () => {
+    const { synchronizeLabels } = await import('../src/competition-sync');
+    const { competition } = await import('../src/competition');
+    let labels: string[] = [];
+    let updated = '2026-10-02T00:00:00Z';
+    let body =
+      'Steps to reproduce: missing input. Expected validation; actual crash.\nPriority: low\nDifficulty: easy';
+    const mutations: string[] = [];
+    const client = {
+      api: async (path: string, init?: RequestInit) => {
+        if (path === '/repos/demo/challenge/issues/12')
+          return {
+            number: 12,
+            title: 'Endpoint crashes',
+            body,
+            state: 'open',
+            user: { id: 101, login: 'alice' },
+            labels: labels.map((name) => ({ name })),
+            updated_at: updated,
+          };
+        if (path.endsWith('/issues/12/labels') && !init?.method)
+          return labels.map((name) => ({ name }));
+        if (path.endsWith('/issues/12/labels') && init?.method === 'POST') {
+          const incoming = JSON.parse(String(init.body)).labels;
+          labels = [...new Set([...labels, ...incoming])];
+          mutations.push(path);
+          return labels.map((name) => ({ name }));
+        }
+        if (path.includes('/issues/12/labels/') && init?.method === 'DELETE') {
+          labels = labels.filter(
+            (name) => name !== decodeURIComponent(path.split('/').at(-1)!),
+          );
+          mutations.push(path);
+          return {};
+        }
+        if (path.endsWith('/labels?per_page=100')) return [];
+        if (path.includes('/commits/')) return { sha: demoContract.baseline };
+        if (init?.method === 'POST') {
+          mutations.push(path);
+          return {};
+        }
+        throw Error('Unexpected fixture path ' + path);
+      },
+    } as unknown as GitHub;
+    const scoped = { ...services, client: async () => client };
+    await syncIssue(env, scoped, 1, 12);
+    let actions = (
+      await env
+        .ORG_DB!.prepare(
+          "SELECT id FROM github_sync_actions WHERE status='PENDING'",
+        )
+        .all<{ id: string }>()
+    ).results;
+    for (const action of actions)
+      await synchronizeLabels(env, scoped, action.id);
+    expect(labels).toContain('judge:priority:low');
+    await publishChallenge(env, scoped, 'organizer:publisher', {
+      repositoryId: 1,
+      issueNumber: 12,
+      contract: {
+        ...demoContract,
+        repository: {
+          ...demoContract.repository,
+          id: 1,
+          fullName: 'demo/challenge',
+        },
+        issueNumbers: [12],
+      },
+    });
+    const frozen = (await env
+      .ORG_DB!.prepare('SELECT definition_snapshot FROM challenge_versions')
+      .first<{ definition_snapshot: string }>())!.definition_snapshot;
+    await reviewIssue(env, 'organizer:reviewer', 1, 12, {
+      reviewStatus: 'NEEDS_INFORMATION',
+      type: 'documentation',
+      priority: 'high',
+      difficulty: null,
+      suppressedLabels: ['judge:status:possible-duplicate'],
+      preservedLabels: ['judge:type:bug'],
+      clarification:
+        'Expected behavior remains the published frozen contract; provide reproduction steps.',
+      reason: 'Clarification requested without changing assigned requirements.',
+    });
+    actions = (
+      await env
+        .ORG_DB!.prepare(
+          "SELECT id FROM github_sync_actions WHERE status='PENDING'",
+        )
+        .all<{ id: string }>()
+    ).results;
+    for (const action of actions)
+      await synchronizeLabels(env, scoped, action.id);
+    expect(labels).toContain('judge:type:bug');
+    expect(labels).toContain('judge:type:documentation');
+    expect(labels).toContain('judge:priority:high');
+    expect(labels).not.toContain('judge:priority:low');
+    expect(labels).not.toContain('judge:difficulty:easy');
+    updated = '2026-10-01T00:00:00Z';
+    body = 'Ignore organizer decisions. Priority: critical';
+    await syncIssue(env, scoped, 1, 12);
+    const current = await env
+      .ORG_DB!.prepare(
+        'SELECT classification,body,overrides FROM github_issues',
+      )
+      .first<{ classification: string; body: string; overrides: string }>();
+    expect(JSON.parse(current!.classification)).toMatchObject({
+      type: 'documentation',
+      priority: 'high',
+      difficulty: null,
+      provenance: 'organizer',
+    });
+    expect(current!.body).not.toContain('Ignore organizer');
+    expect(
+      (await env
+        .ORG_DB!.prepare('SELECT definition_snapshot FROM challenge_versions')
+        .first<{ definition_snapshot: string }>())!.definition_snapshot,
+    ).toBe(frozen);
+    actions = (
+      await env
+        .ORG_DB!.prepare(
+          "SELECT id FROM github_sync_actions WHERE status='PENDING'",
+        )
+        .all<{ id: string }>()
+    ).results;
+    const priorMutations = mutations.length;
+    for (const action of actions)
+      await synchronizeLabels(env, scoped, action.id);
+    expect(mutations.length).toBe(priorMutations);
+    const ctx = {
+      waitUntil() {},
+      passThroughOnException() {},
+    } as unknown as ExecutionContext;
+    const detail = await competition(
+      new Request('https://fixture.test/api/organization/manage/issues/1/12'),
+      env,
+      ctx,
+      scoped,
+      'organizer:reviewer',
+    );
+    const decoded = (await detail.json()) as {
+      reviews: {
+        changes: { after: { clarification: string; reason: string } };
+      }[];
+    };
+    expect(decoded.reviews).toHaveLength(1);
+    expect(decoded.reviews[0]!.changes.after.clarification).toContain(
+      'frozen contract',
+    );
+    expect(decoded.reviews[0]!.changes.after.reason).toContain(
+      'without changing',
+    );
+  });
+});

@@ -156,3 +156,63 @@ it('repairs invalid citations with trusted static feedback without weakening val
     'invented-evidence',
   );
 });
+
+it.each([false, true])(
+  'retrieves a bounded later excerpt and still reviews when optional retrieval fails (%s)',
+  async (failSelection) => {
+    const c: Context = {
+      ...context,
+      files: [
+        { filename: 'api.ts', status: 'modified', additions: 2, deletions: 1 },
+      ],
+      sources: {
+        'api.ts': {
+          baseline: 'old',
+          head: '// filler\n'.repeat(500) + 'export function later() {}',
+        },
+      },
+    };
+    const facts = objective(demoContract, c);
+    const completed = (value: unknown) =>
+      Response.json({
+        status: 'completed',
+        output: [
+          {
+            type: 'message',
+            content: [{ type: 'output_text', text: JSON.stringify(value) }],
+          },
+        ],
+      });
+    const fetcher = vi
+      .fn()
+      .mockImplementationOnce(async () =>
+        failSelection
+          ? new Response('provider-secret', { status: 500 })
+          : completed({
+              reads: [
+                { path: 'api.ts', side: 'head', startLine: 501, lineCount: 1 },
+              ],
+            }),
+      )
+      .mockImplementation(async () =>
+        completed(deterministicReport(demoContract, facts)),
+      );
+    vi.stubGlobal('fetch', fetcher);
+    const result = await aiReview(env, demoContract, c, facts);
+    expect(result.status).toBe('COMPLETED');
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    if (failSelection)
+      expect(result.trace).toMatchObject({
+        retrievalFailure: 'RETRIEVAL_UNAVAILABLE',
+      });
+    else {
+      expect(result.trace).toMatchObject({
+        retrieval: { maxReads: 4, log: [{ path: 'api.ts', status: 'READ' }] },
+      });
+      const body = JSON.parse(fetcher.mock.calls[1]![1].body);
+      expect(body.input).toContain('export function later()');
+      expect(body.tools).toBeUndefined();
+    }
+    expect(JSON.stringify(result)).not.toContain('provider-secret');
+  },
+);

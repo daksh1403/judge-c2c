@@ -15,6 +15,13 @@ export async function migrate(
     '0013_additional_contributions.sql',
     '0014_operational_telemetry.sql',
     '0015_submission_relations.sql',
+    '0016_repository_context_indexes.sql',
+    '0017_run_measurements.sql',
+    '0018_confidential_security.sql',
+    '0019_stacked_submission_relations.sql',
+    '0020_runner_measurements.sql',
+    '0021_console_identities.sql',
+    '0022_stage_measurements.sql',
   ],
 ) {
   for (const file of files) {

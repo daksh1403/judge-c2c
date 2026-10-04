@@ -1,0 +1,13 @@
+# Current completion checkpoint
+
+The working baseline was frozen on current HEAD `6edcb4552fb70863442906214d1a9cc6db8e657b`: 465 PASS, 213 PARTIAL, 26 NOT_IMPLEMENTED, 5 UNVERIFIED, 2 BLOCKED, 1 FAIL and 2 NOT_APPLICABLE. This session started from current repository/live state, with authenticated GitHub, open PR #6, matching remote head, green quality CI and a successful native Cloudflare Preview.
+
+Focused implementation and validation updated 72 affected entries; previous statuses and notes are retained in `current-workstream-ledger-changes.json`. Requirements were not removed. Production, comprehensive semantic guarantees and absent measurements have not been certified.
+
+Implemented: restricted confidential reports; named/revocable roles and team-scoped read access; immutable PR relationships; advisory source/API inventory with immutable caches; progressive bounded read-only context; isolated offline dependency installation and failures; independent guest checks; change-aware supplemental routing; fresh benchmark setup; operational observations; protected typed artifacts; engineering evidence/provenance; automatic additional-work suggestions requiring human recognition.
+
+Executed: npm check (311 tests at that checkpoint), the complete browser suite (12 initial passes plus two regressions corrected and passing on targeted rerun), real Docker dependency/containment/benchmark rehearsals, a 48-event signed burst and two-worker lease fencing, scanner/storage failure/recovery, deployed judge-role denial and bundle integrity. Subsequent focused tests validate additional changes; final CI verifies the pushed revision.
+
+The original grounding FAIL remains open while live payment calibration runs. Missing AI criterion echoes are recovered only from objective facts. Missing qualitative AI analysis is UNVERIFIED and the stage is NEEDS_REVIEW; contradictory statuses and unknown citations are still rejected. CallMissed budget exhaustion and failed Cloudflare responses remain preserved as separate attempts. Successful older reference/protected-test grounded records are retained, not substituted for current final calibration.
+
+External limitations: two live OSV attempts timed out. The runner remains an organizer-machine Docker VM through an authenticated development tunnel, not provisioned production hostile-code capacity. Production deploy/merge remains disabled. No merge has been performed.

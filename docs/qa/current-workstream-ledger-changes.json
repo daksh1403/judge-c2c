@@ -1,0 +1,437 @@
+{
+  "baselineHead": "6edcb4552fb70863442906214d1a9cc6db8e657b",
+  "changes": [
+    {
+      "id": "09.03",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Security report workflow: Private reporting guidance is provided, but restricted vulnerability ingestion and per-security-role artifact access are not implemented."
+    },
+    {
+      "id": "09.12",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Restricted security handling: Private reporting guidance is provided, but restricted vulnerability ingestion and per-security-role artifact access are not implemented."
+    },
+    {
+      "id": "09.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "No automated exploit disclosure: Automation does not post exploit-body comments; native public issues remain public and private security reporting requires repository-owner setup."
+    },
+    {
+      "id": "44.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Participant scope: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent."
+    },
+    {
+      "id": "44.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Organizer scope: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent."
+    },
+    {
+      "id": "44.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Cross-team isolation: Shared organizer/judge credentials have separate permissions; per-person identities and participant/team-scoped console authorization remain absent."
+    },
+    {
+      "id": "14.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Typed immutable ALTERNATE, DUPLICATE and SUPERSEDES organizer annotations now link same-team, same-repository attempts sharing structured issues; cycle/capacity/idempotency guards and judge display are implemented. Static review and schema smoke passed; concurrent service, organizer authorization and deployed UI behavior remain unexecuted. Stacked dependency policy remains separately missing at 14.05."
+    },
+    {
+      "id": "14.05",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Stacked PR policy: Independent PR attempts are retained, but explicit alternate/superseding/stacked PR relationship types and stacked dependency evaluation are absent."
+    },
+    {
+      "id": "19.09",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Repository index reuse: Baseline execution is rerun for each evaluation; no versioned baseline-check cache or repository index cache is implemented."
+    },
+    {
+      "id": "24.06",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Changed symbols and components: Changed-file/risk metadata exists; a symbol graph and deterministic public API compatibility analyzer are not implemented."
+    },
+    {
+      "id": "24.10",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "API compatibility: Changed-file/risk metadata exists; a symbol graph and deterministic public API compatibility analyzer are not implemented."
+    },
+    {
+      "id": "37.05",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Repository context cache: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented."
+    },
+    {
+      "id": "31.08",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Progressive retrieval: Reviewer receives a bounded preassembled context with no tool access; progressive controlled retrieval tools are not implemented."
+    },
+    {
+      "id": "31.09",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Controlled tools: Reviewer receives a bounded preassembled context with no tool access; progressive controlled retrieval tools are not implemented."
+    },
+    {
+      "id": "20.01",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Controlled dependency installation: Participant dependency installation is deliberately not supported; guest networking is denied and prepared tooling is organizer-controlled."
+    },
+    {
+      "id": "49.10",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Install failure: Participant dependency installation is unsupported, so no install-failure recovery adapter exists."
+    },
+    {
+      "id": "37.04",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Dependency cache: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented."
+    },
+    {
+      "id": "37.11",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Parallel tests lint security type checks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented."
+    },
+    {
+      "id": "37.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Safe independent parallelism: Independent immutable file retrieval is bounded/parallel; objective commands are currently sequential for guest isolation."
+    },
+    {
+      "id": "19.08",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Benchmark executions deliberately bypass the new opt-in execution cache to avoid treating cached timings as a fresh reproducible measurement. A supported benchmark profile and validated safe reuse strategy have not been implemented."
+    },
+    {
+      "id": "32.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Requirement review: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Relevant quality review: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Sensitive security routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Architecture routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Performance routing: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Documentation fast path: Explainable risk flags exist and issue triage uses deterministic rules, but review depth does not dynamically select specialized reviewers or execution plans."
+    },
+    {
+      "id": "32.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Server-owned LIGHT/DEEP model overrides are supported separately for CallMissed and Cloudflare, with existing model fallback, bounded identifiers, recorded routing reason and effective provider-call selection. No model catalog capability or latency/cost reduction is claimed; provider runtime and deployed routing remain unverified."
+    },
+    {
+      "id": "35.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Planning equivalent: Context preparation/risk classification is the planning equivalent; no independently persisted adaptive execution plan exists."
+    },
+    {
+      "id": "37.12",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "A bounded LIGHT contextual-review path is selected for documentation-only changes without functional or runner criteria. All authoritative checks and criteria remain required; this is not a general deterministic execution fast path. Runtime provider/context-budget and deployed behavior remain unverified."
+    },
+    {
+      "id": "37.13",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "DEEP contextual review is selected for sensitive/dependency, architecture/large-change and authoritative benchmark/performance scope, with larger bounded context and optional configured model. No criteria are waived and deterministic execution remains unchanged. Runtime routing and deeper review quality are unverified."
+    },
+    {
+      "id": "37.15",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Changed-file-aware checks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented."
+    },
+    {
+      "id": "37.16",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Server routing metadata and fixed changed-path signals now select DEEP security review and its bounded context. An additional-category allowlist cannot force depth or redefine scope. Real sensitive-change reviewer calibration and deployed review behavior remain unverified."
+    },
+    {
+      "id": "37.17",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Documentation avoids benchmarks: No production evaluation/baseline/dependency/index result cache or adaptive fast/deep execution planner is implemented."
+    },
+    {
+      "id": "50.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Risk routing: Risk flags/schema are tested; adaptive evaluation planning is not implemented."
+    },
+    {
+      "id": "50.12",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Planning: Risk flags/schema are tested; adaptive evaluation planning is not implemented."
+    },
+    {
+      "id": "33.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Source: Findings cite source evidence, but lack dedicated origin and related-requirement fields; relationships require following evidence IDs."
+    },
+    {
+      "id": "33.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Requirement: Findings cite source evidence, but lack dedicated origin and related-requirement fields; relationships require following evidence IDs."
+    },
+    {
+      "id": "04.15",
+      "before": "UNVERIFIED",
+      "after": "PASS",
+      "previousNote": "Fast intake: Work is deferred via waitUntil after inbox insertion, but p95 webhook latency under burst load has not been measured."
+    },
+    {
+      "id": "38.01",
+      "before": "UNVERIFIED",
+      "after": "PASS",
+      "previousNote": "Deadline burst: No event-scale burst or multi-host production capacity rehearsal has been executed."
+    },
+    {
+      "id": "38.06",
+      "before": "UNVERIFIED",
+      "after": "PASS",
+      "previousNote": "Scalable workers: No event-scale burst or multi-host production capacity rehearsal has been executed."
+    },
+    {
+      "id": "49.16",
+      "before": "UNVERIFIED",
+      "after": "PASS",
+      "previousNote": "Scanner fail: The relevant boundaries/failure paths were inspected, but this exact external failure scenario lacks an executed fault-injection test."
+    },
+    {
+      "id": "49.22",
+      "before": "UNVERIFIED",
+      "after": "PASS",
+      "previousNote": "Storage fail: The relevant boundaries/failure paths were inspected, but this exact external failure scenario lacks an executed fault-injection test."
+    },
+    {
+      "id": "08.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Missing labels trigger triage: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified."
+    },
+    {
+      "id": "08.31",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Label provenance: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified."
+    },
+    {
+      "id": "08.32",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Avoid synchronization loops: Tested missing-label synchronization and override authority; historical taxonomy migrations and every delayed-webhook ordering remain unverified."
+    },
+    {
+      "id": "17.12",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Frozen contracts now declare typed required/optional artifact kinds; combined issue contracts preserve declarations, APIs/UI show availability, and ACCEPTED requires readable integrity-checked required artifacts. Metadata availability is not proof of content or participant functionality. Runtime completion/retention/storage-outage and deployed capture scenarios remain unverified."
+    },
+    {
+      "id": "21.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Structured reports: Bounded structured execution records and protected digest bundles work; arbitrary structured reports and large object artifacts are not complete."
+    },
+    {
+      "id": "21.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Artifacts: Bounded structured execution records and protected digest bundles work; arbitrary structured reports and large object artifacts are not complete."
+    },
+    {
+      "id": "39.31",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Artifacts: Protected bounded reproducibility bundle works; large object artifacts are unavailable while R2 remains disabled."
+    },
+    {
+      "id": "46.01",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Large output outside rows: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.02",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Stdout: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.03",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Stderr: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.04",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Test reports: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.05",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Coverage: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Security: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.07",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Benchmarks: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.08",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Diffs: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Generated reports: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.10",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Metadata: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "46.11",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Checksums: Bounded database execution records and protected digest bundles are available; general stdout/report/coverage/security/benchmark/diff object artifacts need R2 provisioning and retention/integrity drills."
+    },
+    {
+      "id": "47.09",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Artifacts: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete."
+    },
+    {
+      "id": "47.06",
+      "before": "PARTIAL",
+      "after": "PASS",
+      "previousNote": "Tool versions: Runtime/image/evaluator identities and bounded records are retained; full per-tool version catalog and large artifacts are incomplete."
+    },
+    {
+      "id": "48.08",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Worker startup: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.09",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Worker failure: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.10",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Dependency install: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.11",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Test duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.12",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Scan duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.13",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Benchmark duration: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.16",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "AI tools: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.18",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Cache hits: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.21",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PASS",
+      "previousNote": "Resources: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    },
+    {
+      "id": "48.17",
+      "before": "NOT_IMPLEMENTED",
+      "after": "PARTIAL",
+      "previousNote": "AI cost: Cloudflare logs and limited status/count records exist, but a dedicated metric/export/alert for this operational measurement is not implemented."
+    }
+  ]
+}

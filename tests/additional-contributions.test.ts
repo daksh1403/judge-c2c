@@ -1,8 +1,10 @@
+import { paymentRetryPolicy } from '../src/runner-policy';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import {
   createCandidate,
+  discoverAdditionalContributions,
   listCandidates,
   reviewCandidate,
 } from '../src/additional-contributions';
@@ -289,5 +291,249 @@ it('caps candidates at twenty per run', async () => {
     (await createCandidate(f.env, runId, 'organizer:session', candidateInput))
       .status,
   ).toBe(409);
+  f.sql.close();
+});
+
+it('discovers bounded diff suggestions with server provenance and idempotent replay but no automatic recognition', async () => {
+  const f = fixture();
+  f.sql
+    .prepare(
+      'UPDATE evaluations SET head_sha=?,context=?,evidence=? WHERE id=?',
+    )
+    .run(
+      'b'.repeat(40),
+      JSON.stringify({
+        files: [
+          { filename: 'README.md', status: 'added', additions: 10 },
+          { filename: 'tests/new.test.ts', status: 'added', additions: 10 },
+          { filename: 'docs/extra.md', status: 'added', additions: 10 },
+        ],
+      }),
+      JSON.stringify([
+        ...evidence,
+        {
+          id: 'diff',
+          kind: 'diff',
+          status: 'PASS',
+          claim: 'Frozen baseline/head comparison.',
+        },
+      ]),
+      runId,
+    );
+  const first = await discoverAdditionalContributions(f.env, runId);
+  expect(first.status).toBe('SUGGESTED');
+  expect(first.candidateIds).toHaveLength(2);
+  const replay = await discoverAdditionalContributions(f.env, runId);
+  expect(replay).toEqual(first);
+  const candidates = await listCandidates(f.env, runId);
+  expect(candidates).toHaveLength(2);
+  for (const candidate of candidates) {
+    expect(candidate.actor).toBe('system:additional-discovery-v1');
+    expect(candidate.verificationStatus).toBe('UNVERIFIED');
+    expect(candidate.latestDecision).toBeNull();
+    expect(candidate.paths).not.toContain('README.md');
+  }
+  expect(
+    f.sql
+      .prepare(
+        "SELECT count(*) n FROM audit WHERE action='additional_contribution.created'",
+      )
+      .get()?.n,
+  ).toBe(2);
+  expect(
+    f.sql
+      .prepare('SELECT count(*) n FROM additional_contribution_decisions')
+      .get()?.n,
+  ).toBe(0);
+  f.sql.close();
+});
+it('suggests optional trusted functional improvements separately from required work and leaves attribution to organizers', async () => {
+  const f = fixture();
+  const frozen = structuredClone(contract);
+  frozen.execution = {
+    ...frozen.execution,
+    memoryMiB: 256,
+    runner: paymentRetryPolicy,
+  } as typeof frozen.execution;
+  frozen.requirements.push({
+    id: 'extra-function',
+    title: 'Optional functional improvement',
+    mandatory: false,
+    criteria: [
+      {
+        id: 'extra-opt',
+        description: 'Extra bounded retry',
+        kind: 'functional',
+        verification: { type: 'runner', checkId: 'retry-bounded' },
+      },
+    ],
+  } as never);
+  f.sql
+    .prepare(
+      'UPDATE evaluations SET head_sha=?,contract_snapshot=?,context=?,evidence=? WHERE id=?',
+    )
+    .run(
+      'b'.repeat(40),
+      JSON.stringify(frozen),
+      JSON.stringify({
+        files: [{ filename: 'server.mjs', status: 'modified', additions: 5 }],
+      }),
+      JSON.stringify([
+        {
+          id: 'diff',
+          kind: 'diff',
+          status: 'PASS',
+          claim: 'Frozen comparison.',
+        },
+        {
+          id: 'functional-extra',
+          kind: 'execution',
+          criterionId: 'extra-opt',
+          status: 'PASS',
+          baselineStatus: 'FAIL',
+          claim: 'Trusted optional check passed.',
+        },
+      ]),
+      runId,
+    );
+  const found = await discoverAdditionalContributions(f.env, runId);
+  expect(found.candidateIds).toHaveLength(1);
+  const [candidate] = await listCandidates(f.env, runId);
+  expect(candidate).toMatchObject({
+    category: 'testing',
+    criterionIds: ['extra-opt'],
+    verificationStatus: 'VERIFIED',
+    latestDecision: null,
+    paths: ['server.mjs'],
+  });
+  expect(candidate!.description).toContain('not proof of authorship');
+  f.sql.close();
+});
+it.each([
+  {
+    id: 'policy',
+    kind: 'policy',
+    status: 'FAIL',
+    claim: 'Protected path changed.',
+  },
+  {
+    id: 'regression',
+    kind: 'execution',
+    status: 'FAIL',
+    baselineStatus: 'PASS',
+    claim: 'Regression.',
+  },
+])(
+  'blocks discovery on policy violation or observed regression',
+  async (blocker) => {
+    const f = fixture();
+    f.sql
+      .prepare(
+        'UPDATE evaluations SET head_sha=?,context=?,evidence=? WHERE id=?',
+      )
+      .run(
+        'b'.repeat(40),
+        JSON.stringify({
+          files: [
+            { filename: 'tests/extra.test.ts', status: 'added', additions: 5 },
+          ],
+        }),
+        JSON.stringify([
+          {
+            id: 'diff',
+            kind: 'diff',
+            status: 'PASS',
+            claim: 'Frozen comparison.',
+          },
+          blocker,
+        ]),
+        runId,
+      );
+    expect(await discoverAdditionalContributions(f.env, runId)).toEqual({
+      status: 'BLOCKED_POLICY_OR_REGRESSION',
+      candidateIds: [],
+    });
+    expect(await listCandidates(f.env, runId)).toEqual([]);
+    f.sql.close();
+  },
+);
+it('does not discover changed existing docs as novel, unknown categories or required-path additions', async () => {
+  const f = fixture();
+  f.sql
+    .prepare(
+      'UPDATE evaluations SET head_sha=?,context=?,evidence=? WHERE id=?',
+    )
+    .run(
+      'b'.repeat(40),
+      JSON.stringify({
+        files: [
+          { filename: 'docs/old.md', status: 'modified', additions: 5 },
+          { filename: 'README.md', status: 'added', additions: 5 },
+          { filename: 'new-component.ts', status: 'added', additions: 5 },
+        ],
+      }),
+      JSON.stringify([
+        {
+          id: 'diff',
+          kind: 'diff',
+          status: 'PASS',
+          claim: 'Frozen comparison.',
+        },
+      ]),
+      runId,
+    );
+  expect(
+    (await discoverAdditionalContributions(f.env, runId)).candidateIds,
+  ).toEqual([]);
+  f.sql.close();
+});
+
+it('caps automatic discovery at five suggestions and preserves the existing twenty-candidate run limit', async () => {
+  const f = fixture();
+  f.sql
+    .prepare(
+      'UPDATE evaluations SET head_sha=?,context=?,evidence=? WHERE id=?',
+    )
+    .run(
+      'b'.repeat(40),
+      JSON.stringify({
+        files: Array.from({ length: 30 }, (_, index) => ({
+          filename: `docs/extra-${index}.md`,
+          status: 'added',
+          additions: 2,
+        })),
+      }),
+      JSON.stringify([
+        {
+          id: 'diff',
+          kind: 'diff',
+          status: 'PASS',
+          claim: 'Frozen comparison.',
+        },
+      ]),
+      runId,
+    );
+  expect(
+    (await discoverAdditionalContributions(f.env, runId)).candidateIds,
+  ).toHaveLength(5);
+  expect(await listCandidates(f.env, runId)).toHaveLength(5);
+  expect(
+    (await discoverAdditionalContributions(f.env, runId)).candidateIds,
+  ).toHaveLength(5);
+  expect(await listCandidates(f.env, runId)).toHaveLength(5);
+  f.sql.close();
+});
+it('does not discover suggestions before completion or when baseline and head are identical', async () => {
+  const f = fixture();
+  expect(
+    (await discoverAdditionalContributions(f.env, runId)).candidateIds,
+  ).toEqual([]);
+  f.sql
+    .prepare("UPDATE evaluations SET state='CHECKING' WHERE id=?")
+    .run(runId);
+  expect(await discoverAdditionalContributions(f.env, runId)).toEqual({
+    status: 'UNAVAILABLE',
+    candidateIds: [],
+  });
   f.sql.close();
 });

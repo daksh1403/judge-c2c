@@ -1,0 +1,343 @@
+{
+  "synthetic": true,
+  "scope": "Local Docker, immutable prepared npm catalogue only. Cloudflare execution is unverified; this is not a live hackathon evaluation.",
+  "at": "2026-10-04T07:12:20.280Z",
+  "image": "sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+  "evidence": [
+    {
+      "label": "success",
+      "requestHash": "bd5b5f4fc3be9b981fb1715d015f0f1ab9c95820ea0023eecdc28c49896a2638",
+      "result": {
+        "requestHash": "bd5b5f4fc3be9b981fb1715d015f0f1ab9c95820ea0023eecdc28c49896a2638",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "aee408847d35e44e99430f0979c3357b85fe8dbb4535a494301198adbee85f27",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+        "runtime": "v24.21.0; npm@11.19.0; offline-image-cache; docker-local-v1",
+        "metrics": {
+          "startupMs": 293,
+          "tools": {
+            "node": "v24.21.0",
+            "npm": "11.19.0"
+          },
+          "resources": [
+            {
+              "scope": "service",
+              "sampledAt": "2026-10-04T07:12:06.003Z",
+              "cpuUsageUsec": 1907118,
+              "memoryBytes": 55488512,
+              "pids": 15
+            },
+            {
+              "scope": "command:scripts-disabled",
+              "sampledAt": "2026-10-04T07:12:09.620Z",
+              "cpuUsageUsec": 1103964,
+              "memoryBytes": 36487168,
+              "pids": 8
+            },
+            {
+              "scope": "command:installed-module",
+              "sampledAt": "2026-10-04T07:12:09.753Z",
+              "cpuUsageUsec": 1183010,
+              "memoryBytes": 35889152,
+              "pids": 8
+            }
+          ]
+        },
+        "startedAt": "2026-10-04T07:12:01.474Z",
+        "finishedAt": "2026-10-04T07:12:09.838Z",
+        "checks": [
+          {
+            "id": "dependency-preparation",
+            "kind": "dependency",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1846,
+            "stdout": "\nadded 86 packages in 2s\n",
+            "stderr": "npm warn deprecated eslint@9.39.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.\n",
+            "detail": "Offline npm@11.19.0 ci with scripts disabled; immutable image cache sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1; frozen lock SHA-256 c70cb199fa13739f0054251c217f850bf3f66c6340399b9a237a41f980424c38. Setup reuse only; all benchmark timings are fresh."
+          },
+          {
+            "id": "http",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 240,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance http: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "latency",
+            "kind": "benchmark",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 1872,
+            "stdout": "{\"budgetMs\":5000,\"p95Ms\":200.644,\"protocol\":\"http-latency-v1\",\"samplesMs\":[123.814,174.479,194.633,119.83,184.973,200.644,190.047,134.266,183.88,192.131],\"scope\":\"End-to-end HTTP including evaluator transport overhead; development capacity only.\",\"warmup\":1}",
+            "stderr": "",
+            "detail": "Trusted HTTP latency benchmark: p95 200.644 ms over 10 validated samples, budget 5000 ms. Includes transport overhead; environment-specific."
+          },
+          {
+            "id": "installed-module",
+            "kind": "test",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1301,
+            "stdout": "{\"started\":1791097928641,\"finished\":1791097929643}\n",
+            "stderr": "",
+            "detail": "Configured test command passed."
+          },
+          {
+            "id": "scripts-disabled",
+            "kind": "security",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1096,
+            "stdout": "{\"started\":1791097928479,\"finished\":1791097929490}\n",
+            "stderr": "",
+            "detail": "Configured security command passed."
+          }
+        ]
+      }
+    },
+    {
+      "label": "setup-reuse-fresh-benchmark",
+      "requestHash": "786dfcb915c5608d03ebb76a76d9d674373177a5a6529687c053cecdf1ace1d9",
+      "result": {
+        "requestHash": "786dfcb915c5608d03ebb76a76d9d674373177a5a6529687c053cecdf1ace1d9",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "08f80686754df41632e4b3fd5bd528134b909a33c4d42741948ae335dfc2c6a5",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+        "runtime": "v24.21.0; npm@11.19.0; offline-image-cache; docker-local-v1",
+        "metrics": {
+          "startupMs": 307,
+          "tools": {
+            "node": "v24.21.0",
+            "npm": "11.19.0"
+          },
+          "resources": [
+            {
+              "scope": "service",
+              "sampledAt": "2026-10-04T07:12:14.233Z",
+              "cpuUsageUsec": 1914806,
+              "memoryBytes": 56299520,
+              "pids": 15
+            },
+            {
+              "scope": "command:scripts-disabled",
+              "sampledAt": "2026-10-04T07:12:17.757Z",
+              "cpuUsageUsec": 1058286,
+              "memoryBytes": 36544512,
+              "pids": 8
+            },
+            {
+              "scope": "command:installed-module",
+              "sampledAt": "2026-10-04T07:12:17.921Z",
+              "cpuUsageUsec": 1135655,
+              "memoryBytes": 36028416,
+              "pids": 8
+            }
+          ]
+        },
+        "startedAt": "2026-10-04T07:12:09.843Z",
+        "finishedAt": "2026-10-04T07:12:18.012Z",
+        "checks": [
+          {
+            "id": "dependency-preparation",
+            "kind": "dependency",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1892,
+            "stdout": "\nadded 86 packages in 2s\n",
+            "stderr": "npm warn deprecated eslint@9.39.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.\n",
+            "detail": "Offline npm@11.19.0 ci with scripts disabled; immutable image cache sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1; frozen lock SHA-256 c70cb199fa13739f0054251c217f850bf3f66c6340399b9a237a41f980424c38. Setup reuse only; all benchmark timings are fresh."
+          },
+          {
+            "id": "http",
+            "kind": "acceptance",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 223,
+            "stdout": "{\"ok\":true}",
+            "stderr": "",
+            "detail": "Trusted HTTP acceptance http: PASS. Expected status 200; observed 200."
+          },
+          {
+            "id": "latency",
+            "kind": "benchmark",
+            "status": "PASS",
+            "exitCode": null,
+            "durationMs": 1702,
+            "stdout": "{\"budgetMs\":5000,\"p95Ms\":197.526,\"protocol\":\"http-latency-v1\",\"samplesMs\":[172.852,123.761,179.219,117.992,184.581,123.681,179.054,119.333,186.647,197.526],\"scope\":\"End-to-end HTTP including evaluator transport overhead; development capacity only.\",\"warmup\":1}",
+            "stderr": "",
+            "detail": "Trusted HTTP latency benchmark: p95 197.526 ms over 10 validated samples, budget 5000 ms. Includes transport overhead; environment-specific."
+          },
+          {
+            "id": "installed-module",
+            "kind": "test",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1281,
+            "stdout": "{\"started\":1791097936804,\"finished\":1791097937804}\n",
+            "stderr": "",
+            "detail": "Configured test command passed."
+          },
+          {
+            "id": "scripts-disabled",
+            "kind": "security",
+            "status": "PASS",
+            "exitCode": 0,
+            "durationMs": 1099,
+            "stdout": "{\"started\":1791097936626,\"finished\":1791097937628}\n",
+            "stderr": "",
+            "detail": "Configured security command passed."
+          }
+        ]
+      }
+    },
+    {
+      "label": "cache-miss-failure",
+      "requestHash": "29ed27896cd815193142778fa810edf976719b5b3fe7f5d7fd61c09fcb1ad5fc",
+      "result": {
+        "requestHash": "29ed27896cd815193142778fa810edf976719b5b3fe7f5d7fd61c09fcb1ad5fc",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "7932264f583188175b71970a75df1bcad1fcf2f42be04ce11e36905ef0d5a4a8",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+        "runtime": "v24.21.0; docker-local-v1",
+        "metrics": {
+          "startupMs": 271,
+          "tools": {
+            "node": "v24.21.0",
+            "npm": "11.19.0"
+          },
+          "resources": []
+        },
+        "startedAt": "2026-10-04T07:12:18.014Z",
+        "finishedAt": "2026-10-04T07:12:20.144Z",
+        "checks": [
+          {
+            "id": "dependency-preparation",
+            "kind": "dependency",
+            "status": "FAIL",
+            "exitCode": 1,
+            "durationMs": 1756,
+            "stdout": "",
+            "stderr": "npm error code ENOTCACHED\nnpm error request to https://registry.npmjs.org/eslint/-/eslint-9.39.1.tgz failed: cache mode is 'only-if-cached' but no cached response is available.\nnpm error A complete log of this run can be found in: /tmp/judge-npm-cache/_logs/2026-10-04T07_12_18_554Z-debug-0.log\n",
+            "detail": "Offline npm@11.19.0 ci with scripts disabled; immutable image cache sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1; frozen lock SHA-256 98e1986d42065983a7ed5dab51c1cf395a9aa86391d610bc275b4885f9e10f19. Setup reuse only; all benchmark timings are fresh."
+          },
+          {
+            "id": "http",
+            "kind": "acceptance",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "latency",
+            "kind": "benchmark",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "installed-module",
+            "kind": "test",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "scripts-disabled",
+            "kind": "security",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          }
+        ]
+      }
+    },
+    {
+      "label": "lock-rejected",
+      "requestHash": "ae36f7cce5c78b5b38e6f852278c61ad13d15214db7e6bc4affcc0d75b634912",
+      "result": {
+        "requestHash": "ae36f7cce5c78b5b38e6f852278c61ad13d15214db7e6bc4affcc0d75b634912",
+        "commit": "1111111111111111111111111111111111111111",
+        "contractHash": "3fbed21dcc67b082f47a5c5ceb04ba73f91c962b8bd0defd4596facbc9684bf7",
+        "version": "node-http-v1.3.0",
+        "image": "docker-local@sha256:179d84466fa39c9e5a9821672b3e32ca7f94325e963d9c05d39ac27d47847fd1",
+        "runtime": "unavailable; docker-local-v1",
+        "metrics": {
+          "resources": []
+        },
+        "startedAt": "2026-10-04T07:12:20.243Z",
+        "finishedAt": "2026-10-04T07:12:20.244Z",
+        "checks": [
+          {
+            "id": "dependency-preparation",
+            "kind": "dependency",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "http",
+            "kind": "acceptance",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "latency",
+            "kind": "benchmark",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "installed-module",
+            "kind": "test",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          },
+          {
+            "id": "scripts-disabled",
+            "kind": "security",
+            "status": "UNVERIFIED",
+            "exitCode": null,
+            "durationMs": 0,
+            "stdout": "",
+            "stderr": "",
+            "detail": "Offline dependency preparation failed or pinned lock/tool inputs were rejected. No dependent check ran."
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { api } from '../src/api';
 import { organization } from '../src/organization';
 import { digest } from '../src/domain';
+import { assessExpectedArtifacts } from '../src/expected-artifacts';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -20,6 +21,10 @@ function fixture() {
     'CREATE TABLE evaluations(id TEXT PRIMARY KEY,evidence TEXT,context TEXT,report TEXT,baseline_sha TEXT); CREATE TABLE execution_results(run_id TEXT,commit_sha TEXT,result TEXT,created_at TEXT); CREATE TABLE artifacts(key TEXT PRIMARY KEY,run_id TEXT REFERENCES evaluations(id),sha256 TEXT,bytes INTEGER,content_type TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);',
   );
   sql.exec(readFileSync('migrations/0012_artifact_store.sql', 'utf8'));
+  sql.exec('CREATE TABLE github_repositories(id INTEGER PRIMARY KEY)');
+  sql.exec('CREATE TABLE teams(id TEXT PRIMARY KEY,status TEXT NOT NULL)');
+  sql.exec(readFileSync('migrations/0018_confidential_security.sql', 'utf8'));
+  sql.exec(readFileSync('migrations/0021_console_identities.sql', 'utf8'));
   sql
     .prepare('INSERT INTO evaluations(id,baseline_sha) VALUES(?,?)')
     .run(id, 'base');
@@ -63,6 +68,153 @@ function fixture() {
 }
 afterEach(() => vi.restoreAllMocks());
 describe('protected artifacts with real SQLite policy', () => {
+  it('stores inspectable check reports and incomplete diff data without inventing missing outputs', async () => {
+    const f = fixture();
+    const check = (id: string, kind: string, stdout = '') => ({
+      id,
+      kind,
+      status: 'PASS',
+      exitCode: 0,
+      durationMs: 10,
+      stdout,
+      stderr: '',
+      detail: 'Synthetic observed check',
+    });
+    const checks = [
+      check('tests', 'test', 'TAP version 13\nok 1'),
+      check('coverage-empty', 'coverage'),
+      check('scan', 'security', 'No configured scan findings'),
+      {
+        ...check(
+          'latency',
+          'benchmark',
+          JSON.stringify({
+            protocol: 'http-latency-v1',
+            samplesMs: Array(10).fill(1),
+            p95Ms: 1,
+          }),
+        ),
+        exitCode: null,
+      },
+      {
+        ...check('unrun-coverage', 'coverage', 'stale output'),
+        status: 'UNVERIFIED',
+        exitCode: null,
+      },
+    ];
+    f.sql.prepare('UPDATE evaluations SET context=? WHERE id=?').run(
+      JSON.stringify({
+        files: [
+          {
+            filename: 'server.mjs',
+            status: 'modified',
+            patch: '@@\n+example',
+            patchTruncated: true,
+          },
+        ],
+      }),
+      id,
+    );
+    f.sql
+      .prepare('INSERT INTO execution_results VALUES(?,?,?,?)')
+      .run(
+        id,
+        'head',
+        JSON.stringify({ commit: 'head', requestHash: 'fixture', checks }),
+        'now',
+      );
+    const captured = await captureRunArtifacts(f.env, id);
+    expect(captured.status).toBe('CAPTURED');
+    for (const kind of [
+      'tests-submission-0-0',
+      'security-submission-0-2',
+      'benchmark-submission-0-3',
+    ]) {
+      const artifact = captured.artifacts.find((a) => a.kind === kind)!;
+      expect(artifact.status).toBe('STORED');
+      const response = await readArtifact(f.env, artifact.key);
+      expect(response.status).toBe(200);
+      const report = JSON.parse(await response.text());
+      expect(report.runId).toBe(id);
+      expect(report.side).toBe('submission');
+      expect(report.check.status).toBe('PASS');
+      expect(response.headers.get('x-artifact-sha256')).toBe(artifact.sha256);
+    }
+    expect(captured.artifacts.some((a) => a.kind.startsWith('coverage-'))).toBe(
+      false,
+    );
+    expect(
+      captured.artifacts.some((a) => a.kind === 'check-submission-0-4'),
+    ).toBe(true);
+    const diff = captured.artifacts.find((a) => a.kind === 'diff')!;
+    expect(
+      JSON.parse(await (await readArtifact(f.env, diff.key)).text()),
+    ).toMatchObject({
+      complete: false,
+      files: [{ filename: 'server.mjs', patchTruncated: true }],
+    });
+    const availability = assessExpectedArtifacts(
+      {
+        expectedArtifacts: [
+          { id: 'tests', kind: 'tests', required: true },
+          { id: 'coverage', kind: 'coverage', required: true },
+        ],
+      },
+      captured.artifacts,
+    );
+    expect(availability.map((a) => a.status)).toEqual(['PASS', 'UNVERIFIED']);
+  });
+  it('retains actual coverage output and keeps incomplete/unrun benchmarks diagnostic', async () => {
+    const f = fixture();
+    const base = {
+      status: 'PASS',
+      exitCode: 0,
+      durationMs: 1,
+      stdout: '',
+      stderr: '',
+      detail: 'Fixture',
+    };
+    const checks = [
+      {
+        ...base,
+        id: 'coverage',
+        kind: 'coverage',
+        stdout: 'File | % Stmts\nserver.mjs | 75',
+      },
+      {
+        ...base,
+        id: 'incomplete',
+        kind: 'benchmark',
+        status: 'FAIL',
+        exitCode: null,
+        stdout: JSON.stringify({
+          protocol: 'http-latency-v1',
+          samplesMs: [1],
+          p95Ms: null,
+        }),
+      },
+    ];
+    f.sql
+      .prepare('INSERT INTO execution_results VALUES(?,?,?,?)')
+      .run(id, 'head', JSON.stringify({ checks }), 'now');
+    const result = await captureRunArtifacts(f.env, id);
+    const row = result.artifacts.find(
+      (a) => a.kind === 'coverage-submission-0-0',
+    )!;
+    const report = JSON.parse(
+      await (await readArtifact(f.env, row.key)).text(),
+    );
+    expect(report.check.stdout).toContain('75');
+    expect(report.scope).toContain(
+      'no coverage percentage or adequacy is inferred',
+    );
+    expect(result.artifacts.some((a) => a.kind.startsWith('benchmark-'))).toBe(
+      false,
+    );
+    expect(
+      result.artifacts.some((a) => a.kind === 'check-submission-0-1'),
+    ).toBe(true);
+  });
   it('stores redacted immutable bytes and downloads only integrity-checked attachments', async () => {
     const f = fixture();
     const row = await storeArtifact(
@@ -356,4 +508,61 @@ describe('protected artifacts with real SQLite policy', () => {
     await expireArtifacts(f.env);
     expect(f.objects.size).toBe(0);
   });
+});
+
+it('preserves authoritative evidence and earlier stored bytes through partial provider failure and recovery', async () => {
+  const f = fixture();
+  const evidence = JSON.stringify([
+    {
+      id: 'trusted-check',
+      kind: 'execution',
+      status: 'FAIL',
+      baselineStatus: 'PASS',
+      claim: 'Synthetic regression evidence',
+    },
+  ]);
+  f.sql
+    .prepare('UPDATE evaluations SET evidence=?,report=? WHERE id=?')
+    .run(evidence, '{"summary":"fixture report"}', id);
+  const earlier = await storeArtifact(
+    f.env,
+    id,
+    'prior-review',
+    'Earlier immutable review',
+  );
+  f.kv.put
+    .mockImplementationOnce(async (key, value) => {
+      f.objects.set(key, value);
+    })
+    .mockRejectedValueOnce(Error('private provider credential details'));
+  const partial = await captureRunArtifacts(f.env, id);
+  expect(partial.status).toBe('PARTIAL');
+  expect(partial.failures).toContainEqual({
+    kind: 'report',
+    code: 'ARTIFACT_UPLOAD_FAILED',
+  });
+  expect(partial.artifacts.find((a) => a.kind === 'report')!.status).toBe(
+    'FAILED',
+  );
+  expect(partial.artifacts.find((a) => a.kind === 'evidence')!.status).toBe(
+    'STORED',
+  );
+  expect(
+    f.sql.prepare('SELECT evidence FROM evaluations WHERE id=?').get(id)!
+      .evidence,
+  ).toBe(evidence);
+  const retained = await readArtifact(f.env, earlier.key);
+  expect(retained.status).toBe(200);
+  expect(await retained.text()).toBe('Earlier immutable review');
+  expect(JSON.stringify(partial)).not.toContain('private provider');
+  const recovered = await captureRunArtifacts(f.env, id);
+  expect(recovered.status).toBe('CAPTURED');
+  expect(recovered.artifacts.find((a) => a.kind === 'report')).toMatchObject({
+    status: 'STORED',
+    attempts: 2,
+  });
+  expect(
+    f.sql.prepare('SELECT evidence FROM evaluations WHERE id=?').get(id)!
+      .evidence,
+  ).toBe(evidence);
 });

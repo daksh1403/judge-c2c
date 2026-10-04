@@ -10,6 +10,15 @@ const safePath = z
       !/[\x00-\x1f\\]/.test(p) &&
       !p.startsWith('.git/'),
   );
+const runWhen = z
+  .enum([
+    'ALWAYS',
+    'SOURCE_CHANGE',
+    'DEPENDENCY_CHANGE',
+    'SECURITY_CHANGE',
+    'PERFORMANCE_CHANGE',
+  ])
+  .optional();
 const key = z.string().regex(/^[a-zA-Z0-9][\w.-]{0,79}$/);
 export const commandKinds = [
   'build',
@@ -36,12 +45,22 @@ export const runnerPolicySchema = z
         ),
     ]),
     entrypoint: safePath,
+    // Organizer opt-in; packages must already exist in the immutable image cache.
+    dependencies: z
+      .object({
+        mode: z.literal('NPM_OFFLINE_V1'),
+        npmVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+        lockHash: z.string().regex(/^[a-f0-9]{64}$/),
+      })
+      .strict()
+      .optional(),
     commands: z
       .array(
         z
           .object({
             id: key,
             kind: z.enum(commandKinds),
+            runWhen,
             argv: z
               .array(
                 z
@@ -71,6 +90,7 @@ export const runnerPolicySchema = z
             samples: z.number().int().min(10).max(30),
             warmup: z.number().int().min(1).max(5),
             maxP95Ms: z.number().positive().max(5000),
+            runWhen,
           })
           .strict(),
       )
@@ -100,6 +120,7 @@ export const runnerPolicySchema = z
     const ids = [...p.commands, ...p.cases, ...(p.benchmarks ?? [])].map(
       (c) => c.id,
     );
+    if (p.dependencies) ids.push('dependency-preparation');
     if (new Set(ids).size !== ids.length)
       ctx.addIssue({
         code: 'custom',
@@ -176,4 +197,4 @@ export const paymentRetryDescriptions: Record<string, string> = {
   'retry-permanent': 'Do not retry a permanent payment failure.',
   'retry-invalid': 'Reject a non-positive maximum attempt count.',
 };
-export const RUNNER_VERSION = 'node-http-v1.2.0';
+export const RUNNER_VERSION = 'node-http-v1.3.0';

@@ -1,0 +1,38 @@
+{
+  "capturedAt": "2026-10-04T07:26:43.654686+00:00",
+  "profile": "synthetic-local-D1-authentication-and-browser-fixtures",
+  "affectedIds": ["44.02", "44.04", "44.10"],
+  "migration": "0021_console_identities.sql",
+  "authentication": "organizer-issued per-person random credential; SHA-256 hash stored; linked expiring sessions; revocable named identity",
+  "typecheck": "PASS",
+  "runtimeCommand": "npx vitest run tests/console-identities.test.ts tests/confidential-security.test.ts tests/organization.test.ts tests/artifact-store.test.ts",
+  "runtimeTests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0
+  },
+  "runtimeReportSha256": "e9f1c9734c2d4f02013dcf1500676bb67b12423cb12d5c5c2a7b9d4b8802c65c",
+  "browserCommand": "npx playwright test tests/browser/console-identities.spec.ts",
+  "browserTests": {
+    "passed": 2,
+    "failed": 0
+  },
+  "testedBoundaries": [
+    "Organizer-only credential issuance/list/revocation; nonorganizer and cross-origin mutation denial.",
+    "Credential lists/audit omit raw credentials and hashes; database stores only random-token digest.",
+    "Immutable roles/team grants; revocation deletes active sessions and denies future login.",
+    "Participant team query spoofing ignored; cross-team evaluation reads return404.",
+    "Evaluation outcomes require current submission team and frozen assignment team to match identity scope.",
+    "Participant ordinary management, judge evaluation details, raw evidence/report/context, artifacts, security reports and operational metrics endpoints denied.",
+    "Non-active teams cannot use existing participant sessions or credentials.",
+    "Named security identity accesses confidential reports only; named organizer audit actor stable across sessions.",
+    "Browser named identities escaped; participant controls read-only; one-time credential displayed once then removed on revoke.",
+    "Optional organizer security/identity service unavailability remains visible without aborting ordinary evaluation views."
+  ],
+  "boundary": [
+    "Organizer-issued identity labels are not verified GitHub OAuth accounts.",
+    "Existing shared setup/judge/security secrets remain for bootstrap/compatibility; named credentials enable individually revocable delegation.",
+    "Participant scope is read-only submission status and deterministic criterion outcomes; team self-service changes and raw artifact access are not supported.",
+    "Tests use local D1/runtime and synthetic browser fixtures, not independent live hackathon identities."
+  ]
+}

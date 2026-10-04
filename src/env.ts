@@ -12,6 +12,7 @@ export interface Env {
   ORG_REVIEW_ORIGINS?: string;
   ORG_ADMIN_TOKEN?: string;
   ORG_JUDGE_TOKEN?: string;
+  ORG_SECURITY_TOKEN?: string;
   ORG_VAULT_KEY?: string;
   DB: D1Database;
   ARTIFACTS?: R2Bucket;
@@ -29,6 +30,7 @@ export interface Env {
   GITHUB_APP_PRIVATE_KEY?: string;
   PUBLIC_ORIGIN?: string;
   EVALUATION_DETAILS_KIND?: 'organization';
+  AI_PRICING_JSON?: string;
   AI_MODEL?: string;
   AI_MODEL_LIGHT?: string;
   AI_MODEL_DEEP?: string;

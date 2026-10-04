@@ -231,3 +231,52 @@ it('rejects invalid/reserved budgets and leaves all input objects unchanged', ()
   buildReviewContext(f.contract, f.context, f.evidence, f.plan, 20_000);
   expect(JSON.stringify(f)).toBe(before);
 });
+
+it('progressively reads only known source citations with exact line and UTF8 budgets', async () => {
+  const { retrieveReviewContext } = await import('../src/review-context');
+  const f = fixture();
+  f.context.sources['server.ts']!.head =
+    'first\n多字节🚀\nconst api_key = "abcdefghijklmnop";';
+  const result = retrieveReviewContext(
+    f.context,
+    f.evidence,
+    [
+      { path: 'server.ts', side: 'head', startLine: 2, lineCount: 2 },
+      { path: '../../secret', side: 'head', startLine: 1, lineCount: 2 },
+      { path: 'server.ts', side: 'head', startLine: 0, lineCount: 2 },
+      { path: 'server.ts', side: 'head', startLine: 1, lineCount: 81 },
+      { path: 'server.ts', side: 'head', startLine: 1, lineCount: 1 },
+    ],
+    8000,
+  );
+  expect(result.snippets[0]).toMatchObject({
+    path: 'server.ts',
+    startLine: 2,
+    evidenceIds: ['source-context'],
+  });
+  expect(result.snippets[0]!.text).toContain('多字节🚀');
+  expect(result.snippets[0]!.text).not.toContain('abcdefghijklmnop');
+  expect(result.log.map((l) => l.status)).toEqual([
+    'READ',
+    'DENIED',
+    'DENIED',
+    'DENIED',
+  ]);
+  expect(result.droppedRequests).toBe(1);
+  expect(result.bytes).toBeLessThanOrEqual(result.maxBytes);
+  expect(
+    retrieveReviewContext(
+      f.context,
+      [],
+      [{ path: 'server.ts', side: 'head', startLine: 1, lineCount: 1 }],
+    ).log[0]!.status,
+  ).toBe('DENIED');
+  expect(
+    retrieveReviewContext(
+      f.context,
+      f.evidence,
+      [{ path: 'server.ts', side: 'head', startLine: 1, lineCount: 1 }],
+      1,
+    ).log[0]!.status,
+  ).toBe('BUDGET_EXCEEDED');
+});

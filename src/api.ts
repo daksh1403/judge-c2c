@@ -1,3 +1,5 @@
+import { attentionItems } from './attention';
+import { retryableRun } from './retry-policy';
 import { assessExpectedArtifacts } from './expected-artifacts';
 import { buildEvaluationPlan } from './evaluation-plan';
 import type { ArtifactMetadata } from './artifact-store';
@@ -113,6 +115,8 @@ export async function api(request: Request, env: Env) {
       ]);
     const detail = {
       ...run,
+      retryable: retryableRun(run),
+      attentionItems: attentionItems(run, JSON.parse(run.evidence ?? '[]')),
       reviewPolicyCurrent:
         JSON.parse(run.report || '{}').aiTrace?.policy === AI_POLICY_VERSION,
       timeline: timeline.results,
@@ -255,18 +259,7 @@ export async function api(request: Request, env: Env) {
       await dispatch(env, run.id);
       return json({ status: 'dispatch_requested', runId: run.id }, 202);
     }
-    if (
-      !(
-        run.state === 'FAILED' ||
-        (run.state === 'COMPLETED' &&
-          (['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED'].includes(
-            run.ai_status ?? '',
-          ) ||
-            JSON.parse(run.report || '{}').aiTrace?.policy !==
-              AI_POLICY_VERSION))
-      ) ||
-      !(await isCurrent(env, run))
-    )
+    if (!retryableRun(run) || !(await isCurrent(env, run)))
       return json({ error: 'RUN_NOT_RETRYABLE' }, 409);
     // A retry is a new auditable attempt; the failed report is never overwritten.
     const newId = await digest(run.id + crypto.randomUUID());

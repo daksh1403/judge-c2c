@@ -90,3 +90,42 @@ describe('declarative npm advisory comparison', () => {
     expect(f).not.toHaveBeenCalled();
   });
 });
+
+it.each([429, 500, 503, 504])(
+  'keeps scanner HTTP %i outages UNVERIFIED and recovers with advisory deltas',
+  async (status) => {
+    const unavailable = await dependencyAudit(
+      input,
+      input,
+      async () =>
+        new Response('private scanner credential details', { status }),
+    );
+    expect(unavailable).toHaveLength(1);
+    expect(unavailable[0]!.status).toBe('UNVERIFIED');
+    expect(unavailable[0]!.claim).toContain('OSV_HTTP_' + status);
+    expect(JSON.stringify(unavailable)).not.toContain('credential details');
+    const recovered = await dependencyAudit(input, input, async () =>
+      Response.json({ results: [{ vulns: [{ id: 'GHSA-fixture' }] }] }),
+    );
+    expect(recovered.find((e) => e.id === 'dependency-audit')!.status).toBe(
+      'PASS',
+    );
+    expect(recovered.find((e) => e.id !== 'dependency-audit')).toMatchObject({
+      status: 'FAIL',
+      baselineStatus: 'FAIL',
+    });
+  },
+);
+it('keeps transport and oversized scanner failures UNVERIFIED with bounded output', async () => {
+  for (const fetcher of [
+    async () => {
+      throw Error('secret scanner transport details');
+    },
+    async () => new Response('x'.repeat(200001)),
+  ]) {
+    const result = await dependencyAudit(input, input, fetcher as typeof fetch);
+    expect(result[0]!.status).toBe('UNVERIFIED');
+    expect(JSON.stringify(result).length).toBeLessThan(1000);
+    expect(JSON.stringify(result)).not.toContain('secret scanner transport');
+  }
+});

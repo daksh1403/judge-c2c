@@ -1,0 +1,607 @@
+{
+  "at": "2026-10-04T03:30:21.289Z",
+  "mode": "REAL_GITHUB_DOCKER_CALLMISSED",
+  "identity": "One actual authenticated operator; replay code persona, not multiple independent accounts",
+  "pr": 9,
+  "runId": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+  "state": "COMPLETED",
+  "aiStatus": "COMPLETED",
+  "publication": "PUBLISHED",
+  "baseline": "65cb717281eaa2aced69dfaa68ac06c6d540ce2a",
+  "head": "628436f51c897930e2c902c2051c185259ef95c8",
+  "requirements": [
+    {
+      "requirementId": "bounded-retry",
+      "mandatory": true,
+      "status": "PASS",
+      "needsAttention": false,
+      "criteria": [
+        {
+          "criterionId": "retry-transient",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-transient"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-bounded",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-bounded"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-permanent",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-permanent"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-immediate",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-immediate"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-exhausted",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-exhausted"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-zero",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-invalid-zero"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-large",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-invalid-large"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-fraction",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-invalid-fraction"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-invalid-string",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-invalid-string"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-empty",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-outcomes-empty"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-unknown",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-outcomes-unknown"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "retry-outcomes-null",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-retry-outcomes-null"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        }
+      ]
+    },
+    {
+      "requirementId": "payment-regression",
+      "mandatory": true,
+      "status": "PASS",
+      "needsAttention": false,
+      "criteria": [
+        {
+          "criterionId": "health-preserved",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-health-preserved"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-created",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-payment-created"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-idempotency",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-payment-idempotency"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-read",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-payment-read"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-conflict",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-payment-conflict"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        },
+        {
+          "criterionId": "payment-invalid",
+          "status": "PASS",
+          "evidenceIds": [
+            "criterion-payment-invalid"
+          ],
+          "reason": "A relevant objective criterion check passed."
+        }
+      ]
+    }
+  ],
+  "trace": {
+    "attemptFailures": [],
+    "attempts": 1,
+    "contextBudget": {
+      "contextBytes": 38252,
+      "estimatedInputTokens": 11830,
+      "inputTokenEstimateMethod": "[REDACTED]",
+      "maxContextBytes": 48000,
+      "omittedDiffPaths": [],
+      "omittedEvidenceIds": [],
+      "omittedSourcePaths": [
+        "README.md",
+        "server.mjs",
+        "server.test.mjs"
+      ],
+      "reservedInputBytes": 9065,
+      "reservedOutputTokens": 4500,
+      "version": "bounded-review-context-v1"
+    },
+    "downgradedObservationPaths": [
+      "solution_approach.problem_understanding",
+      "solution_approach.approach_summary",
+      "solution_approach.solution_design",
+      "solution_approach.correctness",
+      "solution_approach.architecture_fit",
+      "solution_approach.strengths[0]",
+      "solution_approach.strengths[1]",
+      "solution_approach.strengths[2]",
+      "solution_approach.weaknesses[0]",
+      "solution_approach.weaknesses[1]",
+      "solution_approach.weaknesses[2]",
+      "solution_approach.tradeoffs[1]"
+    ],
+    "durationMs": 48295,
+    "evaluationPlan": {
+      "depth": "STANDARD",
+      "maxChangedFiles": 30,
+      "maxContextBytes": 48000,
+      "reasons": [
+        "All frozen contract criteria remain required at every review depth.",
+        "Authoritative execution checks are unchanged by this advisory plan.",
+        "Changes require standard source review or have no changed-path evidence.",
+        "Functional criteria or trusted runner checks require objective verification.",
+        "Removed test content needs focused review."
+      ],
+      "reviewAreas": [
+        "correctness",
+        "policy",
+        "requirements",
+        "solution-approach",
+        "source-review",
+        "testing"
+      ],
+      "version": "adaptive-review-v1"
+    },
+    "groundingPolicy": "objective-facts-unverified-narratives-v1",
+    "inputHash": "ba420f1c34d08ca24d68e2b84e8e9ae2de784e4fc4e946dbbb5efed21ef93aa8",
+    "model": "kimi-k2.6",
+    "modelRouting": {
+      "model": "kimi-k2.6",
+      "reason": "CALLMISSED_MODEL retained; no depth override is configured.",
+      "version": "server-model-routing-v1"
+    },
+    "policy": "requirements-and-approach-v8",
+    "provider": "callmissed",
+    "requiresHumanAttention": true,
+    "responseId": "resp_93cc4a31fccf47fd9a6a982de100b742",
+    "unverifiedNarrativePaths": [
+      "solution_approach.problem_understanding",
+      "solution_approach.approach_summary",
+      "solution_approach.solution_design",
+      "solution_approach.correctness",
+      "solution_approach.maintainability",
+      "solution_approach.architecture_fit",
+      "solution_approach.strengths[0]",
+      "solution_approach.strengths[1]",
+      "solution_approach.strengths[2]",
+      "solution_approach.weaknesses[0]",
+      "solution_approach.weaknesses[1]",
+      "solution_approach.weaknesses[2]",
+      "solution_approach.tradeoffs[0]",
+      "solution_approach.tradeoffs[1]",
+      "solution_approach.unverified_assumptions[0]",
+      "findings[0]",
+      "findings[1]",
+      "findings[2]",
+      "findings[3]"
+    ],
+    "usage": {
+      "input_tokens": 14062,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 2112
+      },
+      "output_tokens": 2223,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 16285
+    }
+  },
+  "unsupportedObserved": 0,
+  "criterionConsistency": true,
+  "summary": "Objective criteria: 18 PASS, 0 FAIL, 0 UNVERIFIED. Contextual AI narratives are unverified interpretation and require human review; citations do not prove their semantic truth.",
+  "observations": [
+    {
+      "field": "approach_summary",
+      "evidenceIds": [
+        "context-source-2",
+        "criterion-retry-transient",
+        "criterion-retry-permanent"
+      ],
+      "text": "The implementation replaces the single-attempt baseline with a loop over outcomes bounded by maxAttempts, returning immediately on success or permanent failure.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "architecture_fit",
+      "evidenceIds": [
+        "context-source-2",
+        "criterion-health-preserved",
+        "criterion-payment-created"
+      ],
+      "text": "The retry logic is contained within the existing retryPayment exported function, preserving the rest of the server routes and in-memory store unchanged.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "correctness",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null",
+        "criterion-health-preserved",
+        "criterion-payment-created",
+        "criterion-payment-idempotency",
+        "criterion-payment-read",
+        "criterion-payment-conflict",
+        "criterion-payment-invalid"
+      ],
+      "text": "All functional criteria pass under trusted runner execution, indicating the retry and payment endpoints behave per specification.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "maintainability",
+      "evidenceIds": [
+        "context-source-2",
+        "context-source-3"
+      ],
+      "text": "Loop-based logic is readable and new retry.test.mjs provides parameterized unit tests, though integration coverage was removed.",
+      "verification": "INFERENCE"
+    },
+    {
+      "field": "problem_understanding",
+      "evidenceIds": [
+        "context-source-2",
+        "criterion-retry-transient",
+        "criterion-retry-bounded"
+      ],
+      "text": "The root problem is that temporary outcomes should advance to the next outcome up to maxAttempts, while success and permanent outcomes terminate early.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "solution_design",
+      "evidenceIds": [
+        "context-source-2"
+      ],
+      "text": "A for loop iterates over outcomes.slice(0, maxAttempts), increments attempts, returns on success, breaks on permanent, and returns failed if the loop completes.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[0]",
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent"
+      ],
+      "text": "Correctly implements bounded temporary retries and early termination for success and permanent outcomes.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[1]",
+      "evidenceIds": [
+        "context-source-3"
+      ],
+      "text": "New unit tests are parameterized and cover happy paths plus a range of invalid inputs.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "strengths[2]",
+      "evidenceIds": [
+        "criterion-health-preserved",
+        "criterion-payment-created",
+        "criterion-payment-conflict"
+      ],
+      "text": "Existing payment APIs remain functionally intact.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "tradeoffs[0]",
+      "evidenceIds": [
+        "context-source-3",
+        "context-source-4"
+      ],
+      "text": "Added focused unit tests for retry logic but removed broader integration tests that also exercised payment routes.",
+      "verification": "INFERENCE"
+    },
+    {
+      "field": "tradeoffs[1]",
+      "evidenceIds": [
+        "context-source-1"
+      ],
+      "text": "README update includes accurate behavioral description alongside embedded hostile instruction text.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "unverified_assumptions[0]",
+      "evidenceIds": [],
+      "text": "The in-memory store behavior and 404 handling for unknown payment IDs remain unchanged, but no test currently exercises them.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "weaknesses[0]",
+      "evidenceIds": [
+        "context-source-4",
+        "policy-6"
+      ],
+      "text": "Removal of protected-file server.test.mjs violates repository policy and eliminates regression coverage for payment APIs.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "weaknesses[1]",
+      "evidenceIds": [
+        "context-source-1",
+        "context-source-4"
+      ],
+      "text": "Embedded hostile instructions in README and test file are policy violations regardless of stated rehearsal intent.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "weaknesses[2]",
+      "evidenceIds": [
+        "context-source-3"
+      ],
+      "text": "retry.test.mjs only tests the retryPayment function directly, not the HTTP routing or server wiring.",
+      "verification": "UNVERIFIED"
+    }
+  ],
+  "artifactRecapture": {
+    "status": 200,
+    "result": {
+      "runId": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+      "status": "CAPTURED",
+      "artifacts": [
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/evidence/4141a53251fcb2dfe3a7ff11a3c55818654733b5fe7a5f7c189a4be27cb637c4",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "4141a53251fcb2dfe3a7ff11a3c55818654733b5fe7a5f7c189a4be27cb637c4",
+          "bytes": 14675,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 03:28:13",
+          "kind": "evidence",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860493620,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/context/a80d68ca3587516c9f31ff43f693fee8299714187f82132bed3b1f5e103a261f",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "a80d68ca3587516c9f31ff43f693fee8299714187f82132bed3b1f5e103a261f",
+          "bytes": 22094,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 03:28:14",
+          "kind": "context",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860494094,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/execution-baseline-0/4d69f44073a6442967135acd0224e8a9bfaa68d0a6736900fcf6c86880abb8a1",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "4d69f44073a6442967135acd0224e8a9bfaa68d0a6736900fcf6c86880abb8a1",
+          "bytes": 5895,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 03:28:14",
+          "kind": "execution-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860494515,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stdout-baseline-0/1d466ae1bce982eb5666a6fa1848ac6d41c0028584751839254d5ce86ed26e02",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "1d466ae1bce982eb5666a6fa1848ac6d41c0028584751839254d5ce86ed26e02",
+          "bytes": 1630,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 03:28:14",
+          "kind": "stdout-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860494934,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/execution-submission-1/94b301a960fec26550be28ca42302e253d2b18ec49b63c5c2d303505a87d88c3",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "94b301a960fec26550be28ca42302e253d2b18ec49b63c5c2d303505a87d88c3",
+          "bytes": 6273,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 03:28:15",
+          "kind": "execution-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860495784,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 03:28:15",
+          "kind": "stderr-baseline-0",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860495351,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 03:28:16",
+          "kind": "stderr-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860496651,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/stdout-submission-1/c3b96bbca9a97f777711cc1dbe44250dab43de874774e466cc0ed95580bf4bcb",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "c3b96bbca9a97f777711cc1dbe44250dab43de874774e466cc0ed95580bf4bcb",
+          "bytes": 1989,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 03:28:16",
+          "kind": "stdout-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860496213,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c/report/1d93dbebdf09da32e66d4baf1a8218de1d2ad5295faf01d410cf416fdd5bf913",
+          "run_id": "8765f666b06312a81f9adcf2f016e65850b9ef40f34bf1ee1af95f90320c4a7c",
+          "sha256": "1d93dbebdf09da32e66d4baf1a8218de1d2ad5295faf01d410cf416fdd5bf913",
+          "bytes": 11911,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 03:30:20",
+          "kind": "report",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798860620813,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        }
+      ],
+      "failures": []
+    }
+  },
+  "artifactDownload": {
+    "status": 200,
+    "integrity": true,
+    "unauthorized": 401,
+    "bytes": 14675
+  }
+}
