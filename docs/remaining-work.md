@@ -9,7 +9,7 @@ Affected workstream bookkeeping; requirements and acceptance criteria are unchan
 | PARTIAL        |     4 |
 | NOT_APPLICABLE |     2 |
 
-Original three-submission calibration and reviewer diagnostic now pass through actual PR #7 frontend actions under policy v14. PR #6 and PR #7 are merged with owner authorization. Separate production verification remains pending. No statuses were upgraded for implementation alone.
+Original three-submission calibration and reviewer diagnostic now pass through actual PR #7 frontend actions under policy v15 on the main frontend; the diagnostic explicitly returns NEEDS_REVIEW when unsupported qualitative prose is discarded. PR #6 and PR #7 are merged with owner authorization. Separate production verification remains pending. No statuses were upgraded for implementation alone.
 
 ## 01. Project foundation & development workflow
 
