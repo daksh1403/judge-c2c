@@ -53,7 +53,9 @@ test('judges can filter submissions and follow criterion evidence', async ({
   ).toBeVisible();
   await page.getByRole('searchbox').fill('');
   await page.getByLabel('Filter evaluation state').selectOption('COMPLETED');
-  await expect(page.getByRole('heading', { name: 'Competition metrics' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Competition metrics' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
   await expect(
     page.getByRole('heading', { name: 'Requirements' }),
@@ -89,7 +91,9 @@ test('needs attention page displays work queue', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/?attention=1');
-  await expect(page.getByRole('heading', { name: 'Needs Attention' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Needs Attention' }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -117,10 +121,12 @@ test('competition metrics display on overview', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Competition metrics' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Competition metrics' }),
+  ).toBeVisible();
   await expect(page.getByText('Total teams')).toBeVisible();
   await expect(page.getByText('Submitted teams')).toBeVisible();
-  await expect(page.getByText('Success rate')).toBeVisible();
+  await expect(page.getByText('Evaluation completion rate')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -181,7 +187,9 @@ test('judge summary displays key information', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'Judge Summary' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Judge Summary' }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -229,7 +237,9 @@ test('objective checks display baseline comparison', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'Objective Checks' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Objective Checks' }),
+  ).toBeVisible();
   await expect(page.getByText('execution checks')).toBeVisible();
   await expect(page.getByText('↓ Regression')).toBeVisible();
   await expect(page.getByText('→ Unchanged')).toBeVisible();
@@ -275,11 +285,15 @@ test('AI review state displays grounding information', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'AI Review State' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'AI Review State' }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test('regressions section displays when failures detected', async ({ page }) => {
+test('regressions section displays when failures detected', async ({
+  page,
+}) => {
   await page.route('**/api/overview', (route) =>
     route.fulfill({
       json: {
@@ -316,7 +330,9 @@ test('regressions section displays when failures detected', async ({ page }) => 
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'Regressions' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Regressions' }),
+  ).toBeVisible();
   await expect(page.getByText('regressions detected')).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -354,7 +370,9 @@ test('evidence explorer groups by kind', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'Evidence Explorer' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Evidence Explorer' }),
+  ).toBeVisible();
   await expect(page.getByText('EXECUTION', { exact: true })).toBeVisible();
   await expect(page.getByText('SOURCE', { exact: true })).toBeVisible();
   await expect(page.getByText('TEST', { exact: true })).toBeVisible();
@@ -396,7 +414,9 @@ test('state banners display for evaluation states', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('performance section displays when benchmarks available', async ({ page }) => {
+test('performance section displays when benchmarks available', async ({
+  page,
+}) => {
   await page.route('**/api/overview', (route) =>
     route.fulfill({
       json: {
@@ -433,7 +453,9 @@ test('performance section displays when benchmarks available', async ({ page }) 
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
-  await expect(page.getByRole('heading', { name: 'Performance' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Performance' }),
+  ).toBeVisible();
   await expect(page.getByText('1 benchmarks')).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -1985,13 +2007,26 @@ test('engineering support matrix separates trusted check facts, server assessmen
     ...paymentRetryPolicy,
     commands: [{ id: 'lint', kind: 'lint', argv: ['node', 'lint.mjs'] }],
   };
-  const evidence = [
+  const evidence: import('../../src/domain').Evidence[] = [
     {
       id: 'execution-lint',
       kind: 'execution' as const,
       status: 'FAIL' as const,
       baselineStatus: 'PASS' as const,
       claim: 'Configured lint check failed.',
+    },
+    {
+      id: 'diff-metadata',
+      kind: 'diff',
+      status: 'PASS',
+      claim: 'Exact baseline-to-head comparison: 1 changed file; metadata does not establish functionality.',
+    },
+    {
+      id: 'auth-source-context',
+      kind: 'source',
+      path: 'src/auth.ts',
+      status: 'PASS',
+      claim: 'Source retrieved for contextual inspection only; presence is not functional proof.',
     },
   ];
   const review = deterministicReport(contract, evidence);
@@ -2102,4 +2137,13 @@ test('engineering support matrix separates trusted check facts, server assessmen
   await expect(
     authentication.getByText('MISSING_MEANINGFUL_ANALYSIS', { exact: false }),
   ).toBeVisible();
+  await expect(authentication.locator('strong')).toContainText('UNVERIFIED');
+  await expect(
+    authentication.getByText('No diff available for authentication regression analysis', { exact: false }),
+  ).toBeVisible();
+  await expect(
+    authentication.getByText('human inspection required', { exact: false }),
+  ).toBeVisible();
+  await expect(authentication.getByText('SUPPORTED_FACT', { exact: false })).toHaveCount(0);
+  await expect(authentication.locator('a')).toHaveCount(0);
 });
