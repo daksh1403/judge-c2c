@@ -245,25 +245,27 @@
         {
           "id": "01.12",
           "requirement": "Local preview production separation",
-          "status": "PARTIAL",
+          "status": "PASS",
           "evidence": [
             ".github/workflows/ci.yml",
             ".github/workflows/deploy.yml",
             "scripts/preview-config.mjs",
             "scripts/production-config.mjs",
-            "docs/qa/current-production-prerequisites.md"
+            "docs/qa/current-production-prerequisites.md",
+            "docs/qa/current-live-environment-isolation.json",
+            "docs/qa/current-deployed-environment-bindings.json"
           ],
-          "note": "Production generator now declares an exact custom-domain route and rejects invalid/review resource origins. Four configuration tests pass. Live GitHub has no cloudflare-production environment, repository variables or secret names; actual independent production resources, deployment and separation remain unverified.",
+          "note": "Live Cloudflare production Worker uses separately migrated D1 databases, separate KV and fresh secrets. Native frontend and its preview delegate only to review. Actual frontend denied review credentials on production and production credentials on review/main and branch preview. Authenticated deployed binding metadata confirms disjoint D1/KV and no native production service binding. Owner selected tunnel/Workers.dev and KV only; this verifies environment separation, not event capacity or functional production AI.",
           "verification": {
-            "method": "LOCAL_EXECUTION",
-            "boundary": "Executed configuration regressions; no production resources or deployment were created."
+            "method": "LIVE_INTEGRATION",
+            "boundary": "Deployed production/review resource metadata and three actual frontend cross-environment login denials, supplemented by existing local/preview configuration guards. Production AI quota, App onboarding and event capacity remain separate gaps."
           },
           "assignedAgent": "workflow-infra",
           "defectReference": null,
-          "relatedPR": null,
+          "relatedPR": "https://github.com/daksh1403/judge-c2c/pull/8",
           "lastValidationState": {
-            "status": "PARTIAL",
-            "basis": "Production generator now declares an exact custom-domain route and rejects invalid/review resource origins. Four configuration tests pass. Live GitHub has no cloudflare-production environment, repository variables or secret names; actual independent production resources, deployment and separation remain unverified."
+            "status": "PASS",
+            "basis": "Live Cloudflare production Worker uses separately migrated D1 databases, separate KV and fresh secrets. Native frontend and its preview delegate only to review. Actual frontend denied review credentials on production and production credentials on review/main and branch preview. Authenticated deployed binding metadata confirms disjoint D1/KV and no native production service binding. Owner selected tunnel/Workers.dev and KV only; this verifies environment separation, not event capacity or functional production AI."
           }
         },
         {
@@ -536,9 +538,7 @@
           "id": "02.11",
           "requirement": "Approved main merge deploys production",
           "status": "BLOCKED",
-          "evidence": [
-            ".github/workflows/deploy.yml"
-          ],
+          "evidence": [".github/workflows/deploy.yml"],
           "note": "Approved main merge deploys production: Production remains disabled; preview success cannot prove a production merge deploy.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -975,9 +975,7 @@
           "id": "04.05",
           "requirement": "Issue opened",
           "status": "PASS",
-          "evidence": [
-            "docs/qa/payment-issue-triage-evidence.json"
-          ],
+          "evidence": ["docs/qa/payment-issue-triage-evidence.json"],
           "note": "Issue opened: Actual initially unlabeled GitHub issue #10 was ingested and attributed with not-scored review labels.",
           "verification": {
             "method": "LIVE_INTEGRATION",
@@ -1021,9 +1019,7 @@
           "id": "04.07",
           "requirement": "Issue labeled and unlabeled",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue labeled and unlabeled: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1067,9 +1063,7 @@
           "id": "04.09",
           "requirement": "Issue closed and reopened",
           "status": "PASS",
-          "evidence": [
-            "tests/acceptance-audit.test.ts"
-          ],
+          "evidence": ["tests/acceptance-audit.test.ts"],
           "note": "Issue closed and reopened: Executed native-label authority/loop and closure/reopening scenarios preserve judging state.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -1457,9 +1451,7 @@
           "id": "05.11",
           "requirement": "Policy-controlled registration",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Policy-controlled registration: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -1477,9 +1469,7 @@
           "id": "05.12",
           "requirement": "Approval when self-registration enabled",
           "status": "NOT_APPLICABLE",
-          "evidence": [
-            "src/competition-domain.ts"
-          ],
+          "evidence": ["src/competition-domain.ts"],
           "note": "Approval when self-registration enabled: Current event policy is explicitly ORGANIZER_ONLY; participant self-registration and its approval flow are disabled.",
           "verification": {
             "method": "SOURCE_INSPECTION",
@@ -4039,9 +4029,7 @@
           "id": "14.01",
           "requirement": "Multiple issues per PR",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple issues per PR: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4059,9 +4047,7 @@
           "id": "14.02",
           "requirement": "Separable requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Separable requirements: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4079,9 +4065,7 @@
           "id": "14.03",
           "requirement": "Multiple attempts per issue",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Multiple attempts per issue: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4145,9 +4129,7 @@
           "id": "14.06",
           "requirement": "Retained history",
           "status": "PASS",
-          "evidence": [
-            "tests/hackathon-rehearsal.test.ts"
-          ],
+          "evidence": ["tests/hackathon-rehearsal.test.ts"],
           "note": "Retained history: Executed multi-issue and alternate-PR fixtures preserve separable criteria and independent submission history.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4387,10 +4369,7 @@
           "id": "16.01",
           "requirement": "Run distinct from submission",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Run distinct from submission: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4408,10 +4387,7 @@
           "id": "16.02",
           "requirement": "Multiple runs",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Multiple runs: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4429,10 +4405,7 @@
           "id": "16.03",
           "requirement": "New run per head",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "New run per head: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4450,10 +4423,7 @@
           "id": "16.04",
           "requirement": "Previous evaluation retained",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Previous evaluation retained: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4471,10 +4441,7 @@
           "id": "16.05",
           "requirement": "Superseded state",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Superseded state: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4492,10 +4459,7 @@
           "id": "16.06",
           "requirement": "Obvious current run",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "Obvious current run: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4513,10 +4477,7 @@
           "id": "16.07",
           "requirement": "No historical overwrite",
           "status": "PASS",
-          "evidence": [
-            "tests/competition.test.ts",
-            "tests/intake.test.ts"
-          ],
+          "evidence": ["tests/competition.test.ts", "tests/intake.test.ts"],
           "note": "No historical overwrite: Executed new-head, close/reopen and retry scenarios keep distinct historical attempts and current run pointers.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4563,10 +4524,7 @@
           "id": "17.01",
           "requirement": "Authoritative contract",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Authoritative contract: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4584,10 +4542,7 @@
           "id": "17.02",
           "requirement": "Schema version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4605,10 +4560,7 @@
           "id": "17.03",
           "requirement": "Repository identity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Repository identity: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4626,10 +4578,7 @@
           "id": "17.04",
           "requirement": "Challenge and evaluation version",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Challenge and evaluation version: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4647,10 +4596,7 @@
           "id": "17.05",
           "requirement": "Baseline",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Baseline: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4668,10 +4614,7 @@
           "id": "17.06",
           "requirement": "Assigned issues",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Assigned issues: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4689,10 +4632,7 @@
           "id": "17.07",
           "requirement": "Mandatory requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Mandatory requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4710,10 +4650,7 @@
           "id": "17.08",
           "requirement": "Optional requirements",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Optional requirements: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4731,10 +4668,7 @@
           "id": "17.09",
           "requirement": "Acceptance criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Acceptance criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4752,10 +4686,7 @@
           "id": "17.10",
           "requirement": "Constraints",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Constraints: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4891,10 +4822,7 @@
           "id": "17.16",
           "requirement": "Additional categories",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Additional categories: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4912,10 +4840,7 @@
           "id": "17.17",
           "requirement": "Forbidden actions",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Forbidden actions: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4933,10 +4858,7 @@
           "id": "17.18",
           "requirement": "Schema validation",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Schema validation: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4954,10 +4876,7 @@
           "id": "17.19",
           "requirement": "No AI-invented criteria",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "No AI-invented criteria: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -4975,10 +4894,7 @@
           "id": "17.20",
           "requirement": "Participant cannot override policy",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/competition.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/competition.test.ts"],
           "note": "Participant cannot override policy: Executed contract validation enforces immutable IDs/SHA, mandatory/optional criteria, constraints, trusted checks and forbidden paths; participant files cannot publish a contract.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9607,9 +9523,7 @@
           "id": "32.08",
           "requirement": "Cheap trivial classification",
           "status": "PASS",
-          "evidence": [
-            "tests/issue-taxonomy.test.ts"
-          ],
+          "evidence": ["tests/issue-taxonomy.test.ts"],
           "note": "Cheap trivial classification: Trivial issue classification runs deterministic rules without a paid model call.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9633,10 +9547,7 @@
           "id": "33.01",
           "requirement": "Category",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Category: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9654,10 +9565,7 @@
           "id": "33.02",
           "requirement": "Severity",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Severity: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9675,10 +9583,7 @@
           "id": "33.03",
           "requirement": "Claim",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Claim: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9696,10 +9601,7 @@
           "id": "33.04",
           "requirement": "Evidence",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Evidence: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9717,10 +9619,7 @@
           "id": "33.05",
           "requirement": "Verification",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Verification: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9738,10 +9637,7 @@
           "id": "33.06",
           "requirement": "Source",
           "status": "PASS",
-          "evidence": [
-            "src/domain.ts",
-            "tests/engineering-review.test.ts"
-          ],
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9759,10 +9655,7 @@
           "id": "33.07",
           "requirement": "Requirement",
           "status": "PASS",
-          "evidence": [
-            "src/domain.ts",
-            "tests/engineering-review.test.ts"
-          ],
+          "evidence": ["src/domain.ts", "tests/engineering-review.test.ts"],
           "note": "Server-owned finding provenance identifies AI assessment origin and derives related requirement IDs only through known cited criterion evidence. Six engineering dimensions expose configured objective deltas, advisory interpretation and explicit missing-capability UNVERIFIED states; no exploitability or unmeasured performance claim is promoted.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9780,10 +9673,7 @@
           "id": "33.08",
           "requirement": "Fact versus inference",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Fact versus inference: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -9830,10 +9720,7 @@
           "id": "33.10",
           "requirement": "Unverified state",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts",
-            "tests/runner.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts", "tests/runner.test.ts"],
           "note": "Unverified state: Executed schema validation enforces finding category/severity/claim/citations and inference separation from objective evidence.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -10723,10 +10610,7 @@
           "id": "37.07",
           "requirement": "Prepared environments",
           "status": "PASS",
-          "evidence": [
-            "runner/Dockerfile",
-            "docs/qa/docker-evidence.json"
-          ],
+          "evidence": ["runner/Dockerfile", "docs/qa/docker-evidence.json"],
           "note": "Prepared environments: Actual development jobs use a prepared immutable image rather than rebuilding participant environments.",
           "verification": {
             "method": "LOCAL_EXECUTION",
@@ -10888,9 +10772,7 @@
           "id": "37.14",
           "requirement": "Risk routing",
           "status": "PASS",
-          "evidence": [
-            "tests/domain.test.ts"
-          ],
+          "evidence": ["tests/domain.test.ts"],
           "note": "Risk routing: Deterministic risk signals are tested; they are routing metadata, not scores.",
           "verification": {
             "method": "FIXTURE_TEST",
@@ -15215,9 +15097,7 @@
           "id": "49.24",
           "requirement": "Preview fail",
           "status": "PASS",
-          "evidence": [
-            "https://github.com/daksh1403/judge-c2c/pull/4"
-          ],
+          "evidence": ["https://github.com/daksh1403/judge-c2c/pull/4"],
           "note": "Preview fail: A real native build failure was investigated and repaired; later builds passed.",
           "verification": {
             "method": "LIVE_INTEGRATION",

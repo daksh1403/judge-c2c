@@ -1,6 +1,6 @@
 # Current completion checkpoint
 
-2026-10-04 stabilization. Current ledger remains 699 PASS, 4 PARTIAL, 9 BLOCKED and 2 NOT_APPLICABLE; all 714 requirements remain intact. No acceptance status was upgraded solely from implementation.
+2026-10-04 stabilization. Current ledger remains 700 PASS, 3 PARTIAL, 9 BLOCKED and 2 NOT_APPLICABLE; all 714 requirements remain intact. No acceptance status was upgraded solely from implementation.
 
 Actual PR #7 Cloudflare frontend clicks, without mocked responses or direct test API calls, verified the reviewer diagnostic and the ORIGINAL payment-engine reference PR #11, partial PR #8 and protected-test PR #9. All three new attempts executed CallMissed kimi-k2.6 under policy v14, completed, published GitHub checks, retained objective criterion outcomes, had zero unknown citations and zero unsupported OBSERVED claims, and displayed human attention and inspectable citations. Protected-test manipulation remains a policy FAIL. See current-ai-reviewer-frontend.json and its screenshots. Prior rejected diagnostic evidence is preserved separately.
 
@@ -23,3 +23,5 @@ The owner-operated tunnel runner now accepts distinct review and production sign
 Validation: npm run check passed with 479 tests; two further focused rejection tests passed; npm run test:browser passed all 29 scenarios. Real main frontend v15 original calibration passed.
 
 Production worker deployed at https://judge-c2c-production.dakshx.workers.dev with separate migrated D1 databases, separate KV namespace, fresh role/vault/runner secrets and the owner tunnel. R2 is omitted. Actual production frontend runner diagnostic passed (baseline FAIL → trusted canary PASS). Production AI diagnostic failed: compact provider diagnosis returned HTTP 429 / Cloudflare code 4006, daily free allocation of 10,000 neurons exhausted. This is a provider quota blocker, not model validation success. A quota-specific frontend message and bounded non-retry behavior are implemented. Fresh production GitHub App connection is still required; no production participant evaluation is claimed. Evidence: current-production-frontend-smoke.json/.png.
+
+Acceptance 01.12 is now PASS from actual deployed resource metadata and three frontend cross-environment credential denials. This is the only acceptance status changed in post-merge stabilization; production AI quota/App/capacity gaps remain open.
