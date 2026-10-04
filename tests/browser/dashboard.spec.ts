@@ -1739,6 +1739,6 @@ test('engineering support matrix separates trusted check facts, server assessmen
       .filter({ hasText: '28.03 · Authentication regression' }),
   });
   await expect(
-    authentication.getByText('MISSING_MEANINGFUL_ANALYSIS', { exact: false }),
+    authentication.getByText('BOUNDED_ANALYSIS_AVAILABLE', { exact: false }),
   ).toBeVisible();
 });
