@@ -1,0 +1,9 @@
+{
+  "at": "2026-10-04T18:23:10.906Z",
+  "origin": "https://judge-c2c-production.dakshx.workers.dev",
+  "mode": "ACTUAL_FRONTEND_BUTTONS",
+  "boundary": "Production deployment diagnostics only. Synthetic diagnostic contract; no production participant evaluation or GitHub App connection claimed.",
+  "newAppRequired": true,
+  "status": "FAIL",
+  "failure": "page.waitForResponse: Timeout 180000ms exceeded while waiting for event \"response\""
+}
