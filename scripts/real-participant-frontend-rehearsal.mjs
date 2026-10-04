@@ -1,0 +1,72 @@
+import { chromium } from '@playwright/test';
+import { readFile, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import assert from 'node:assert/strict';
+const origin = process.env.REVIEW_URL || 'https://feat-frontend-polish-judge-c2c.dakshx.workers.dev';
+const actor = JSON.parse(execFileSync('gh', ['api', 'user', '--jq', '{login,id}'], { encoding: 'utf8' }));
+const browser = await chromium.launch({ headless: true });
+const admin = await browser.newContext();
+const participant = await browser.newContext();
+const errors = [];
+let identityId, adminPage;
+const output = { at: new Date().toISOString(), origin, mode: 'REAL_FRONTEND_CLICKS_NO_MOCKS_NO_DIRECT_API_CALLS', github: actor, checks: {}, limitations: ['One real GitHub account and its existing registered team, using organizer-issued participant access; not multiple independent people or OAuth sign-in.', 'Isolated review resources. No scoring or existing assignment changes.'] };
+async function login(context, token) {
+  const page = await context.newPage();
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto(origin + '/?organization=1');
+  await page.locator('#organization-token').fill(token);
+  await page.locator('#organization-login').getByRole('button').click();
+  await page.locator('#organization-token').waitFor({ state: 'detached', timeout: 20000 });
+  return page;
+}
+try {
+  adminPage = await login(admin, (await readFile('.wrangler/organization-access.txt', 'utf8')).trim());
+  await adminPage.getByRole('heading', { name: 'Hackathon workflow' }).waitFor();
+  const listed = adminPage.waitForResponse(r => r.url().includes('/api/organization/manage/teams?'));
+  await adminPage.locator('[data-tab="teams"]').click();
+  await listed;
+  const teamButton = adminPage.locator('[data-detail^="teams/"]').first();
+  const teamId = (await teamButton.getAttribute('data-detail')).slice(6);
+  const detailResponse = adminPage.waitForResponse(r => r.url().endsWith('/manage/teams/' + teamId));
+  await teamButton.click();
+  const detail = await (await detailResponse).json();
+  assert.ok(detail.members.some(m => m.github_id === actor.id && m.github_login.toLowerCase() === actor.login.toLowerCase()));
+  output.team = { id: teamId, name: detail.team.name, githubMemberVerified: true, assignments: detail.assignments.length, submissions: detail.submissions.length };
+  await adminPage.locator('#identity-create [name="name"]').fill(actor.login + ' live verification');
+  await adminPage.locator('#identity-create [name="role"]').selectOption('participant');
+  await adminPage.locator('#identity-create [name="teamId"]').fill(teamId);
+  const created = adminPage.waitForResponse(r => r.url().endsWith('/api/organization/identities') && r.request().method() === 'POST');
+  await adminPage.locator('#identity-create').getByRole('button').click();
+  const issued = await (await created).json();
+  identityId = issued.id;
+  await adminPage.getByLabel('One-time console credential').waitFor();
+  const token = await adminPage.getByLabel('One-time console credential').inputValue();
+  await adminPage.getByLabel('One-time console credential').evaluate(el => el.remove());
+  const participantPage = await login(participant, token);
+  await participantPage.locator('#participant-workspace').waitFor();
+  assert.ok((await participantPage.locator('body').innerText()).includes(detail.team.name));
+  assert.ok(await participantPage.locator('[data-participant-evaluation]').count());
+  await participantPage.locator('[data-participant-evaluation]').first().click();
+  await participantPage.locator('#participant-evaluation-detail').getByText('PASS', { exact: false }).first().waitFor();
+  for (const selector of ['#identity-create', '#security-intake', '#sync-repositories', '#test-reviewer', '#retry-evaluation']) assert.equal(await participantPage.locator(selector).count(), 0);
+  output.checks.ownTeamAndRequirementsRendered = true;
+  output.checks.privilegedControlsAbsent = true;
+  await participantPage.screenshot({ path: 'docs/qa/current-real-participant.png', fullPage: true });
+  await adminPage.locator('[data-revoke-identity="' + identityId + '"]').click();
+  await adminPage.getByText('Credential revoked. Its active sessions have been removed.').waitFor();
+  identityId = null;
+  await participantPage.reload();
+  await participantPage.locator('#organization-login').waitFor();
+  assert.equal(await participantPage.locator('#participant-workspace').count(), 0);
+  output.checks.revocationRemovesActiveFrontendAccess = true;
+  output.errors = errors;
+  assert.equal(errors.length, 0);
+  output.status = 'PASS';
+} catch (error) {
+  output.status = 'FAIL'; output.failure = error.message; throw error;
+} finally {
+  if (identityId && adminPage) await adminPage.locator('[data-revoke-identity="' + identityId + '"]').click().catch(() => {});
+  await writeFile('docs/qa/current-real-participant-frontend.json', JSON.stringify(output, null, 2) + '\n');
+  await browser.close();
+}
+console.log(JSON.stringify({ status: output.status, actualAccount: actor.login, checks: output.checks }));

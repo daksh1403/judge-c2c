@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-04T11:06:14.544Z",
+  "at": "2026-10-04T13:32:35.042Z",
   "mode": "REAL_MINIFLARE_D1_CONTROLLED_ADVISORY_RESPONSE",
   "synthetic": true,
   "validation": "CONTROLLED_CASES_VALIDATED",
@@ -15,14 +15,14 @@
           "status": "FAIL",
           "baselineStatus": "FAIL",
           "path": "package-lock.json",
-          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.348Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Fresh comparison; cache population is best-effort."
+          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:34.895Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Fresh comparison; cache population is best-effort."
         },
         {
           "id": "dependency-audit",
           "kind": "source",
           "status": "PASS",
           "baselineStatus": "PASS",
-          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.348Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Fresh comparison; cache population is best-effort."
+          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:34.895Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Fresh comparison; cache population is best-effort."
         }
       ],
       "hit": [
@@ -32,26 +32,26 @@
           "status": "FAIL",
           "baselineStatus": "FAIL",
           "path": "package-lock.json",
-          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.348Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot HIT; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Reused historical advisory snapshot, not a fresh provider scan."
+          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:34.895Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot HIT; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Reused historical advisory snapshot, not a fresh provider scan."
         },
         {
           "id": "dependency-audit",
           "kind": "source",
           "status": "PASS",
           "baselineStatus": "PASS",
-          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.348Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot HIT; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Reused historical advisory snapshot, not a fresh provider scan."
+          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:34.895Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot HIT; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Reused historical advisory snapshot, not a fresh provider scan."
         }
       ],
       "stored": [
         {
           "repository_id": 1,
-          "cache_key": "b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592",
+          "cache_key": "306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91",
           "origin_run_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          "request": "{\"auditor\":\"npm-osv-v1\",\"baseline\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"contractHash\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"evaluator\":\"node-http-v1.3.0\",\"head\":\"cccccccccccccccccccccccccccccccccccccccc\",\"inputs\":[{\"lock\":\"cfae4aa9b2deeee2f0f91f33684087d5cf7284e6d76d8d8b47445764e0ebc4b5\",\"manifest\":\"a21f24dfc500be70a2365f74aee01f136247749b36aac6fec1835bbcf09b38b1\"},{\"lock\":\"cfae4aa9b2deeee2f0f91f33684087d5cf7284e6d76d8d8b47445764e0ebc4b5\",\"manifest\":\"a21f24dfc500be70a2365f74aee01f136247749b36aac6fec1835bbcf09b38b1\"}],\"provider\":\"https://api.osv.dev/v1/querybatch\",\"repositoryId\":1,\"schemaVersion\":1,\"snapshotHour\":497531}",
-          "result": "[{\"baselineStatus\":\"FAIL\",\"claim\":\"OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.348Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a.\",\"id\":\"dependency-57a6d7c582f4919a291d9431\",\"kind\":\"source\",\"path\":\"package-lock.json\",\"status\":\"FAIL\"},{\"baselineStatus\":\"PASS\",\"claim\":\"OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.348Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a.\",\"id\":\"dependency-audit\",\"kind\":\"source\",\"status\":\"PASS\"}]",
-          "result_hash": "f77c39f89f845cfc108d7fa82ac55c17ae52701b3ef3f6dd6ffb671550f76281",
-          "queried_at": 1791111601000,
-          "expires_at": 1791115200000
+          "request": "{\"auditor\":\"npm-osv-v1\",\"baseline\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"contractHash\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"evaluator\":\"node-http-v1.3.0\",\"head\":\"cccccccccccccccccccccccccccccccccccccccc\",\"inputs\":[{\"lock\":\"cfae4aa9b2deeee2f0f91f33684087d5cf7284e6d76d8d8b47445764e0ebc4b5\",\"manifest\":\"a21f24dfc500be70a2365f74aee01f136247749b36aac6fec1835bbcf09b38b1\"},{\"lock\":\"cfae4aa9b2deeee2f0f91f33684087d5cf7284e6d76d8d8b47445764e0ebc4b5\",\"manifest\":\"a21f24dfc500be70a2365f74aee01f136247749b36aac6fec1835bbcf09b38b1\"}],\"provider\":\"https://api.osv.dev/v1/querybatch\",\"repositoryId\":1,\"schemaVersion\":1,\"snapshotHour\":497533}",
+          "result": "[{\"baselineStatus\":\"FAIL\",\"claim\":\"OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:34.895Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a.\",\"id\":\"dependency-57a6d7c582f4919a291d9431\",\"kind\":\"source\",\"path\":\"package-lock.json\",\"status\":\"FAIL\"},{\"baselineStatus\":\"PASS\",\"claim\":\"OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:34.895Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a.\",\"id\":\"dependency-audit\",\"kind\":\"source\",\"status\":\"PASS\"}]",
+          "result_hash": "ff3b37bab786627d026b442754a386962fde884df6d74f1f55e88ae8f12a86ff",
+          "queried_at": 1791118801000,
+          "expires_at": 1791122400000
         }
       ]
     },
@@ -64,14 +64,14 @@
           "status": "FAIL",
           "baselineStatus": "FAIL",
           "path": "package-lock.json",
-          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.395Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T12:00:01.000Z; expires 2026-10-04T13:00:00.000Z; cache 40a35f3e4e6b5266b1a907a3f4705b8c4fb463301e5dd620452449f8cc24c1d8. Fresh comparison; cache population is best-effort."
+          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:34.932Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T14:00:01.000Z; expires 2026-10-04T15:00:00.000Z; cache b3d4462b12e2f79451917ebd5c962eda92b527c6ebb900f34c45c4f84abb6217. Fresh comparison; cache population is best-effort."
         },
         {
           "id": "dependency-audit",
           "kind": "source",
           "status": "PASS",
           "baselineStatus": "PASS",
-          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.395Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T12:00:01.000Z; expires 2026-10-04T13:00:00.000Z; cache 40a35f3e4e6b5266b1a907a3f4705b8c4fb463301e5dd620452449f8cc24c1d8. Fresh comparison; cache population is best-effort."
+          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:34.932Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T14:00:01.000Z; expires 2026-10-04T15:00:00.000Z; cache b3d4462b12e2f79451917ebd5c962eda92b527c6ebb900f34c45c4f84abb6217. Fresh comparison; cache population is best-effort."
         }
       ]
     },
@@ -84,14 +84,14 @@
           "status": "FAIL",
           "baselineStatus": "FAIL",
           "path": "package-lock.json",
-          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.439Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:03.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Fresh comparison; cache population is best-effort."
+          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:34.957Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:03.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Fresh comparison; cache population is best-effort."
         },
         {
           "id": "dependency-audit",
           "kind": "source",
           "status": "PASS",
           "baselineStatus": "PASS",
-          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.439Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:03.000Z; expires 2026-10-04T12:00:00.000Z; cache b30c085de20bb6065d9442080ae4fa0d23af26348d85ba5cd1059e8355268592. Fresh comparison; cache population is best-effort."
+          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:34.957Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:03.000Z; expires 2026-10-04T14:00:00.000Z; cache 306bf5d9255c9faf586375d4abffef35dd7153a2daba680f51874479e2d05d91. Fresh comparison; cache population is best-effort."
         }
       ]
     },
@@ -124,14 +124,14 @@
           "status": "FAIL",
           "baselineStatus": "FAIL",
           "path": "package-lock.json",
-          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T11:06:14.492Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b4816c2bf12f99c931984183a1065191171c9ec00eff4e76944f0f78c700d349. Fresh comparison; cache population is best-effort."
+          "claim": "OSV npm advisory lodash:GHSA-controlled-fixture; baseline versions 4.17.20, submission versions 4.17.20. Pre-existing advisory remains. Matching package metadata is confirmed; exploitability and actual installed artifacts require separate verification. npm-osv-v1 queried 2026-10-04T13:32:35.006Z; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache c226db9e4d6d441cbeb6816a3c64b56b16f4aadac068e00b045187a4e1e8461e. Fresh comparison; cache population is best-effort."
         },
         {
           "id": "dependency-audit",
           "kind": "source",
           "status": "PASS",
           "baselineStatus": "PASS",
-          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T11:06:14.492Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T11:00:01.000Z; expires 2026-10-04T12:00:00.000Z; cache b4816c2bf12f99c931984183a1065191171c9ec00eff4e76944f0f78c700d349. Fresh comparison; cache population is best-effort."
+          "claim": "OSV query completed for 1 exact declared npm package/version pairs at 2026-10-04T13:32:35.006Z; 1 advisory identities compared. No advisory match is not proof of vulnerability-free code. Inventory SHA-256 55670f32afb13b939dd1f06f5e3ecf3d08dcda0caf2e74e734ad1a3316373512; response SHA-256 ed6fe437d4c240fa3ea2216d8d8d6472a7a741bdf318f959a625949ac233213a. Advisory snapshot MISS; origin run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; observed at 2026-10-04T13:00:01.000Z; expires 2026-10-04T14:00:00.000Z; cache c226db9e4d6d441cbeb6816a3c64b56b16f4aadac068e00b045187a4e1e8461e. Fresh comparison; cache population is best-effort."
         }
       ]
     }

@@ -1,9 +1,9 @@
 {
-  "at": "2026-10-04T08:45:21.186Z",
+  "at": "2026-10-04T13:10:08.664Z",
   "mode": "REAL_GITHUB_DOCKER_CALLMISSED",
   "identity": "One actual authenticated operator; replay code persona, not multiple independent accounts",
   "pr": 11,
-  "runId": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
+  "runId": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
   "state": "COMPLETED",
   "aiStatus": "COMPLETED",
   "publication": "PUBLISHED",
@@ -205,9 +205,10 @@
       "solution_approach.strengths[0]",
       "solution_approach.strengths[1]",
       "solution_approach.strengths[2]",
-      "solution_approach.tradeoffs[1]"
+      "solution_approach.weaknesses[0]",
+      "solution_approach.weaknesses[1]"
     ],
-    "durationMs": 30486,
+    "durationMs": 45570,
     "evaluationPlan": {
       "depth": "STANDARD",
       "maxChangedFiles": 30,
@@ -229,7 +230,7 @@
       "version": "adaptive-review-v1"
     },
     "groundingPolicy": "objective-facts-unverified-narratives-v1",
-    "inputHash": "abf671daf98de5751bed9bf83ffe27e7aca43cbc44900363cff7f60acab11ff9",
+    "inputHash": "b165423ec36dfa1072c2de499f48f83f353d67699dcc4bd407eaee9dd52fc9be",
     "invokedModel": "kimi-k2.6",
     "model": "kimi-k2.6",
     "modelRouting": {
@@ -238,14 +239,14 @@
       "version": "server-model-routing-v1"
     },
     "objectiveCriterionRecovery": [],
-    "policy": "requirements-and-approach-v11",
+    "policy": "requirements-and-approach-v12",
     "provider": "callmissed",
     "qualitativeCriterionAnalysis": {
       "missingCriterionIds": [],
       "status": "PRESENT"
     },
     "requiresHumanAttention": true,
-    "responseId": "resp_02d06465c0084617b7ce60c954c3042b",
+    "responseId": "resp_6e794aa250d0462db737147d71f60ce6",
     "unverifiedNarrativePaths": [
       "solution_approach.problem_understanding",
       "solution_approach.approach_summary",
@@ -257,23 +258,24 @@
       "solution_approach.strengths[1]",
       "solution_approach.strengths[2]",
       "solution_approach.weaknesses[0]",
+      "solution_approach.weaknesses[1]",
       "solution_approach.tradeoffs[0]",
       "solution_approach.tradeoffs[1]",
-      "findings[0]",
-      "findings[1]",
-      "findings[2]"
+      "solution_approach.unverified_assumptions[0]",
+      "solution_approach.unverified_assumptions[1]",
+      "solution_approach.unverified_assumptions[2]"
     ],
     "usage": {
-      "input_tokens": 13607,
+      "input_tokens": 13391,
       "input_tokens_details": {
         "cache_write_tokens": 0,
-        "cached_tokens": 0
+        "cached_tokens": 384
       },
-      "output_tokens": 1727,
+      "output_tokens": 1803,
       "output_tokens_details": {
         "reasoning_tokens": 0
       },
-      "total_tokens": 15334
+      "total_tokens": 15194
     }
   },
   "unsupportedObserved": 0,
@@ -283,21 +285,20 @@
     {
       "field": "approach_summary",
       "evidenceIds": [
-        "context-source-3",
-        "criterion-retry-transient",
-        "criterion-retry-permanent"
+        "context-source-1",
+        "context-source-2",
+        "diff"
       ],
-      "text": "Replace single-attempt stub with a capped loop over outcomes, stopping on success or permanent failure, bounded by maxAttempts.",
+      "text": "Replace single-attempt stub with a bounded loop over outcomes sliced to maxAttempts, returning immediately on success or permanent failure and otherwise returning failed with consumed attempt count.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "architecture_fit",
       "evidenceIds": [
-        "context-source-3",
-        "criterion-health-preserved",
-        "criterion-payment-created"
+        "context-source-1",
+        "context-source-3"
       ],
-      "text": "Retry logic is isolated in a pure exported function; existing payment routes and health endpoint are unchanged.",
+      "text": "Pure function retryPayment exported from server.mjs and consumed by HTTP route handlers keeps domain logic separate from transport; no external state or side effects.",
       "verification": "UNVERIFIED"
     },
     {
@@ -314,91 +315,124 @@
         "criterion-retry-invalid-string",
         "criterion-retry-outcomes-empty",
         "criterion-retry-outcomes-unknown",
-        "criterion-retry-outcomes-null",
-        "criterion-health-preserved",
-        "criterion-payment-created",
-        "criterion-payment-idempotency",
-        "criterion-payment-read",
-        "criterion-payment-conflict",
-        "criterion-payment-invalid"
+        "criterion-retry-outcomes-null"
       ],
-      "text": "All 18 functional runner checks pass, including retries, validation, and preserved payment behavior.",
+      "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "maintainability",
       "evidenceIds": [
-        "context-source-3"
+        "context-source-1",
+        "context-source-2",
+        "execution-lint"
       ],
-      "text": "Pure function with early returns keeps branching flat; slice clamping is slightly implicit.",
+      "text": "Loop-based implementation is concise; unit tests cover core cases directly against the exported function; build and lint commands pass.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "problem_understanding",
       "evidenceIds": [
-        "context-source-1",
-        "context-source-3"
+        "context-source-3",
+        "diff"
       ],
-      "text": "The baseline handled temporary failures with a single attempt; the task is to continue through temporary outcomes up to maxAttempts while honoring immediate success and permanent failure termination.",
+      "text": "The challenge requires advancing through temporary outcomes up to maxAttempts, stopping immediately on success or permanent failure, while preserving existing payment APIs and adding regression coverage.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "solution_design",
       "evidenceIds": [
-        "context-source-3"
+        "context-source-1",
+        "context-source-2"
       ],
-      "text": "Validate inputs, then iterate outcomes.slice(0, maxAttempts), counting attempts and returning on success or permanent failure.",
+      "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "strengths[0]",
       "evidenceIds": [
-        "context-source-3"
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted"
       ],
-      "text": "Simple loop with early returns makes control flow explicit.",
+      "text": "All retry functional criteria pass execution.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "strengths[1]",
       "evidenceIds": [
-        "context-source-3"
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null"
       ],
-      "text": "Input validation reuses existing outcome checker and adds numeric bounds.",
+      "text": "Edge-case validation criteria pass execution.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "strengths[2]",
       "evidenceIds": [
-        "criterion-retry-transient",
-        "criterion-retry-bounded",
-        "criterion-retry-permanent"
+        "context-source-2",
+        "execution-repository-tests"
       ],
-      "text": "All required retry semantics verified by runner.",
+      "text": "Unit tests directly exercise the exported retryPayment function alongside HTTP-level validation.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "tradeoffs[0]",
       "evidenceIds": [
-        "context-source-3"
+        "context-source-1",
+        "context-source-2"
       ],
-      "text": "Using slice to enforce the attempts bound is concise but couples truncation logic to iteration.",
+      "text": "Simpler loop without back-off delay is acceptable for synchronous simulation but does not model real network retry timing.",
       "verification": "INFERENCE"
     },
     {
       "field": "tradeoffs[1]",
       "evidenceIds": [
-        "context-source-2"
+        "context-source-1"
       ],
-      "text": "Unit tests mirror runner cases rather than expanding parametric coverage.",
+      "text": "Slicing outcomes with .slice(0, maxAttempts) is concise yet creates an intermediate array for each call; negligible at small bounds.",
+      "verification": "INFERENCE"
+    },
+    {
+      "field": "unverified_assumptions[0]",
+      "evidenceIds": [],
+      "text": "No performance or load benchmarks were executed; behavior under high concurrency is unverified.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "unverified_assumptions[1]",
+      "evidenceIds": [],
+      "text": "Security scans or fuzzing of retry input boundaries beyond the specified cases were not performed.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "unverified_assumptions[2]",
+      "evidenceIds": [],
+      "text": "Strict production contract stability beyond the frozen runner cases is assumed but not proven.",
       "verification": "UNVERIFIED"
     },
     {
       "field": "weaknesses[0]",
       "evidenceIds": [
-        "context-source-3"
+        "context-source-1"
       ],
-      "text": "No dedicated error if outcomes.length exceeds maxAttempts; slice silently truncates.",
-      "verification": "INFERENCE"
+      "text": "Server source omits from diff; only function body change is visible, leaving surrounding route wiring unreviewed.",
+      "verification": "UNVERIFIED"
+    },
+    {
+      "field": "weaknesses[1]",
+      "evidenceIds": [
+        "context-source-2"
+      ],
+      "text": "Unit tests assert only function outputs, not HTTP-level retry endpoint integration.",
+      "verification": "UNVERIFIED"
     }
   ],
   "assessments": [
@@ -981,9 +1015,7 @@
         "UNVERIFIED": 0
       },
       "dimension": "TESTING",
-      "findingIndexes": [
-        1
-      ],
+      "findingIndexes": [],
       "missingCapabilities": [
         {
           "reason": "Passing configured cases does not prove comprehensive edge-case coverage or test quality.",
@@ -994,9 +1026,7 @@
       "summary": "Configured checks: 19 PASS, 0 FAIL, 0 UNVERIFIED. These outcomes describe only their configured check scope, not an overall testing verdict.",
       "supportMatrix": {
         "contextualAi": {
-          "findingIndexes": [
-            1
-          ],
+          "findingIndexes": [],
           "origin": "AI_ASSESSMENT",
           "reason": "Citation validity alone cannot establish arbitrary model prose as an engineering fact.",
           "status": "UNVERIFIED"
@@ -1119,7 +1149,7 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-1",
+              "evidenceId": "context-source-3",
               "kind": "source",
               "path": "README.md",
               "requirementId": null,
@@ -1130,9 +1160,9 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
-              "kind": "source",
-              "path": "server.mjs",
+              "evidenceId": "diff",
+              "kind": "diff",
+              "path": null,
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -1143,7 +1173,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "The baseline handled temporary failures with a single attempt; the task is to continue through temporary outcomes up to maxAttempts while honoring immediate success and permanent failure termination."
+          "text": "The challenge requires advancing through temporary outcomes up to maxAttempts, stopping immediately on success or permanent failure, while preserving existing payment APIs and adding regression coverage."
         }
       ],
       "dimension": "QUALITY",
@@ -1168,7 +1198,7 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
@@ -1176,25 +1206,25 @@
               "status": "PASS"
             },
             {
-              "checkId": "retry-transient",
-              "checkKind": "acceptance",
-              "criterionId": "retry-transient",
-              "evidenceId": "criterion-retry-transient",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
             },
             {
-              "checkId": "retry-permanent",
-              "checkKind": "acceptance",
-              "criterionId": "retry-permanent",
-              "evidenceId": "criterion-retry-permanent",
-              "kind": "execution",
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "diff",
+              "kind": "diff",
               "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
             }
           ],
@@ -1203,7 +1233,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Replace single-attempt stub with a capped loop over outcomes, stopping on success or permanent failure, bounded by maxAttempts."
+          "text": "Replace single-attempt stub with a bounded loop over outcomes sliced to maxAttempts, returning immediately on success or permanent failure and otherwise returning failed with consumed attempt count."
         },
         {
           "evidence": [
@@ -1211,9 +1241,20 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -1224,7 +1265,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Validate inputs, then iterate outcomes.slice(0, maxAttempts), counting attempts and returning on success or permanent failure."
+          "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added."
         }
       ],
       "dimension": "ARCHITECTURE",
@@ -1249,42 +1290,20 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
-            },
-            {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
             }
           ],
           "findingIndex": null,
-          "observationPath": "solution_approach.architecture_fit",
+          "observationPath": "solution_approach.weaknesses[0]",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Retry logic is isolated in a pure exported function; existing payment routes and health endpoint are unchanged."
+          "text": "Server source omits from diff; only function body change is visible, leaving surrounding route wiring unreviewed."
         }
       ],
       "dimension": "ARCHITECTURE",
@@ -1436,72 +1455,6 @@
               "requirementId": "bounded-retry",
               "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
-            },
-            {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-idempotency",
-              "checkKind": "acceptance",
-              "criterionId": "payment-idempotency",
-              "evidenceId": "criterion-payment-idempotency",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-read",
-              "checkKind": "acceptance",
-              "criterionId": "payment-read",
-              "evidenceId": "criterion-payment-read",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-conflict",
-              "checkKind": "acceptance",
-              "criterionId": "payment-conflict",
-              "evidenceId": "criterion-payment-conflict",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-invalid",
-              "checkKind": "acceptance",
-              "criterionId": "payment-invalid",
-              "evidenceId": "criterion-payment-invalid",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
             }
           ],
           "findingIndex": null,
@@ -1509,7 +1462,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "All 18 functional runner checks pass, including retries, validation, and preserved payment behavior."
+          "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases."
         }
       ],
       "dimension": "QUALITY",
@@ -1526,18 +1479,65 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No obvious symptom masking patterns detected; implementation addresses test cases",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "criterion-retry-transient",
+          "criterion-retry-bounded",
+          "criterion-retry-permanent",
+          "criterion-retry-immediate",
+          "criterion-retry-exhausted",
+          "criterion-retry-invalid-zero",
+          "criterion-retry-invalid-large",
+          "criterion-retry-invalid-fraction",
+          "criterion-retry-invalid-string",
+          "criterion-retry-outcomes-empty",
+          "criterion-retry-outcomes-unknown",
+          "criterion-retry-outcomes-null",
+          "criterion-health-preserved",
+          "criterion-payment-created",
+          "criterion-payment-idempotency",
+          "criterion-payment-read",
+          "criterion-payment-conflict",
+          "criterion-payment-invalid",
+          "diff"
+        ],
+        "limit": "Analysis based on diff patterns and test coverage; deeper semantic understanding requires human review",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "QUALITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "criterion-retry-transient",
+        "criterion-retry-bounded",
+        "criterion-retry-permanent",
+        "criterion-retry-immediate",
+        "criterion-retry-exhausted",
+        "criterion-retry-invalid-zero",
+        "criterion-retry-invalid-large",
+        "criterion-retry-invalid-fraction",
+        "criterion-retry-invalid-string",
+        "criterion-retry-outcomes-empty",
+        "criterion-retry-outcomes-unknown",
+        "criterion-retry-outcomes-null",
+        "criterion-health-preserved",
+        "criterion-payment-created",
+        "criterion-payment-idempotency",
+        "criterion-payment-read",
+        "criterion-payment-conflict",
+        "criterion-payment-invalid",
+        "diff"
+      ],
       "id": "25.05",
       "inspectReason": "Inspect workaround paths and authoritative negative cases for symptom masking.",
       "label": "Symptom masking",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -1558,18 +1558,29 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No obvious duplication detected in changed code",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Analysis limited to diff and symbol changes; repository-wide clone detection not performed",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "MAINTAINABILITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "25.07",
       "inspectReason": "Inspect repeated implementations or run a configured duplication analyzer.",
       "label": "Duplication",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -1582,7 +1593,7 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
@@ -1590,25 +1601,14 @@
               "status": "PASS"
             },
             {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-3",
+              "kind": "source",
+              "path": "README.md",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
             }
           ],
@@ -1617,7 +1617,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Retry logic is isolated in a pure exported function; existing payment routes and health endpoint are unchanged."
+          "text": "Pure function retryPayment exported from server.mjs and consumed by HTTP route handlers keeps domain logic separate from transport; no external state or side effects."
         }
       ],
       "dimension": "ARCHITECTURE",
@@ -1642,23 +1642,13 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
-            }
-          ],
-          "findingIndex": null,
-          "observationPath": "solution_approach.tradeoffs[0]",
-          "origin": "AI_ASSESSMENT",
-          "relevanceBasis": "SCOPED_APPROACH_FIELD",
-          "status": "UNVERIFIED",
-          "text": "Using slice to enforce the attempts bound is concise but couples truncation logic to iteration."
-        },
-        {
-          "evidence": [
+            },
             {
               "checkId": null,
               "checkKind": null,
@@ -1672,11 +1662,32 @@
             }
           ],
           "findingIndex": null,
+          "observationPath": "solution_approach.tradeoffs[0]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "SCOPED_APPROACH_FIELD",
+          "status": "UNVERIFIED",
+          "text": "Simpler loop without back-off delay is acceptable for synchronous simulation but does not model real network retry timing."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-1",
+              "kind": "source",
+              "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
           "observationPath": "solution_approach.tradeoffs[1]",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Unit tests mirror runner cases rather than expanding parametric coverage."
+          "text": "Slicing outcomes with .slice(0, maxAttempts) is concise yet creates an intermediate array for each call; negligible at small bounds."
         }
       ],
       "dimension": "ARCHITECTURE",
@@ -1709,14 +1720,276 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
-      "contextualAnalysis": [],
+      "analysisCoverage": "CONTEXTUAL_ANALYSIS_AVAILABLE",
+      "contextualAnalysis": [
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-1",
+              "kind": "source",
+              "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.solution_design",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": "retry-transient",
+              "checkKind": "acceptance",
+              "criterionId": "retry-transient",
+              "evidenceId": "criterion-retry-transient",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-bounded",
+              "checkKind": "acceptance",
+              "criterionId": "retry-bounded",
+              "evidenceId": "criterion-retry-bounded",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-permanent",
+              "checkKind": "acceptance",
+              "criterionId": "retry-permanent",
+              "evidenceId": "criterion-retry-permanent",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-immediate",
+              "checkKind": "acceptance",
+              "criterionId": "retry-immediate",
+              "evidenceId": "criterion-retry-immediate",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-exhausted",
+              "checkKind": "acceptance",
+              "criterionId": "retry-exhausted",
+              "evidenceId": "criterion-retry-exhausted",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-zero",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-zero",
+              "evidenceId": "criterion-retry-invalid-zero",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-large",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-large",
+              "evidenceId": "criterion-retry-invalid-large",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-fraction",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-fraction",
+              "evidenceId": "criterion-retry-invalid-fraction",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-string",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-string",
+              "evidenceId": "criterion-retry-invalid-string",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-empty",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-empty",
+              "evidenceId": "criterion-retry-outcomes-empty",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-unknown",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-unknown",
+              "evidenceId": "criterion-retry-outcomes-unknown",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-null",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-null",
+              "evidenceId": "criterion-retry-outcomes-null",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.correctness",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": "retry-invalid-zero",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-zero",
+              "evidenceId": "criterion-retry-invalid-zero",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-large",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-large",
+              "evidenceId": "criterion-retry-invalid-large",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-fraction",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-fraction",
+              "evidenceId": "criterion-retry-invalid-fraction",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-string",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-string",
+              "evidenceId": "criterion-retry-invalid-string",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-empty",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-empty",
+              "evidenceId": "criterion-retry-outcomes-empty",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-unknown",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-unknown",
+              "evidenceId": "criterion-retry-outcomes-unknown",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-null",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-null",
+              "evidenceId": "criterion-retry-outcomes-null",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.strengths[1]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Edge-case validation criteria pass execution."
+        }
+      ],
       "dimension": "TESTING",
       "evidenceIds": [],
       "id": "25.11",
       "inspectReason": "Inspect configured case coverage and missing boundaries; passing existing cases does not imply missing cases passed.",
       "label": "Edge cases",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
@@ -1733,11 +2006,33 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "lint",
+              "checkKind": "lint",
+              "criterionId": null,
+              "evidenceId": "execution-lint",
+              "kind": "execution",
+              "path": null,
+              "requirementId": null,
+              "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
             }
           ],
@@ -1746,7 +2041,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Pure function with early returns keeps branching flat; slice clamping is slightly implicit."
+          "text": "Loop-based implementation is concise; unit tests cover core cases directly against the exported function; build and lint commands pass."
         }
       ],
       "dimension": "MAINTAINABILITY",
@@ -1803,7 +2098,7 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-1",
+              "evidenceId": "context-source-3",
               "kind": "source",
               "path": "README.md",
               "requirementId": null,
@@ -1814,9 +2109,9 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
-              "kind": "source",
-              "path": "server.mjs",
+              "evidenceId": "diff",
+              "kind": "diff",
+              "path": null,
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -1827,215 +2122,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "The baseline handled temporary failures with a single attempt; the task is to continue through temporary outcomes up to maxAttempts while honoring immediate success and permanent failure termination."
-        },
-        {
-          "evidence": [
-            {
-              "checkId": "retry-transient",
-              "checkKind": "acceptance",
-              "criterionId": "retry-transient",
-              "evidenceId": "criterion-retry-transient",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-bounded",
-              "checkKind": "acceptance",
-              "criterionId": "retry-bounded",
-              "evidenceId": "criterion-retry-bounded",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-permanent",
-              "checkKind": "acceptance",
-              "criterionId": "retry-permanent",
-              "evidenceId": "criterion-retry-permanent",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-immediate",
-              "checkKind": "acceptance",
-              "criterionId": "retry-immediate",
-              "evidenceId": "criterion-retry-immediate",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-exhausted",
-              "checkKind": "acceptance",
-              "criterionId": "retry-exhausted",
-              "evidenceId": "criterion-retry-exhausted",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-invalid-zero",
-              "checkKind": "acceptance",
-              "criterionId": "retry-invalid-zero",
-              "evidenceId": "criterion-retry-invalid-zero",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-invalid-large",
-              "checkKind": "acceptance",
-              "criterionId": "retry-invalid-large",
-              "evidenceId": "criterion-retry-invalid-large",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-invalid-fraction",
-              "checkKind": "acceptance",
-              "criterionId": "retry-invalid-fraction",
-              "evidenceId": "criterion-retry-invalid-fraction",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-invalid-string",
-              "checkKind": "acceptance",
-              "criterionId": "retry-invalid-string",
-              "evidenceId": "criterion-retry-invalid-string",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-outcomes-empty",
-              "checkKind": "acceptance",
-              "criterionId": "retry-outcomes-empty",
-              "evidenceId": "criterion-retry-outcomes-empty",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-outcomes-unknown",
-              "checkKind": "acceptance",
-              "criterionId": "retry-outcomes-unknown",
-              "evidenceId": "criterion-retry-outcomes-unknown",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "retry-outcomes-null",
-              "checkKind": "acceptance",
-              "criterionId": "retry-outcomes-null",
-              "evidenceId": "criterion-retry-outcomes-null",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "bounded-retry",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-idempotency",
-              "checkKind": "acceptance",
-              "criterionId": "payment-idempotency",
-              "evidenceId": "criterion-payment-idempotency",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-read",
-              "checkKind": "acceptance",
-              "criterionId": "payment-read",
-              "evidenceId": "criterion-payment-read",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-conflict",
-              "checkKind": "acceptance",
-              "criterionId": "payment-conflict",
-              "evidenceId": "criterion-payment-conflict",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-invalid",
-              "checkKind": "acceptance",
-              "criterionId": "payment-invalid",
-              "evidenceId": "criterion-payment-invalid",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            }
-          ],
-          "findingIndex": null,
-          "observationPath": "solution_approach.correctness",
-          "origin": "AI_ASSESSMENT",
-          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
-          "status": "UNVERIFIED",
-          "text": "All 18 functional runner checks pass, including retries, validation, and preserved payment behavior."
+          "text": "The challenge requires advancing through temporary outcomes up to maxAttempts, stopping immediately on success or permanent failure, while preserving existing payment APIs and adding regression coverage."
         }
       ],
       "dimension": "QUALITY",
@@ -2060,6 +2147,38 @@
         {
           "evidence": [
             {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-1",
+              "kind": "source",
+              "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.solution_design",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added."
+        },
+        {
+          "evidence": [
+            {
               "checkId": "retry-transient",
               "checkKind": "acceptance",
               "criterionId": "retry-transient",
@@ -2190,72 +2309,6 @@
               "requirementId": "bounded-retry",
               "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
-            },
-            {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-idempotency",
-              "checkKind": "acceptance",
-              "criterionId": "payment-idempotency",
-              "evidenceId": "criterion-payment-idempotency",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-read",
-              "checkKind": "acceptance",
-              "criterionId": "payment-read",
-              "evidenceId": "criterion-payment-read",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-conflict",
-              "checkKind": "acceptance",
-              "criterionId": "payment-conflict",
-              "evidenceId": "criterion-payment-conflict",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-invalid",
-              "checkKind": "acceptance",
-              "criterionId": "payment-invalid",
-              "evidenceId": "criterion-payment-invalid",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
             }
           ],
           "findingIndex": null,
@@ -2263,7 +2316,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "All 18 functional runner checks pass, including retries, validation, and preserved payment behavior."
+          "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases."
         },
         {
           "evidence": [
@@ -2271,23 +2324,13 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
-            }
-          ],
-          "findingIndex": null,
-          "observationPath": "solution_approach.strengths[1]",
-          "origin": "AI_ASSESSMENT",
-          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
-          "status": "UNVERIFIED",
-          "text": "Input validation reuses existing outcome checker and adds numeric bounds."
-        },
-        {
-          "evidence": [
+            },
             {
               "checkId": null,
               "checkKind": null,
@@ -2298,14 +2341,177 @@
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
+            },
+            {
+              "checkId": "lint",
+              "checkKind": "lint",
+              "criterionId": null,
+              "evidenceId": "execution-lint",
+              "kind": "execution",
+              "path": null,
+              "requirementId": null,
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
             }
           ],
           "findingIndex": null,
-          "observationPath": "solution_approach.tradeoffs[1]",
+          "observationPath": "solution_approach.maintainability",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Unit tests mirror runner cases rather than expanding parametric coverage."
+          "text": "Loop-based implementation is concise; unit tests cover core cases directly against the exported function; build and lint commands pass."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": "retry-transient",
+              "checkKind": "acceptance",
+              "criterionId": "retry-transient",
+              "evidenceId": "criterion-retry-transient",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-bounded",
+              "checkKind": "acceptance",
+              "criterionId": "retry-bounded",
+              "evidenceId": "criterion-retry-bounded",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-permanent",
+              "checkKind": "acceptance",
+              "criterionId": "retry-permanent",
+              "evidenceId": "criterion-retry-permanent",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-immediate",
+              "checkKind": "acceptance",
+              "criterionId": "retry-immediate",
+              "evidenceId": "criterion-retry-immediate",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-exhausted",
+              "checkKind": "acceptance",
+              "criterionId": "retry-exhausted",
+              "evidenceId": "criterion-retry-exhausted",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.strengths[0]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "All retry functional criteria pass execution."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": "retry-invalid-zero",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-zero",
+              "evidenceId": "criterion-retry-invalid-zero",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-large",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-large",
+              "evidenceId": "criterion-retry-invalid-large",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-fraction",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-fraction",
+              "evidenceId": "criterion-retry-invalid-fraction",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-string",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-string",
+              "evidenceId": "criterion-retry-invalid-string",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-empty",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-empty",
+              "evidenceId": "criterion-retry-outcomes-empty",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-unknown",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-unknown",
+              "evidenceId": "criterion-retry-outcomes-unknown",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-null",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-null",
+              "evidenceId": "criterion-retry-outcomes-null",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.strengths[1]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Edge-case validation criteria pass execution."
         },
         {
           "evidence": [
@@ -2332,12 +2538,33 @@
               "status": "PASS"
             }
           ],
-          "findingIndex": 1,
-          "observationPath": null,
+          "findingIndex": null,
+          "observationPath": "solution_approach.strengths[2]",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "UNVERIFIED AI interpretation: Repository unit tests cover the same cases as the runner acceptances, providing supplementary fast feedback but no additional edge coverage beyond the contract cases."
+          "text": "Unit tests directly exercise the exported retryPayment function alongside HTTP-level validation."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.weaknesses[1]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Unit tests assert only function outputs, not HTTP-level retry endpoint integration."
         }
       ],
       "dimension": "TESTING",
@@ -2376,18 +2603,29 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No explicit private intention claims detected in code changes",
+        "confidence": "HIGH",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection on diff; sophisticated intention inference is explicitly avoided",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "QUALITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "25.18",
       "inspectReason": "Private participant intentions are unknown and are never inferred from code, prose, check outcomes or citations.",
       "label": "No private intention claims",
-      "missingAnalysisReason": "Private intention is unknown and cannot be inferred.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -2400,11 +2638,33 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "lint",
+              "checkKind": "lint",
+              "criterionId": null,
+              "evidenceId": "execution-lint",
+              "kind": "execution",
+              "path": null,
+              "requirementId": null,
+              "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
             }
           ],
@@ -2413,7 +2673,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "SCOPED_APPROACH_FIELD",
           "status": "UNVERIFIED",
-          "text": "Pure function with early returns keeps branching flat; slice clamping is slightly implicit."
+          "text": "Loop-based implementation is concise; unit tests cover core cases directly against the exported function; build and lint commands pass."
         }
       ],
       "dimension": "MAINTAINABILITY",
@@ -2431,65 +2691,109 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "Scoped module inventory is missing for changed files",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires actual import/export inventory; file presence is context only",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.02",
       "inspectReason": "Inspect module responsibilities and interfaces; typecheck PASS does not prove separation.",
       "label": "Separation of concerns",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "Scoped module inventory is missing for changed files",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No obvious duplication detected in changed code",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Analysis limited to diff and symbol changes; repository-wide clone detection not performed",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "MAINTAINABILITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.03",
       "inspectReason": "Inspect repeated code or dedicated duplication analysis.",
       "label": "Duplication",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "No error-specific test evidence available to validate error handling",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires error-specific test coverage to verify error paths",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "QUALITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.04",
       "inspectReason": "Inspect failure paths and dedicated error-case executions.",
       "label": "Error handling",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "No error-specific test evidence available to validate error handling",
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "No changed symbols available for naming analysis",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires changed symbol list to evaluate naming",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "QUALITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.05",
       "inspectReason": "Inspect naming against repository conventions; no naming analyzer is configured.",
       "label": "Naming",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "No changed symbols available for naming analysis",
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -2527,6 +2831,15 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "CONTEXTUAL_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No export information available for API design analysis",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires export inventory to analyze API design",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [
         {
           "evidence": [
@@ -2534,32 +2847,45 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-1",
+              "evidenceId": "context-source-3",
               "kind": "source",
               "path": "README.md",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "diff",
+              "kind": "diff",
+              "path": null,
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
             }
           ],
-          "findingIndex": 2,
-          "observationPath": null,
+          "findingIndex": null,
+          "observationPath": "solution_approach.problem_understanding",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "UNVERIFIED AI interpretation: README updated with bounded-retry semantics; no API schema or request/response examples added."
+          "text": "The challenge requires advancing through temporary outcomes up to maxAttempts, stopping immediately on success or permanent failure, while preserving existing payment APIs and adding regression coverage."
         }
       ],
       "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.08",
       "inspectReason": "Inspect API inventory, compatibility tests and intended call sites.",
       "label": "API design",
-      "missingAnalysisReason": null,
+      "missingAnalysisReason": "No export information available for API design analysis",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -2580,50 +2906,83 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Technical debt indicators: Technical debt marker in added line: +Temporary failures advance to the next supplied o...; Technical debt marker in added line: +  ['temporary then success', ['temporary', 'succe...; Technical debt marker in added line: +  ['bounded temporary failures', ['temporary', 't...; Technical debt marker in added line: +  ['success stops', ['success', 'temporary'], 3, ...; Technical debt marker in added line: +  ['outcomes exhausted', ['temporary'], 3, 'faile...",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; some technical debt may be intentional or acceptable",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "MAINTAINABILITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.10",
       "inspectReason": "Inspect concrete debt introduced or removed and future change costs.",
       "label": "Technical debt",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Testability concerns: No test execution evidence available",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; test coverage does not guarantee test quality",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "TESTING",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "27.11",
       "inspectReason": "Inspect seams and deterministic test isolation; test PASS does not prove testability.",
       "label": "Testability",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "SUPPORTED_FACT",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "No obvious hardcoded secrets detected in changes",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; secret scanner may miss novel patterns",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.01",
       "inspectReason": "Inspect redacted secret-scan results and credential handling; never reproduce secret values.",
       "label": "Hardcoded secrets",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -2636,9 +2995,20 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -2649,7 +3019,7 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Validate inputs, then iterate outcomes.slice(0, maxAttempts), counting attempts and returning on success or permanent failure."
+          "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added."
         },
         {
           "evidence": [
@@ -2784,72 +3154,6 @@
               "requirementId": "bounded-retry",
               "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
-            },
-            {
-              "checkId": "health-preserved",
-              "checkKind": "acceptance",
-              "criterionId": "health-preserved",
-              "evidenceId": "criterion-health-preserved",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-created",
-              "checkKind": "acceptance",
-              "criterionId": "payment-created",
-              "evidenceId": "criterion-payment-created",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-idempotency",
-              "checkKind": "acceptance",
-              "criterionId": "payment-idempotency",
-              "evidenceId": "criterion-payment-idempotency",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-read",
-              "checkKind": "acceptance",
-              "criterionId": "payment-read",
-              "evidenceId": "criterion-payment-read",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-conflict",
-              "checkKind": "acceptance",
-              "criterionId": "payment-conflict",
-              "evidenceId": "criterion-payment-conflict",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
-            },
-            {
-              "checkId": "payment-invalid",
-              "checkKind": "acceptance",
-              "criterionId": "payment-invalid",
-              "evidenceId": "criterion-payment-invalid",
-              "kind": "execution",
-              "path": null,
-              "requirementId": "payment-regression",
-              "scope": "CONFIGURED_CHECK_ONLY",
-              "status": "PASS"
             }
           ],
           "findingIndex": null,
@@ -2857,19 +3161,85 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "All 18 functional runner checks pass, including retries, validation, and preserved payment behavior."
+          "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases."
         },
         {
           "evidence": [
             {
-              "checkId": null,
-              "checkKind": null,
-              "criterionId": null,
-              "evidenceId": "context-source-3",
-              "kind": "source",
-              "path": "server.mjs",
-              "requirementId": null,
-              "scope": "CITED_CONTEXT_ONLY",
+              "checkId": "retry-invalid-zero",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-zero",
+              "evidenceId": "criterion-retry-invalid-zero",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-large",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-large",
+              "evidenceId": "criterion-retry-invalid-large",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-fraction",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-fraction",
+              "evidenceId": "criterion-retry-invalid-fraction",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-string",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-string",
+              "evidenceId": "criterion-retry-invalid-string",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-empty",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-empty",
+              "evidenceId": "criterion-retry-outcomes-empty",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-unknown",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-unknown",
+              "evidenceId": "criterion-retry-outcomes-unknown",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-null",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-null",
+              "evidenceId": "criterion-retry-outcomes-null",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
               "status": "PASS"
             }
           ],
@@ -2878,7 +3248,39 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Input validation reuses existing outcome checker and adds numeric bounds."
+          "text": "Edge-case validation criteria pass execution."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "repository-tests",
+              "checkKind": "test",
+              "criterionId": null,
+              "evidenceId": "execution-repository-tests",
+              "kind": "execution",
+              "path": null,
+              "requirementId": null,
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.strengths[2]",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Unit tests directly exercise the exported retryPayment function alongside HTTP-level validation."
         }
       ],
       "dimension": "SECURITY",
@@ -2896,65 +3298,109 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "No authentication-specific test evidence available",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires auth-specific test coverage to verify no regression",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.03",
       "inspectReason": "Inspect authentication-specific baseline/head negative tests.",
       "label": "Authentication regression",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "No authentication-specific test evidence available",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "No authorization-specific test evidence available",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires authorization-specific test coverage to verify no regression",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.04",
       "inspectReason": "Inspect role/ownership denial cases on baseline and head.",
       "label": "Authorization regression",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "No authorization-specific test evidence available",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Injection concerns: No injection-specific test evidence available",
+        "confidence": "HIGH",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; context matters for many of these patterns",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.05",
       "inspectReason": "Inspect dedicated injection threat-model cases and tainted data paths.",
       "label": "Injection",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Sensitive data concerns: No sensitive data-specific test evidence available",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; legitimate logging may match patterns",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.06",
       "inspectReason": "Inspect redaction, storage and disclosure boundaries without exposing sensitive values.",
       "label": "Sensitive data",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -2975,98 +3421,127 @@
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
-      "contextualAnalysis": [],
+      "analysisCoverage": "CONTEXTUAL_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Command execution concerns: No command execution-specific test evidence available",
+        "confidence": "HIGH",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; legitimate command execution may match patterns",
+        "status": "CONCERN"
+      },
+      "contextualAnalysis": [
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-1",
+              "kind": "source",
+              "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "lint",
+              "checkKind": "lint",
+              "criterionId": null,
+              "evidenceId": "execution-lint",
+              "kind": "execution",
+              "path": null,
+              "requirementId": null,
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.maintainability",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "Loop-based implementation is concise; unit tests cover core cases directly against the exported function; build and lint commands pass."
+        }
+      ],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.08",
       "inspectReason": "Inspect subprocess boundaries and dedicated command-injection tests.",
       "label": "Command execution",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "File handling concerns: No file handling-specific test evidence available",
+        "confidence": "HIGH",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; legitimate file operations may match patterns",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.09",
       "inspectReason": "Inspect path traversal, symlink and file-permission cases.",
       "label": "File handling",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Permission bypass concerns: No permission-specific test evidence available",
+        "confidence": "HIGH",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; legitimate refactoring may remove unused checks",
+        "status": "CONCERN"
+      },
       "contextualAnalysis": [],
       "dimension": "SECURITY",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "28.10",
       "inspectReason": "Inspect explicit deny-path and privilege-boundary executions.",
       "label": "Permission bypass",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
-      "status": "UNVERIFIED"
-    },
-    {
-      "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
-      "contextualAnalysis": [],
-      "dimension": "SECURITY",
-      "evidenceIds": [],
-      "id": "28.11",
-      "inspectReason": "Inspect configured isolation and network-denial measurements.",
-      "label": "Network behavior",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
-      "needsReview": true,
-      "parentFactStatus": "UNVERIFIED",
-      "requiresHumanInspection": true,
-      "scope": "semantic-facet",
-      "status": "UNVERIFIED"
-    },
-    {
-      "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
-      "contextualAnalysis": [],
-      "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
-      "id": "29.01",
-      "inspectReason": "Inspect conventions across changed and existing components.",
-      "label": "Consistency",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
-      "needsReview": true,
-      "parentFactStatus": "UNVERIFIED",
-      "requiresHumanInspection": true,
-      "scope": "semantic-facet",
-      "status": "UNVERIFIED"
-    },
-    {
-      "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
-      "contextualAnalysis": [],
-      "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
-      "id": "29.02",
-      "inspectReason": "Inspect dependencies and ownership across module boundaries.",
-      "label": "Boundaries",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
-      "needsReview": true,
-      "parentFactStatus": "UNVERIFIED",
-      "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -3081,7 +3556,50 @@
               "criterionId": null,
               "evidenceId": "context-source-3",
               "kind": "source",
+              "path": "README.md",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "diff",
+              "kind": "diff",
+              "path": null,
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.problem_understanding",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "The challenge requires advancing through temporary outcomes up to maxAttempts, stopping immediately on success or permanent failure, while preserving existing payment APIs and adding regression coverage."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-1",
+              "kind": "source",
               "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -3092,14 +3610,14 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Using slice to enforce the attempts bound is concise but couples truncation logic to iteration."
+          "text": "Simpler loop without back-off delay is acceptable for synchronous simulation but does not model real network retry timing."
         }
       ],
-      "dimension": "ARCHITECTURE",
+      "dimension": "SECURITY",
       "evidenceIds": [],
-      "id": "29.03",
-      "inspectReason": "Inspect dependency relationships; no coupling analyzer is configured.",
-      "label": "Coupling",
+      "id": "28.11",
+      "inspectReason": "Inspect configured isolation and network-denial measurements.",
+      "label": "Network behavior",
       "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
@@ -3110,17 +3628,98 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "Scoped module inventory is missing for changed files",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires actual import/export inventory; file presence is context only",
+        "status": "UNVERIFIED"
+      },
+      "contextualAnalysis": [],
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [
+        "diff"
+      ],
+      "id": "29.01",
+      "inspectReason": "Inspect conventions across changed and existing components.",
+      "label": "Consistency",
+      "missingAnalysisReason": "Scoped module inventory is missing for changed files",
+      "needsReview": true,
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "bounded-evidence-backed-analysis",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "Scoped module inventory is missing for changed files",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires actual import/export inventory; file presence is context only",
+        "status": "UNVERIFIED"
+      },
+      "contextualAnalysis": [],
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [
+        "diff"
+      ],
+      "id": "29.02",
+      "inspectReason": "Inspect dependencies and ownership across module boundaries.",
+      "label": "Boundaries",
+      "missingAnalysisReason": "Scoped module inventory is missing for changed files",
+      "needsReview": true,
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "bounded-evidence-backed-analysis",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
       "contextualAnalysis": [],
       "dimension": "ARCHITECTURE",
       "evidenceIds": [],
-      "id": "29.04",
-      "inspectReason": "Inspect how each component groups related responsibilities.",
-      "label": "Cohesion",
+      "id": "29.03",
+      "inspectReason": "Inspect dependency relationships; no coupling analyzer is configured.",
+      "label": "Coupling",
       "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
       "scope": "semantic-facet",
+      "status": "UNVERIFIED"
+    },
+    {
+      "aiNarrativeStatus": "UNVERIFIED",
+      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "Scoped module inventory is missing for changed files",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires actual import/export inventory; file presence is context only",
+        "status": "UNVERIFIED"
+      },
+      "contextualAnalysis": [],
+      "dimension": "ARCHITECTURE",
+      "evidenceIds": [
+        "diff"
+      ],
+      "id": "29.04",
+      "inspectReason": "Inspect how each component groups related responsibilities.",
+      "label": "Cohesion",
+      "missingAnalysisReason": "Scoped module inventory is missing for changed files",
+      "needsReview": true,
+      "parentFactStatus": "UNVERIFIED",
+      "requiresHumanInspection": true,
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -3133,9 +3732,20 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-1",
               "kind": "source",
               "path": "server.mjs",
+              "requirementId": null,
+              "scope": "CITED_CONTEXT_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": null,
+              "checkKind": null,
+              "criterionId": null,
+              "evidenceId": "context-source-2",
+              "kind": "source",
+              "path": "retry.test.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
@@ -3146,7 +3756,149 @@
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Validate inputs, then iterate outcomes.slice(0, maxAttempts), counting attempts and returning on success or permanent failure."
+          "text": "Sliced iteration over outcomes bounded by maxAttempts, with early returns for success and break for permanent failure; invalid inputs rejected before loop entry; comprehensive direct unit tests added."
+        },
+        {
+          "evidence": [
+            {
+              "checkId": "retry-transient",
+              "checkKind": "acceptance",
+              "criterionId": "retry-transient",
+              "evidenceId": "criterion-retry-transient",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-bounded",
+              "checkKind": "acceptance",
+              "criterionId": "retry-bounded",
+              "evidenceId": "criterion-retry-bounded",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-permanent",
+              "checkKind": "acceptance",
+              "criterionId": "retry-permanent",
+              "evidenceId": "criterion-retry-permanent",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-immediate",
+              "checkKind": "acceptance",
+              "criterionId": "retry-immediate",
+              "evidenceId": "criterion-retry-immediate",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-exhausted",
+              "checkKind": "acceptance",
+              "criterionId": "retry-exhausted",
+              "evidenceId": "criterion-retry-exhausted",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-zero",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-zero",
+              "evidenceId": "criterion-retry-invalid-zero",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-large",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-large",
+              "evidenceId": "criterion-retry-invalid-large",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-fraction",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-fraction",
+              "evidenceId": "criterion-retry-invalid-fraction",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-invalid-string",
+              "checkKind": "acceptance",
+              "criterionId": "retry-invalid-string",
+              "evidenceId": "criterion-retry-invalid-string",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-empty",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-empty",
+              "evidenceId": "criterion-retry-outcomes-empty",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-unknown",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-unknown",
+              "evidenceId": "criterion-retry-outcomes-unknown",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            },
+            {
+              "checkId": "retry-outcomes-null",
+              "checkKind": "acceptance",
+              "criterionId": "retry-outcomes-null",
+              "evidenceId": "criterion-retry-outcomes-null",
+              "kind": "execution",
+              "path": null,
+              "requirementId": "bounded-retry",
+              "scope": "CONFIGURED_CHECK_ONLY",
+              "status": "PASS"
+            }
+          ],
+          "findingIndex": null,
+          "observationPath": "solution_approach.correctness",
+          "origin": "AI_ASSESSMENT",
+          "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
+          "status": "UNVERIFIED",
+          "text": "All functional criteria pass via trusted runner execution, validating happy-path retries, bounded attempts, permanent-stop, exhausted-outcomes, and invalid-input edge cases."
         },
         {
           "evidence": [
@@ -3154,20 +3906,20 @@
               "checkId": null,
               "checkKind": null,
               "criterionId": null,
-              "evidenceId": "context-source-3",
+              "evidenceId": "context-source-2",
               "kind": "source",
-              "path": "server.mjs",
+              "path": "retry.test.mjs",
               "requirementId": null,
               "scope": "CITED_CONTEXT_ONLY",
               "status": "PASS"
             }
           ],
           "findingIndex": null,
-          "observationPath": "solution_approach.strengths[1]",
+          "observationPath": "solution_approach.weaknesses[1]",
           "origin": "AI_ASSESSMENT",
           "relevanceBasis": "EXPLICIT_TOPIC_MATCH",
           "status": "UNVERIFIED",
-          "text": "Input validation reuses existing outcome checker and adds numeric bounds."
+          "text": "Unit tests assert only function outputs, not HTTP-level retry endpoint integration."
         }
       ],
       "dimension": "ARCHITECTURE",
@@ -3201,33 +3953,55 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "No scoped configuration or extension execution evidence available",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Absence of hardcoded patterns cannot establish extensibility",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "29.07",
       "inspectReason": "Inspect extension points and concrete anticipated changes.",
       "label": "Extensibility",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "No scoped configuration or extension execution evidence available",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
       "aiNarrativeStatus": "UNVERIFIED",
-      "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "analysisCoverage": "BOUNDED_ANALYSIS_AVAILABLE",
+      "boundedAnalysis": {
+        "assessment": "Change scope appears appropriate for requirements",
+        "confidence": "MEDIUM",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Pattern-based detection; actual rewrite necessity requires human judgment",
+        "status": "SUPPORTED"
+      },
       "contextualAnalysis": [],
       "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "29.08",
       "inspectReason": "Inspect the diff against requirement scope and existing components.",
       "label": "Unnecessary rewrite",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": null,
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     },
     {
@@ -3249,17 +4023,28 @@
     {
       "aiNarrativeStatus": "UNVERIFIED",
       "analysisCoverage": "MISSING_MEANINGFUL_ANALYSIS",
+      "boundedAnalysis": {
+        "assessment": "Scoped module inventory is missing for changed files",
+        "confidence": "LOW",
+        "evidenceIds": [
+          "diff"
+        ],
+        "limit": "Requires actual import/export inventory; file presence is context only",
+        "status": "UNVERIFIED"
+      },
       "contextualAnalysis": [],
       "dimension": "ARCHITECTURE",
-      "evidenceIds": [],
+      "evidenceIds": [
+        "diff"
+      ],
       "id": "29.10",
       "inspectReason": "Inspect which component owns each changed responsibility.",
       "label": "Responsibility placement",
-      "missingAnalysisReason": "No sufficiently scoped persisted observation or finding with known citations addresses this facet.",
+      "missingAnalysisReason": "Scoped module inventory is missing for changed files",
       "needsReview": true,
       "parentFactStatus": "UNVERIFIED",
       "requiresHumanInspection": true,
-      "scope": "semantic-facet",
+      "scope": "bounded-evidence-backed-analysis",
       "status": "UNVERIFIED"
     }
   ],
@@ -3271,13 +4056,15 @@
       "25.04",
       "25.08",
       "25.09",
+      "25.11",
       "25.12",
       "25.15",
       "25.16",
       "27.01",
       "27.08",
       "28.02",
-      "29.03",
+      "28.08",
+      "28.11",
       "29.05"
     ],
     "guidanceOnlyFacetIds": [
@@ -3285,7 +4072,6 @@
       "25.06",
       "25.07",
       "25.10",
-      "25.11",
       "25.13",
       "25.14",
       "25.18",
@@ -3304,12 +4090,11 @@
       "28.05",
       "28.06",
       "28.07",
-      "28.08",
       "28.09",
       "28.10",
-      "28.11",
       "29.01",
       "29.02",
+      "29.03",
       "29.04",
       "29.06",
       "29.07",
@@ -3367,38 +4152,20 @@
   "artifactRecapture": {
     "status": 200,
     "result": {
-      "runId": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
+      "runId": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
       "status": "CAPTURED",
       "artifacts": [
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/context/3e084fec282290dd4deb3f955dd8174b05a2a3c09975c4fcd06eae5a5b91f769",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "3e084fec282290dd4deb3f955dd8174b05a2a3c09975c4fcd06eae5a5b91f769",
-          "bytes": 19592,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:22",
-          "kind": "context",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879462955,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/evidence/b791b169ab45d2619fcbac8259fc62ee2b8179182d5d0df5512aec20b445fe62",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b791b169ab45d2619fcbac8259fc62ee2b8179182d5d0df5512aec20b445fe62",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/evidence/0436c9e5ff3d2c4eddf2b0edc1c8f386f4de90bd21ec0a2155060c81392b6215",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "0436c9e5ff3d2c4eddf2b0edc1c8f386f4de90bd21ec0a2155060c81392b6215",
           "bytes": 14315,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:22",
+          "created_at": "2026-10-04 13:08:51",
           "kind": "evidence",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879462526,
+          "expires_at": 1798895331594,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3407,16 +4174,34 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/diff/33257e094fa7b2c5a619be8209bcacf7aa1f9f97f0ba9650bf82e62631c4b226",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "33257e094fa7b2c5a619be8209bcacf7aa1f9f97f0ba9650bf82e62631c4b226",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/context/3e084fec282290dd4deb3f955dd8174b05a2a3c09975c4fcd06eae5a5b91f769",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "3e084fec282290dd4deb3f955dd8174b05a2a3c09975c4fcd06eae5a5b91f769",
+          "bytes": 19592,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 13:08:52",
+          "kind": "context",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895332075,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/diff/953d172085bf864bde0645402558f0fbb40e28f2454279e129695e3641312843",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "953d172085bf864bde0645402558f0fbb40e28f2454279e129695e3641312843",
           "bytes": 3079,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:23",
+          "created_at": "2026-10-04 13:08:52",
           "kind": "diff",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879463407,
+          "expires_at": 1798895332543,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3425,16 +4210,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/execution-baseline-0/6b8ac942a96b06a0cd736a82a8f47b851c4cf1f3acb3abe7701b7656afc086ef",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "6b8ac942a96b06a0cd736a82a8f47b851c4cf1f3acb3abe7701b7656afc086ef",
-          "bytes": 6476,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/execution-baseline-0/de0a8d3d973c0b72bc35acde61b8d5612b22470ac2ac6c9c860ebab475c57b8b",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "de0a8d3d973c0b72bc35acde61b8d5612b22470ac2ac6c9c860ebab475c57b8b",
+          "bytes": 6458,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:23",
+          "created_at": "2026-10-04 13:08:53",
           "kind": "execution-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879463840,
+          "expires_at": 1798895333022,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3443,16 +4228,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/stderr-baseline-0/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
           "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
           "bytes": 628,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 08:44:24",
+          "created_at": "2026-10-04 13:08:53",
           "kind": "stderr-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879464774,
+          "expires_at": 1798895333931,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3461,16 +4246,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/stdout-baseline-0/414b84248102e1f09187e317837c11b4634817e1dfd49b3cc1627ef6785b5fc8",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "414b84248102e1f09187e317837c11b4634817e1dfd49b3cc1627ef6785b5fc8",
-          "bytes": 1628,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/stdout-baseline-0/0e1b4d9a659af58ee4d364ea6c044438f541906ca611b13c63c3e7be655e4d50",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "0e1b4d9a659af58ee4d364ea6c044438f541906ca611b13c63c3e7be655e4d50",
+          "bytes": 1630,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 08:44:24",
+          "created_at": "2026-10-04 13:08:53",
           "kind": "stdout-baseline-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879464312,
+          "expires_at": 1798895333487,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3479,16 +4264,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-0/64957f5c3205fda11049223297cd23e22ff7dd95889c62b0ff49ca97f5c38ce7",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "64957f5c3205fda11049223297cd23e22ff7dd95889c62b0ff49ca97f5c38ce7",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-0/15710953d754ae089d7af05fcf67f6b47da5cbd84559a9b0b2a83bebe425527b",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "15710953d754ae089d7af05fcf67f6b47da5cbd84559a9b0b2a83bebe425527b",
           "bytes": 922,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:25",
+          "created_at": "2026-10-04 13:08:54",
           "kind": "check-baseline-0-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879465224,
+          "expires_at": 1798895334405,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3497,16 +4282,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-1/cd3ce8700cf8c267e02cabe1bb51c6d2a54b1ddb45686e0b09ab9af466cb40b3",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "cd3ce8700cf8c267e02cabe1bb51c6d2a54b1ddb45686e0b09ab9af466cb40b3",
-          "bytes": 918,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-1/d50467f87de3336a53f7f1bc2cfa140f25eb56a6b8567b8e67066aaee1054b73",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "d50467f87de3336a53f7f1bc2cfa140f25eb56a6b8567b8e67066aaee1054b73",
+          "bytes": 917,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:25",
+          "created_at": "2026-10-04 13:08:54",
           "kind": "check-baseline-0-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879465734,
+          "expires_at": 1798895334856,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3515,16 +4300,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-2/de43158f37d522585825bf49f4c0b437784eb171ac23db16950c57feea792199",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "de43158f37d522585825bf49f4c0b437784eb171ac23db16950c57feea792199",
-          "bytes": 922,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-2/5c3c16fcbfc0c32e3d1310c929313f31dced15fd94a1ee57d5a8411bad5e2d22",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "5c3c16fcbfc0c32e3d1310c929313f31dced15fd94a1ee57d5a8411bad5e2d22",
+          "bytes": 921,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:26",
+          "created_at": "2026-10-04 13:08:55",
           "kind": "check-baseline-0-2",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879466636,
+          "expires_at": 1798895335319,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3533,16 +4318,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-3/920910c342c6741d369a2c2337d59e4da81639705317a9c69c6f06e7d8b959aa",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "920910c342c6741d369a2c2337d59e4da81639705317a9c69c6f06e7d8b959aa",
-          "bytes": 923,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-3/4a47c3d6e5090d0bbfb6fe9849461596845e176029feadd39332f38668375e9e",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "4a47c3d6e5090d0bbfb6fe9849461596845e176029feadd39332f38668375e9e",
+          "bytes": 922,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:27",
+          "created_at": "2026-10-04 13:08:55",
           "kind": "check-baseline-0-3",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879467063,
+          "expires_at": 1798895335766,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3551,16 +4336,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-4/508157febf680320060a7c4dd3a1e65fbd6a4d5f6f0ea2317e73e86d3f6d4998",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "508157febf680320060a7c4dd3a1e65fbd6a4d5f6f0ea2317e73e86d3f6d4998",
-          "bytes": 922,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-4/276329bbcd7439b5486c1e44741bea9ae183e6f2ee875dc1c8b0ef6e423c1e35",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "276329bbcd7439b5486c1e44741bea9ae183e6f2ee875dc1c8b0ef6e423c1e35",
+          "bytes": 921,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:27",
+          "created_at": "2026-10-04 13:08:56",
           "kind": "check-baseline-0-4",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879467516,
+          "expires_at": 1798895336211,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3569,16 +4354,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-5/718d3db0e87541e99c70da67b0a159a500175e4faa9bfefd5d64c3f1647540b6",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "718d3db0e87541e99c70da67b0a159a500175e4faa9bfefd5d64c3f1647540b6",
-          "bytes": 922,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-5/c86257aa744fefd1cd3abd9c3067e1cea2fdcd57c0fb29f262717c1ae5b8201c",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "c86257aa744fefd1cd3abd9c3067e1cea2fdcd57c0fb29f262717c1ae5b8201c",
+          "bytes": 921,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:27",
+          "created_at": "2026-10-04 13:08:56",
           "kind": "check-baseline-0-5",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879467960,
+          "expires_at": 1798895336666,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3587,16 +4372,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-6/c998cc87dfd7db6eebe58a25824addd3af6e8bd36d0a873615d116ea558e345d",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "c998cc87dfd7db6eebe58a25824addd3af6e8bd36d0a873615d116ea558e345d",
-          "bytes": 924,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-6/a1ff53f9033b6bb9b4efb049b32174e9d4da38a696796ccc0a2bf620e4d5cab8",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "a1ff53f9033b6bb9b4efb049b32174e9d4da38a696796ccc0a2bf620e4d5cab8",
+          "bytes": 923,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:28",
+          "created_at": "2026-10-04 13:08:59",
           "kind": "check-baseline-0-6",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879468424,
+          "expires_at": 1798895339142,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3605,16 +4390,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-7/a9e799ad1c3ed89d0f986a2b5d6144d2f128763cbf1e0e5e7025f750d33b460d",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "a9e799ad1c3ed89d0f986a2b5d6144d2f128763cbf1e0e5e7025f750d33b460d",
-          "bytes": 930,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-7/90e1c65fc3ed3648ae9a2a3b7173456ca6f273f3caa95a652e7040e89e79f614",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "90e1c65fc3ed3648ae9a2a3b7173456ca6f273f3caa95a652e7040e89e79f614",
+          "bytes": 929,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:28",
+          "created_at": "2026-10-04 13:08:59",
           "kind": "check-baseline-0-7",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879468939,
+          "expires_at": 1798895339580,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3623,52 +4408,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-8/1c5a65fead18117b2990d4987079c673e6714664b9d06898606de27bf982d915",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "1c5a65fead18117b2990d4987079c673e6714664b9d06898606de27bf982d915",
-          "bytes": 926,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-10/b02d79598193dee6b8f94cd4973e765b5745678aa416d3c43bf88492852e82bd",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "b02d79598193dee6b8f94cd4973e765b5745678aa416d3c43bf88492852e82bd",
+          "bytes": 930,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:29",
-          "kind": "check-baseline-0-8",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879469409,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-9/b244625b91c84ff4c82f85e1a2f61225677f4d5130286cdeff623ad4bfc369f5",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b244625b91c84ff4c82f85e1a2f61225677f4d5130286cdeff623ad4bfc369f5",
-          "bytes": 926,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:29",
-          "kind": "check-baseline-0-9",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879469855,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-10/bf28cdaad2623a76503cf537e4148768e123747eec236168e5e889b451dc2eda",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "bf28cdaad2623a76503cf537e4148768e123747eec236168e5e889b451dc2eda",
-          "bytes": 931,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:30",
+          "created_at": "2026-10-04 13:09:00",
           "kind": "check-baseline-0-10",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879470318,
+          "expires_at": 1798895340966,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3677,16 +4426,52 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-11/713f02fe084e6aebb945657ea62362f115d4a6bdedacb7118ca0da45c25e3477",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "713f02fe084e6aebb945657ea62362f115d4a6bdedacb7118ca0da45c25e3477",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-8/6615b4df06b38320f363101e3da6cbf042a56195aa6bb2707c388694b3d2bd0b",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "6615b4df06b38320f363101e3da6cbf042a56195aa6bb2707c388694b3d2bd0b",
           "bytes": 925,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:30",
+          "created_at": "2026-10-04 13:09:00",
+          "kind": "check-baseline-0-8",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895340028,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-9/36437d13e5f05479ad93be3d80c281d548427757267f522ce17a588f5965ae90",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "36437d13e5f05479ad93be3d80c281d548427757267f522ce17a588f5965ae90",
+          "bytes": 925,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 13:09:00",
+          "kind": "check-baseline-0-9",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895340493,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-11/1ab126c5962866e595bea361d15b65b3db5be1af0f047020256e40797e743c70",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "1ab126c5962866e595bea361d15b65b3db5be1af0f047020256e40797e743c70",
+          "bytes": 924,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 13:09:01",
           "kind": "check-baseline-0-11",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879470769,
+          "expires_at": 1798895341440,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3695,16 +4480,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-12/a06e1bc47bd034afaff82e44092760a272980c0cde2434e1fe43d35c10add428",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "a06e1bc47bd034afaff82e44092760a272980c0cde2434e1fe43d35c10add428",
-          "bytes": 900,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-12/e3627c718751cf91660d69f8b978f10d8ea44f0356ba9a1a2cb587d67b324787",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "e3627c718751cf91660d69f8b978f10d8ea44f0356ba9a1a2cb587d67b324787",
+          "bytes": 899,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:31",
+          "created_at": "2026-10-04 13:09:01",
           "kind": "check-baseline-0-12",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879471232,
+          "expires_at": 1798895341917,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3713,16 +4498,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-13/55d28efbcb21d1a2874fe45a14e46a2d2206e89e0001088fe32a03216478d983",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "55d28efbcb21d1a2874fe45a14e46a2d2206e89e0001088fe32a03216478d983",
-          "bytes": 1005,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-13/905ea4379a752fec79884e9b161c5c364451db1f2c559390879fc489d726f0a9",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "905ea4379a752fec79884e9b161c5c364451db1f2c559390879fc489d726f0a9",
+          "bytes": 1004,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:31",
+          "created_at": "2026-10-04 13:09:02",
           "kind": "check-baseline-0-13",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879471685,
+          "expires_at": 1798895342382,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3731,16 +4516,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-14/e74b0979be5b53564787d2e5e0a492eaccc64e8ef801f97ca7854ecbaea0ee5c",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "e74b0979be5b53564787d2e5e0a492eaccc64e8ef801f97ca7854ecbaea0ee5c",
-          "bytes": 1013,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-14/1cffbf4006f4e2367189cdd9f533856382c4510af67b17ec5e772bc01ce41d4c",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "1cffbf4006f4e2367189cdd9f533856382c4510af67b17ec5e772bc01ce41d4c",
+          "bytes": 1012,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:32",
+          "created_at": "2026-10-04 13:09:02",
           "kind": "check-baseline-0-14",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879472145,
+          "expires_at": 1798895342832,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3749,16 +4534,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-15/de2fc697568c09c7cbd31162ce8338fa5ff9fc4998cc6aa6cbda1cba7d60eeae",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "de2fc697568c09c7cbd31162ce8338fa5ff9fc4998cc6aa6cbda1cba7d60eeae",
-          "bytes": 999,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-15/590e47913ca0180a6325879a72c9b4b9453e529e1e5474cb83e61c28ab3a9c50",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "590e47913ca0180a6325879a72c9b4b9453e529e1e5474cb83e61c28ab3a9c50",
+          "bytes": 998,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:32",
+          "created_at": "2026-10-04 13:09:03",
           "kind": "check-baseline-0-15",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879472608,
+          "expires_at": 1798895343291,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3767,16 +4552,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-16/c97b03e45f56e6fdc01eae99bbea7392f6a0ad2f800c5c48ff48e5e0feeb122c",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "c97b03e45f56e6fdc01eae99bbea7392f6a0ad2f800c5c48ff48e5e0feeb122c",
-          "bytes": 921,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-16/3e45f2667ad7c5ef95fe560010bd0e89b39d8249352a5811e7e7f36b072ca522",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "3e45f2667ad7c5ef95fe560010bd0e89b39d8249352a5811e7e7f36b072ca522",
+          "bytes": 920,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:33",
+          "created_at": "2026-10-04 13:09:03",
           "kind": "check-baseline-0-16",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879473199,
+          "expires_at": 1798895343763,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3785,16 +4570,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-17/dcd1a7f804f112ed379113054f26e1828b7e2cad7a41fa61d26d93de1ebde91b",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "dcd1a7f804f112ed379113054f26e1828b7e2cad7a41fa61d26d93de1ebde91b",
-          "bytes": 916,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-17/b111ada8de6953749a065e269ec566a4a417d16043cdc78c306766e01d9fae47",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "b111ada8de6953749a065e269ec566a4a417d16043cdc78c306766e01d9fae47",
+          "bytes": 915,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:33",
+          "created_at": "2026-10-04 13:09:04",
           "kind": "check-baseline-0-17",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879473971,
+          "expires_at": 1798895344234,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3803,16 +4588,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-18/165653aa3dbf5ef5d801b326f11a55b4a9a480fb6b4ae7085016b6412afc8f1a",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "165653aa3dbf5ef5d801b326f11a55b4a9a480fb6b4ae7085016b6412afc8f1a",
-          "bytes": 883,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-18/eac9de1f5f82fa5a455040d00889c37a32601c4b6d19fc35a66038cd3e52082e",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "eac9de1f5f82fa5a455040d00889c37a32601c4b6d19fc35a66038cd3e52082e",
+          "bytes": 882,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:34",
+          "created_at": "2026-10-04 13:09:04",
           "kind": "check-baseline-0-18",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879474417,
+          "expires_at": 1798895344693,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3821,34 +4606,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/tests-baseline-0-19/82460c9ef1863db4dbe9c0483c83271a6ec88541a249a8c0a1bcd853acb3a98a",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "82460c9ef1863db4dbe9c0483c83271a6ec88541a249a8c0a1bcd853acb3a98a",
-          "bytes": 1171,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:34",
-          "kind": "tests-baseline-0-19",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879474874,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-baseline-0-20/cf5c5108bdce8c5082edbf9f8169bf40b467d968d965fc82eeb3eb6a86930df5",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "cf5c5108bdce8c5082edbf9f8169bf40b467d968d965fc82eeb3eb6a86930df5",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-baseline-0-20/34e4fcaeca2e0f400ffe5bf3119597fa27bb9221d1bb87f29a60cc06bbd3ccd7",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "34e4fcaeca2e0f400ffe5bf3119597fa27bb9221d1bb87f29a60cc06bbd3ccd7",
           "bytes": 880,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:35",
+          "created_at": "2026-10-04 13:09:05",
           "kind": "check-baseline-0-20",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879475320,
+          "expires_at": 1798895345631,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3857,16 +4624,34 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/execution-submission-1/04cad552c3c880b5b6bf3273a9b41d1c0c53731497f60e67b72ca6ed6d920595",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "04cad552c3c880b5b6bf3273a9b41d1c0c53731497f60e67b72ca6ed6d920595",
-          "bytes": 6977,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/tests-baseline-0-19/c0647700d1c2432c837ed4d51d1e1d92cdd580f281a6ba65823e5e97f0f86be2",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "c0647700d1c2432c837ed4d51d1e1d92cdd580f281a6ba65823e5e97f0f86be2",
+          "bytes": 1173,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:35",
+          "created_at": "2026-10-04 13:09:05",
+          "kind": "tests-baseline-0-19",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895345148,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/execution-submission-1/16285c2aee98eb99e6c1ce91449010f6fb2cccb66f3e2ee1b53961c6f8f91881",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "16285c2aee98eb99e6c1ce91449010f6fb2cccb66f3e2ee1b53961c6f8f91881",
+          "bytes": 6952,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 13:09:06",
           "kind": "execution-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879475760,
+          "expires_at": 1798895346091,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3875,34 +4660,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
-          "bytes": 628,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/stdout-submission-1/4bf6e8ae1b4316427202f2ba710f8699504c892652c27f53bdcedecc55e54ba5",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "4bf6e8ae1b4316427202f2ba710f8699504c892652c27f53bdcedecc55e54ba5",
+          "bytes": 2111,
           "content_type": "text/plain",
-          "created_at": "2026-10-04 08:44:36",
-          "kind": "stderr-submission-1",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879476666,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/stdout-submission-1/d5e16c638e3f67e1ee95ce1be68a87473a8b822b3ab364d4162a48bfb420ffb6",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "d5e16c638e3f67e1ee95ce1be68a87473a8b822b3ab364d4162a48bfb420ffb6",
-          "bytes": 2115,
-          "content_type": "text/plain",
-          "created_at": "2026-10-04 08:44:36",
+          "created_at": "2026-10-04 13:09:06",
           "kind": "stdout-submission-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879476218,
+          "expires_at": 1798895346543,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3911,16 +4678,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-0/f9d4c39b985585a893c3d4b4dd1a6d0fad0a376be6f81c910e404dd482eef538",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "f9d4c39b985585a893c3d4b4dd1a6d0fad0a376be6f81c910e404dd482eef538",
-          "bytes": 925,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-0/fad4dfff255fddcf84d14975b10f794d2805244b4585a66b17484a63f073edb3",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "fad4dfff255fddcf84d14975b10f794d2805244b4585a66b17484a63f073edb3",
+          "bytes": 924,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:37",
+          "created_at": "2026-10-04 13:09:07",
           "kind": "check-submission-1-0",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879477128,
+          "expires_at": 1798895347475,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3929,16 +4696,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-1/8733585a8d6e541b6ca3793f6fe9dea3ae8ab8267e79a3b96ed7af645054573a",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "8733585a8d6e541b6ca3793f6fe9dea3ae8ab8267e79a3b96ed7af645054573a",
-          "bytes": 920,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-1/cd4e033306d38c975010c1c1dec98b1dd4678050c8b47ce159ea0df45a53a889",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "cd4e033306d38c975010c1c1dec98b1dd4678050c8b47ce159ea0df45a53a889",
+          "bytes": 919,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:37",
+          "created_at": "2026-10-04 13:09:07",
           "kind": "check-submission-1-1",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879477578,
+          "expires_at": 1798895347937,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3947,16 +4714,34 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-2/016a4a45a2bb16e6ba5adba5fa3c128d0992d7c981414a3285e6e0645b2562c1",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "016a4a45a2bb16e6ba5adba5fa3c128d0992d7c981414a3285e6e0645b2562c1",
-          "bytes": 924,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/stderr-submission-1/ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "ecce8c62dc59044b402bd4dcba6bd253492f921ed2ba98eefffedf223811b486",
+          "bytes": 628,
+          "content_type": "text/plain",
+          "created_at": "2026-10-04 13:09:07",
+          "kind": "stderr-submission-1",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895347012,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-2/6afae92d1ae51351efbcc54fb853d2a153bf9fb6d494c40e8b4a455defdfd231",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "6afae92d1ae51351efbcc54fb853d2a153bf9fb6d494c40e8b4a455defdfd231",
+          "bytes": 923,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:38",
+          "created_at": "2026-10-04 13:09:08",
           "kind": "check-submission-1-2",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879478117,
+          "expires_at": 1798895348403,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3965,16 +4750,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-3/b08904b2416f626fc7ec373ae54f8a93296146f91dd25f99df8e0d4ac564a23a",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b08904b2416f626fc7ec373ae54f8a93296146f91dd25f99df8e0d4ac564a23a",
-          "bytes": 925,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-3/4efe9ca5bff9f49680582172934ba6265a0b397616a686624bd740bf70da5e37",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "4efe9ca5bff9f49680582172934ba6265a0b397616a686624bd740bf70da5e37",
+          "bytes": 924,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:38",
+          "created_at": "2026-10-04 13:09:08",
           "kind": "check-submission-1-3",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879478561,
+          "expires_at": 1798895348862,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -3983,16 +4768,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-4/30ef2b39940cea423561dd50f79e3298ffcf940a0e17ad0ef99a0a1d62277d8b",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "30ef2b39940cea423561dd50f79e3298ffcf940a0e17ad0ef99a0a1d62277d8b",
-          "bytes": 924,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-4/99183a540cd725af4f84c18e900d40f76298e824ec1d325f9a8bb5982efa4b85",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "99183a540cd725af4f84c18e900d40f76298e824ec1d325f9a8bb5982efa4b85",
+          "bytes": 923,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:39",
+          "created_at": "2026-10-04 13:09:09",
           "kind": "check-submission-1-4",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879478997,
+          "expires_at": 1798895349311,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4001,16 +4786,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-5/b192bd1bed91c95e9e3b9a690006cf41d023e6fca03f41483cbf27a52b020320",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b192bd1bed91c95e9e3b9a690006cf41d023e6fca03f41483cbf27a52b020320",
-          "bytes": 924,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-5/ffe5acdf5bf163641aadd506f4ffd2fdbffeed907138069210ce230b860194d2",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "ffe5acdf5bf163641aadd506f4ffd2fdbffeed907138069210ce230b860194d2",
+          "bytes": 923,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:39",
+          "created_at": "2026-10-04 13:09:09",
           "kind": "check-submission-1-5",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879479428,
+          "expires_at": 1798895349786,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4019,16 +4804,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-6/d9cc16453bdf24e3ef18cae1a55f511e1beec39dfa2fa032053c8d086d87de37",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "d9cc16453bdf24e3ef18cae1a55f511e1beec39dfa2fa032053c8d086d87de37",
-          "bytes": 926,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-6/963891887495378269469678e7c3bf1ac8ab37e45c1896253337a2ed548105ca",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "963891887495378269469678e7c3bf1ac8ab37e45c1896253337a2ed548105ca",
+          "bytes": 925,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:40",
+          "created_at": "2026-10-04 13:09:10",
           "kind": "check-submission-1-6",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879480092,
+          "expires_at": 1798895350244,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4037,16 +4822,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-7/038ba7e1f68703c574aae227540eb28bcaea0bed4243c66eab64bb1159d57e0c",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "038ba7e1f68703c574aae227540eb28bcaea0bed4243c66eab64bb1159d57e0c",
-          "bytes": 932,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-7/403cf03c6a294e6f37ed14fef41c5f9853cba237b6fd8bcb4fea325c991e0fd6",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "403cf03c6a294e6f37ed14fef41c5f9853cba237b6fd8bcb4fea325c991e0fd6",
+          "bytes": 931,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:40",
+          "created_at": "2026-10-04 13:09:10",
           "kind": "check-submission-1-7",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879480523,
+          "expires_at": 1798895350736,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4055,16 +4840,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-8/62c70c9cee3599abc005953ac2b6273cde5ecaa5e017a0aec816d8f5798dbda9",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "62c70c9cee3599abc005953ac2b6273cde5ecaa5e017a0aec816d8f5798dbda9",
-          "bytes": 928,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-8/3ca95d265f746d2d5885430b059020422509bbd9a896abe42d3dbb27fdae4ad6",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "3ca95d265f746d2d5885430b059020422509bbd9a896abe42d3dbb27fdae4ad6",
+          "bytes": 927,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:40",
+          "created_at": "2026-10-04 13:09:11",
           "kind": "check-submission-1-8",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879480968,
+          "expires_at": 1798895351199,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4073,34 +4858,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-10/b576f467cddad36513e13e26aae8f59a2d5167b9b6f72f54bd4f17df218bea85",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b576f467cddad36513e13e26aae8f59a2d5167b9b6f72f54bd4f17df218bea85",
-          "bytes": 933,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-9/a315b9f618e066dd185130e118711c8f05d9a533fd7ce74b2540d02103c5961f",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "a315b9f618e066dd185130e118711c8f05d9a533fd7ce74b2540d02103c5961f",
+          "bytes": 927,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:41",
-          "kind": "check-submission-1-10",
-          "storage": "KV",
-          "status": "STORED",
-          "expires_at": 1798879481881,
-          "error_code": null,
-          "attempts": 1,
-          "upload_token": null,
-          "upload_lease_until": null,
-          "delete_token": null,
-          "cleanup_after": null
-        },
-        {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-9/4994aff157796f05a6f65d9b65c23d90a88fb3a0957f248dfb55515eb2c64bda",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "4994aff157796f05a6f65d9b65c23d90a88fb3a0957f248dfb55515eb2c64bda",
-          "bytes": 928,
-          "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:41",
+          "created_at": "2026-10-04 13:09:11",
           "kind": "check-submission-1-9",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879481415,
+          "expires_at": 1798895351658,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4109,16 +4876,34 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-11/b491e43afd812c66dbac6a6045fd5ff4ca4a9ecafbb5acca426af619db938351",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "b491e43afd812c66dbac6a6045fd5ff4ca4a9ecafbb5acca426af619db938351",
-          "bytes": 927,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-10/3792ce47cdb4fd71c91cef99e245a04a9a20b216cc9003547463cd5927ee66fd",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "3792ce47cdb4fd71c91cef99e245a04a9a20b216cc9003547463cd5927ee66fd",
+          "bytes": 932,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:42",
+          "created_at": "2026-10-04 13:09:12",
+          "kind": "check-submission-1-10",
+          "storage": "KV",
+          "status": "STORED",
+          "expires_at": 1798895352114,
+          "error_code": null,
+          "attempts": 1,
+          "upload_token": null,
+          "upload_lease_until": null,
+          "delete_token": null,
+          "cleanup_after": null
+        },
+        {
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-11/4392c50611f38196dcf03256c22f1808bd2ea69d583550e22ab7d3e1faba0088",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "4392c50611f38196dcf03256c22f1808bd2ea69d583550e22ab7d3e1faba0088",
+          "bytes": 926,
+          "content_type": "application/json",
+          "created_at": "2026-10-04 13:09:12",
           "kind": "check-submission-1-11",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879482317,
+          "expires_at": 1798895352633,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4127,16 +4912,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-12/f348265eb5878b35ce884e46ba287470fd4b7db3d8a61e28d3b5230c68443e2d",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "f348265eb5878b35ce884e46ba287470fd4b7db3d8a61e28d3b5230c68443e2d",
-          "bytes": 902,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-12/4723191a2e579be636a83095085988a02d9668baef21538599c0821bae917c86",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "4723191a2e579be636a83095085988a02d9668baef21538599c0821bae917c86",
+          "bytes": 901,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:42",
+          "created_at": "2026-10-04 13:09:13",
           "kind": "check-submission-1-12",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879482829,
+          "expires_at": 1798895353132,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4145,16 +4930,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-13/5de684434d5d809f0e1712926c2300035a25480600dbbf12be0f72fbb459f4ac",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "5de684434d5d809f0e1712926c2300035a25480600dbbf12be0f72fbb459f4ac",
-          "bytes": 1007,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-13/df218af3489ffa3da96546c274400936824db664d1e3f808ba36f82970e4cd3f",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "df218af3489ffa3da96546c274400936824db664d1e3f808ba36f82970e4cd3f",
+          "bytes": 1006,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:43",
+          "created_at": "2026-10-04 13:09:13",
           "kind": "check-submission-1-13",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879483279,
+          "expires_at": 1798895353605,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4163,16 +4948,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-14/de74717709cd2d30b375519f99660f694e5d7636097ece7369294ec3b17ac53b",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "de74717709cd2d30b375519f99660f694e5d7636097ece7369294ec3b17ac53b",
-          "bytes": 1015,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-14/dd83edf0eb353a19e284ec7294a4d4ec54e89b8ec5eb14738c7c60b5e7fbc026",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "dd83edf0eb353a19e284ec7294a4d4ec54e89b8ec5eb14738c7c60b5e7fbc026",
+          "bytes": 1014,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:43",
+          "created_at": "2026-10-04 13:09:14",
           "kind": "check-submission-1-14",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879483753,
+          "expires_at": 1798895354068,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4181,16 +4966,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-15/e42dc8862eda938cc0d04bb7e2627c9879e4053159350827103f01f69d14603c",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "e42dc8862eda938cc0d04bb7e2627c9879e4053159350827103f01f69d14603c",
-          "bytes": 1001,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-15/604fb50169f4d828a476f4a6e522a5019b5664317d89236921190f1f86c4a294",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "604fb50169f4d828a476f4a6e522a5019b5664317d89236921190f1f86c4a294",
+          "bytes": 1000,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:44",
+          "created_at": "2026-10-04 13:09:14",
           "kind": "check-submission-1-15",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879484189,
+          "expires_at": 1798895354530,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4199,16 +4984,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-16/dcfc79df290661a98497f10254aad3af9adca85b1672a3da6ccff43bd9368f8a",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "dcfc79df290661a98497f10254aad3af9adca85b1672a3da6ccff43bd9368f8a",
-          "bytes": 923,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-16/8d1890fc30a74d0d42e72ea014ea1da504c045811a63b4d209e05a88b74d9fb0",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "8d1890fc30a74d0d42e72ea014ea1da504c045811a63b4d209e05a88b74d9fb0",
+          "bytes": 922,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:44",
+          "created_at": "2026-10-04 13:09:15",
           "kind": "check-submission-1-16",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879484636,
+          "expires_at": 1798895355011,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4217,16 +5002,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-17/63a06d6dc9857effa2a73a1359bb0be3291e55bf1e90ba212e3201e3f75f480d",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "63a06d6dc9857effa2a73a1359bb0be3291e55bf1e90ba212e3201e3f75f480d",
-          "bytes": 918,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-17/dcc28ef69cb3a2b9421e1b51fd9113e22780a9db0a28580ee56dd2a0051f4684",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "dcc28ef69cb3a2b9421e1b51fd9113e22780a9db0a28580ee56dd2a0051f4684",
+          "bytes": 917,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:45",
+          "created_at": "2026-10-04 13:09:15",
           "kind": "check-submission-1-17",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879485127,
+          "expires_at": 1798895355469,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4235,16 +5020,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-18/94218b2b43586114cdd12b49754dd61cc4170341d5eab41d04def8cdc394c2f9",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "94218b2b43586114cdd12b49754dd61cc4170341d5eab41d04def8cdc394c2f9",
-          "bytes": 885,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-18/7b320602b7a969709ef968b009d24e91f9403d1ebc99a427bb77e3a38cf1d7b3",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "7b320602b7a969709ef968b009d24e91f9403d1ebc99a427bb77e3a38cf1d7b3",
+          "bytes": 884,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:45",
+          "created_at": "2026-10-04 13:09:15",
           "kind": "check-submission-1-18",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879485584,
+          "expires_at": 1798895355930,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4253,16 +5038,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/check-submission-1-20/f4858559f3e853b1598ffc890df410465f86235d4fb5f1cea2e8c16399690ec7",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "f4858559f3e853b1598ffc890df410465f86235d4fb5f1cea2e8c16399690ec7",
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/check-submission-1-20/7d3cb6920c397a47ccd0dedbb071d051bd8b1502487a23a17cb866da7ff47926",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "7d3cb6920c397a47ccd0dedbb071d051bd8b1502487a23a17cb866da7ff47926",
           "bytes": 882,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:46",
+          "created_at": "2026-10-04 13:09:16",
           "kind": "check-submission-1-20",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879486506,
+          "expires_at": 1798895356837,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4271,16 +5056,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/tests-submission-1-19/f409fb8fac98c6eeaaf636daf4e545ba628bca3e0df2f9d257f2bdae509613a0",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "f409fb8fac98c6eeaaf636daf4e545ba628bca3e0df2f9d257f2bdae509613a0",
-          "bytes": 1673,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/tests-submission-1-19/ee73f9fc49adcd6e61a81e0115f96279aa507f16f23433640fbc0e85616ba59a",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "ee73f9fc49adcd6e61a81e0115f96279aa507f16f23433640fbc0e85616ba59a",
+          "bytes": 1669,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:44:46",
+          "created_at": "2026-10-04 13:09:16",
           "kind": "tests-submission-1-19",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879486061,
+          "expires_at": 1798895356385,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,
@@ -4289,16 +5074,16 @@
           "cleanup_after": null
         },
         {
-          "key": "evaluations/50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d/report/94ddebf424e20a8700a8064dad942a85ff1b7ad681e01657cec200ca08b64ded",
-          "run_id": "50c15cb46589f5ba68974c829a7d55205905c8b2354f381b394d1781ee5b5b2d",
-          "sha256": "94ddebf424e20a8700a8064dad942a85ff1b7ad681e01657cec200ca08b64ded",
-          "bytes": 78514,
+          "key": "evaluations/42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9/report/463814fe6d89b2b17f39a35fa599e2afe9e2003c094074f3d3d283fde111c770",
+          "run_id": "42fa7a3692e574d776369bbc82941cae042f7cc3dddda68054476191de1b90b9",
+          "sha256": "463814fe6d89b2b17f39a35fa599e2afe9e2003c094074f3d3d283fde111c770",
+          "bytes": 94910,
           "content_type": "application/json",
-          "created_at": "2026-10-04 08:45:17",
+          "created_at": "2026-10-04 13:10:03",
           "kind": "report",
           "storage": "KV",
           "status": "STORED",
-          "expires_at": 1798879517798,
+          "expires_at": 1798895403329,
           "error_code": null,
           "attempts": 1,
           "upload_token": null,

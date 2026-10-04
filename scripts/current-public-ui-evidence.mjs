@@ -18,63 +18,32 @@ page.on('pageerror', (error) => errors.push(error.message));
 const parse = (value) =>
   typeof value === 'string' ? JSON.parse(value) : value;
 try {
+  const initialResponse = page.waitForResponse(
+    (response) =>
+      response.url() === origin + '/api/overview' &&
+      response.request().method() === 'GET',
+  );
   await page.goto(origin);
   await page
     .getByRole('heading', { name: 'Evaluate a real public PR', exact: true })
     .waitFor();
-  const initial = await (
-    await context.request.get(origin + '/api/overview')
-  ).json();
+  const initial = await (await initialResponse).json();
   let run = initial.runs?.find(
     (item) =>
       item.request?.prUrl ===
       'https://github.com/Daksh-Codebase/payment-engine/pull/11',
   );
-  if (!run || process.env.PUBLIC_PROOF_NEW_ATTEMPT === 'true') {
-    await page
-      .getByLabel('Public GitHub pull request URL')
-      .fill('https://github.com/Daksh-Codebase/payment-engine/pull/11');
-    await page
-      .getByLabel('What was the team expected to implement?')
-      .fill(
-        'Implement the issue #6 bounded payment retry behavior while preserving the existing payment API.',
-      );
-    await page
-      .getByText('Baseline and objective assertions (optional)', {
-        exact: true,
-      })
-      .click();
-    await page
-      .getByLabel('Frozen baseline commit SHA')
-      .fill('65cb717281eaa2aced69dfaa68ac06c6d540ce2a');
-    await page
-      .getByLabel('Protected paths (one per line)')
-      .fill('.github/workflows\ntests');
-    const submitted = page.waitForResponse(
-      (response) =>
-        response.url().endsWith('/api/preview/evaluations') &&
-        response.request().method() === 'POST',
-    );
-    await page
-      .getByRole('button', { name: 'Evaluate PR', exact: true })
-      .click();
-    const response = await submitted;
-    assert.equal(response.status(), 202);
-    const result = await response.json();
-    run = { id: result.runId };
-  }
-  await context.storageState({ path: statePath });
+  assert.ok(
+    run,
+    'Existing isolated public attempt is required; this capture creates no new runs',
+  );
+  const detailResponse = page.waitForResponse(
+    (response) =>
+      response.url() === origin + '/api/evaluations/' + run.id &&
+      response.request().method() === 'GET',
+  );
   await page.goto(origin + '/?run=' + run.id);
-  for (let attempt = 0; attempt < 80; attempt++) {
-    const response = await context.request.get(
-      origin + '/api/evaluations/' + run.id,
-    );
-    assert.equal(response.status(), 200);
-    run = await response.json();
-    if (['COMPLETED', 'FAILED'].includes(run.state)) break;
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-  }
-  await page.reload();
+  run = await (await detailResponse).json();
   await page
     .getByRole('heading', { name: 'Requirements', exact: true })
     .waitFor();
@@ -126,6 +95,29 @@ try {
         !reviewContext?.trustedChecks,
     );
   }
+  assert.equal(run.state, 'FAILED');
+  assert.equal(run.failure_code, 'GITHUB_HTTP_403');
+  assert.equal(evidence.length, 0);
+  assert.equal(contract, null);
+  assert.equal(report, null);
+  assert.equal(reviewContext, null);
+  await page
+    .getByText('FAILED EVALUATION · GITHUB_HTTP_403', { exact: true })
+    .waitFor();
+  assert.equal(
+    await page.locator('#mode-label').innerText(),
+    'PUBLIC PR REVIEW',
+  );
+  assert.ok(
+    (await page.locator('#demo-banner').innerText()).includes(
+      'Read-only GitHub',
+    ),
+  );
+  assert.ok(
+    (await page.locator('.summary-assessment').innerText()).includes(
+      'GITHUB_HTTP_403',
+    ),
+  );
   assert.ok(!text.includes('[object Object]'));
   assert.equal(errors.length, 0);
   const regressions = page.locator('.panel').filter({
@@ -134,17 +126,21 @@ try {
   const regressionScopeTruthful = (await regressions.innerText()).includes(
     'Regression safety remains UNVERIFIED',
   );
+  assert.ok(regressionScopeTruthful);
   await page.screenshot({
     path: 'docs/qa/current-native-preview-public.png',
     fullPage: true,
   });
+  const overviewResponse = page.waitForResponse(
+    (response) =>
+      response.url() === origin + '/api/overview' &&
+      response.request().method() === 'GET',
+  );
   await page.getByRole('button', { name: /All submissions/ }).click();
   await page
     .getByRole('heading', { name: 'Competition metrics', exact: true })
     .waitFor();
-  const overview = await (
-    await context.request.get(origin + '/api/overview')
-  ).json();
+  const overview = await (await overviewResponse).json();
   const displayedNewest = await page
     .locator('#rows [data-run]')
     .evaluateAll((nodes) => nodes.map((node) => node.dataset.run));
@@ -159,8 +155,28 @@ try {
       .evaluateAll((nodes) => nodes.map((node) => node.dataset.run)),
     [...newest].reverse(),
   );
+  const teamCountsUnavailable =
+    (
+      await page
+        .locator('.metric-item')
+        .filter({ hasText: 'Submitted teams' })
+        .innerText()
+    ).includes('Unavailable') &&
+    (
+      await page
+        .locator('.metric-item')
+        .filter({ hasText: 'Not submitted' })
+        .innerText()
+    ).includes('Unavailable');
+  assert.ok(teamCountsUnavailable);
+  await page.screenshot({
+    path: 'docs/qa/current-native-preview-public-overview.png',
+    fullPage: true,
+  });
   const result = {
     mode: 'ACTUAL_DEPLOYED_BROWSER_NO_MOCKS',
+    capture:
+      'Native UI network responses only; no direct API requests, interception, or new attempts',
     at: new Date().toISOString(),
     origin,
     role: 'public-review-session',
@@ -197,15 +213,15 @@ try {
           ],
     browser: {
       errors,
+      directLinkModeVerified: true,
+      failureSummaryVerified: true,
       structuredObservationsRendered: report?.solution_approach
         ? !text.includes('[object Object]')
         : null,
       regressionScopeTruthful,
       sortingVerified: overview.runs.length > 1,
       displayedRunCount: overview.runs.length,
-      teamCountsUnavailable: (
-        await page.locator('.metrics-grid').innerText()
-      ).includes('Unavailable'),
+      teamCountsUnavailable,
     },
   };
   await writeFile(
