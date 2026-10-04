@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   groundReview,
+  rejectUnsupportedQualitativeClaims,
   GROUNDING_POLICY,
   completeObjectiveAssessments,
   completeApproachEvidenceIndex,
@@ -418,4 +419,79 @@ it('traces citation-index repair while preserving missing-criterion NEEDS_REVIEW
     'UNVERIFIED',
   );
   expect(result.review.assessments[0]?.status).toBe('FAIL');
+});
+
+it('rejects unsupported qualitative prose without repairing unknown citations or contradictions', () => {
+  const { contract, evidence, review } = fixture();
+  review.solution_approach.maintainability = {
+    text: 'All code is perfect.',
+    verification: 'INFERENCE',
+    evidenceIds: [],
+  };
+  const rejected = rejectUnsupportedQualitativeClaims(review, evidence);
+  const validated = validateReview(rejected.value, contract, evidence);
+  expect(rejected.rejectedClaims).toHaveLength(1);
+  expect(validated.solution_approach.maintainability.text).not.toContain(
+    'All code is perfect',
+  );
+  expect(validated.solution_approach.maintainability.evidenceIds).toEqual([]);
+  const unknown = structuredClone(review);
+  unknown.solution_approach.maintainability.evidenceIds = ['invented'];
+  expect(
+    rejectUnsupportedQualitativeClaims(unknown, evidence).rejectedClaims,
+  ).toEqual([]);
+  expect(() =>
+    validateReview(
+      rejectUnsupportedQualitativeClaims(unknown, evidence).value,
+      contract,
+      evidence,
+    ),
+  ).toThrow();
+  const contradiction = structuredClone(review);
+  contradiction.assessments[0]!.status = 'PASS';
+  expect(() =>
+    validateReview(
+      rejectUnsupportedQualitativeClaims(contradiction, evidence).value,
+      contract,
+      evidence,
+    ),
+  ).toThrow();
+  const incomplete = { ...review, solution_approach: {} };
+  expect(
+    rejectUnsupportedQualitativeClaims(incomplete, evidence).rejectedClaims,
+  ).toEqual([]);
+  expect(() =>
+    validateReview(
+      rejectUnsupportedQualitativeClaims(incomplete, evidence).value,
+      contract,
+      evidence,
+    ),
+  ).toThrow();
+});
+
+it('discards observations citing unavailable evidence without inventing an assessment', () => {
+  const { contract, evidence, review } = fixture();
+  evidence[1]!.status = 'UNVERIFIED';
+  review.solution_approach.maintainability = {
+    text: 'Maintainability has been proven.',
+    verification: 'OBSERVED',
+    evidenceIds: ['source'],
+  };
+  review.solution_approach.evidence = ['source'];
+  const rejected = rejectUnsupportedQualitativeClaims(review, evidence);
+  const validated = validateReview(rejected.value, contract, evidence);
+  expect(rejected.rejectedClaims).toEqual([
+    {
+      path: 'solution_approach.maintainability',
+      reason: 'Unverified evidence cannot establish an observed fact.',
+    },
+  ]);
+  expect(validated.solution_approach.maintainability.verification).toBe(
+    'UNVERIFIED',
+  );
+  expect(validated.solution_approach.maintainability.evidenceIds).toEqual([]);
+  expect(validated.solution_approach.maintainability.text).not.toContain(
+    'Maintainability has been proven',
+  );
+  expect(validated.assessments).toEqual(review.assessments);
 });

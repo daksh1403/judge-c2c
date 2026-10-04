@@ -1,0 +1,157 @@
+{
+  "at": "2026-10-04T18:19:14.131Z",
+  "origin": "https://judge-c2c-production.dakshx.workers.dev",
+  "mode": "ACTUAL_FRONTEND_BUTTONS",
+  "boundary": "Production deployment diagnostics only. Synthetic diagnostic contract; no production participant evaluation or GitHub App connection claimed.",
+  "newAppRequired": true,
+  "runner": {
+    "http": 200,
+    "synthetic": true,
+    "status": "COMPLETED",
+    "results": [
+      {
+        "label": "baseline",
+        "result": {
+          "requestHash": "981c7495806eb326655563cc1a5fd802a96b750363fe0c882a2e4020a346f9b3",
+          "commit": "0000000000000000000000000000000000000000",
+          "contractHash": "b97ed8576b7dbe81224a525a9f1704c96dc44d19ad589833be4cb80f2c1a9ab1",
+          "version": "node-http-v1.3.0",
+          "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+          "runtime": "v24.21.0; docker-local-v1",
+          "metrics": {
+            "startupMs": 396,
+            "tools": {
+              "node": "v24.21.0",
+              "npm": "11.19.0"
+            },
+            "resources": [
+              {
+                "scope": "service",
+                "sampledAt": "2026-10-04T18:19:18.289Z",
+                "cpuUsageUsec": 101885,
+                "memoryBytes": 10973184,
+                "pids": 8
+              }
+            ]
+          },
+          "startedAt": "2026-10-04T18:19:17.711Z",
+          "finishedAt": "2026-10-04T18:19:18.341Z",
+          "checks": [
+            {
+              "id": "ready",
+              "kind": "acceptance",
+              "status": "FAIL",
+              "exitCode": null,
+              "durationMs": 0,
+              "stdout": "",
+              "stderr": "",
+              "detail": "Required service entrypoint is missing."
+            }
+          ]
+        }
+      },
+      {
+        "label": "submission",
+        "result": {
+          "requestHash": "b3bd4f12bbaa55438aeaf63f5a745c7a3432777d833cfef6913b39b56e5ecae1",
+          "commit": "1111111111111111111111111111111111111111",
+          "contractHash": "b97ed8576b7dbe81224a525a9f1704c96dc44d19ad589833be4cb80f2c1a9ab1",
+          "version": "node-http-v1.3.0",
+          "image": "docker-local@sha256:669a7c4162f97d15fe6c020f4947243804fa3270e5187238ca1ff81a5b860110",
+          "runtime": "v24.21.0; docker-local-v1",
+          "metrics": {
+            "startupMs": 196,
+            "tools": {
+              "node": "v24.21.0",
+              "npm": "11.19.0"
+            },
+            "resources": [
+              {
+                "scope": "service",
+                "sampledAt": "2026-10-04T18:19:18.946Z",
+                "cpuUsageUsec": 137749,
+                "memoryBytes": 31211520,
+                "pids": 15
+              }
+            ]
+          },
+          "startedAt": "2026-10-04T18:19:18.442Z",
+          "finishedAt": "2026-10-04T18:19:19.005Z",
+          "checks": [
+            {
+              "id": "ready",
+              "kind": "acceptance",
+              "status": "PASS",
+              "exitCode": null,
+              "durationMs": 114,
+              "stdout": "{\"ready\":true}",
+              "stderr": "",
+              "detail": "Trusted HTTP acceptance ready: PASS. Expected status 200; observed 200."
+            }
+          ]
+        }
+      }
+    ],
+    "visibleMessage": "Docker runner verified: missing baseline FAIL → trusted canary PASS. Synthetic diagnostic, not a participant PR evaluation."
+  },
+  "ai": {
+    "http": 200,
+    "synthetic": true,
+    "status": "FAILED",
+    "summary": "Evidence-backed review completed. Only trusted execution evidence verifies functional behavior; missing checks remain UNVERIFIED. AI inference is not proof.",
+    "trace": {
+      "policy": "requirements-and-approach-v15",
+      "provider": "cloudflare",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "inputHash": "4e9688f48df05cd91ad35585ad327b7bda23f32d7dacc0bafeefd43541eea7f4",
+      "durationMs": 340,
+      "attempts": 2,
+      "attemptFailures": [
+        "AI_OUTPUT_INVALID",
+        "AI_OUTPUT_INVALID"
+      ],
+      "failureCode": "AI_OUTPUT_INVALID",
+      "contextBudget": {
+        "version": "bounded-review-context-v1",
+        "contextBytes": 4192,
+        "maxContextBytes": 48000,
+        "reservedInputBytes": 9662,
+        "reservedOutputTokens": 4096,
+        "estimatedInputTokens": 3464,
+        "inputTokenEstimateMethod": "UTF-8 byte count divided by four; estimate only",
+        "omittedEvidenceIds": [],
+        "omittedSourcePaths": [],
+        "omittedDiffPaths": [],
+        "finalContextBytes": 4192
+      },
+      "evaluationPlan": {
+        "version": "adaptive-review-v1",
+        "depth": "STANDARD",
+        "reviewAreas": [
+          "correctness",
+          "documentation",
+          "policy",
+          "requirements",
+          "solution-approach",
+          "testing"
+        ],
+        "reasons": [
+          "All frozen contract criteria remain required at every review depth.",
+          "Authoritative execution checks are unchanged by this advisory plan.",
+          "Changed paths contain documentation only.",
+          "Functional criteria or trusted runner checks require objective verification."
+        ],
+        "maxContextBytes": 48000,
+        "maxChangedFiles": 30
+      },
+      "modelRouting": {
+        "version": "server-model-routing-v1",
+        "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "reason": "AI_MODEL retained; no depth override is configured."
+      }
+    },
+    "visibleMessage": "Reviewer diagnostic: FAILED. Objective evidence remains available."
+  },
+  "status": "FAIL",
+  "failure": "The expression evaluated to a falsy value:\n\n  assert.ok(['COMPLETED','NEEDS_REVIEW'].includes(body.status))\n"
+}

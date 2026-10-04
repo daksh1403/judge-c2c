@@ -4,16 +4,12 @@ Affected workstream bookkeeping; requirements and acceptance criteria are unchan
 
 | Status         | Items |
 | -------------- | ----: |
-| PASS           |   699 |
+| PASS           |   700 |
 | BLOCKED        |     9 |
-| PARTIAL        |     4 |
+| PARTIAL        |     3 |
 | NOT_APPLICABLE |     2 |
 
-Original three-submission calibration and reviewer diagnostic now pass through actual PR #7 frontend actions under policy v14. Production remains unauthorized. No statuses were upgraded for implementation alone.
-
-## 01. Project foundation & development workflow
-
-- **01.12 — Local preview production separation (PARTIAL)**: Exact production domain routing and isolation guards pass targeted tests. Actual cloudflare-production environment, inputs/resources/secrets/domain and deployed separation remain absent or unverified; merge alone is insufficient.
+Original three-submission calibration and reviewer diagnostic now pass through actual PR #7 frontend actions under policy v15 on the main frontend; the diagnostic explicitly returns NEEDS_REVIEW when unsupported qualitative prose is discarded. PR #6 and PR #7 are merged with owner authorization. Separate production verification remains pending. No statuses were upgraded for implementation alone.
 
 ## 03. GitHub integration
 

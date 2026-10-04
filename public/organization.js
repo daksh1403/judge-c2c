@@ -399,9 +399,11 @@
           $('#reviewer-status').textContent =
             result.status === 'COMPLETED'
               ? 'AI reviewer returned a validated report. This is a synthetic diagnostic, not a PR evaluation.'
-              : 'Reviewer diagnostic: ' +
-                result.status +
-                '. Objective evidence remains available.';
+              : result.trace?.failureCode === 'CLOUDFLARE_AI_QUOTA_EXHAUSTED'
+                ? 'Cloudflare AI daily quota exhausted. Wait for the quota reset or enable Workers Paid. AI analysis remains UNVERIFIED; objective evidence is preserved.'
+                : 'Reviewer diagnostic: ' +
+                  result.status +
+                  '. Objective evidence remains available.';
         } catch (e) {
           error(e);
         } finally {

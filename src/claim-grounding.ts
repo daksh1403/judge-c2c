@@ -176,3 +176,93 @@ export function completeApproachEvidenceIndex(
     addedEvidenceIds,
   };
 }
+
+/** Reject unsupported qualitative prose after a bounded provider retry. Never
+ * recover missing analysis, unknown citations, or objective contradictions. */
+export function rejectUnsupportedQualitativeClaims(
+  value: unknown,
+  evidence: Evidence[],
+) {
+  const parsed = reviewSchema.safeParse(value);
+  const unchanged = {
+    value,
+    rejectedClaims: [] as { path: string; reason: string }[],
+  };
+  if (!parsed.success) return unchanged;
+  const review = parsed.data;
+  const known = new Map(evidence.map((item) => [item.id, item]));
+  const approach = review.solution_approach;
+  const entries = [
+    ...(
+      [
+        'problem_understanding',
+        'approach_summary',
+        'solution_design',
+        'correctness',
+        'maintainability',
+        'architecture_fit',
+      ] as const
+    ).map((field) => ({
+      path: `solution_approach.${field}`,
+      observation: approach[field],
+    })),
+    ...(
+      [
+        'strengths',
+        'weaknesses',
+        'tradeoffs',
+        'unverified_assumptions',
+      ] as const
+    ).flatMap((field) =>
+      approach[field].map((observation, index) => ({
+        path: `solution_approach.${field}[${index}]`,
+        observation,
+      })),
+    ),
+  ];
+  const ids = [
+    ...approach.evidence,
+    ...entries.flatMap((e) => e.observation.evidenceIds),
+    ...review.assessments.flatMap((a) => a.evidenceIds),
+    ...review.findings.flatMap((f) => f.evidenceIds),
+  ];
+  if (ids.some((id) => !known.has(id))) return unchanged;
+  const rejectedClaims: { path: string; reason: string }[] = [];
+  for (const { path, observation } of entries) {
+    let reason: string | undefined;
+    if (
+      observation.verification !== 'UNVERIFIED' &&
+      !observation.evidenceIds.length
+    )
+      reason = 'The reviewer supplied no supporting evidence.';
+    else if (
+      observation.verification === 'OBSERVED' &&
+      observation.evidenceIds.some(
+        (id) => known.get(id)?.status === 'UNVERIFIED',
+      )
+    )
+      reason = 'Unverified evidence cannot establish an observed fact.';
+    else if (
+      path === 'solution_approach.correctness' &&
+      observation.verification === 'OBSERVED' &&
+      !observation.evidenceIds.some(
+        (id) =>
+          known.get(id)?.kind === 'execution' &&
+          known.get(id)?.criterionId &&
+          known.get(id)?.status !== 'UNVERIFIED',
+      )
+    )
+      reason = 'Observed correctness requires trusted criterion execution.';
+    else if (
+      path.startsWith('solution_approach.unverified_assumptions') &&
+      observation.verification !== 'UNVERIFIED'
+    )
+      reason = 'Assumptions require human verification.';
+    if (!reason) continue;
+    rejectedClaims.push({ path, reason });
+    observation.text = `AI claim rejected: ${reason} No supported qualitative judgment is available; inspect the objective evidence and review manually.`;
+    observation.verification = 'UNVERIFIED';
+    observation.evidenceIds = [];
+  }
+  return { value: review, rejectedClaims };
+}

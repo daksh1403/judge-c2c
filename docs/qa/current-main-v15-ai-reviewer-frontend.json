@@ -1,0 +1,201 @@
+{
+  "at": "2026-10-04T18:09:45.732Z",
+  "origin": "https://judge-c2c.dakshx.workers.dev",
+  "mode": "REAL_FRONTEND_CLICKS_NO_MOCKS_NO_DIRECT_API_CALLS",
+  "evaluations": [
+    {
+      "pr": 11,
+      "runId": "307aafaca516878ff06e97b09dd1937d907d9f50649c2ab8edc1aa00f98d7407",
+      "state": "COMPLETED",
+      "ai": "COMPLETED",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "policy": "requirements-and-approach-v15",
+      "publication": "PUBLISHED",
+      "objectiveStatuses": [
+        {
+          "id": "bounded-retry",
+          "status": "PASS"
+        },
+        {
+          "id": "payment-regression",
+          "status": "PASS"
+        }
+      ],
+      "unsupportedFacts": 0,
+      "unknownCitations": 0,
+      "policyFailures": 0,
+      "humanAttentionVisible": true,
+      "evidenceCitationOpened": true
+    },
+    {
+      "pr": 8,
+      "runId": "53dc2b52506bcab184a46e92c7fb20ba4d8721589ebd00cbc636b176d352b932",
+      "state": "COMPLETED",
+      "ai": "COMPLETED",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "policy": "requirements-and-approach-v15",
+      "publication": "PUBLISHED",
+      "objectiveStatuses": [
+        {
+          "id": "bounded-retry",
+          "status": "PARTIAL"
+        },
+        {
+          "id": "payment-regression",
+          "status": "PASS"
+        }
+      ],
+      "unsupportedFacts": 0,
+      "unknownCitations": 0,
+      "policyFailures": 0,
+      "humanAttentionVisible": true,
+      "evidenceCitationOpened": true
+    },
+    {
+      "pr": 9,
+      "runId": "48f4412a059699cc892039cf14d96819af5b008b94e0a579ee551b9b1d6abf55",
+      "state": "COMPLETED",
+      "ai": "COMPLETED",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "policy": "requirements-and-approach-v15",
+      "publication": "PUBLISHED",
+      "objectiveStatuses": [
+        {
+          "id": "bounded-retry",
+          "status": "PASS"
+        },
+        {
+          "id": "payment-regression",
+          "status": "PASS"
+        }
+      ],
+      "unsupportedFacts": 0,
+      "unknownCitations": 0,
+      "policyFailures": 1,
+      "humanAttentionVisible": true,
+      "evidenceCitationOpened": true
+    }
+  ],
+  "errors": [],
+  "boundary": "Actual isolated deployed review frontend and real provider/runner evaluation records for the original GitHub PRs. One authenticated operator account, not a production hackathon or multiple independent participants.",
+  "reviewerButton": {
+    "http": 200,
+    "status": "NEEDS_REVIEW",
+    "trace": {
+      "policy": "requirements-and-approach-v15",
+      "provider": "callmissed",
+      "model": "kimi-k2.6",
+      "invokedModel": "kimi-k2.6",
+      "responseId": "resp_dcde790b61e045a49c4ed5c1df016a80",
+      "inputHash": "4e9688f48df05cd91ad35585ad327b7bda23f32d7dacc0bafeefd43541eea7f4",
+      "durationMs": 357,
+      "attempts": 2,
+      "evaluationPlan": {
+        "version": "adaptive-review-v1",
+        "depth": "STANDARD",
+        "reviewAreas": [
+          "correctness",
+          "documentation",
+          "policy",
+          "requirements",
+          "solution-approach",
+          "testing"
+        ],
+        "reasons": [
+          "All frozen contract criteria remain required at every review depth.",
+          "Authoritative execution checks are unchanged by this advisory plan.",
+          "Changed paths contain documentation only.",
+          "Functional criteria or trusted runner checks require objective verification."
+        ],
+        "maxContextBytes": 48000,
+        "maxChangedFiles": 30
+      },
+      "modelRouting": {
+        "version": "server-model-routing-v1",
+        "model": "kimi-k2.6",
+        "reason": "CALLMISSED_MODEL retained; no depth override is configured."
+      },
+      "contextBudget": {
+        "version": "bounded-review-context-v1",
+        "contextBytes": 4192,
+        "maxContextBytes": 48000,
+        "reservedInputBytes": 9662,
+        "reservedOutputTokens": 4500,
+        "estimatedInputTokens": 3464,
+        "inputTokenEstimateMethod": "UTF-8 byte count divided by four; estimate only",
+        "omittedEvidenceIds": [],
+        "omittedSourcePaths": [],
+        "omittedDiffPaths": [],
+        "finalContextBytes": 4192
+      },
+      "groundingPolicy": "objective-facts-unverified-narratives-v1",
+      "downgradedObservationPaths": [
+        "solution_approach.approach_summary",
+        "solution_approach.maintainability",
+        "solution_approach.strengths[0]",
+        "solution_approach.weaknesses[1]"
+      ],
+      "unverifiedNarrativePaths": [
+        "solution_approach.problem_understanding",
+        "solution_approach.approach_summary",
+        "solution_approach.solution_design",
+        "solution_approach.correctness",
+        "solution_approach.maintainability",
+        "solution_approach.architecture_fit",
+        "solution_approach.strengths[0]",
+        "solution_approach.weaknesses[0]",
+        "solution_approach.weaknesses[1]",
+        "solution_approach.tradeoffs[0]",
+        "solution_approach.unverified_assumptions[0]",
+        "findings[0]",
+        "findings[1]"
+      ],
+      "requiresHumanAttention": true,
+      "qualitativeClaimRejections": [
+        {
+          "path": "solution_approach.weaknesses[0]",
+          "reason": "Unverified evidence cannot establish an observed fact."
+        },
+        {
+          "path": "solution_approach.tradeoffs[0]",
+          "reason": "The reviewer supplied no supporting evidence."
+        }
+      ],
+      "objectiveCriterionRecovery": [],
+      "approachEvidenceIndexRepair": [
+        "criterion-future-time",
+        "criterion-past-time"
+      ],
+      "qualitativeCriterionAnalysis": {
+        "status": "UNVERIFIED",
+        "missingCriterionIds": []
+      },
+      "attemptFailures": [
+        "AI_UNVERIFIED_OBSERVED"
+      ],
+      "cost": {
+        "status": "UNAVAILABLE",
+        "scope": "successful-final-response",
+        "reason": "Known rates and actual provider token usage are required; this is not total review billing."
+      },
+      "usage": {
+        "input_tokens": 3159,
+        "input_tokens_details": {
+          "cached_tokens": 576,
+          "cache_write_tokens": 0
+        },
+        "output_tokens": 675,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 3834
+      }
+    },
+    "summary": "Objective criteria: 1 PASS, 0 FAIL, 2 UNVERIFIED. Contextual AI narratives are unverified interpretation and require human review; citations do not prove their semantic truth.",
+    "visibleMessage": "Reviewer diagnostic: NEEDS_REVIEW. Objective evidence remains available."
+  },
+  "status": "PASS"
+}

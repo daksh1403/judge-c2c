@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-04T18:25:06.593Z",
+  "mode": "REAL_FRONTEND_LOGIN_DENIAL",
+  "status": "PASS",
+  "records": [
+    {
+      "origin": "https://judge-c2c-production.dakshx.workers.dev",
+      "label": "review credential denied by production",
+      "http": 401,
+      "privilegedWorkspaceVisible": false
+    },
+    {
+      "origin": "https://judge-c2c.dakshx.workers.dev",
+      "label": "production credential denied by review",
+      "http": 401,
+      "privilegedWorkspaceVisible": false
+    },
+    {
+      "origin": "https://feat-post-merge-stabilization-judge-c2c.dakshx.workers.dev",
+      "label": "production credential denied by branch preview",
+      "http": 401,
+      "privilegedWorkspaceVisible": false
+    }
+  ]
+}

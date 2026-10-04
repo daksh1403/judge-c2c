@@ -1,0 +1,265 @@
+{
+  "at": "2026-10-04T18:25:02.230750+00:00",
+  "mode": "AUTHENTICATED_CLOUDFLARE_BINDING_METADATA",
+  "status": "PASS",
+  "secrets": "Names only; values omitted",
+  "records": [
+    {
+      "worker": "judge-c2c",
+      "bindings": [
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "DB",
+          "type": "d1",
+          "id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c"
+        },
+        {
+          "name": "DEMO_MODE",
+          "type": "plain_text"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_SERVICE",
+          "type": "service",
+          "service": "judge-c2c-review"
+        },
+        {
+          "name": "PREVIEW_EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-public-preview-evaluator"
+        },
+        {
+          "name": "PREVIEW_TESTING",
+          "type": "plain_text"
+        }
+      ]
+    },
+    {
+      "worker": "judge-c2c-review",
+      "bindings": [
+        {
+          "name": "AI",
+          "type": "ai"
+        },
+        {
+          "name": "AI_MODEL",
+          "type": "plain_text"
+        },
+        {
+          "name": "AI_PRICING_JSON",
+          "type": "plain_text"
+        },
+        {
+          "name": "AI_PROVIDER",
+          "type": "plain_text"
+        },
+        {
+          "name": "ARTIFACT_KV",
+          "type": "kv_namespace",
+          "namespace_id": "2bfcf7ac70ba405e906f7d3e7c161868"
+        },
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "CALLMISSED_API_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "CALLMISSED_MODEL",
+          "type": "plain_text"
+        },
+        {
+          "name": "DB",
+          "type": "d1",
+          "id": "cbbc7d68-2fef-40c6-be53-511ffb0d720c"
+        },
+        {
+          "name": "DEMO_MODE",
+          "type": "plain_text"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "type": "plain_text"
+        },
+        {
+          "name": "EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-review-evaluator"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_ADMIN_TOKEN",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_DB",
+          "type": "d1",
+          "id": "35f5053d-1fa5-49a7-89b9-4751e1c7a895"
+        },
+        {
+          "name": "ORG_EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-organization-evaluator"
+        },
+        {
+          "name": "ORG_JUDGE_TOKEN",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_NAME",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_PUBLIC_ORIGIN",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_REVIEW_ORIGINS",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_VAULT_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "PREVIEW_EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-public-preview-evaluator"
+        },
+        {
+          "name": "PREVIEW_TESTING",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_ENABLED",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_ENDPOINT",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_IMAGE_URI",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_TUNNEL_KEY",
+          "type": "secret_text"
+        }
+      ]
+    },
+    {
+      "worker": "judge-c2c-production",
+      "bindings": [
+        {
+          "name": "AI",
+          "type": "ai"
+        },
+        {
+          "name": "AI_MODEL",
+          "type": "plain_text"
+        },
+        {
+          "name": "AI_PROVIDER",
+          "type": "plain_text"
+        },
+        {
+          "name": "ARTIFACT_KV",
+          "type": "kv_namespace",
+          "namespace_id": "2abdedf31b924fc79d44bf346a58cd9e"
+        },
+        {
+          "name": "ASSETS",
+          "type": "assets"
+        },
+        {
+          "name": "DB",
+          "type": "d1",
+          "id": "d89e55f7-26d9-455c-b0f5-123eeec1562f"
+        },
+        {
+          "name": "DEMO_MODE",
+          "type": "plain_text"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "type": "plain_text"
+        },
+        {
+          "name": "EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-production-evaluator"
+        },
+        {
+          "name": "ORG_ADMIN_TOKEN",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_DB",
+          "type": "d1",
+          "id": "1fa908ba-3db7-46bb-9246-aa607ca99da8"
+        },
+        {
+          "name": "ORG_EVALUATOR",
+          "type": "workflow",
+          "workflow_name": "judge-c2c-organization-production-evaluator"
+        },
+        {
+          "name": "ORG_JUDGE_TOKEN",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_NAME",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_PUBLIC_ORIGIN",
+          "type": "plain_text"
+        },
+        {
+          "name": "ORG_SECURITY_TOKEN",
+          "type": "secret_text"
+        },
+        {
+          "name": "ORG_VAULT_KEY",
+          "type": "secret_text"
+        },
+        {
+          "name": "PREVIEW_TESTING",
+          "type": "plain_text"
+        },
+        {
+          "name": "PUBLIC_ORIGIN",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_ENABLED",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_ENDPOINT",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_IMAGE_URI",
+          "type": "plain_text"
+        },
+        {
+          "name": "RUNNER_TUNNEL_KEY",
+          "type": "secret_text"
+        }
+      ]
+    }
+  ]
+}

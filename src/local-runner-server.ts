@@ -12,9 +12,17 @@ import {
 import { verifyWebhook } from './security';
 import type { RunnerResult } from './runner';
 export function createRunnerServer(
-  key: string,
+  key: string | readonly string[],
   evaluate: (body: unknown) => Promise<RunnerResult>,
 ) {
+  const keys = typeof key === 'string' ? [key] : [...key];
+  if (
+    keys.length < 1 ||
+    keys.length > 2 ||
+    keys.some((secret) => !/^[a-f0-9]{64}$/.test(secret)) ||
+    new Set(keys).size !== keys.length
+  )
+    throw new Error('RUNNER_KEYS_INVALID');
   const seen = new Map<string, number>();
   let busy = false;
   async function handle(req: IncomingMessage, res: ServerResponse) {
@@ -55,14 +63,17 @@ export function createRunnerServer(
       fatal: true,
       ignoreBOM: true,
     }).decode(raw);
-    if (
-      !(await verifyWebhook(
-        new TextEncoder().encode(requestMessage(timestamp, nonce, hash)),
-        signature,
-        key,
-      ))
-    )
-      return reply(401, '{"error":"UNAUTHORIZED"}');
+    let matchedKey: string | undefined;
+    for (const secret of keys)
+      if (
+        await verifyWebhook(
+          new TextEncoder().encode(requestMessage(timestamp, nonce, hash)),
+          signature,
+          secret,
+        )
+      )
+        matchedKey = secret;
+    if (!matchedKey) return reply(401, '{"error":"UNAUTHORIZED"}');
     for (const [id, time] of seen)
       if (time < Date.now() - 60000) seen.delete(id);
     if (seen.has(nonce)) return reply(409, '{"error":"REPLAY"}');
@@ -75,7 +86,7 @@ export function createRunnerServer(
       res.setHeader(
         'x-runner-signature',
         await runnerSignature(
-          key,
+          matchedKey,
           responseMessage(nonce, hash, await digest(text)),
         ),
       );
