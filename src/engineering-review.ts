@@ -1,4 +1,5 @@
 import type { Contract, Evidence, Review } from './domain';
+import type { ChangedFile } from './github';
 import {
   analyzeSymptomMasking,
   analyzeDuplication,
@@ -36,7 +37,13 @@ const facetAnalyzers: Record<
     repositoryIndex?: Record<string, string[]>;
     imports?: Record<string, string[]>;
     exports?: Record<string, string[]>;
-  }) => { status: string; evidenceIds: string[]; assessment: string; confidence: string; limit: string }
+  }) => {
+    status: string;
+    evidenceIds: string[];
+    assessment: string;
+    confidence: string;
+    limit: string;
+  }
 > = {
   '25.05': analyzeSymptomMasking,
   '25.07': analyzeDuplication,
@@ -461,6 +468,7 @@ export function enrichEngineeringReview(
   evidence: Evidence[],
   review: Review,
   origin: 'AI_ASSESSMENT' | 'DETERMINISTIC_POLICY' = 'AI_ASSESSMENT',
+  context?: { files: ChangedFile[] },
 ) {
   const known = new Map(evidence.map((e) => [e.id, e]));
   const criterionRequirement = new Map(
@@ -778,28 +786,41 @@ export function enrichEngineeringReview(
           limit: string;
         } | null = null;
         if (facetAnalyzers[id]) {
-          const diffEvidence = evidence.find(e => e.kind === 'diff');
-          const changedFileEvidence = evidence.find(e => e.kind === 'source' && e.criterionId === 'changed-files');
-          const changedFiles = changedFileEvidence?.claim?.split(',') || [];
-          
+          // Claims are metadata, never source. Only complete frozen patches are inspected.
+          const files = context?.files;
+          const diff =
+            files?.length &&
+            files.every(
+              (file) => typeof file.patch === 'string' && !file.patchTruncated,
+            )
+              ? files.map((file) => file.patch).join('\n')
+              : undefined;
           boundedAnalysis = facetAnalyzers[id]({
             contract,
             evidence,
-            diff: diffEvidence?.claim,
-            changedFiles,
-            changedSymbols: [], // Would need to extract from diff evidence
-            repositoryIndex: {},
-            imports: {},
-            exports: {},
+            diff,
+            changedFiles: files?.map((file) => file.filename),
           });
+          boundedAnalysis.evidenceIds = [
+            ...new Set([
+              ...boundedAnalysis.evidenceIds.filter((evidenceId) =>
+                known.has(evidenceId),
+              ),
+              ...(diff
+                ? evidence
+                    .filter((item) => item.kind === 'diff')
+                    .map((item) => item.id)
+                : []),
+            ]),
+          ];
         }
 
         const contextualAnalysis = contextualForFacet(id);
-        
-        // If bounded analysis is available, use its status
-        const facetStatus = boundedAnalysis
-          ? boundedAnalysis.status === 'SUPPORTED' ? 'SUPPORTED_FACT' : boundedAnalysis.status
-          : evidenceIds.length ? 'SUPPORTED_FACT' : 'UNVERIFIED';
+
+        // Pattern assessments cannot establish semantic facts, even with citations.
+        const facetStatus = evidenceIds.length
+          ? 'SUPPORTED_FACT'
+          : 'UNVERIFIED';
 
         const facetEvidenceIds = boundedAnalysis
           ? [...evidenceIds, ...boundedAnalysis.evidenceIds]
@@ -823,10 +844,10 @@ export function enrichEngineeringReview(
           contextualAnalysis,
           analysisCoverage: contextualAnalysis.length
             ? 'CONTEXTUAL_ANALYSIS_AVAILABLE'
-            : boundedAnalysis
+            : boundedAnalysis && boundedAnalysis.status !== 'UNVERIFIED'
               ? 'BOUNDED_ANALYSIS_AVAILABLE'
               : 'MISSING_MEANINGFUL_ANALYSIS',
-          needsReview: boundedAnalysis ? boundedAnalysis.status === 'CONCERN' : true,
+          needsReview: true,
           missingAnalysisReason: boundedAnalysis
             ? boundedAnalysis.status === 'UNVERIFIED'
               ? boundedAnalysis.assessment
@@ -839,12 +860,15 @@ export function enrichEngineeringReview(
           requiresHumanInspection: true,
           aiNarrativeStatus: 'UNVERIFIED',
           parentFactStatus: parent.supportMatrix.facts.status,
-          boundedAnalysis: boundedAnalysis ? {
-            status: boundedAnalysis.status,
-            assessment: boundedAnalysis.assessment,
-            confidence: boundedAnalysis.confidence,
-            limit: boundedAnalysis.limit,
-          } : undefined,
+          boundedAnalysis: boundedAnalysis
+            ? {
+                status: boundedAnalysis.status,
+                evidenceIds: boundedAnalysis.evidenceIds,
+                assessment: boundedAnalysis.assessment,
+                confidence: boundedAnalysis.confidence,
+                limit: boundedAnalysis.limit,
+              }
+            : undefined,
         };
       }),
     },

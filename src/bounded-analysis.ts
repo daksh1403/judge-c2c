@@ -19,6 +19,31 @@ type BoundedAnalysisInput = {
   exports?: Record<string, string[]>;
 };
 
+/** Failed or missing outcomes never support a positive functional assessment. */
+function executionLimit(evidence: Evidence[]): AnalysisResult | null {
+  const failed = evidence.filter((e) => e.status === 'FAIL');
+  if (failed.length)
+    return {
+      status: 'CONCERN',
+      evidenceIds: failed.map((e) => e.id),
+      assessment:
+        'Relevant execution checks failed; behavior is not established as working',
+      confidence: 'HIGH',
+      limit:
+        'Failure applies only to the cited execution scope; inspect root cause',
+    };
+  const unknown = evidence.filter((e) => e.status !== 'PASS');
+  if (unknown.length)
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: unknown.map((e) => e.id),
+      assessment: 'Relevant execution checks lack verified passing outcomes',
+      confidence: 'LOW',
+      limit: 'Execute scoped checks before assessing behavior',
+    };
+  return null;
+}
+
 /**
  * Bounded evidence-backed analysis for semantic review facets.
  * Uses deterministic evidence (diff, symbols, scans, tests) to produce
@@ -29,59 +54,81 @@ type BoundedAnalysisInput = {
 export function analyzeSymptomMasking(
   input: BoundedAnalysisInput,
 ): AnalysisResult {
-  const {
-    contract,
-    evidence,
-    diff,
-    changedFiles,
-    changedSymbols,
-  } = input;
+  const { contract, evidence, diff, changedFiles, changedSymbols } = input;
 
   // Look for evidence of root cause vs symptom masking
-  const testEvidence = evidence.filter(e => e.kind === 'execution' && e.criterionId);
-  const regressionEvidence = evidence.filter(e => e.status === 'FAIL' && e.baselineStatus === 'PASS');
-  const narrowGuardChanges = diff?.match(/(if|guard|check|validate).*return.*null|undefined|false|empty/gi);
-  const constantSpecialCases = diff?.match(/(case|when).*===.*['"](?:true|false|null|undefined)['"]/gi);
+  const testEvidence = evidence.filter(
+    (e) => e.kind === 'execution' && e.criterionId,
+  );
+  const outcomeLimit = executionLimit(testEvidence);
+  if (outcomeLimit) return outcomeLimit;
+  const regressionEvidence = evidence.filter(
+    (e) => e.status === 'FAIL' && e.baselineStatus === 'PASS',
+  );
+  const narrowGuardChanges = diff?.match(
+    /(if|guard|check|validate).*return.*null|undefined|false|empty/gi,
+  );
+  const constantSpecialCases = diff?.match(
+    /(case|when).*===.*['"](?:true|false|null|undefined)['"]/gi,
+  );
 
   const concerns: string[] = [];
   const relevantEvidence: string[] = [];
 
   if (narrowGuardChanges && narrowGuardChanges.length > 0) {
-    concerns.push('Narrow guard conditions detected that may bypass root cause');
+    concerns.push(
+      'Narrow guard conditions detected that may bypass root cause',
+    );
   }
 
   if (constantSpecialCases && constantSpecialCases.length > 0) {
-    concerns.push('Constant special-case conditions that may mask underlying issue');
+    concerns.push(
+      'Constant special-case conditions that may mask underlying issue',
+    );
   }
 
   if (regressionEvidence.length > 0) {
-    concerns.push('Baseline regression detected; verify fix addresses root cause');
-    relevantEvidence.push(...regressionEvidence.map(e => e.id));
+    concerns.push(
+      'Baseline regression detected; verify fix addresses root cause',
+    );
+    relevantEvidence.push(...regressionEvidence.map((e) => e.id));
   }
 
   if (testEvidence.length === 0) {
     return {
       status: 'UNVERIFIED',
       evidenceIds: [],
-      assessment: 'Insufficient test evidence to distinguish root cause from symptom masking',
+      assessment:
+        'Insufficient test evidence to distinguish root cause from symptom masking',
       confidence: 'LOW',
       limit: 'Requires test coverage for negative cases and edge conditions',
     };
   }
 
+  if (!diff)
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: testEvidence.map((e) => e.id),
+      assessment: 'No scoped source diff available to assess symptom masking',
+      confidence: 'LOW',
+      limit: 'Passing checks alone do not establish root-cause resolution',
+    };
+
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: testEvidence.map(e => e.id),
-      assessment: 'No obvious symptom masking patterns detected; implementation addresses test cases',
+      evidenceIds: testEvidence.map((e) => e.id),
+      assessment:
+        'No obvious symptom masking patterns detected; implementation addresses test cases',
       confidence: 'MEDIUM',
-      limit: 'Analysis based on diff patterns and test coverage; deeper semantic understanding requires human review',
+      limit:
+        'Analysis based on diff patterns and test coverage; deeper semantic understanding requires human review',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: [...testEvidence.map(e => e.id), ...relevantEvidence],
+    evidenceIds: [...testEvidence.map((e) => e.id), ...relevantEvidence],
     assessment: `Potential symptom masking: ${concerns.join('; ')}. Verify implementation addresses root cause requirement.`,
     confidence: 'MEDIUM',
     limit: 'Pattern-based detection; actual intent requires human review',
@@ -106,10 +153,12 @@ export function analyzeDuplication(
   // Simple bounded duplication detection in changed files
   const concerns: string[] = [];
   const lines = diff.split('\n');
-  const addedLines = lines.filter(l => l.startsWith('+') && !l.startsWith('+++'));
+  const addedLines = lines.filter(
+    (l) => l.startsWith('+') && !l.startsWith('+++'),
+  );
   const lineGroups = new Map<string, number>();
 
-  addedLines.forEach(line => {
+  addedLines.forEach((line) => {
     const normalized = line.replace(/\s+/g, ' ').trim();
     if (normalized.length > 10) {
       lineGroups.set(normalized, (lineGroups.get(normalized) || 0) + 1);
@@ -127,7 +176,7 @@ export function analyzeDuplication(
   // Check for duplicate function/class names
   if (changedSymbols) {
     const symbolCounts = new Map<string, number>();
-    changedSymbols.forEach(s => {
+    changedSymbols.forEach((s) => {
       symbolCounts.set(s, (symbolCounts.get(s) || 0) + 1);
     });
     const duplicateSymbols = Array.from(symbolCounts.entries())
@@ -135,7 +184,9 @@ export function analyzeDuplication(
       .map(([s, _]) => s);
 
     if (duplicateSymbols.length > 0) {
-      concerns.push(`Duplicate symbol definitions: ${duplicateSymbols.join(', ')}`);
+      concerns.push(
+        `Duplicate symbol definitions: ${duplicateSymbols.join(', ')}`,
+      );
     }
   }
 
@@ -145,7 +196,8 @@ export function analyzeDuplication(
       evidenceIds: [],
       assessment: 'No obvious duplication detected in changed code',
       confidence: 'MEDIUM',
-      limit: 'Analysis limited to diff and symbol changes; repository-wide clone detection not performed',
+      limit:
+        'Analysis limited to diff and symbol changes; repository-wide clone detection not performed',
     };
   }
 
@@ -154,7 +206,8 @@ export function analyzeDuplication(
     evidenceIds: [],
     assessment: `Duplication concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Bounded detection within diff; may miss duplication across unchanged files',
+    limit:
+      'Bounded detection within diff; may miss duplication across unchanged files',
   };
 }
 
@@ -185,11 +238,13 @@ export function analyzeNoPrivateIntentions(
   const lines = diff.split('\n');
   const concerns: string[] = [];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      intentionPatterns.forEach(pattern => {
+      intentionPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential intention claim in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential intention claim in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -199,9 +254,11 @@ export function analyzeNoPrivateIntentions(
     return {
       status: 'SUPPORTED',
       evidenceIds: [],
-      assessment: 'No explicit private intention claims detected in code changes',
+      assessment:
+        'No explicit private intention claims detected in code changes',
       confidence: 'HIGH',
-      limit: 'Pattern-based detection on diff; sophisticated intention inference is explicitly avoided',
+      limit:
+        'Pattern-based detection on diff; sophisticated intention inference is explicitly avoided',
     };
   }
 
@@ -210,7 +267,8 @@ export function analyzeNoPrivateIntentions(
     evidenceIds: [],
     assessment: `Potential intention claims detected: ${concerns.join('; ')}. Private intentions should not be asserted from code or prose.`,
     confidence: 'MEDIUM',
-    limit: 'Pattern detection; actual intent inference requires human interpretation',
+    limit:
+      'Pattern detection; actual intent inference requires human interpretation',
   };
 }
 
@@ -229,28 +287,49 @@ export function analyzeSeparationOfConcerns(
     };
   }
 
+  if (
+    !imports ||
+    changedFiles.some((file) => !Object.hasOwn(imports, file)) ||
+    !exports ||
+    changedFiles.some((file) => !Object.hasOwn(exports, file))
+  )
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment: 'Scoped module inventory is missing for changed files',
+      confidence: 'LOW',
+      limit:
+        'Requires actual import/export inventory; file presence is context only',
+    };
+
   const concerns: string[] = [];
 
   // Check for files with many different responsibilities
-  changedFiles.forEach(file => {
+  changedFiles.forEach((file) => {
     const fileImports = imports?.[file] || [];
     const fileExports = exports?.[file] || [];
 
     // If a file imports from many different domains, may have mixed concerns
-    const importDomains = new Set(fileImports.map(i => i.split('/')[0]));
+    const importDomains = new Set(fileImports.map((i) => i.split('/')[0]));
     if (importDomains.size > 5) {
-      concerns.push(`${file} imports from ${importDomains.size} different domains, suggesting mixed concerns`);
+      concerns.push(
+        `${file} imports from ${importDomains.size} different domains, suggesting mixed concerns`,
+      );
     }
 
     // If a file exports many different types of symbols
-    const exportTypes = new Set(fileExports.map(e => {
-      if (e.includes('class')) return 'class';
-      if (e.includes('function') || e.includes('=>')) return 'function';
-      if (e.includes('const') || e.includes('let')) return 'variable';
-      return 'unknown';
-    }));
+    const exportTypes = new Set(
+      fileExports.map((e) => {
+        if (e.includes('class')) return 'class';
+        if (e.includes('function') || e.includes('=>')) return 'function';
+        if (e.includes('const') || e.includes('let')) return 'variable';
+        return 'unknown';
+      }),
+    );
     if (exportTypes.size > 3) {
-      concerns.push(`${file} exports multiple symbol types, suggesting mixed responsibilities`);
+      concerns.push(
+        `${file} exports multiple symbol types, suggesting mixed responsibilities`,
+      );
     }
   });
 
@@ -260,7 +339,8 @@ export function analyzeSeparationOfConcerns(
       evidenceIds: [],
       assessment: 'Changed files appear to maintain separation of concerns',
       confidence: 'MEDIUM',
-      limit: 'Analysis based on import/export patterns; actual semantic separation requires human review',
+      limit:
+        'Analysis based on import/export patterns; actual semantic separation requires human review',
     };
   }
 
@@ -269,7 +349,8 @@ export function analyzeSeparationOfConcerns(
     evidenceIds: [],
     assessment: `Separation of concerns issues: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; architectural judgment requires human interpretation',
+    limit:
+      'Pattern-based detection; architectural judgment requires human interpretation',
   };
 }
 
@@ -278,10 +359,15 @@ export function analyzeErrorHandling(
 ): AnalysisResult {
   const { diff, evidence } = input;
 
-  const errorTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('error') || e.criterionId?.includes('fail') || e.criterionId?.includes('exception'))
+  const errorTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('error') ||
+        e.criterionId?.includes('fail') ||
+        e.criterionId?.includes('exception')),
   );
+  const outcomeLimit = executionLimit(errorTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -294,14 +380,22 @@ export function analyzeErrorHandling(
   }
 
   const lines = diff.split('\n');
-  const addedTryCatch = lines.filter(l => l.startsWith('+') && /\btry\s*{/.test(l));
-  const addedErrorPaths = lines.filter(l => l.startsWith('+') && /\b(catch|error|throw|finally)\b/i.test(l));
-  const addedSilentErrors = lines.filter(l => l.startsWith('+') && /\bcatch\s*\([^)]*\)\s*{\s*}/.test(l));
+  const addedTryCatch = lines.filter(
+    (l) => l.startsWith('+') && /\btry\s*{/.test(l),
+  );
+  const addedErrorPaths = lines.filter(
+    (l) => l.startsWith('+') && /\b(catch|error|throw|finally)\b/i.test(l),
+  );
+  const addedSilentErrors = lines.filter(
+    (l) => l.startsWith('+') && /\bcatch\s*\([^)]*\)\s*{\s*}/.test(l),
+  );
 
   const concerns: string[] = [];
 
   if (addedSilentErrors.length > 0) {
-    concerns.push(`${addedSilentErrors.length} silent error catch blocks detected`);
+    concerns.push(
+      `${addedSilentErrors.length} silent error catch blocks detected`,
+    );
   }
 
   if (addedTryCatch.length > 0 && addedErrorPaths.length === 0) {
@@ -312,7 +406,8 @@ export function analyzeErrorHandling(
     return {
       status: 'UNVERIFIED',
       evidenceIds: [],
-      assessment: 'No error-specific test evidence available to validate error handling',
+      assessment:
+        'No error-specific test evidence available to validate error handling',
       confidence: 'LOW',
       limit: 'Requires error-specific test coverage to verify error paths',
     };
@@ -321,25 +416,26 @@ export function analyzeErrorHandling(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: errorTestEvidence.map(e => e.id),
-      assessment: 'Error handling appears appropriate; error-specific tests exist',
+      evidenceIds: errorTestEvidence.map((e) => e.id),
+      assessment:
+        'Error handling appears appropriate; error-specific tests exist',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual error handling quality requires human review',
+      limit:
+        'Pattern-based detection; actual error handling quality requires human review',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: errorTestEvidence.map(e => e.id),
+    evidenceIds: errorTestEvidence.map((e) => e.id),
     assessment: `Error handling concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; silent errors may be intentional in some contexts',
+    limit:
+      'Pattern-based detection; silent errors may be intentional in some contexts',
   };
 }
 
-export function analyzeNaming(
-  input: BoundedAnalysisInput,
-): AnalysisResult {
+export function analyzeNaming(input: BoundedAnalysisInput): AnalysisResult {
   const { changedSymbols, diff } = input;
 
   if (!changedSymbols || changedSymbols.length === 0) {
@@ -355,9 +451,12 @@ export function analyzeNaming(
   const concerns: string[] = [];
 
   // Check for obvious naming issues
-  changedSymbols.forEach(symbol => {
+  changedSymbols.forEach((symbol) => {
     // Very short names (except common ones)
-    if (symbol.length < 3 && !['i', 'j', 'k', 'x', 'y', 'z', 'a', 'b'].includes(symbol)) {
+    if (
+      symbol.length < 3 &&
+      !['i', 'j', 'k', 'x', 'y', 'z', 'a', 'b'].includes(symbol)
+    ) {
       concerns.push(`Very short symbol name: ${symbol}`);
     }
 
@@ -378,7 +477,8 @@ export function analyzeNaming(
       evidenceIds: [],
       assessment: 'Changed symbols follow standard naming conventions',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; semantic naming quality requires human judgment',
+      limit:
+        'Pattern-based detection; semantic naming quality requires human judgment',
     };
   }
 
@@ -387,21 +487,25 @@ export function analyzeNaming(
     evidenceIds: [],
     assessment: `Naming concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; naming style conventions vary by language/team',
+    limit:
+      'Pattern-based detection; naming style conventions vary by language/team',
   };
 }
 
-export function analyzeAPIDesign(
-  input: BoundedAnalysisInput,
-): AnalysisResult {
+export function analyzeAPIDesign(input: BoundedAnalysisInput): AnalysisResult {
   const { exports, diff, evidence } = input;
 
-  const apiTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('api') || e.criterionId?.includes('interface') || e.criterionId?.includes('compatibility'))
+  const apiTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('api') ||
+        e.criterionId?.includes('interface') ||
+        e.criterionId?.includes('compatibility')),
   );
+  const outcomeLimit = executionLimit(apiTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
-  if (!exports) {
+  if (!exports || Object.keys(exports).length === 0) {
     return {
       status: 'UNVERIFIED',
       evidenceIds: [],
@@ -415,16 +519,20 @@ export function analyzeAPIDesign(
 
   // Check for API changes
   Object.entries(exports).forEach(([file, exported]) => {
-    exported.forEach(exp => {
+    exported.forEach((exp) => {
       // Very long function signatures
       if (exp.length > 200) {
-        concerns.push(`Long API signature in ${file}: ${exp.substring(0, 50)}...`);
+        concerns.push(
+          `Long API signature in ${file}: ${exp.substring(0, 50)}...`,
+        );
       }
 
       // Many parameters (simple heuristic)
       const paramCount = (exp.match(/,/g) || []).length;
       if (paramCount > 7) {
-        concerns.push(`High parameter count in ${file}: ${exp.substring(0, 50)}...`);
+        concerns.push(
+          `High parameter count in ${file}: ${exp.substring(0, 50)}...`,
+        );
       }
     });
   });
@@ -433,7 +541,8 @@ export function analyzeAPIDesign(
     return {
       status: 'UNVERIFIED',
       evidenceIds: [],
-      assessment: 'No API-specific test evidence available to validate API design',
+      assessment:
+        'No API-specific test evidence available to validate API design',
       confidence: 'LOW',
       limit: 'Requires API compatibility or interface tests to verify design',
     };
@@ -442,19 +551,21 @@ export function analyzeAPIDesign(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: apiTestEvidence.map(e => e.id),
+      evidenceIds: apiTestEvidence.map((e) => e.id),
       assessment: 'API design appears reasonable; API-specific tests exist',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual API quality requires human review',
+      limit:
+        'Pattern-based detection; actual API quality requires human review',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: apiTestEvidence.map(e => e.id),
+    evidenceIds: apiTestEvidence.map((e) => e.id),
     assessment: `API design concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; API design involves tradeoffs that require human judgment',
+    limit:
+      'Pattern-based detection; API design involves tradeoffs that require human judgment',
   };
 }
 
@@ -491,18 +602,22 @@ export function analyzeTechnicalDebt(
     /any/i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      debtPatterns.forEach(pattern => {
+      debtPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Technical debt marker in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Technical debt marker in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
   });
 
   // Check for lint/typecheck failures
-  const lintFailures = evidence.filter(e => e.kind === 'source' && e.status === 'FAIL');
+  const lintFailures = evidence.filter(
+    (e) => e.kind === 'source' && e.status === 'FAIL',
+  );
   if (lintFailures.length > 0) {
     concerns.push(`${lintFailures.length} lint/typecheck failures present`);
   }
@@ -513,16 +628,18 @@ export function analyzeTechnicalDebt(
       evidenceIds: [],
       assessment: 'No obvious technical debt markers detected in changes',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; technical debt may exist in unchanged code or not be marked',
+      limit:
+        'Pattern-based detection; technical debt may exist in unchanged code or not be marked',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: lintFailures.map(e => e.id),
+    evidenceIds: lintFailures.map((e) => e.id),
     assessment: `Technical debt indicators: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; some technical debt may be intentional or acceptable',
+    limit:
+      'Pattern-based detection; some technical debt may be intentional or acceptable',
   };
 }
 
@@ -531,7 +648,11 @@ export function analyzeTestability(
 ): AnalysisResult {
   const { evidence, changedFiles } = input;
 
-  const testEvidence = evidence.filter(e => e.kind === 'execution' && e.criterionId?.includes('test'));
+  const testEvidence = evidence.filter(
+    (e) => e.kind === 'execution' && e.criterionId?.includes('test'),
+  );
+  const outcomeLimit = executionLimit(testEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!changedFiles || changedFiles.length === 0) {
     return {
@@ -546,8 +667,12 @@ export function analyzeTestability(
   const concerns: string[] = [];
 
   // Check if changed files have corresponding tests
-  const testFiles = changedFiles.filter(f => f.includes('.test.') || f.includes('.spec.'));
-  const nonTestFiles = changedFiles.filter(f => !f.includes('.test.') && !f.includes('.spec.'));
+  const testFiles = changedFiles.filter(
+    (f) => f.includes('.test.') || f.includes('.spec.'),
+  );
+  const nonTestFiles = changedFiles.filter(
+    (f) => !f.includes('.test.') && !f.includes('.spec.'),
+  );
 
   if (nonTestFiles.length > 0 && testFiles.length === 0) {
     concerns.push('Code changes without corresponding test changes');
@@ -560,19 +685,21 @@ export function analyzeTestability(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: testEvidence.map(e => e.id),
+      evidenceIds: testEvidence.map((e) => e.id),
       assessment: 'Testability appears adequate; tests exist',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual test quality requires human review',
+      limit:
+        'Pattern-based detection; actual test quality requires human review',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: testEvidence.map(e => e.id),
+    evidenceIds: testEvidence.map((e) => e.id),
     assessment: `Testability concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; test coverage does not guarantee test quality',
+    limit:
+      'Pattern-based detection; test coverage does not guarantee test quality',
   };
 }
 
@@ -581,7 +708,12 @@ export function analyzeHardcodedSecrets(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const secretEvidence = evidence.filter(e => e.kind === 'source' && (e.criterionId?.includes('secret') || e.criterionId?.includes('credential')));
+  const secretEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'source' &&
+      (e.criterionId?.includes('secret') ||
+        e.criterionId?.includes('credential')),
+  );
 
   if (!diff) {
     return {
@@ -606,11 +738,13 @@ export function analyzeHardcodedSecrets(
     /Bearer\s+[A-Za-z0-9\-._~+/]+=*/i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      secretPatterns.forEach(pattern => {
+      secretPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential hardcoded secret in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential hardcoded secret in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -623,7 +757,7 @@ export function analyzeHardcodedSecrets(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: secretEvidence.map(e => e.id),
+      evidenceIds: secretEvidence.map((e) => e.id),
       assessment: 'No obvious hardcoded secrets detected in changes',
       confidence: 'MEDIUM',
       limit: 'Pattern-based detection; secret scanner may miss novel patterns',
@@ -632,10 +766,11 @@ export function analyzeHardcodedSecrets(
 
   return {
     status: 'CONCERN',
-    evidenceIds: secretEvidence.map(e => e.id),
+    evidenceIds: secretEvidence.map((e) => e.id),
     assessment: `Secret concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; false positives possible for legitimate constants',
+    limit:
+      'Pattern-based detection; false positives possible for legitimate constants',
   };
 }
 
@@ -644,10 +779,15 @@ export function analyzeAuthRegression(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const authTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('auth') || e.criterionId?.includes('login') || e.criterionId?.includes('permission'))
+  const authTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('auth') ||
+        e.criterionId?.includes('login') ||
+        e.criterionId?.includes('permission')),
   );
+  const outcomeLimit = executionLimit(authTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -672,16 +812,24 @@ export function analyzeAuthRegression(
     /guard/i,
   ];
 
-  const authChanges = lines.filter(l => l.startsWith('+') && authPatterns.some(p => p.test(l)));
+  const authChanges = lines.filter(
+    (l) => l.startsWith('+') && authPatterns.some((p) => p.test(l)),
+  );
 
   if (authChanges.length > 0 && authTestEvidence.length === 0) {
-    concerns.push('Authentication-related changes without corresponding test coverage');
+    concerns.push(
+      'Authentication-related changes without corresponding test coverage',
+    );
   }
 
   // Check for removed auth checks
-  const removedAuthChecks = lines.filter(l => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l));
+  const removedAuthChecks = lines.filter(
+    (l) => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l),
+  );
   if (removedAuthChecks.length > 0) {
-    concerns.push(`${removedAuthChecks.length} removed authorization checks detected`);
+    concerns.push(
+      `${removedAuthChecks.length} removed authorization checks detected`,
+    );
   }
 
   if (authTestEvidence.length === 0) {
@@ -697,8 +845,9 @@ export function analyzeAuthRegression(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: authTestEvidence.map(e => e.id),
-      assessment: 'No authentication regression detected; auth-specific tests exist',
+      evidenceIds: authTestEvidence.map((e) => e.id),
+      assessment:
+        'No authentication regression detected; auth-specific tests exist',
       confidence: 'MEDIUM',
       limit: 'Pattern-based detection; complex auth flows require human review',
     };
@@ -706,10 +855,11 @@ export function analyzeAuthRegression(
 
   return {
     status: 'CONCERN',
-    evidenceIds: authTestEvidence.map(e => e.id),
+    evidenceIds: authTestEvidence.map((e) => e.id),
     assessment: `Authentication regression concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; some auth changes may be legitimate refactoring',
+    limit:
+      'Pattern-based detection; some auth changes may be legitimate refactoring',
   };
 }
 
@@ -718,10 +868,15 @@ export function analyzeAuthzRegression(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const authzTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('authorize') || e.criterionId?.includes('role') || e.criterionId?.includes('access'))
+  const authzTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('authorize') ||
+        e.criterionId?.includes('role') ||
+        e.criterionId?.includes('access')),
   );
+  const outcomeLimit = executionLimit(authzTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -746,16 +901,24 @@ export function analyzeAuthzRegression(
     /permission/i,
   ];
 
-  const authzChanges = lines.filter(l => l.startsWith('+') && authzPatterns.some(p => p.test(l)));
+  const authzChanges = lines.filter(
+    (l) => l.startsWith('+') && authzPatterns.some((p) => p.test(l)),
+  );
 
   if (authzChanges.length > 0 && authzTestEvidence.length === 0) {
-    concerns.push('Authorization-related changes without corresponding test coverage');
+    concerns.push(
+      'Authorization-related changes without corresponding test coverage',
+    );
   }
 
   // Check for removed authorization checks
-  const removedAuthzChecks = lines.filter(l => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l));
+  const removedAuthzChecks = lines.filter(
+    (l) => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l),
+  );
   if (removedAuthzChecks.length > 0) {
-    concerns.push(`${removedAuthzChecks.length} removed authorization checks detected`);
+    concerns.push(
+      `${removedAuthzChecks.length} removed authorization checks detected`,
+    );
   }
 
   if (authzTestEvidence.length === 0) {
@@ -764,38 +927,45 @@ export function analyzeAuthzRegression(
       evidenceIds: [],
       assessment: 'No authorization-specific test evidence available',
       confidence: 'LOW',
-      limit: 'Requires authorization-specific test coverage to verify no regression',
+      limit:
+        'Requires authorization-specific test coverage to verify no regression',
     };
   }
 
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: authzTestEvidence.map(e => e.id),
-      assessment: 'No authorization regression detected; authorization-specific tests exist',
+      evidenceIds: authzTestEvidence.map((e) => e.id),
+      assessment:
+        'No authorization regression detected; authorization-specific tests exist',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; complex authorization flows require human review',
+      limit:
+        'Pattern-based detection; complex authorization flows require human review',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: authzTestEvidence.map(e => e.id),
+    evidenceIds: authzTestEvidence.map((e) => e.id),
     assessment: `Authorization regression concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; some authorization changes may be legitimate refactoring',
+    limit:
+      'Pattern-based detection; some authorization changes may be legitimate refactoring',
   };
 }
 
-export function analyzeInjection(
-  input: BoundedAnalysisInput,
-): AnalysisResult {
+export function analyzeInjection(input: BoundedAnalysisInput): AnalysisResult {
   const { evidence, diff } = input;
 
-  const injectionTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('inject') || e.criterionId?.includes('sanitize') || e.criterionId?.includes('escape'))
+  const injectionTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('inject') ||
+        e.criterionId?.includes('sanitize') ||
+        e.criterionId?.includes('escape')),
   );
+  const outcomeLimit = executionLimit(injectionTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -822,11 +992,13 @@ export function analyzeInjection(
     /\$\{[^}]*\}/, // Template interpolation without escaping
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      dangerousPatterns.forEach(pattern => {
+      dangerousPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potentially dangerous pattern in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potentially dangerous pattern in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -839,19 +1011,21 @@ export function analyzeInjection(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: injectionTestEvidence.map(e => e.id),
+      evidenceIds: injectionTestEvidence.map((e) => e.id),
       assessment: 'No obvious injection vulnerabilities detected',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; sophisticated injection attacks may evade simple patterns',
+      limit:
+        'Pattern-based detection; sophisticated injection attacks may evade simple patterns',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: injectionTestEvidence.map(e => e.id),
+    evidenceIds: injectionTestEvidence.map((e) => e.id),
     assessment: `Injection concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; context matters for many of these patterns',
+    limit:
+      'Pattern-based detection; context matters for many of these patterns',
   };
 }
 
@@ -860,10 +1034,15 @@ export function analyzeSensitiveData(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const sensitiveTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('sensitive') || e.criterionId?.includes('redact') || e.criterionId?.includes('pii'))
+  const sensitiveTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('sensitive') ||
+        e.criterionId?.includes('redact') ||
+        e.criterionId?.includes('pii')),
   );
+  const outcomeLimit = executionLimit(sensitiveTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -888,11 +1067,13 @@ export function analyzeSensitiveData(
     /log.*token/i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      loggingPatterns.forEach(pattern => {
+      loggingPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential sensitive data logging in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential sensitive data logging in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -905,16 +1086,17 @@ export function analyzeSensitiveData(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: sensitiveTestEvidence.map(e => e.id),
+      evidenceIds: sensitiveTestEvidence.map((e) => e.id),
       assessment: 'No obvious sensitive data exposure detected',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual data sensitivity requires context',
+      limit:
+        'Pattern-based detection; actual data sensitivity requires context',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: sensitiveTestEvidence.map(e => e.id),
+    evidenceIds: sensitiveTestEvidence.map((e) => e.id),
     assessment: `Sensitive data concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
     limit: 'Pattern-based detection; legitimate logging may match patterns',
@@ -926,10 +1108,15 @@ export function analyzeCommandExecution(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const commandTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('command') || e.criterionId?.includes('exec') || e.criterionId?.includes('shell'))
+  const commandTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('command') ||
+        e.criterionId?.includes('exec') ||
+        e.criterionId?.includes('shell')),
   );
+  const outcomeLimit = executionLimit(commandTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -953,11 +1140,13 @@ export function analyzeCommandExecution(
     /shell\s*:\s*true/i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      commandPatterns.forEach(pattern => {
+      commandPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Command execution in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Command execution in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -971,11 +1160,13 @@ export function analyzeCommandExecution(
     /exec\s*\([^)]*user/,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      untrustedInputPatterns.forEach(pattern => {
+      untrustedInputPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential untrusted input in command: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential untrusted input in command: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -988,7 +1179,7 @@ export function analyzeCommandExecution(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: commandTestEvidence.map(e => e.id),
+      evidenceIds: commandTestEvidence.map((e) => e.id),
       assessment: 'No unsafe command execution detected',
       confidence: 'MEDIUM',
       limit: 'Pattern-based detection; safe command execution requires context',
@@ -997,10 +1188,11 @@ export function analyzeCommandExecution(
 
   return {
     status: 'CONCERN',
-    evidenceIds: commandTestEvidence.map(e => e.id),
+    evidenceIds: commandTestEvidence.map((e) => e.id),
     assessment: `Command execution concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; legitimate command execution may match patterns',
+    limit:
+      'Pattern-based detection; legitimate command execution may match patterns',
   };
 }
 
@@ -1009,10 +1201,15 @@ export function analyzeFileHandling(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const fileTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('file') || e.criterionId?.includes('path') || e.criterionId?.includes('traversal'))
+  const fileTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('file') ||
+        e.criterionId?.includes('path') ||
+        e.criterionId?.includes('traversal')),
   );
+  const outcomeLimit = executionLimit(fileTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -1035,11 +1232,13 @@ export function analyzeFileHandling(
     /path\s*\+\s*['"]\.\./i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      traversalPatterns.forEach(pattern => {
+      traversalPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential path traversal in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential path traversal in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -1052,11 +1251,13 @@ export function analyzeFileHandling(
     /unlinkSync\s*\([^)]*\$\{/,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      unsafePatterns.forEach(pattern => {
+      unsafePatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Unsafe file operation with potential untrusted input: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Unsafe file operation with potential untrusted input: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
@@ -1069,7 +1270,7 @@ export function analyzeFileHandling(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: fileTestEvidence.map(e => e.id),
+      evidenceIds: fileTestEvidence.map((e) => e.id),
       assessment: 'No unsafe file handling detected',
       confidence: 'MEDIUM',
       limit: 'Pattern-based detection; safe file operations require context',
@@ -1078,10 +1279,11 @@ export function analyzeFileHandling(
 
   return {
     status: 'CONCERN',
-    evidenceIds: fileTestEvidence.map(e => e.id),
+    evidenceIds: fileTestEvidence.map((e) => e.id),
     assessment: `File handling concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; legitimate file operations may match patterns',
+    limit:
+      'Pattern-based detection; legitimate file operations may match patterns',
   };
 }
 
@@ -1090,10 +1292,15 @@ export function analyzePermissionBypass(
 ): AnalysisResult {
   const { evidence, diff } = input;
 
-  const permissionTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('permission') || e.criterionId?.includes('bypass') || e.criterionId?.includes('access'))
+  const permissionTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('permission') ||
+        e.criterionId?.includes('bypass') ||
+        e.criterionId?.includes('access')),
   );
+  const outcomeLimit = executionLimit(permissionTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (!diff) {
     return {
@@ -1109,15 +1316,22 @@ export function analyzePermissionBypass(
   const concerns: string[] = [];
 
   // Check for removed permission checks
-  const removedChecks = lines.filter(l => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l));
+  const removedChecks = lines.filter(
+    (l) => l.startsWith('-') && /if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l),
+  );
   if (removedChecks.length > 0) {
     concerns.push(`${removedChecks.length} removed permission checks detected`);
   }
 
   // Check for commented-out permission checks
-  const commentedChecks = lines.filter(l => l.startsWith('+') && /\/\/.*if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l));
+  const commentedChecks = lines.filter(
+    (l) =>
+      l.startsWith('+') && /\/\/.*if\s*\([^)]*\.\s*(can|has|is)[A-Z]/.test(l),
+  );
   if (commentedChecks.length > 0) {
-    concerns.push(`${commentedChecks.length} commented-out permission checks detected`);
+    concerns.push(
+      `${commentedChecks.length} commented-out permission checks detected`,
+    );
   }
 
   if (permissionTestEvidence.length === 0) {
@@ -1127,7 +1341,7 @@ export function analyzePermissionBypass(
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: permissionTestEvidence.map(e => e.id),
+      evidenceIds: permissionTestEvidence.map((e) => e.id),
       assessment: 'No permission bypass detected',
       confidence: 'MEDIUM',
       limit: 'Pattern-based detection; permission logic may be complex',
@@ -1136,10 +1350,11 @@ export function analyzePermissionBypass(
 
   return {
     status: 'CONCERN',
-    evidenceIds: permissionTestEvidence.map(e => e.id),
+    evidenceIds: permissionTestEvidence.map((e) => e.id),
     assessment: `Permission bypass concerns: ${concerns.join('; ')}`,
     confidence: 'HIGH',
-    limit: 'Pattern-based detection; legitimate refactoring may remove unused checks',
+    limit:
+      'Pattern-based detection; legitimate refactoring may remove unused checks',
   };
 }
 
@@ -1158,15 +1373,32 @@ export function analyzeConsistency(
     };
   }
 
+  if (
+    !imports ||
+    changedFiles.some((file) => !Object.hasOwn(imports, file)) ||
+    !exports ||
+    changedFiles.some((file) => !Object.hasOwn(exports, file))
+  )
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment: 'Scoped module inventory is missing for changed files',
+      confidence: 'LOW',
+      limit:
+        'Requires actual import/export inventory; file presence is context only',
+    };
+
   const concerns: string[] = [];
 
   // Check for inconsistent import styles
   if (imports) {
     const importStyles = new Map<string, number>();
-    Object.values(imports).flat().forEach(imp => {
-      const style = imp.includes('from') ? 'named' : 'default';
-      importStyles.set(style, (importStyles.get(style) || 0) + 1);
-    });
+    Object.values(imports)
+      .flat()
+      .forEach((imp) => {
+        const style = imp.includes('from') ? 'named' : 'default';
+        importStyles.set(style, (importStyles.get(style) || 0) + 1);
+      });
 
     if (importStyles.size > 1) {
       concerns.push('Mixed import styles detected');
@@ -1176,10 +1408,12 @@ export function analyzeConsistency(
   // Check for inconsistent export patterns
   if (exports) {
     const exportStyles = new Map<string, number>();
-    Object.values(exports).flat().forEach(exp => {
-      const style = exp.includes('export default') ? 'default' : 'named';
-      exportStyles.set(style, (exportStyles.get(style) || 0) + 1);
-    });
+    Object.values(exports)
+      .flat()
+      .forEach((exp) => {
+        const style = exp.includes('export default') ? 'default' : 'named';
+        exportStyles.set(style, (exportStyles.get(style) || 0) + 1);
+      });
 
     if (exportStyles.size > 1) {
       concerns.push('Mixed export styles detected');
@@ -1192,7 +1426,8 @@ export function analyzeConsistency(
       evidenceIds: [],
       assessment: 'Code style appears consistent',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; architectural consistency requires human review',
+      limit:
+        'Pattern-based detection; architectural consistency requires human review',
     };
   }
 
@@ -1205,9 +1440,7 @@ export function analyzeConsistency(
   };
 }
 
-export function analyzeBoundaries(
-  input: BoundedAnalysisInput,
-): AnalysisResult {
+export function analyzeBoundaries(input: BoundedAnalysisInput): AnalysisResult {
   const { imports, changedFiles } = input;
 
   if (!changedFiles || changedFiles.length === 0) {
@@ -1220,18 +1453,34 @@ export function analyzeBoundaries(
     };
   }
 
+  if (!imports || changedFiles.some((file) => !Object.hasOwn(imports, file)))
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment: 'Scoped module inventory is missing for changed files',
+      confidence: 'LOW',
+      limit:
+        'Requires actual import/export inventory; file presence is context only',
+    };
+
   const concerns: string[] = [];
 
   // Check for cross-layer imports (more lenient - only flag very different layers)
   if (imports) {
     Object.entries(imports).forEach(([file, fileImports]) => {
       const fileLayer = file.split('/').slice(0, 2).join('/'); // Extract first two segments
-      fileImports.forEach(imp => {
+      fileImports.forEach((imp) => {
         const importLayer = imp.split('/').slice(0, 2).join('/');
         // Only flag if importing from very different layers (e.g., ui importing from db)
         const sensitiveLayers = ['src/db', 'src/ui', 'src/api', 'src/auth'];
-        if (sensitiveLayers.includes(fileLayer) && sensitiveLayers.includes(importLayer) && fileLayer !== importLayer) {
-          concerns.push(`Cross-layer import in ${file}: imports from ${importLayer}`);
+        if (
+          sensitiveLayers.includes(fileLayer) &&
+          sensitiveLayers.includes(importLayer) &&
+          fileLayer !== importLayer
+        ) {
+          concerns.push(
+            `Cross-layer import in ${file}: imports from ${importLayer}`,
+          );
         }
       });
     });
@@ -1243,7 +1492,8 @@ export function analyzeBoundaries(
       evidenceIds: [],
       assessment: 'Module boundaries appear respected',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual layer boundaries require architectural context',
+      limit:
+        'Pattern-based detection; actual layer boundaries require architectural context',
     };
   }
 
@@ -1256,9 +1506,7 @@ export function analyzeBoundaries(
   };
 }
 
-export function analyzeCohesion(
-  input: BoundedAnalysisInput,
-): AnalysisResult {
+export function analyzeCohesion(input: BoundedAnalysisInput): AnalysisResult {
   const { imports, exports, changedFiles } = input;
 
   if (!changedFiles || changedFiles.length === 0) {
@@ -1271,15 +1519,34 @@ export function analyzeCohesion(
     };
   }
 
+  if (
+    !imports ||
+    changedFiles.some((file) => !Object.hasOwn(imports, file)) ||
+    !exports ||
+    changedFiles.some((file) => !Object.hasOwn(exports, file))
+  )
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment: 'Scoped module inventory is missing for changed files',
+      confidence: 'LOW',
+      limit:
+        'Requires actual import/export inventory; file presence is context only',
+    };
+
   const concerns: string[] = [];
 
   // Check for files with unrelated exports
   if (exports) {
     Object.entries(exports).forEach(([file, fileExports]) => {
-      const exportPrefixes = new Set(fileExports.map(e => {
-        const parts = e.split(/[A-Z]/);
-        return parts[0]?.toLowerCase() || '';
-      }).filter(p => p.length > 0));
+      const exportPrefixes = new Set(
+        fileExports
+          .map((e) => {
+            const parts = e.split(/[A-Z]/);
+            return parts[0]?.toLowerCase() || '';
+          })
+          .filter((p) => p.length > 0),
+      );
       if (exportPrefixes.size > 3) {
         concerns.push(`${file} exports multiple unrelated symbol groups`);
       }
@@ -1289,9 +1556,11 @@ export function analyzeCohesion(
   // Check for files importing from many different domains
   if (imports) {
     Object.entries(imports).forEach(([file, fileImports]) => {
-      const importDomains = new Set(fileImports.map(i => i.split('/')[0]));
+      const importDomains = new Set(fileImports.map((i) => i.split('/')[0]));
       if (importDomains.size > 4) {
-        concerns.push(`${file} imports from ${importDomains.size} different domains, suggesting low cohesion`);
+        concerns.push(
+          `${file} imports from ${importDomains.size} different domains, suggesting low cohesion`,
+        );
       }
     });
   }
@@ -1302,7 +1571,8 @@ export function analyzeCohesion(
       evidenceIds: [],
       assessment: 'Modules appear cohesive',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual cohesion requires semantic understanding',
+      limit:
+        'Pattern-based detection; actual cohesion requires semantic understanding',
     };
   }
 
@@ -1311,7 +1581,8 @@ export function analyzeCohesion(
     evidenceIds: [],
     assessment: `Cohesion concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; low cohesion may be appropriate for utility modules',
+    limit:
+      'Pattern-based detection; low cohesion may be appropriate for utility modules',
   };
 }
 
@@ -1341,42 +1612,62 @@ export function analyzeExtensibility(
     /hardcoded/i,
   ];
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (line.startsWith('+')) {
-      hardcodedPatterns.forEach(pattern => {
+      hardcodedPatterns.forEach((pattern) => {
         if (pattern.test(line)) {
-          concerns.push(`Potential hardcoded behavior in added line: ${line.substring(0, 50)}...`);
+          concerns.push(
+            `Potential hardcoded behavior in added line: ${line.substring(0, 50)}...`,
+          );
         }
       });
     }
   });
 
   // Check for lack of configuration/abstraction
-  const configTestEvidence = evidence.filter(e =>
-    e.kind === 'execution' &&
-    (e.criterionId?.includes('config') || e.criterionId?.includes('extend') || e.criterionId?.includes('plugin'))
+  const configTestEvidence = evidence.filter(
+    (e) =>
+      e.kind === 'execution' &&
+      (e.criterionId?.includes('config') ||
+        e.criterionId?.includes('extend') ||
+        e.criterionId?.includes('plugin')),
   );
+  const outcomeLimit = executionLimit(configTestEvidence);
+  if (outcomeLimit) return outcomeLimit;
 
   if (concerns.length > 0 && configTestEvidence.length === 0) {
     concerns.push('Hardcoded behavior without configuration/abstraction tests');
   }
 
+  if (concerns.length === 0 && configTestEvidence.length === 0)
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment:
+        'No scoped configuration or extension execution evidence available',
+      confidence: 'LOW',
+      limit: 'Absence of hardcoded patterns cannot establish extensibility',
+    };
+
   if (concerns.length === 0) {
     return {
       status: 'SUPPORTED',
-      evidenceIds: configTestEvidence.map(e => e.id),
-      assessment: 'Code appears extensible; no obvious hardcoded one-off behavior',
+      evidenceIds: configTestEvidence.map((e) => e.id),
+      assessment:
+        'Code appears extensible; no obvious hardcoded one-off behavior',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; extensibility requires architectural context',
+      limit:
+        'Pattern-based detection; extensibility requires architectural context',
     };
   }
 
   return {
     status: 'CONCERN',
-    evidenceIds: configTestEvidence.map(e => e.id),
+    evidenceIds: configTestEvidence.map((e) => e.id),
     assessment: `Extensibility concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; some hardcoding may be intentional for specific cases',
+    limit:
+      'Pattern-based detection; some hardcoding may be intentional for specific cases',
   };
 }
 
@@ -1402,13 +1693,19 @@ export function analyzeUnnecessaryRewrite(
   const changedFileCount = changedFiles.length;
 
   if (changedFileCount > requirementScope * 3) {
-    concerns.push(`Large change scope (${changedFileCount} files) relative to requirements (${requirementScope})`);
+    concerns.push(
+      `Large change scope (${changedFileCount} files) relative to requirements (${requirementScope})`,
+    );
   }
 
   // Check for wholesale file replacement vs targeted changes
-  const lineChanges = diff.split('\n').filter(l => l.startsWith('+') || l.startsWith('-')).length;
+  const lineChanges = diff
+    .split('\n')
+    .filter((l) => l.startsWith('+') || l.startsWith('-')).length;
   if (lineChanges > 500) {
-    concerns.push(`Very large diff (${lineChanges} lines), may indicate wholesale rewrite`);
+    concerns.push(
+      `Very large diff (${lineChanges} lines), may indicate wholesale rewrite`,
+    );
   }
 
   if (concerns.length === 0) {
@@ -1417,7 +1714,8 @@ export function analyzeUnnecessaryRewrite(
       evidenceIds: [],
       assessment: 'Change scope appears appropriate for requirements',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual rewrite necessity requires human judgment',
+      limit:
+        'Pattern-based detection; actual rewrite necessity requires human judgment',
     };
   }
 
@@ -1426,7 +1724,8 @@ export function analyzeUnnecessaryRewrite(
     evidenceIds: [],
     assessment: `Potential unnecessary rewrite: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; large changes may be legitimate for complex requirements',
+    limit:
+      'Pattern-based detection; large changes may be legitimate for complex requirements',
   };
 }
 
@@ -1439,11 +1738,27 @@ export function analyzeResponsibilityPlacement(
     return {
       status: 'UNVERIFIED',
       evidenceIds: [],
-      assessment: 'No changed files available for responsibility placement analysis',
+      assessment:
+        'No changed files available for responsibility placement analysis',
       confidence: 'LOW',
       limit: 'Requires changed file list to analyze responsibility placement',
     };
   }
+
+  if (
+    !imports ||
+    changedFiles.some((file) => !Object.hasOwn(imports, file)) ||
+    !exports ||
+    changedFiles.some((file) => !Object.hasOwn(exports, file))
+  )
+    return {
+      status: 'UNVERIFIED',
+      evidenceIds: [],
+      assessment: 'Scoped module inventory is missing for changed files',
+      confidence: 'LOW',
+      limit:
+        'Requires actual import/export inventory; file presence is context only',
+    };
 
   const concerns: string[] = [];
 
@@ -1453,17 +1768,25 @@ export function analyzeResponsibilityPlacement(
       const fileExports = exports[file] || [];
 
       // If a file imports database logic but exports UI code
-      const hasDbImports = fileImports.some(i => i.includes('db') || i.includes('database') || i.includes('query'));
-      const hasUiExports = fileExports.some(e => e.includes('render') || e.includes('view') || e.includes('component'));
+      const hasDbImports = fileImports.some(
+        (i) =>
+          i.includes('db') || i.includes('database') || i.includes('query'),
+      );
+      const hasUiExports = fileExports.some(
+        (e) =>
+          e.includes('render') || e.includes('view') || e.includes('component'),
+      );
 
       if (hasDbImports && hasUiExports) {
         concerns.push(`${file} mixes database imports with UI exports`);
       }
 
       // If a file imports from many unrelated domains
-      const importDomains = new Set(fileImports.map(i => i.split('/')[0]));
+      const importDomains = new Set(fileImports.map((i) => i.split('/')[0]));
       if (importDomains.size > 5) {
-        concerns.push(`${file} imports from many domains, suggesting misplaced responsibilities`);
+        concerns.push(
+          `${file} imports from many domains, suggesting misplaced responsibilities`,
+        );
       }
     });
   }
@@ -1474,7 +1797,8 @@ export function analyzeResponsibilityPlacement(
       evidenceIds: [],
       assessment: 'Responsibilities appear appropriately placed',
       confidence: 'MEDIUM',
-      limit: 'Pattern-based detection; actual responsibility placement requires architectural context',
+      limit:
+        'Pattern-based detection; actual responsibility placement requires architectural context',
     };
   }
 
@@ -1483,6 +1807,7 @@ export function analyzeResponsibilityPlacement(
     evidenceIds: [],
     assessment: `Responsibility placement concerns: ${concerns.join('; ')}`,
     confidence: 'MEDIUM',
-    limit: 'Pattern-based detection; some mixing may be intentional for specific modules',
+    limit:
+      'Pattern-based detection; some mixing may be intentional for specific modules',
   };
 }

@@ -331,6 +331,7 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
                       result.status === 'COMPLETED'
                         ? 'AI_ASSESSMENT'
                         : 'DETERMINISTIC_POLICY',
+                      context,
                     ),
                     aiTrace: result.trace,
                   }),

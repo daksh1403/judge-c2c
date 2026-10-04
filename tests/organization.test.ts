@@ -147,6 +147,41 @@ describe('protected organization setup', () => {
     );
     expect((await organization(alternate, env, ctx)).status).toBe(403);
   });
+  it('allows the explicitly approved PR7 origin and rejects other preview origins', async () => {
+    const approved =
+      'https://feat-frontend-polish-judge-c2c.dakshx.workers.dev';
+    const reviewEnv = { ...env, ORG_REVIEW_ORIGINS: approved };
+    const status = await organization(
+      new Request(approved + '/api/organization/status'),
+      reviewEnv,
+      ctx,
+    );
+    expect(status.status).toBe(200);
+    expect((await body(status)).authenticated).toBe(false);
+    for (const rejected of [
+      'https://unapproved-judge-c2c.dakshx.workers.dev',
+      approved + '.attacker.test',
+      approved.replace('https:', 'http:'),
+      approved + ':8443',
+    ]) {
+      const response = await organization(
+        new Request(rejected + '/api/organization/status'),
+        reviewEnv,
+        ctx,
+      );
+      expect(response.status).toBe(403);
+      expect((await body(response)).error).toBe('ORIGIN_NOT_ALLOWED');
+    }
+    expect(
+      (
+        await organization(
+          new Request(approved + '/api/organization/status'),
+          env,
+          ctx,
+        )
+      ).status,
+    ).toBe(403);
+  });
   it('encrypts credentials and binds decryption to the organization and vault key', async () => {
     const encrypted = await seal(env, { privateKey: 'must-not-be-visible' });
     expect(encrypted).not.toContain('must-not-be-visible');

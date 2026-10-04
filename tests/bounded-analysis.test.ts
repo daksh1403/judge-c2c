@@ -153,10 +153,24 @@ describe('Bounded evidence-backed analysis', () => {
         evidence: [],
         changedFiles: ['src/utils/mixed.ts'],
         imports: {
-          'src/utils/mixed.ts': ['../auth', '../db', '../ui', '../api', '../config', '../logger', '../utils'],
+          'src/utils/mixed.ts': [
+            '../auth',
+            '../db',
+            '../ui',
+            '../api',
+            '../config',
+            '../logger',
+            '../utils',
+          ],
         },
         exports: {
-          'src/utils/mixed.ts': ['class AuthHandler', 'function queryDb', 'function renderView', 'const config', 'type Config'],
+          'src/utils/mixed.ts': [
+            'class AuthHandler',
+            'function queryDb',
+            'function renderView',
+            'const config',
+            'type Config',
+          ],
         },
       });
       expect(result.status).toBe('CONCERN');
@@ -234,7 +248,10 @@ describe('Bounded evidence-backed analysis', () => {
           },
         ],
         exports: {
-          'src/api/user.ts': ['function getUser(id: string): User', 'function createUser(data: User): User'],
+          'src/api/user.ts': [
+            'function getUser(id: string): User',
+            'function createUser(data: User): User',
+          ],
         },
       });
       expect(result.status).toBe('SUPPORTED');
@@ -253,7 +270,9 @@ describe('Bounded evidence-backed analysis', () => {
           },
         ],
         exports: {
-          'src/api/complex.ts': ['function complexFunction(a, b, c, d, e, f, g, h, i, j): Result'],
+          'src/api/complex.ts': [
+            'function complexFunction(a, b, c, d, e, f, g, h, i, j): Result',
+          ],
         },
       });
       expect(result.status).toBe('CONCERN');
@@ -616,10 +635,22 @@ describe('Bounded evidence-backed analysis', () => {
         evidence: [],
         changedFiles: ['src/utils/mixed.ts'],
         imports: {
-          'src/utils/mixed.ts': ['../db', '../ui', '../api', '../auth', '../config'],
+          'src/utils/mixed.ts': [
+            '../db',
+            '../ui',
+            '../api',
+            '../auth',
+            '../config',
+          ],
         },
         exports: {
-          'src/utils/mixed.ts': ['dbquery', 'render', 'apicall', 'authcheck', 'configval'],
+          'src/utils/mixed.ts': [
+            'dbquery',
+            'render',
+            'apicall',
+            'authcheck',
+            'configval',
+          ],
         },
       });
       expect(result.status).toBe('CONCERN');
@@ -670,7 +701,9 @@ describe('Bounded evidence-backed analysis', () => {
         contract: demoContract,
         evidence: [],
         diff: Array(600).fill('+line').join('\n'),
-        changedFiles: Array(10).fill(null).map((_, i) => `src/file${i}.ts`),
+        changedFiles: Array(10)
+          .fill(null)
+          .map((_, i) => `src/file${i}.ts`),
       });
       expect(result.status).toBe('CONCERN');
     });
@@ -706,5 +739,103 @@ describe('Bounded evidence-backed analysis', () => {
       });
       expect(result.status).toBe('CONCERN');
     });
+  });
+});
+
+describe('execution and inspection grounding regressions', () => {
+  const behavioralAnalyzers = [
+    analyzeSymptomMasking,
+    analyzeErrorHandling,
+    analyzeAPIDesign,
+    analyzeTestability,
+    analyzeAuthRegression,
+    analyzeAuthzRegression,
+    analyzeInjection,
+    analyzeSensitiveData,
+    analyzeCommandExecution,
+    analyzeFileHandling,
+    analyzePermissionBypass,
+    analyzeExtensibility,
+  ];
+  it.each(behavioralAnalyzers)(
+    '%s does not support failed or unverified scoped execution',
+    (analyzer) => {
+      for (const status of ['FAIL', 'UNVERIFIED'] as const) {
+        const result = analyzer({
+          contract: demoContract,
+          evidence: [
+            {
+              id: 'scoped-test',
+              kind: 'execution',
+              status,
+              criterionId:
+                'test-error-api-auth-authorize-injection-sensitive-command-file-permission-config',
+              claim: 'Configured outcome',
+            },
+          ],
+          diff: '+function execute() { return true; }',
+          changedFiles: ['src/main.ts', 'src/main.test.ts'],
+          exports: { 'src/main.ts': ['function execute'] },
+        });
+        expect(result.status).toBe(
+          status === 'FAIL' ? 'CONCERN' : 'UNVERIFIED',
+        );
+        expect(result.evidenceIds).toEqual(['scoped-test']);
+        expect(result.assessment).not.toContain(
+          'implementation addresses test cases',
+        );
+      }
+    },
+  );
+  it.each([
+    analyzeSeparationOfConcerns,
+    analyzeConsistency,
+    analyzeBoundaries,
+    analyzeCohesion,
+    analyzeResponsibilityPlacement,
+  ])(
+    '%s keeps absent and incomplete module inventories unverified',
+    (analyzer) => {
+      const inventories: (Record<string, string[]> | undefined)[] = [
+        undefined,
+        {},
+        { 'src/other.ts': [] },
+      ];
+      for (const inventory of inventories) {
+        const result = analyzer({
+          contract: demoContract,
+          evidence: [],
+          changedFiles: ['src/main.ts'],
+          imports: inventory,
+          exports: inventory,
+        });
+        expect(result.status).toBe('UNVERIFIED');
+      }
+    },
+  );
+  it('does not infer symptom masking or API design from passing execution alone', () => {
+    const evidence = [
+      {
+        id: 'pass',
+        kind: 'execution' as const,
+        status: 'PASS' as const,
+        criterionId: 'api-test',
+        claim: 'Scoped check passed',
+      },
+    ];
+    expect(
+      analyzeSymptomMasking({ contract: demoContract, evidence }).status,
+    ).toBe('UNVERIFIED');
+    expect(
+      analyzeAPIDesign({ contract: demoContract, evidence, exports: {} })
+        .status,
+    ).toBe('UNVERIFIED');
+    expect(
+      analyzeExtensibility({
+        contract: demoContract,
+        evidence: [],
+        diff: '+const configuration = {};',
+      }).status,
+    ).toBe('UNVERIFIED');
   });
 });

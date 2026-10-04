@@ -314,7 +314,7 @@ it('projects specific contextual observations and finding indexes with exact ser
   expect(
     result.engineeringReview.rubric.find((r) => r.id === '28.03')!
       .analysisCoverage,
-  ).toBe('BOUNDED_ANALYSIS_AVAILABLE');
+  ).toBe('MISSING_MEANINGFUL_ANALYSIS');
 });
 
 it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate out of contextual facet coverage', () => {
@@ -339,7 +339,7 @@ it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate ou
   expect(rubric.find((r) => r.id === '28.03')!.contextualAnalysis).toEqual([]);
   expect(rubric.find((r) => r.id === '25.18')).toMatchObject({
     status: 'UNVERIFIED',
-    analysisCoverage: 'BOUNDED_ANALYSIS_AVAILABLE',
+    analysisCoverage: 'MISSING_MEANINGFUL_ANALYSIS',
     contextualAnalysis: [],
   });
   review.findings[0]!.evidenceIds = ['execution-lint'];
@@ -360,4 +360,91 @@ it('keeps uncited, unknown-citation, irrelevant and deterministic boilerplate ou
       'DETERMINISTIC_POLICY',
     ).engineeringReview.rubric.every((r) => r.contextualAnalysis.length === 0),
   ).toBe(true);
+});
+
+it('never treats diff metadata and failed execution as semantic facts or working behavior', () => {
+  const { contract, review } = fixture();
+  const evidence: Evidence[] = [
+    {
+      id: 'diff',
+      kind: 'diff',
+      status: 'PASS',
+      claim:
+        'Exact baseline-to-head comparison: 2 changed files. This confirms change metadata, not functionality.',
+    },
+    {
+      id: 'failed',
+      kind: 'execution',
+      criterionId: 'bounded',
+      status: 'FAIL',
+      claim: 'Trusted configured test failed.',
+    },
+  ];
+  const rubric = enrichEngineeringReview(contract, evidence, review)
+    .engineeringReview.rubric;
+  for (const facet of rubric.filter(
+    (facet) => !['25.15', '25.16'].includes(facet.id),
+  )) {
+    expect(facet.status).toBe('UNVERIFIED');
+    expect(facet.needsReview).toBe(true);
+    expect(facet.boundedAnalysis?.assessment ?? '').not.toContain(
+      'implementation addresses test cases',
+    );
+  }
+  expect(
+    rubric.find((facet) => facet.id === '25.05')?.boundedAnalysis,
+  ).toMatchObject({ status: 'CONCERN', evidenceIds: ['failed'] });
+  expect(rubric.find((facet) => facet.id === '27.03')).toMatchObject({
+    analysisCoverage: 'MISSING_MEANINGFUL_ANALYSIS',
+    evidenceIds: [],
+  });
+});
+
+it('inspects actual frozen patches without promoting bounded assessments to facts', () => {
+  const { contract, evidence, review } = fixture();
+  review.findings = [];
+  evidence.push({
+    id: 'diff',
+    kind: 'diff',
+    status: 'PASS',
+    claim: 'Comparison metadata only',
+  });
+  const files = [
+    {
+      filename: 'server.mjs',
+      status: 'modified',
+      additions: 3,
+      deletions: 0,
+      patch:
+        '+const x = calculate();\n+const x = calculate();\n+const x = calculate();',
+    },
+  ];
+  const facet = enrichEngineeringReview(
+    contract,
+    evidence,
+    review,
+    'AI_ASSESSMENT',
+    { files },
+  ).engineeringReview.rubric.find((facet) => facet.id === '27.03')!;
+  expect(facet).toMatchObject({
+    status: 'UNVERIFIED',
+    needsReview: true,
+    evidenceIds: ['diff'],
+    analysisCoverage: 'BOUNDED_ANALYSIS_AVAILABLE',
+    boundedAnalysis: { status: 'CONCERN' },
+  });
+  expect(facet.boundedAnalysis?.assessment).toContain('repeated code blocks');
+  const incomplete = enrichEngineeringReview(
+    contract,
+    evidence,
+    review,
+    'AI_ASSESSMENT',
+    { files: [{ ...files[0]!, patchTruncated: true }] },
+  ).engineeringReview.rubric.find((facet) => facet.id === '27.03')!;
+  expect(incomplete).toMatchObject({
+    status: 'UNVERIFIED',
+    needsReview: true,
+    analysisCoverage: 'MISSING_MEANINGFUL_ANALYSIS',
+    evidenceIds: [],
+  });
 });
