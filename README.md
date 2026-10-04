@@ -4,7 +4,7 @@ GitHub engineering evaluation with immutable contracts, baseline comparison and
 evidence-backed human review. AI interprets evidence; it does not establish facts.
 
 **[Automatic PR Preview](https://feat-evaluation-foundation-judge-c2c.dakshx.workers.dev)** — test real public PRs in your own browser session.
-This foundation is not ready to judge a real event.
+See [current capabilities and operation](docs/system-capabilities.md) and the [live verification checkpoint](docs/qa/current-completion-state.md). Production/event-scale verification remains pending.
 
 ## Try the real review flow
 
@@ -57,10 +57,7 @@ remains **UNVERIFIED**. Do not enter sensitive information into this review envi
 - Passing GitHub CI and native Cloudflare branch Previews that update on PR commits.
   Optional Actions deployment definitions remain disabled pending credentials/approval gates.
 
-**Participant execution is not implemented in this slice.** Build/tests/scanners/coverage/
-benchmarks do not run. Functional criteria remain UNVERIFIED. A passing literal assertion
-confirms only that exact source/documentation criterion. No score is assigned. Additional
-contributions receive no credit without evidence.
+**Authenticated organization evaluations support isolated participant execution** through the trusted Node HTTP runner profile and configured build/test/scanner/coverage/benchmark checks. The credential-free public preview does not execute that full pipeline. Missing execution remains UNVERIFIED; literal source assertions prove only their exact criterion. Additional contributions require evidence and organizer recognition. See the current capability document for the supported boundaries.
 
 ## Local development
 
@@ -156,14 +153,12 @@ human-merged main pushes through `cloudflare-production`, with its own token/acc
 secrets `ADMIN_TOKEN`, `GITHUB_WEBHOOK_SECRET`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`.
 R2 must first be enabled in the Cloudflare account dashboard.
 
-Optional AI requires an AI binding and `AI_MODEL`; the selected model is
-`@cf/meta/llama-3.3-70b-instruct-fp8-fast`, supporting
-[JSON mode](https://developers.cloudflare.com/workers-ai/features/json-mode/).
+AI supports Cloudflare Workers AI or CallMissed. The current live review backend uses CallMissed `kimi-k2.6`; Cloudflare model selection uses `AI_MODEL`. Both paths enforce objective precedence, known citations, bounded context and structured output. Provider credentials stay server-side.
 
 ## API
 
 All live organizer endpoints require `Authorization: Bearer <credential>` (at least
-32 characters). The protected organization console separates organizer and read-only judge role codes; individual scoped identities and participant permissions remain production-readiness gates. `/health` is liveness, not a readiness attestation.
+32 characters). The protected organization console separates organizer and read-only judge role codes; individual revocable identities and team-scoped participant permissions are implemented; production configuration still requires independent verification. `/health` is liveness, not a readiness attestation.
 
 | Endpoint                          | Purpose                                                  |
 | --------------------------------- | -------------------------------------------------------- |
