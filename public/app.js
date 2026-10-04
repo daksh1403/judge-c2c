@@ -135,15 +135,31 @@ function buildObjectiveChecksSection(r, e) {
   return `<section class="panel"><div class="panel-head"><h2>Objective Checks</h2><span class="subtle">${hasExecution ? executionEvidence.length + ' execution checks' : 'No execution evidence'}</span></div>
     ${hasExecution ? `
       <div class="checks-grid">
-        ${executionEvidence.map(x => `
-          <div class="check-item ${x.status.toLowerCase()}">
+        ${executionEvidence.map(x => {
+          const deltaClass = x.baselineStatus === 'PASS' && x.status === 'FAIL' ? 'regression' :
+                            x.baselineStatus === 'FAIL' && x.status === 'PASS' ? 'improvement' :
+                            x.baselineStatus === x.status ? 'unchanged' : 'mixed';
+          const deltaIcon = deltaClass === 'regression' ? '↓' : deltaClass === 'improvement' ? '↑' : '→';
+          
+          return `
+          <div class="check-item ${x.status.toLowerCase()} ${deltaClass}">
             <div class="check-status">${badge(x.status)}</div>
             <div class="check-id"><code>${esc(x.id)}</code></div>
             <div class="check-claim">${esc(x.claim)}</div>
-            ${x.baselineStatus ? `<div class="check-delta">Baseline ${badge(x.baselineStatus)} → ${badge(x.status)}</div>` : ''}
+            ${x.baselineStatus ? `
+              <div class="check-delta">
+                <span class="delta-label">Baseline ${badge(x.baselineStatus)} ${deltaIcon} Submission ${badge(x.status)}</span>
+              </div>
+            ` : ''}
             ${x.path ? `<div class="check-path"><code>${esc(x.path)}</code></div>` : ''}
           </div>
-        `).join('')}
+        `;
+        }).join('')}
+      </div>
+      <div class="delta-legend">
+        <span class="delta-legend-item regression">↓ Regression</span>
+        <span class="delta-legend-item improvement">↑ Improvement</span>
+        <span class="delta-legend-item unchanged">→ Unchanged</span>
       </div>
     ` : '<div class="empty">No execution evidence available. Runtime behavior remains unverified.</div>'}
   </section>`;
@@ -394,7 +410,13 @@ function renderOverview() {
       )
       .join(
         '',
-      )}</section><section class="panel"><div class="panel-head"><h2>Submission activity</h2><div class="filters"><input id="search" type="search" placeholder="Search repository, team or PR" aria-label="Search submissions"><select id="filter" aria-label="Filter evaluation state"><option value="">All evaluations</option><option>COMPLETED</option><option>FAILED</option><option>QUEUED</option><option>SUPERSEDED</option></select></div></div><div class="table-wrap"><table><thead><tr><th>SUBMISSION</th><th>TEAM</th><th>STATE</th><th>EVIDENCE</th><th>REVIEW</th></tr></thead><tbody id="rows"></tbody></table></div><div class="panel-foot"><span id="row-count"></span><span>${overview.preview ? 'Latest 50 session reviews · seven-day retention' : 'Latest 100 evaluations · immutable history'}</span></div></section><section class="principle"><h3>A verdict you can inspect.</h3><p>Requirements come from the frozen contract. Deterministic evidence comes first. Contextual reasoning cites that evidence, and behavior without verification remains explicitly unverified.</p></section>`;
+      )}</section><section class="panel"><div class="panel-head"><h2>Competition metrics</h2></div><div class="metrics-grid">${[
+        ['Total teams', c.teams],
+        ['Submitted teams', c.teams - (c.teams - (c.openSubmissions + c.completed))],
+        ['Not submitted', c.teams - (c.openSubmissions + c.completed)],
+        ['Success rate', c.completed > 0 ? Math.round((c.completed / (c.completed + c.failed)) * 100) + '%' : 'N/A'],
+        ['Avg evaluation time', 'N/A'],
+      ].map(([l, v]) => `<div class="metric-item"><div class="metric-label">${esc(l)}</div><div class="metric-value">${esc(String(v))}</div></div>`).join('')}</div></section><section class="panel"><div class="panel-head"><h2>Submission activity</h2><div class="filters"><input id="search" type="search" placeholder="Search repository, team or PR" aria-label="Search submissions"><select id="filter" aria-label="Filter evaluation state"><option value="">All evaluations</option><option>COMPLETED</option><option>FAILED</option><option>QUEUED</option><option>SUPERSEDED</option></select><select id="sort" aria-label="Sort submissions"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></div></div><div class="table-wrap"><table><thead><tr><th>SUBMISSION</th><th>TEAM</th><th>STATE</th><th>EVIDENCE</th><th>REVIEW</th></tr></thead><tbody id="rows"></tbody></table></div><div class="panel-foot"><span id="row-count"></span><span>${overview.preview ? 'Latest 50 session reviews · seven-day retention' : 'Latest 100 evaluations · immutable history'}</span></div></section><section class="principle"><h3>A verdict you can inspect.</h3><p>Requirements come from the frozen contract. Deterministic evidence comes first. Contextual reasoning cites that evidence, and behavior without verification remains explicitly unverified.</p></section>`;
   if (overview.preview) {
     $('#content').insertAdjacentHTML('afterbegin', reviewForm());
     $('#review-form').addEventListener('submit', submitReview);
@@ -411,6 +433,7 @@ function renderOverview() {
   }
   $('#search').addEventListener('input', renderRows);
   $('#filter').addEventListener('change', renderRows);
+  $('#sort').addEventListener('change', renderRows);
   renderRows();
 }
 function reviewForm() {
@@ -468,14 +491,20 @@ async function submitReview(event) {
 }
 function renderRows() {
   const q = $('#search').value.toLowerCase(),
-    f = $('#filter').value;
-  const rows = overview.runs.filter((r) => {
+    f = $('#filter').value,
+    s = $('#sort').value;
+  let rows = overview.runs.filter((r) => {
     const a = parse(r.assignment_snapshot);
     return (
       (!f || r.state === f) &&
       `${r.full_name} ${r.pr_number} ${a.team_name}`.toLowerCase().includes(q)
     );
   });
+  
+  if (s === 'newest') {
+    rows = rows.reverse();
+  }
+  
   $('#rows').innerHTML =
     rows
       .map((r) => {
@@ -573,8 +602,12 @@ async function detail(id) {
     
     ${requirementsSection}
     ${objectiveChecksSection}
+    ${buildSolutionApproachSection(report)}
+    ${buildAIReviewStateSection(r, report)}
     ${engineeringReviewSection}
     ${securitySection}
+    ${buildPerformanceSection(e)}
+    ${buildRegressionsSection(e)}
     ${contributionsSection}
     ${evidenceSection}
     ${attentionSection}
@@ -673,6 +706,123 @@ function failureDescription(code) {
   };
   return descriptions[code] || code;
 }
+
+function buildSolutionApproachSection(report) {
+  if (!report || !report.solution_approach) {
+    return '';
+  }
+  
+  const approach = report.solution_approach;
+  
+  return `<section class="panel"><div class="panel-head"><h2>Solution Approach</h2></div>
+    <div class="approach-grid">
+      <div class="approach-item">
+        <div class="approach-label">Problem understanding</div>
+        <div class="approach-value">${esc(approach.problem_understanding || 'UNVERIFIED')}</div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-label">Approach summary</div>
+        <div class="approach-value">${esc(approach.approach_summary || 'UNVERIFIED')}</div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-label">Root cause vs symptom</div>
+        <div class="approach-value">${esc(approach.root_cause_analysis || 'UNVERIFIED')}</div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-label">Maintainability</div>
+        <div class="approach-value">${esc(approach.maintainability || 'UNVERIFIED')}</div>
+      </div>
+      <div class="approach-item">
+        <div class="approach-label">Tradeoffs</div>
+        <div class="approach-value">${esc(approach.tradeoffs || 'UNVERIFIED')}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function buildAIReviewStateSection(r, report) {
+  const aiStatus = r.ai_status || 'PENDING';
+  const aiTrace = report?.aiTrace;
+  const requiresAttention = aiTrace?.requiresHumanAttention;
+  
+  let statusClass = aiStatus === 'COMPLETED' ? 'ai-complete' : 
+                    aiStatus === 'FAILED' ? 'ai-failed' : 'ai-pending';
+  
+  return `<section class="panel"><div class="panel-head"><h2>AI Review State</h2></div>
+    <div class="ai-review-status ${statusClass}">
+      <div class="ai-status-label">Status</div>
+      <div class="ai-status-value">${badge(aiStatus)}</div>
+      ${requiresAttention ? '<div class="ai-attention-flag">⚠ Requires human attention</div>' : ''}
+    </div>
+    ${aiTrace ? `
+      <div class="ai-review-details">
+        <div class="ai-detail-item">
+          <span class="ai-detail-label">Model:</span>
+          <span class="ai-detail-value">${esc(aiTrace.model || 'N/A')}</span>
+        </div>
+        <div class="ai-detail-item">
+          <span class="ai-detail-label">Grounding:</span>
+          <span class="ai-detail-value">${esc(aiTrace.grounding || 'N/A')}</span>
+        </div>
+        <div class="ai-detail-item">
+          <span class="ai-detail-label">Citations:</span>
+          <span class="ai-detail-value">${aiTrace.citationCount || 0} references</span>
+        </div>
+        <div class="ai-detail-item">
+          <span class="ai-detail-label">Assessment:</span>
+          <span class="ai-detail-value">${esc(aiTrace.assessment || 'N/A')}</span>
+        </div>
+      </div>
+    ` : '<div class="empty">AI review details not available.</div>'}
+  </section>`;
+}
+
+function buildPerformanceSection(e) {
+  const benchmarkEvidence = e.filter(x => x.kind === 'benchmark');
+  
+  if (benchmarkEvidence.length === 0) {
+    return `<section class="panel"><div class="panel-head"><h2>Performance</h2></div><div class="empty">No benchmark evidence available.</div></section>`;
+  }
+  
+  return `<section class="panel"><div class="panel-head"><h2>Performance</h2><span class="subtle">${benchmarkEvidence.length} benchmarks</span></div>
+    <div class="checks-grid">
+      ${benchmarkEvidence.map(x => `
+        <div class="check-item ${x.status.toLowerCase()}">
+          <div class="check-status">${badge(x.status)}</div>
+          <div class="check-id"><code>${esc(x.id)}</code></div>
+          <div class="check-claim">${esc(x.claim)}</div>
+          ${x.baselineStatus ? `
+            <div class="check-delta">
+              <span class="delta-label">Baseline ${badge(x.baselineStatus)} → ${badge(x.status)}</span>
+            </div>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+  </section>`;
+}
+
+function buildRegressionsSection(e) {
+  const regressionEvidence = e.filter(x => x.baselineStatus === 'PASS' && x.status === 'FAIL');
+  
+  if (regressionEvidence.length === 0) {
+    return `<section class="panel"><div class="panel-head"><h2>Regressions</h2></div><div class="empty">NO REGRESSION DETECTED IN EXECUTED CHECKS</div></section>`;
+  }
+  
+  return `<section class="panel regression-section"><div class="panel-head"><h2>Regressions</h2><span class="subtle">${regressionEvidence.length} regressions detected</span></div>
+    <div class="regression-list">
+      ${regressionEvidence.map(x => `
+        <div class="regression-item">
+          <div class="regression-status">${badge('FAIL')}</div>
+          <div class="regression-id"><code>${esc(x.id)}</code></div>
+          <div class="regression-claim">${esc(x.claim)}</div>
+          <div class="regression-path">${x.path ? `<code>${esc(x.path)}</code>` : ''}</div>
+        </div>
+      `).join('')}
+    </div>
+  </section>`;
+}
+
 async function repositories() {
   $('#breadcrumb').innerHTML =
     'Workspace <span class="slash">/</span> Repositories';

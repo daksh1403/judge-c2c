@@ -52,7 +52,8 @@ test('judges can filter submissions and follow criterion evidence', async ({
     page.getByText('No submissions match.', { exact: false }),
   ).toBeVisible();
   await page.getByRole('searchbox').fill('');
-  await page.getByRole('combobox').selectOption('COMPLETED');
+  await page.getByLabel('Filter evaluation state').selectOption('COMPLETED');
+  await expect(page.getByRole('heading', { name: 'Competition metrics' })).toBeVisible();
   await page.getByRole('button', { name: 'hackathon/CampaignOS' }).click();
   await expect(
     page.getByRole('heading', { name: 'Requirements' }),

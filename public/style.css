@@ -1016,6 +1016,213 @@ td small {
   color: var(--muted);
 }
 
+.check-item.regression {
+  border-left-color: var(--red);
+  background: #fff5f5;
+}
+
+.check-item.improvement {
+  border-left-color: var(--green);
+  background: #f0fff4;
+}
+
+.check-item.unchanged {
+  border-left-color: var(--muted);
+}
+
+.delta-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.delta-legend-item {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.delta-legend-item.regression {
+  background: #ffe6e6;
+  color: var(--red);
+}
+
+.delta-legend-item.improvement {
+  background: #e6f4ea;
+  color: var(--green);
+}
+
+.delta-legend-item.unchanged {
+  background: var(--canvas);
+  color: var(--muted);
+}
+
+.delta-label {
+  font-size: 13px;
+}
+
+.approach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.approach-item {
+  background: var(--canvas);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.approach-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.approach-value {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.regression-section {
+  border: 2px solid var(--red);
+  border-radius: 6px;
+}
+
+.regression-section .panel-head {
+  background: #ffe6e6;
+}
+
+.regression-list {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.regression-item {
+  background: white;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 3px solid var(--red);
+}
+
+.regression-status {
+  margin-bottom: 4px;
+}
+
+.regression-id {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.regression-claim {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.regression-path {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ai-review-status {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-review-status.ai-complete {
+  background: #e6f4ea;
+  border: 1px solid #c6e8c6;
+}
+
+.ai-review-status.ai-failed {
+  background: #ffe6e6;
+  border: 1px solid #ffcccc;
+}
+
+.ai-review-status.ai-pending {
+  background: #fff4e6;
+  border: 1px solid #ffe6cc;
+}
+
+.ai-status-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ai-status-value {
+  font-size: 13px;
+}
+
+.ai-attention-flag {
+  padding: 4px 8px;
+  background: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--amber);
+}
+
+.ai-review-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.ai-detail-item {
+  background: var(--canvas);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.ai-detail-label {
+  color: var(--muted);
+  margin-right: 8px;
+}
+
+.ai-detail-value {
+  font-weight: 500;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-item {
+  background: var(--canvas);
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-weight: 600;
+  font-size: 16px;
+}
+
 .dimension-section {
   margin-bottom: 16px;
   border: 1px solid var(--line);
