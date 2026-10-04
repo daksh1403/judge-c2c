@@ -256,7 +256,10 @@ export async function api(request: Request, env: Env) {
     if (
       !(
         run.state === 'FAILED' ||
-        (run.state === 'COMPLETED' && run.ai_status === 'FAILED')
+        (run.state === 'COMPLETED' &&
+          ['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED'].includes(
+            run.ai_status ?? '',
+          ))
       ) ||
       !(await isCurrent(env, run))
     )

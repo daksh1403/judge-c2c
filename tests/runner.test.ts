@@ -298,12 +298,24 @@ describe('trusted isolated execution', () => {
       evidence,
     );
     expect(reviewed.status).toBe('COMPLETED');
-    expect(reviewed.review.summary).toBe(valid.summary);
+    expect(reviewed.review.summary).toContain(
+      'Objective criteria: 0 PASS, 0 FAIL, 4 UNVERIFIED.',
+    );
+    expect(reviewed.review.summary).toContain('require human review');
+    expect(reviewed.review.summary).toContain(
+      'citations do not prove their semantic truth',
+    );
     expect(reviewed.review.summary).not.toContain('work perfectly');
     expect(reviewed.trace.attempts).toBe(2);
     expect(
-      reviewed.review.assessments.every((a) => a.status === 'UNVERIFIED'),
-    ).toBe(true);
+      reviewed.review.assessments.map(({ criterionId, status }) => ({
+        criterionId,
+        status,
+      })),
+    ).toEqual(
+      policy.cases.map(({ id }) => ({ criterionId: id, status: 'UNVERIFIED' })),
+    );
+    expect(reviewed.trace).toMatchObject({ requiresHumanAttention: true });
     model.mockRejectedValue(new Error('provider down'));
     expect(
       (
