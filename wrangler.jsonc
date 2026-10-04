@@ -166,10 +166,5 @@
       "script_name": "judge-c2c-review",
     },
   ],
-  "services": [
-    {
-      "binding": "ORG_SERVICE",
-      "service": "judge-c2c-review",
-    },
-  ],
+  "services": [],
 }
