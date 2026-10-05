@@ -1,11 +1,20 @@
 import { describe, it, expect, vi } from 'vitest';
-import { mkdtemp, readFile, stat, rm, copyFile, mkdir } from 'node:fs/promises';
+import {
+  mkdtemp,
+  readFile,
+  writeFile,
+  stat,
+  rm,
+  copyFile,
+  mkdir,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   planWorkspace,
   provisionWorkspace,
   verifyWorkspace,
+  retireWorkspace,
   createAdapters,
   // @ts-expect-error Node ESM operator script intentionally has no TS declarations.
 } from '../scripts/organization-workspace.mjs';
@@ -214,6 +223,125 @@ describe('organization workspace setup', () => {
     ] as never);
     await expect(planWorkspace(options, b)).rejects.toThrow(/reuse|collision/i);
   });
+  const oversizedOrigin = `https://${Array(5).fill('a'.repeat(60)).join('.')}`;
+  it('rejects an oversized public hostname during planning before adapter calls', async () => {
+    expect(new URL(oversizedOrigin).hostname).toHaveLength(304);
+    const a = adapters();
+    await expect(
+      planWorkspace({ ...options, origin: oversizedOrigin }, a),
+    ).rejects.toThrow(/hostname|origin/i);
+    expect(a.githubIdentity).not.toHaveBeenCalled();
+    expect(a.inventory).not.toHaveBeenCalled();
+  });
+  it('rejects an oversized public hostname before provisioning or private state', async () =>
+    temporary(async (root) => {
+      const a = adapters();
+      await expect(
+        provisionWorkspace({ ...options, origin: oversizedOrigin }, a, {
+          root,
+        }),
+      ).rejects.toThrow(/hostname|origin/i);
+      expect(a.createResource).not.toHaveBeenCalled();
+      expect(a.migrate).not.toHaveBeenCalled();
+      expect(a.secret).not.toHaveBeenCalled();
+      expect(a.deploy).not.toHaveBeenCalled();
+      expect(a.githubIdentity).not.toHaveBeenCalled();
+      await expect(stat(join(root, '.wrangler'))).rejects.toThrow();
+    }));
+  it('denies a proposed runner endpoint that matches a known protected origin', async () =>
+    temporary(async (root) => {
+      const a = adapters();
+      a.knownResources.mockResolvedValue([
+        { origin: options.runnerEndpoint },
+      ] as never);
+      await expect(planWorkspace(options, a)).rejects.toThrow(
+        /reuse|collision/i,
+      );
+      await expect(provisionWorkspace(options, a, { root })).rejects.toThrow(
+        /reuse|collision/i,
+      );
+      expect(a.createResource).not.toHaveBeenCalled();
+      expect(a.migrate).not.toHaveBeenCalled();
+      expect(a.secret).not.toHaveBeenCalled();
+      expect(a.deploy).not.toHaveBeenCalled();
+      await expect(stat(join(root, '.wrangler'))).rejects.toThrow();
+    }));
+  it.each(['native', 'review', 'current'])(
+    'denies reuse of the %s runner identity as either workspace endpoint without mutation',
+    async (profile) =>
+      temporary(async (root) => {
+        const protectedOrigin = 'https://kept-runner.example.org';
+        const protectedConfig = {
+          vars: { RUNNER_ENDPOINT: `${protectedOrigin}:443/` },
+        };
+        await writeFile(
+          join(root, 'wrangler.jsonc'),
+          JSON.stringify(
+            profile === 'native'
+              ? protectedConfig
+              : profile === 'review'
+                ? { env: { review: protectedConfig } }
+                : {},
+          ),
+        );
+        if (profile === 'current') {
+          await mkdir(join(root, '.wrangler'));
+          await writeFile(
+            join(root, '.wrangler/production.json'),
+            JSON.stringify(protectedConfig),
+          );
+        }
+        const command = vi.fn(async (_executable: string, args: string[]) =>
+          args[0] === 'auth'
+            ? ''
+            : JSON.stringify(
+                args[1] === '/user'
+                  ? { login: 'owner' }
+                  : { state: 'active', role: 'admin' },
+              ),
+        );
+        const request = vi.fn(async (url: string) =>
+          Response.json({
+            success: true,
+            result: url.includes('r2/buckets') ? { buckets: [] } : [],
+          }),
+        );
+        const live = createAdapters({
+          root,
+          env: {
+            CLOUDFLARE_ACCOUNT_ID: options.accountId,
+            CLOUDFLARE_API_TOKEN: 'synthetic-cloud-token',
+          },
+          command,
+          request,
+        });
+        const create = vi.spyOn(live, 'createResource');
+        const migrate = vi.spyOn(live, 'migrate');
+        const secret = vi.spyOn(live, 'secret');
+        const deploy = vi.spyOn(live, 'deploy');
+        for (const target of [
+          { ...options, runnerEndpoint: protectedOrigin },
+          { ...options, origin: protectedOrigin },
+        ]) {
+          await expect(planWorkspace(target, live)).rejects.toThrow(
+            /reuse|collision/i,
+          );
+          await expect(
+            provisionWorkspace(target, live, { root }),
+          ).rejects.toThrow(/reuse|collision/i);
+        }
+        expect(create).not.toHaveBeenCalled();
+        expect(migrate).not.toHaveBeenCalled();
+        expect(secret).not.toHaveBeenCalled();
+        expect(deploy).not.toHaveBeenCalled();
+        expect(
+          command.mock.calls.every(([executable]) => executable === 'gh'),
+        ).toBe(true);
+        await expect(
+          stat(join(root, '.wrangler/workspaces')),
+        ).rejects.toThrow();
+      }),
+  );
   it('persists fresh secrets privately, resumes completed stages, and never automatically deploys', async () =>
     temporary(async (root) => {
       const a = adapters();
@@ -554,4 +682,107 @@ describe('replacement connection verification', () => {
         expect(saved.verification?.connection).not.toBe('VERIFIED');
       }
     }));
+});
+
+it('retirement requires fresh success and reverifies replacement before contacting exact old origin', async () => {
+  await temporary(async (root) => {
+    const a = adapters();
+    await provisionWorkspace(options, a, { root });
+    const oldToken = join(root, 'old-token');
+    await writeFile(oldToken, 'old-private-token', { mode: 0o600 });
+    const expected = {
+      appId: 42,
+      appSlug: 'event-app',
+      installationId: 84,
+      repositories: [`${options.organization}/project`],
+    };
+    const journal = join(root, '.wrangler/workspaces/event-alpha/journal.json');
+    const oldConfig = join(root, 'old-config.json');
+    await writeFile(
+      oldConfig,
+      JSON.stringify({
+        name: 'old-worker',
+        workflows: [
+          { binding: 'EVALUATOR', name: 'old-evaluator' },
+          { binding: 'ORG_EVALUATOR', name: 'old-org-evaluator' },
+        ],
+        kv_namespaces: [{ binding: 'ARTIFACT_KV', id: 'd'.repeat(32) }],
+        vars: {
+          ORG_NAME: 'Old-Org',
+          ORG_PUBLIC_ORIGIN: 'https://old.example.org',
+        },
+        d1_databases: [
+          {
+            binding: 'DB',
+            database_id: '99999999-9999-9999-9999-999999999999',
+          },
+          {
+            binding: 'ORG_DB',
+            database_id: '88888888-8888-8888-8888-888888888888',
+          },
+        ],
+      }),
+      { mode: 0o600 },
+    );
+    const old = {
+      configFile: oldConfig,
+      origin: 'https://old.example.org',
+      organization: 'Old-Org',
+      tokenFile: oldToken,
+    };
+    const retire = vi.fn(async (..._args: any[]) => ({
+      retirement: { state: 'RETIRED' },
+    }));
+    const status = a.workspaceStatus.getMockImplementation()!;
+    (a.workspaceStatus as any).mockImplementation(async (origin: string) =>
+      origin === old.origin
+        ? {
+            authenticated: true,
+            role: 'organizer',
+            organization: 'Old-Org',
+            app: { id: 99, installationId: 199, slug: 'old-app' },
+            retirement: { state: 'ACTIVE' },
+          }
+        : status(),
+    );
+    const b = { ...a, retireWorkspace: retire };
+    await expect(
+      retireWorkspace({ journal, old }, b, { root }),
+    ).rejects.toThrow('fresh VERIFIED');
+    expect(retire).not.toHaveBeenCalled();
+    await verifyWorkspace(options, expected, a, { root });
+    const originalConfig = await readFile(oldConfig, 'utf8');
+    const sharedWorkflow = JSON.parse(originalConfig);
+    sharedWorkflow.workflows[1].name =
+      'judge-c2c-event-alpha-organization-evaluator';
+    await writeFile(oldConfig, JSON.stringify(sharedWorkflow), { mode: 0o600 });
+    const requestsBefore = a.workspaceStatus.mock.calls.length;
+    await expect(
+      retireWorkspace({ journal, old }, b, { root }),
+    ).rejects.toThrow('distinct resource');
+    expect(a.workspaceStatus.mock.calls.length).toBe(requestsBefore);
+    await writeFile(oldConfig, originalConfig, { mode: 0o600 });
+    const result = await retireWorkspace({ journal, old }, b, { root });
+    expect(result.retirement.state).toBe('RETIRED');
+    expect(retire.mock.calls[0]?.[0]).toBe(old.origin);
+    expect(retire.mock.calls[0]?.[1]).toBe('old-private-token');
+    expect((retire.mock.calls as any)[0][2].replacement.organization).toBe(
+      options.organization,
+    );
+    expect(a.runnerDiagnostic).toHaveBeenCalledTimes(2);
+    await expect(
+      retireWorkspace(
+        { journal, old: { ...old, organization: options.organization } },
+        b,
+        { root },
+      ),
+    ).rejects.toThrow('distinct');
+    const saved = JSON.parse(await readFile(journal, 'utf8'));
+    saved.verification.connection = 'FAILED';
+    await writeFile(journal, JSON.stringify(saved), { mode: 0o600 });
+    await expect(
+      retireWorkspace({ journal, old }, b, { root }),
+    ).rejects.toThrow('fresh VERIFIED');
+    expect(retire).toHaveBeenCalledTimes(1);
+  });
 });

@@ -4,6 +4,7 @@ import {
   readFileSync,
   rmSync,
   copyFileSync,
+  writeFileSync,
   existsSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,10 +25,19 @@ const inputs = {
   PRODUCTION_RUNNER_IMAGE:
     'registry.cloudflare.com/account/runner@sha256:' + 'a'.repeat(64),
 };
-function generate(overrides: Record<string, string | undefined> = {}) {
+function generate(
+  overrides: Record<string, string | undefined> = {},
+  protectedRunner?: string,
+) {
   const directory = mkdtempSync(join(tmpdir(), 'judge-production-config-'));
   try {
     copyFileSync('wrangler.jsonc', join(directory, 'wrangler.jsonc'));
+    if (protectedRunner) {
+      const path = join(directory, 'wrangler.jsonc');
+      const config = parse(readFileSync(path, 'utf8'));
+      config.vars = { ...config.vars, RUNNER_ENDPOINT: protectedRunner };
+      writeFileSync(path, JSON.stringify(config));
+    }
     const env = {
       PATH: process.env.PATH,
       ...inputs,
@@ -57,6 +67,21 @@ function generate(overrides: Record<string, string | undefined> = {}) {
   }
 }
 describe('production prerequisites and isolation', () => {
+  it('rejects protected runner reuse in direct workspace configuration', () => {
+    const endpoint = 'https://protected-runner.example.org';
+    const result = generate(
+      {
+        PRODUCTION_WORKSPACE_NAME: 'event-alpha',
+        PRODUCTION_ARTIFACT_BUCKET: 'judge-c2c-event-alpha-artifacts',
+        PRODUCTION_RUNNER_ENDPOINT: endpoint,
+      },
+      endpoint,
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain(
+      'PRODUCTION_RUNNER_ENDPOINT must be a separate HTTPS production origin',
+    );
+  });
   it('supports an explicit owner tunnel without granting native or foreign previews production access', () => {
     const owner = {
       PRODUCTION_RUNNER_MODE: 'OWNER_TUNNEL',

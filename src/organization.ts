@@ -1,3 +1,8 @@
+import {
+  retirementStatus,
+  retireOrganization,
+  requireOrganizationActive,
+} from './organization-retirement';
 import { operationalAlerts } from './operational-alerts';
 import {
   credentialIdentity,
@@ -132,9 +137,19 @@ async function appClient(env: Env) {
   return GitHub.application(await organizationEnv(env));
 }
 async function installedClient(env: Env, repositoryId?: number, write = false) {
+  await requireOrganizationActive({
+    ...env,
+    DB: env.ORG_DB!,
+    EVALUATION_DETAILS_KIND: 'organization',
+  });
   const row = await connection(env);
   if (!row?.installation_id) throw new Error('APP_NOT_INSTALLED');
   const app = await appClient(env);
+  await requireOrganizationActive({
+    ...env,
+    DB: env.ORG_DB!,
+    EVALUATION_DETAILS_KIND: 'organization',
+  });
   const token = await app.api<{ token: string }>(
     `/app/installations/${row.installation_id}/access_tokens`,
     {
@@ -166,6 +181,12 @@ function competitionServices(env: Env): CompetitionServices {
       return row.slug;
     },
     capabilities: async () => {
+      if ((await retirementStatus(env.ORG_DB!)).state !== 'ACTIVE')
+        return {
+          issuesWrite: false,
+          events: [],
+          reason: 'ORGANIZATION_RETIRED',
+        };
       const row = await connection(env);
       if (!row?.installation_id)
         return { issuesWrite: false, events: [], reason: 'APP_NOT_INSTALLED' };
@@ -539,6 +560,8 @@ export async function organization(
   if (url.pathname === '/webhooks/organization') {
     if (request.method !== 'POST')
       return json({ error: 'METHOD_NOT_ALLOWED' }, 405);
+    if ((await retirementStatus(env.ORG_DB)).state !== 'ACTIVE')
+      return json({ error: 'ORGANIZATION_RETIRED' }, 409);
     const row = await connection(env);
     if (!row) return json({ error: 'APP_NOT_CONNECTED' }, 503);
     const orgenv = await organizationEnv(env);
@@ -726,9 +749,21 @@ export async function organization(
         authenticated: true,
         role: session.role,
         identity,
+        retirement: {
+          state: (await retirementStatus(env.ORG_DB)).state,
+          archiveReadOnly: (await retirementStatus(env.ORG_DB)).archiveReadOnly,
+        },
       });
     const row = await connection(env);
     return json({
+      retirement:
+        session.role === 'organizer'
+          ? await retirementStatus(env.ORG_DB)
+          : {
+              state: (await retirementStatus(env.ORG_DB)).state,
+              archiveReadOnly: (await retirementStatus(env.ORG_DB))
+                .archiveReadOnly,
+            },
       identity,
       organization: env.ORG_NAME,
       authenticated: true,
@@ -768,6 +803,38 @@ export async function organization(
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
   const actor = session.role + ':' + (session.identity_id ?? session.hash);
   if (
+    session.role === 'judge' &&
+    !(
+      request.method === 'GET' && url.pathname.startsWith('/api/organization/')
+    ) &&
+    url.pathname !== '/api/organization/logout'
+  )
+    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+  if (
+    url.pathname === '/api/organization/retire' &&
+    request.method === 'POST'
+  ) {
+    if (session.role !== 'organizer')
+      return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+    const row = await connection(env);
+    if (!row) return json({ error: 'APP_NOT_CONNECTED' }, 409);
+    let body: unknown;
+    try {
+      body = await input(request, 4000);
+    } catch {
+      return json({ error: 'INVALID_RETIREMENT_REQUEST' }, 400);
+    }
+    return retireOrganization(env, body, actor, row, () => appClient(env));
+  }
+  if (
+    (await retirementStatus(env.ORG_DB)).state !== 'ACTIVE' &&
+    ((request.method !== 'GET' &&
+      url.pathname !== '/api/organization/logout') ||
+      url.pathname.startsWith('/auth/github/') ||
+      /\/repositories\/[0-9]+\/context$/.test(url.pathname))
+  )
+    return json({ error: 'ORGANIZATION_RETIRED' }, 409);
+  if (
     url.pathname === '/api/organization/identities' ||
     url.pathname.startsWith('/api/organization/identities/')
   )
@@ -789,14 +856,6 @@ export async function organization(
     return confidentialSecurity(request, env, actor);
   if (
     session.role === 'security' &&
-    url.pathname !== '/api/organization/logout'
-  )
-    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
-  if (
-    session.role === 'judge' &&
-    !(
-      request.method === 'GET' && url.pathname.startsWith('/api/organization/')
-    ) &&
     url.pathname !== '/api/organization/logout'
   )
     return json({ error: 'ORGANIZER_REQUIRED' }, 403);
@@ -1165,6 +1224,7 @@ export async function organization(
 
 export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
   if (!env.ORG_DB) return;
+  if ((await retirementStatus(env.ORG_DB)).state !== 'ACTIVE') return;
   await env.ORG_DB.batch([
     env.ORG_DB.prepare(
       'DELETE FROM console_identity_sessions WHERE expires_at<?',

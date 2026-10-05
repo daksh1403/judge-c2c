@@ -1,3 +1,4 @@
+import { requireOrganizationActive } from './organization-retirement';
 import { importPKCS8, SignJWT } from 'jose';
 import { pathSchema, sha, type Contract } from './domain';
 import { boundedBody } from './security';
@@ -34,7 +35,9 @@ export class GitHub {
     return new GitHub(jwt, env.DB);
   }
   static async installation(env: Env, contract: Contract) {
+    await requireOrganizationActive(env);
     const client = await GitHub.application(env);
+    await requireOrganizationActive(env);
     const response = await client.api<{ token: string }>(
       `/app/installations/${contract.repository.installationId}/access_tokens`,
       {
@@ -85,6 +88,7 @@ export class GitHub {
         } as RequestInit),
         2_000_000,
       );
+      if (response.status === 202 && bytes.length === 0) return undefined as T;
       return JSON.parse(new TextDecoder().decode(bytes)) as T;
     } catch (error) {
       failed = true;

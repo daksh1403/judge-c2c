@@ -311,7 +311,10 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
               !(await renewReviewer(this.env.DB, reviewerSlot))
             )
               throw new Error('REVIEWER_LEASE_EXPIRED');
-            await transition(this.env, id, 'CHECKING', 'REVIEWING');
+            if (!(await this.requireCurrent(id))) return;
+            if (!(await transition(this.env, id, 'CHECKING', 'REVIEWING')))
+              return;
+            if (!(await this.requireCurrent(id))) return;
             const evidence = JSON.parse(run.evidence!) as Evidence[];
             const result = await aiReview(
               this.env,

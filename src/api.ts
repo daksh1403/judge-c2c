@@ -1,3 +1,4 @@
+import { organizationActive } from './organization-retirement';
 import { attentionItems } from './attention';
 import { retryableRun } from './retry-policy';
 import { assessExpectedArtifacts } from './expected-artifacts';
@@ -31,6 +32,8 @@ const assignmentSchema = z
 export async function api(request: Request, env: Env) {
   const url = new URL(request.url);
   const path = url.pathname;
+  if (request.method !== 'GET' && !(await organizationActive(env)))
+    return json({ error: 'ORGANIZATION_RETIRED' }, 409);
   const demo = env.DEMO_MODE === 'true';
   if (demo && request.method !== 'GET')
     return json({ error: 'REVIEW_IS_READ_ONLY' }, 403);

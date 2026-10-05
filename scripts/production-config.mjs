@@ -4,6 +4,17 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'jsonc-parser';
 import { isIP } from 'node:net';
 
+export function isProductionHostname(hostname) {
+  return (
+    !isIP(hostname) &&
+    hostname.length <= 253 &&
+    hostname.split('.').length >= 2 &&
+    hostname
+      .split('.')
+      .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
+  );
+}
+
 export function workspaceNames(workspace) {
   if (
     !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(workspace) ||
@@ -88,6 +99,7 @@ export async function buildProductionConfig(
       .flatMap((c) => [
         c.vars?.PUBLIC_ORIGIN,
         c.vars?.ORG_PUBLIC_ORIGIN,
+        c.vars?.RUNNER_ENDPOINT,
         ...(c.vars?.ORG_REVIEW_ORIGINS ?? '').split(','),
       ])
       .filter(Boolean)
@@ -163,15 +175,7 @@ export async function buildProductionConfig(
         'PUBLIC_ORIGIN must match the separate production Worker',
       );
   }
-  if (
-    publicUrl.port ||
-    isIP(publicUrl.hostname) ||
-    publicUrl.hostname.length > 253 ||
-    publicUrl.hostname.split('.').length < 2 ||
-    !publicUrl.hostname
-      .split('.')
-      .every((label) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))
-  )
+  if (publicUrl.port || !isProductionHostname(publicUrl.hostname))
     throw new Error(
       'PUBLIC_ORIGIN must use a production custom-domain hostname',
     );

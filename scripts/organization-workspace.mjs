@@ -13,7 +13,11 @@ import { fileURLToPath } from 'node:url';
 import { randomBytes, createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { parse } from 'jsonc-parser';
-import { buildProductionConfig, workspaceNames } from './production-config.mjs';
+import {
+  buildProductionConfig,
+  isProductionHostname,
+  workspaceNames,
+} from './production-config.mjs';
 
 const uuid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const hex = /^[a-f0-9]{32}$/;
@@ -57,10 +61,7 @@ export function validateWorkspace(options) {
       /(^|[.-])(localhost|local|review|preview|feat|test)([.-]|$)/i.test(
         u.hostname,
       ) ||
-      !u.hostname
-        .split('.')
-        .every((l) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(l)) ||
-      u.hostname.split('.').length < 2 ||
+      !isProductionHostname(u.hostname) ||
       /^[0-9.]+$/.test(u.hostname)
     )
       throw new Error('Invalid isolated HTTPS origin');
@@ -114,7 +115,9 @@ function validateInventory(resources, inventory, known, target, journal) {
   if (
     known.some(
       (r) =>
-        r.origin === target.origin || resources.some((w) => r.name === w.name),
+        r.origin === target.origin ||
+        r.origin === target.runnerEndpoint ||
+        resources.some((w) => r.name === w.name),
     )
   )
     throw new Error('Known production/native/review resource reuse collision');
@@ -574,6 +577,169 @@ export async function verifyWorkspace(
   });
 }
 
+// Retirement is a separate, explicit operation; planning/provisioning never retire a target.
+export async function retireWorkspace(
+  { journal: journalPath, old },
+  adapters,
+  { root = process.cwd() } = {},
+) {
+  const journal = await readJournal(resolve(journalPath ?? ''));
+  if (!journal)
+    throw new Error('Verified private replacement journal required');
+  const { target, names } = validateWorkspace(journal.target);
+  assertJournal(journal, target);
+  if (resolve(journalPath) !== paths(root, target.workspace).journal)
+    throw new Error('Replacement journal must match its exact workspace path');
+  const v = journal.verification;
+  if (
+    v?.connection !== 'VERIFIED' ||
+    v.targetHash !== journal.targetHash ||
+    v.organization !== target.organization ||
+    v.workspace !== target.workspace ||
+    v.origin !== target.origin ||
+    !/^[a-f0-9]{32}$/.test(v.reference) ||
+    Date.parse(v.expiresAt) <= Date.now() ||
+    Date.parse(v.at) > Date.now() ||
+    Date.now() - Date.parse(v.at) > 900000 ||
+    !Number.isFinite(Date.parse(v.at)) ||
+    !Number.isFinite(Date.parse(v.expiresAt))
+  )
+    throw new Error('Retirement requires a fresh VERIFIED replacement journal');
+  let oldUrl;
+  try {
+    oldUrl = new URL(old?.origin);
+  } catch {
+    throw new Error('Explicit old HTTPS origin required');
+  }
+  if (
+    oldUrl.protocol !== 'https:' ||
+    oldUrl.username ||
+    oldUrl.password ||
+    oldUrl.origin !== old.origin ||
+    !isProductionHostname(oldUrl.hostname) ||
+    oldUrl.port ||
+    !/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/.test(old.organization) ||
+    old.organization.length > 39 ||
+    old.organization.toLowerCase() === target.organization.toLowerCase() ||
+    old.origin === target.origin
+  )
+    throw new Error(
+      'Retirement requires distinct exact old and replacement identities',
+    );
+  const oldConfigInfo = await lstat(resolve(old.configFile ?? ''));
+  if (!oldConfigInfo.isFile() || (oldConfigInfo.mode & 0o777) !== 0o600)
+    throw new Error('Old config must be a private mode-0600 regular file');
+  const config = parse(await readFile(resolve(old.configFile), 'utf8'));
+  if (
+    config.vars?.ORG_NAME !== old.organization ||
+    config.vars?.ORG_PUBLIC_ORIGIN !== old.origin ||
+    !config.name ||
+    !['EVALUATOR', 'ORG_EVALUATOR'].every((binding) =>
+      config.workflows?.some(
+        (w) =>
+          w.binding === binding &&
+          typeof w.name === 'string' &&
+          /^[a-z0-9-]{1,63}$/.test(w.name),
+      ),
+    ) ||
+    !config.kv_namespaces?.some(
+      (k) => k.binding === 'ARTIFACT_KV' && hex.test(k.id),
+    ) ||
+    !config.d1_databases?.some(
+      (d) => d.binding === 'ORG_DB' && uuid.test(d.database_id),
+    ) ||
+    !config.d1_databases?.some(
+      (d) => d.binding === 'DB' && uuid.test(d.database_id),
+    )
+  )
+    throw new Error(
+      'Old config must identify the exact old workspace and isolated databases',
+    );
+  const oldResources = [
+    config.name,
+    ...(config.workflows ?? []).map((w) => w.name),
+    ...(config.d1_databases ?? []).flatMap((d) => [
+      d.database_id,
+      d.database_name,
+    ]),
+    ...(config.kv_namespaces ?? []).map((k) => k.id),
+    ...(config.r2_buckets ?? []).map((b) => b.bucket_name),
+  ].filter(Boolean);
+  const newResources = [
+    names.worker,
+    names.evaluator,
+    names.organizationEvaluator,
+    ...Object.entries(journal.resources).flatMap(([name, r]) => [name, r.id]),
+  ];
+  if (oldResources.some((r) => newResources.includes(r)))
+    throw new Error('Retirement requires distinct resource identities');
+  const tokenInfo = await lstat(resolve(old.tokenFile ?? ''));
+  if (!tokenInfo.isFile() || (tokenInfo.mode & 0o777) !== 0o600)
+    throw new Error(
+      'Old organizer credential must use a private mode-0600 regular file',
+    );
+  const token = (await readFile(resolve(old.tokenFile), 'utf8')).trim();
+  if (!token || token.length > 200 || token === journal.secrets.ORG_ADMIN_TOKEN)
+    throw new Error('Distinct old organizer credential required');
+  const verified = await verifyWorkspace(
+    target,
+    {
+      appId: v.appId,
+      appSlug: v.appSlug,
+      installationId: v.installationId,
+      repositories: v.repositories,
+    },
+    adapters,
+    { root },
+  );
+  return locked(root, target.workspace, async (files) => {
+    const current = await readJournal(files.journal);
+    assertJournal(current, target);
+    if (current.verification?.reference !== verified.reference)
+      throw new Error('Replacement verification changed concurrently');
+    const status = await adapters.workspaceStatus(old.origin, token);
+    if (
+      status?.authenticated !== true ||
+      status.role !== 'organizer' ||
+      status.organization !== old.organization ||
+      !Number.isSafeInteger(status.app?.id) ||
+      !Number.isSafeInteger(status.app?.installationId) ||
+      status.app.id === verified.appId ||
+      status.app.installationId === verified.installationId
+    )
+      throw new Error('Authenticated old workspace identity mismatch');
+    const replacement = {
+      organization: target.organization,
+      workspace: target.workspace,
+      origin: target.origin,
+      targetHash: current.targetHash,
+      appId: verified.appId,
+      installationId: verified.installationId,
+      verificationReference: verified.reference,
+      verifiedAt: verified.at,
+      expiresAt: verified.expiresAt,
+    };
+    const result = await adapters.retireWorkspace(old.origin, token, {
+      confirmation: old.organization,
+      attestation: true,
+      replacement,
+    });
+    if (!['RETIRING', 'RETIRED'].includes(result?.retirement?.state))
+      throw new Error(
+        'Retirement state unavailable; old intake state must be inspected',
+      );
+    current.retirement = {
+      organization: old.organization,
+      origin: old.origin,
+      state: result.retirement.state,
+      at: new Date().toISOString(),
+      verificationReference: verified.reference,
+    };
+    await saveJournal(files.journal, current);
+    return result;
+  });
+}
+
 async function runCommand(executable, args, { input, env, cwd } = {}) {
   return new Promise((accept, reject) => {
     const child = spawn(executable, args, {
@@ -690,7 +856,13 @@ export function createAdapters({
     throw new Error('Cloudflare resource inventory limit exceeded');
   };
   let cookie;
-  const workspaceRequest = async (origin, token, path, method = 'GET') => {
+  const workspaceRequest = async (
+    origin,
+    token,
+    path,
+    method = 'GET',
+    body,
+  ) => {
     // Each adapter session is bound to one exact origin and fresh organizer token.
     if (!cookie || cookie.origin !== origin || cookie.token !== token) {
       const response = await request(`${origin}/api/organization/login`, {
@@ -707,7 +879,12 @@ export function createAdapters({
     }
     const response = await request(`${origin}${path}`, {
       method,
-      headers: { origin, cookie: cookie.value },
+      headers: {
+        origin,
+        cookie: cookie.value,
+        'content-type': 'application/json',
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
       redirect: 'error',
       signal: AbortSignal.timeout(method === 'POST' ? 120000 : 30000),
     });
@@ -758,6 +935,7 @@ export function createAdapters({
           for (const origin of [
             config.vars?.PUBLIC_ORIGIN,
             config.vars?.ORG_PUBLIC_ORIGIN,
+            config.vars?.RUNNER_ENDPOINT,
             ...(config.vars?.ORG_REVIEW_ORIGINS ?? '').split(','),
           ].filter(Boolean))
             resources.push({ origin: new URL(origin).origin });
@@ -832,6 +1010,8 @@ export function createAdapters({
           'Explicit deployment requires clean main at origin/main',
         );
     },
+    retireWorkspace: (origin, token, body) =>
+      workspaceRequest(origin, token, '/api/organization/retire', 'POST', body),
     workspaceStatus: (origin, token) =>
       workspaceRequest(origin, token, '/api/organization/status'),
     app: (slug) => github(`/apps/${slug}`),
@@ -884,7 +1064,8 @@ export async function main(
 ) {
   const values = {},
     repositories = [];
-  let verify = false,
+  let retire = false,
+    verify = false,
     apply = false,
     deploy = false;
   const allowed = new Set([
@@ -903,9 +1084,18 @@ export async function main(
     'app-slug',
     'installation-id',
     'repository',
+    'journal',
+    'old-origin',
+    'old-token-file',
+    'old-config',
+    'confirm-organization',
   ]);
   for (let i = 0; i < args.length; i++) {
     const argument = args[i];
+    if (argument === 'retire') {
+      retire = true;
+      continue;
+    }
     if (argument === 'verify' || argument === '--verify') {
       verify = true;
       continue;
@@ -930,6 +1120,50 @@ export async function main(
     const value = args[++i];
     if (key === 'repository') repositories.push(value);
     else values[key] = value;
+  }
+  if (retire) {
+    if (
+      verify ||
+      apply ||
+      deploy ||
+      Object.keys(values).some(
+        (k) =>
+          ![
+            'journal',
+            'old-origin',
+            'old-token-file',
+            'old-config',
+            'confirm-organization',
+          ].includes(k),
+      ) ||
+      repositories.length
+    )
+      throw new Error(
+        'Retirement requires only explicit old target and replacement journal options',
+      );
+    if (
+      !values.journal ||
+      !values['old-origin'] ||
+      !values['old-token-file'] ||
+      !values['old-config'] ||
+      !values['confirm-organization']
+    )
+      throw new Error(
+        'Retirement requires journal, old origin, token file, config and exact organization confirmation',
+      );
+    return retireWorkspace(
+      {
+        journal: values.journal,
+        old: {
+          origin: values['old-origin'],
+          tokenFile: values['old-token-file'],
+          configFile: values['old-config'],
+          organization: values['confirm-organization'],
+        },
+      },
+      adapters,
+      { root },
+    );
   }
   if ((deploy && !apply) || (verify && (apply || deploy)))
     throw new Error(

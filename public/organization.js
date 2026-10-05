@@ -14,7 +14,8 @@
     );
   let timer = null,
     roleObserver = null,
-    authenticatedRole = null;
+    authenticatedRole = null,
+    archiveReadOnly = false;
   async function call(path, body) {
     const response = await fetch('/api/organization/' + path, {
       headers: body ? { 'content-type': 'application/json' } : {},
@@ -221,11 +222,198 @@
         }
       };
   }
+  function receipt(value) {
+    if (value.length > 16000) throw new Error('INVALID_CONNECTION_RECEIPT');
+    let data;
+    try {
+      data = JSON.parse(value);
+    } catch {
+      throw new Error('INVALID_CONNECTION_RECEIPT');
+    }
+    const allowed = [
+      'reference',
+      'connection',
+      'organization',
+      'workspace',
+      'origin',
+      'targetHash',
+      'appId',
+      'appSlug',
+      'installationId',
+      'repositories',
+      'actor',
+      'at',
+      'expiresAt',
+      'runner',
+      'provider',
+      'functionalEvaluation',
+    ];
+    if (
+      !data ||
+      typeof data !== 'object' ||
+      Array.isArray(data) ||
+      Object.keys(data).some((key) => !allowed.includes(key))
+    )
+      throw new Error(
+        'Use only the credential-free connection receipt, never the private setup journal.',
+      );
+    const org = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
+    let origin;
+    try {
+      origin = new URL(data.origin);
+    } catch {
+      throw new Error('INVALID_CONNECTION_RECEIPT');
+    }
+    const at = Date.parse(data.at),
+      expires = Date.parse(data.expiresAt),
+      now = Date.now();
+    if (
+      data.connection !== 'VERIFIED' ||
+      [
+        'organization',
+        'workspace',
+        'origin',
+        'targetHash',
+        'reference',
+        'at',
+        'expiresAt',
+      ].some((key) => typeof data[key] !== 'string') ||
+      ['appSlug', 'actor', 'runner', 'provider', 'functionalEvaluation'].some(
+        (key) => data[key] !== undefined && typeof data[key] !== 'string',
+      ) ||
+      (data.repositories !== undefined &&
+        (!Array.isArray(data.repositories) ||
+          data.repositories.some((item) => typeof item !== 'string'))) ||
+      !org.test(data.organization) ||
+      !/^[a-z0-9][a-z0-9-]{0,62}$/.test(data.workspace) ||
+      origin.protocol !== 'https:' ||
+      origin.origin !== data.origin ||
+      !/^[a-f0-9]{64}$/.test(data.targetHash) ||
+      !/^[a-f0-9]{32}$/.test(data.reference) ||
+      !Number.isSafeInteger(data.appId) ||
+      data.appId < 1 ||
+      !Number.isSafeInteger(data.installationId) ||
+      data.installationId < 1 ||
+      !Number.isFinite(at) ||
+      !Number.isFinite(expires) ||
+      at > now ||
+      now - at > 900000 ||
+      expires <= now ||
+      expires <= at ||
+      expires - at > 900000
+    )
+      throw new Error('INVALID_OR_EXPIRED_CONNECTION_RECEIPT');
+    return {
+      organization: data.organization,
+      workspace: data.workspace,
+      origin: data.origin,
+      targetHash: data.targetHash,
+      appId: data.appId,
+      installationId: data.installationId,
+      verificationReference: data.reference,
+      verifiedAt: data.at,
+      expiresAt: data.expiresAt,
+    };
+  }
+  function retirementPanel(status, target) {
+    const pending = status.retirement?.state === 'RETIRING';
+    target.innerHTML = `<h3>${pending ? 'Retirement pending' : 'Retire this workspace'}</h3><p>Retirement fences new work and removes this workspace’s GitHub App installation. Historical evidence remains read-only. Your acknowledgement authorizes retirement; it is not independent replacement proof or functional evaluation evidence.</p>${pending ? `<p>Installation removal is not confirmed. ${esc(status.retirement.error || 'Waiting for authoritative GitHub confirmation.')}</p><p>Replacement: ${esc(status.retirement.replacement?.organization)} · ${esc(status.retirement.replacement?.origin)}</p>` : ''}<form id="organization-retirement" class="review-form">${pending ? '' : '<label>Credential-free connection receipt<textarea id="retirement-receipt" maxlength="16000" required></textarea></label><p id="replacement-review" role="status"></p>'}<label>Type ${esc(status.organization)} exactly<input id="retirement-confirmation" autocomplete="off" required></label><label><input id="retirement-attestation" type="checkbox" required> I have verified the replacement workspace and authorize removal of this old installation.</label><button class="button" id="retirement-submit" disabled>${pending ? 'Retry installation removal' : 'Retire old workspace'}</button><p id="retirement-result" role="status"></p></form>`;
+    let replacement = pending ? status.retirement.replacement : null;
+    const update = () => {
+      if (!pending) {
+        try {
+          replacement = receipt($('#retirement-receipt').value);
+          $('#replacement-review').textContent =
+            `Replacement: ${replacement.organization} · ${replacement.origin}`;
+        } catch {
+          replacement = null;
+          $('#replacement-review').textContent =
+            'Paste a fresh credential-free verification receipt.';
+        }
+      }
+      $('#retirement-submit').disabled =
+        !replacement ||
+        $('#retirement-confirmation').value !== status.organization ||
+        !$('#retirement-attestation').checked;
+    };
+    target.querySelector('form').addEventListener('input', update);
+    target.querySelector('form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      update();
+      if ($('#retirement-submit').disabled) return;
+      $('#retirement-submit').disabled = true;
+      $('#retirement-result').textContent =
+        'Waiting for authoritative installation removal…';
+      try {
+        const result = await call('retire', {
+          confirmation: $('#retirement-confirmation').value,
+          attestation: true,
+          replacement,
+        });
+        if (!['RETIRING', 'RETIRED'].includes(result.retirement?.state))
+          throw new Error('RETIREMENT_UNCONFIRMED');
+        await load();
+      } catch (failure) {
+        $('#retirement-result').textContent = failure.message;
+        update();
+      }
+    });
+  }
+  async function loadArchive(status) {
+    $('#mode-label').textContent = 'READ ONLY ARCHIVE';
+    const replacement = status.retirement.replacement;
+    let link = '';
+    try {
+      const url = new URL(replacement?.origin);
+      if (url.protocol === 'https:' && url.origin === replacement.origin)
+        link = `<a class="button" href="${esc(url.origin)}?organization=1">Open replacement ${esc(replacement.organization)}</a>`;
+    } catch {}
+    $('#content').innerHTML =
+      `<section class="panel"><h2>${esc(status.organization)} · ${status.retirement.state === 'RETIRED' ? 'Retired workspace' : 'Retirement pending'}</h2><p>Historical evidence is read-only. New evaluation work is fenced.${status.retirement.state === 'RETIRING' ? ' Installation removal is not confirmed.' : ''}</p>${link}<button class="button" id="archive-lock">Lock organization</button></section><div id="archive-role"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
+    $('#archive-lock').onclick = async () => {
+      await call('logout', {});
+      await load();
+    };
+    const strip = () =>
+      document
+        .querySelectorAll(
+          '#content form,#retry-evaluation,#retry-artifact-capture,[data-contribution-decision],[data-contribution-reason]',
+        )
+        .forEach((node) => {
+          if (!node.closest('#retirement-panel')) node.remove();
+        });
+    roleObserver = new MutationObserver(strip);
+    roleObserver.observe($('#content'), { childList: true, subtree: true });
+    if (status.role === 'organizer' && status.retirement.state === 'RETIRING') {
+      const panel = document.createElement('section');
+      panel.id = 'retirement-panel';
+      panel.className = 'panel inset';
+      $('#content').append(panel);
+      retirementPanel(status, panel);
+    }
+    if (status.role === 'participant')
+      await loadParticipant($('#archive-role'));
+    else if (status.role === 'security') await loadSecurity($('#archive-role'));
+    else {
+      const overview = await call('overview');
+      $('#organization-runs').innerHTML =
+        `<section class="panel"><h3>Historical evaluations</h3>${overview.runs.map((run) => `<button class="row-button" data-org-run="${esc(run.id)}">${esc(run.full_name)} · PR #${esc(run.pr_number)} · ${esc(run.state)}</button>`).join('') || '<p>No recorded evaluations.</p>'}</section>`;
+      document
+        .querySelectorAll('[data-org-run]')
+        .forEach(
+          (button) => (button.onclick = () => detail(button.dataset.orgRun)),
+        );
+      const id = new URL(location.href).searchParams.get('evaluation');
+      if (id) await detail(id);
+    }
+    strip();
+  }
   async function load() {
     clearTimeout(timer);
     roleObserver?.disconnect();
     roleObserver = null;
     authenticatedRole = null;
+    archiveReadOnly = false;
     $('#message').textContent = '';
     $('#login').hidden = true;
     $('#signout').hidden = true;
@@ -252,6 +440,13 @@
         return;
       }
       authenticatedRole = status.role;
+      archiveReadOnly = ['RETIRING', 'RETIRED'].includes(
+        status.retirement?.state,
+      );
+      if (archiveReadOnly) {
+        await loadArchive(status);
+        return;
+      }
       if (status.identity)
         $('#breadcrumb').textContent =
           `Workspace / ${status.identity.name} · ${status.role}`;
@@ -298,24 +493,6 @@
       }
       $('#content').innerHTML =
         `<section class="panel"><div class="panel-head"><h2>${esc(status.organization)} · GitHub App</h2><button class="button" id="organization-lock">Lock organization</button></div><div class="inset"><p>${app ? `App <strong>${esc(app.slug)}</strong> · ${app.installationId ? 'Installation #' + app.installationId : 'Awaiting installation'}` : 'Create an organization-owned GitHub App. Contents and PRs: read. Issues and checks: write. No source modification permissions.'}</p>${!app ? '<button class="button primary" id="register-app">Register App on GitHub</button>' : !app.installationId ? `<a class="button primary" href="${esc(app.installUrl)}">Install on ${esc(status.organization)}</a>` : '<button class="button" id="sync-repositories">Sync installed repositories</button>'}<p class="subtle">Only repositories selected during installation are available. Functional behavior remains UNVERIFIED until isolated checks provide execution evidence.</p></div></section><section class="panel inset"><p><strong>Isolated execution: ${status.runner?.enabled ? 'configured' : 'disabled'}</strong> · AI requirement review: ${status.ai?.enabled ? 'configured' : 'disabled'}</p><p class="subtle">${esc(status.runner?.reason || 'Runtime availability has not been verified.')}</p><button class="button" id="test-runner">Test Docker runner</button><p id="runner-status" role="status"></p><button class="button" id="test-reviewer">Test AI reviewer</button><p id="reviewer-status" role="status"></p></section><div id="organization-workflow"></div><div id="organization-repositories"></div><div id="organization-runs"></div><div id="organization-detail"></div>`;
-      if (authenticatedRole === 'organizer') {
-        const securityPanel = document.createElement('section');
-        securityPanel.className = 'panel inset';
-        $('#content').appendChild(securityPanel);
-        try {
-          await loadSecurity(securityPanel);
-        } catch (failure) {
-          securityPanel.innerHTML = `<h3>Confidential vulnerability reports</h3><p role="status">Restricted report intake unavailable: ${esc(failure.message)}. Existing evaluation views remain available.</p>`;
-        }
-        const identitiesPanel = document.createElement('section');
-        identitiesPanel.className = 'panel inset';
-        $('#content').appendChild(identitiesPanel);
-        try {
-          await loadIdentities(identitiesPanel);
-        } catch (failure) {
-          identitiesPanel.innerHTML = `<h3>Named console access</h3><p role="status">Identity management unavailable: ${esc(failure.message)}.</p>`;
-        }
-      }
       if (authenticatedRole === 'organizer') {
         const panel = document.createElement('section');
         panel.className = 'panel inset';
@@ -414,7 +591,13 @@
         try {
           const setup = await call('start', {});
           const target = new URL(setup.action);
-          if (target.origin !== 'https://github.com')
+          if (
+            target.origin !== 'https://github.com' ||
+            target.pathname !==
+              `/organizations/${encodeURIComponent(status.organization)}/settings/apps/new` ||
+            target.username ||
+            target.password
+          )
             throw new Error('INVALID_REGISTRATION_TARGET');
           const form = document.createElement('form');
           form.action = target.href;
@@ -438,6 +621,28 @@
           error(e);
         }
       });
+      if (authenticatedRole === 'organizer') {
+        const retirement = document.createElement('section');
+        retirement.className = 'panel inset';
+        $('#content').append(retirement);
+        retirementPanel(status, retirement);
+        const securityPanel = document.createElement('section');
+        securityPanel.className = 'panel inset';
+        $('#content').appendChild(securityPanel);
+        try {
+          await loadSecurity(securityPanel);
+        } catch (failure) {
+          securityPanel.innerHTML = `<h3>Confidential vulnerability reports</h3><p role="status">Restricted report intake unavailable: ${esc(failure.message)}. Existing evaluation views remain available.</p>`;
+        }
+        const identitiesPanel = document.createElement('section');
+        identitiesPanel.className = 'panel inset';
+        $('#content').appendChild(identitiesPanel);
+        try {
+          await loadIdentities(identitiesPanel);
+        } catch (failure) {
+          identitiesPanel.innerHTML = `<h3>Named console access</h3><p role="status">Identity management unavailable: ${esc(failure.message)}.</p>`;
+        }
+      }
       if (!app?.installationId) return;
       const [repos, overview] = await Promise.all([
         call('repositories'),
@@ -820,11 +1025,12 @@
                         ? 'No configured criterion improvement is verified.'
                         : 'Verification status is not available.',
                   mayRecognize =
+                    !archiveReadOnly &&
                     authenticatedRole === 'organizer' &&
                     currentOpenRun &&
                     verificationStatus === 'VERIFIED',
                   id = esc(contribution.id || 'Not available');
-                return `<article class="inset contribution-card" data-contribution-id="${id}"><div class="panel-head"><h4>${esc(contribution.title || 'Not available')}</h4><span>${esc(contribution.category || 'Not available')}</span><span class="badge">${esc(verificationLabel)}</span></div><p>${esc(verificationExplanation)}</p><p>${esc(contribution.description || 'Not available')}</p><p>Contribution ${id} · run ${esc(contribution.runId || 'Not available')} · submitted by ${esc(contribution.actor || 'Not available')} · ${esc(dateLabel(contribution.createdAt))}</p><p>Changed paths ${escapedList(contribution.paths)}</p><p>Criteria ${escapedList(contribution.criterionIds)}</p><div class="contribution-evidence"><strong>Evidence</strong>${evidenceLinks(contribution.evidenceIds, evidenceById)}</div>${decision ? `<div class="inset"><strong>Latest decision ${esc(decision.decision || 'Not available')} · sequence ${esc(String(decision.sequence ?? 'Not available'))}</strong><p>Decision ${esc(decision.id || 'Not available')} · candidate ${esc(decision.candidateId || 'Not available')} · run ${esc(decision.runId || 'Not available')}</p><p>${esc(decision.reason || 'Not available')}</p><p>${esc(decision.actor || 'Not available')} · ${esc(dateLabel(decision.createdAt))}</p></div>` : '<p>No decision recorded.</p>'}${authenticatedRole === 'organizer' ? `<label for="contribution-reason-${encodeURIComponent(String(contribution.id || 'unknown'))}">Decision reason</label><textarea id="contribution-reason-${encodeURIComponent(String(contribution.id || 'unknown'))}" data-contribution-reason rows="2" minlength="20" maxlength="2000"></textarea><div class="contribution-actions"><button class="button" aria-label="Recognize criterion improvement" data-contribution-decision="RECOGNIZED" ${mayRecognize ? '' : 'disabled'}>Recognize criterion improvement</button><button class="button" data-contribution-decision="REJECTED">Reject</button></div><p data-contribution-status role="status"></p>` : ''}</article>`;
+                return `<article class="inset contribution-card" data-contribution-id="${id}"><div class="panel-head"><h4>${esc(contribution.title || 'Not available')}</h4><span>${esc(contribution.category || 'Not available')}</span><span class="badge">${esc(verificationLabel)}</span></div><p>${esc(verificationExplanation)}</p><p>${esc(contribution.description || 'Not available')}</p><p>Contribution ${id} · run ${esc(contribution.runId || 'Not available')} · submitted by ${esc(contribution.actor || 'Not available')} · ${esc(dateLabel(contribution.createdAt))}</p><p>Changed paths ${escapedList(contribution.paths)}</p><p>Criteria ${escapedList(contribution.criterionIds)}</p><div class="contribution-evidence"><strong>Evidence</strong>${evidenceLinks(contribution.evidenceIds, evidenceById)}</div>${decision ? `<div class="inset"><strong>Latest decision ${esc(decision.decision || 'Not available')} · sequence ${esc(String(decision.sequence ?? 'Not available'))}</strong><p>Decision ${esc(decision.id || 'Not available')} · candidate ${esc(decision.candidateId || 'Not available')} · run ${esc(decision.runId || 'Not available')}</p><p>${esc(decision.reason || 'Not available')}</p><p>${esc(decision.actor || 'Not available')} · ${esc(dateLabel(decision.createdAt))}</p></div>` : '<p>No decision recorded.</p>'}${!archiveReadOnly && authenticatedRole === 'organizer' ? `<label for="contribution-reason-${encodeURIComponent(String(contribution.id || 'unknown'))}">Decision reason</label><textarea id="contribution-reason-${encodeURIComponent(String(contribution.id || 'unknown'))}" data-contribution-reason rows="2" minlength="20" maxlength="2000"></textarea><div class="contribution-actions"><button class="button" aria-label="Recognize criterion improvement" data-contribution-decision="RECOGNIZED" ${mayRecognize ? '' : 'disabled'}>Recognize criterion improvement</button><button class="button" data-contribution-decision="REJECTED">Reject</button></div><p data-contribution-status role="status"></p>` : ''}</article>`;
               })
               .join('')
           : '<p class="empty">No additional contributions have been recorded.</p>',
@@ -853,6 +1059,7 @@
               .join('')
           : '<p>No verified criteria are available to associate.</p>',
         contributionFormHtml =
+          !archiveReadOnly &&
           authenticatedRole === 'organizer' &&
           run.state === 'COMPLETED' &&
           contributionCategories.length > 0 &&
@@ -870,14 +1077,17 @@
           ? `<p class="${contributionNotice.type === 'warning' ? 'error' : 'artifact-capture-notice'}" role="status">${esc(contributionNotice.message)}</p>`
           : '';
       const artifactCaptureHtml =
-          authenticatedRole === 'organizer' && terminal && recapturableArtifacts
+          !archiveReadOnly &&
+          authenticatedRole === 'organizer' &&
+          terminal &&
+          recapturableArtifacts
             ? '<div class="artifact-capture"><button class="button" id="retry-artifact-capture">Retry artifact capture</button><p id="artifact-retry-status" role="status"></p></div>'
             : '',
         artifactCaptureNotice = artifactCaptureResult
           ? `<p class="artifact-capture-notice" role="status">Artifact capture ${esc(artifactCaptureResult.status)}.${(artifactCaptureResult.failures || []).map((failure) => ` ${esc(failure.kind)}: ${esc(failure.code)}.`).join('')}</p>`
           : '';
       $('#organization-detail').innerHTML =
-        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name ?? contract.repository.fullName)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset" id="ai-trace">${freshness}<p>Frozen baseline <code>${esc(run.baseline_sha)}</code><br>Evaluated head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)} · AI review: ${esc(run.ai_status || 'pending')}</p>${report?.aiTrace?.cost ? `<p class="subtle">AI final response cost: ${report.aiTrace.cost.status === 'ESTIMATE' ? '$' + esc((report.aiTrace.cost.microUsd / 1000000).toFixed(6)) + ' estimate; retrieval and failed requests excluded' : 'unavailable; verified pricing and usage are required'}.</p>` : ''}${report?.aiTrace?.qualitativeCriterionAnalysis?.status === 'UNVERIFIED' ? `<p class="ai-notice"><strong>Missing AI criterion analysis remains UNVERIFIED.</strong> Trusted objective results were recovered for ${esc(report.aiTrace.qualitativeCriterionAnalysis.missingCriterionIds.join(', '))}; no missing AI judgment was invented. Human review is required.</p>` : ''}${report?.aiTrace?.failureCode ? `<p class="error">AI review rejected: ${esc(report.aiTrace.failureCode)}. Objective evidence remains available.</p>` : ''}${run.retryable === true || run.state === 'FAILED' || (run.state === 'COMPLETED' && (['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED', 'NEEDS_REVIEW'].includes(run.ai_status) || run.reviewPolicyCurrent === false)) ? `<button class="button" id="retry-evaluation">Retry as a new evaluation attempt</button>` : ''}<p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p>${run.ai_status !== 'COMPLETED' ? `<p class="ai-notice"><strong>Semantic review ${esc(run.ai_status || 'pending')}</strong>. Objective check results remain separate; this submission has not completed AI review.</p>` : ''}${report?.aiTrace?.contextBudget ? `<p class="subtle">Review context: ${esc(String(report.aiTrace.contextBudget.finalContextBytes ?? report.aiTrace.contextBudget.contextBytes))} bytes; omitted evidence ${esc(String(report.aiTrace.contextBudget.omittedEvidenceIds?.length ?? 0))}, source excerpts ${esc(String(report.aiTrace.contextBudget.omittedSourcePaths?.length ?? 0))}. Omitted context remains unverified.</p>` : ''}<p class="ai-notice">AI interpretation is advisory inference. It does not replace authoritative requirements or execution evidence, and it cannot mark unexecuted behavior as verified.</p><p>Functional behavior is verified only by the listed trusted execution results. Only configured checks are shown; unperformed checks remain UNVERIFIED. Source patterns and advisory matches do not establish exploitability.</p></div><p><a class="button" href="/api/organization/evaluations/${encodeURIComponent(id)}/bundle">Download reproducibility bundle</a></p><div class="panel-head"><h3>Authoritative requirements</h3></div>${(run.attentionItems ?? []).length ? `<section class="inset"><h3>Needs attention</h3>${run.attentionItems.map((item) => `<article><strong>${esc(item.what)}</strong><p>${esc(item.why)}</p><p>Inspect: ${item.inspect.map((id) => `<a href="#${['timeline', 'ai-trace', 'solution-approach', 'engineering-review'].includes(id) ? id : 'evidence-' + encodeURIComponent(id)}">${esc(id)}</a>`).join(', ')}</p><p>${esc(item.action)}</p></article>`).join('')}</section>` : ''}${requirementsHtml}${planHtml}${repositoryIntelligenceHtml(runContext, report?.aiTrace)}${routingHtml}${groundingHtml}${expectedArtifactHtml}<div id="solution-approach">${window.JudgeApproach(report)}</div><div id="engineering-review">${engineeringHtml}</div>${regressionHtml}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item" id="evidence-${encodeURIComponent(String(item.id))}"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Additional contributions</h3></div><p>Contribution records and decisions do not change evaluation results automatically.</p>${contributionsHtml}${contributionFormHtml}${contributionNoticeHtml}<div class="panel-head"><h3>Baseline and head check comparison</h3></div>${checkComparison(executions, run.baseline_sha, run.head_sha)}<div class="panel-head"><h3>Isolated execution</h3></div>${
+        `<section class="panel"><div class="panel-head"><h2>${esc(run.full_name ?? contract.repository.fullName)} · PR #${run.pr_number}</h2><span class="badge">${esc(run.state)}</span></div><div class="inset" id="ai-trace">${freshness}<p>Frozen baseline <code>${esc(run.baseline_sha)}</code><br>Evaluated head <code>${esc(run.head_sha)}</code></p><p>Evaluation ${esc(contract.evaluationVersion)} · GitHub publication: ${esc(run.publication_status)} · AI review: ${esc(run.ai_status || 'pending')}</p>${report?.aiTrace?.cost ? `<p class="subtle">AI final response cost: ${report.aiTrace.cost.status === 'ESTIMATE' ? '$' + esc((report.aiTrace.cost.microUsd / 1000000).toFixed(6)) + ' estimate; retrieval and failed requests excluded' : 'unavailable; verified pricing and usage are required'}.</p>` : ''}${report?.aiTrace?.qualitativeCriterionAnalysis?.status === 'UNVERIFIED' ? `<p class="ai-notice"><strong>Missing AI criterion analysis remains UNVERIFIED.</strong> Trusted objective results were recovered for ${esc(report.aiTrace.qualitativeCriterionAnalysis.missingCriterionIds.join(', '))}; no missing AI judgment was invented. Human review is required.</p>` : ''}${report?.aiTrace?.failureCode ? `<p class="error">AI review rejected: ${esc(report.aiTrace.failureCode)}. Objective evidence remains available.</p>` : ''}${!archiveReadOnly && (run.retryable === true || run.state === 'FAILED' || (run.state === 'COMPLETED' && (['FAILED', 'SKIPPED_CONTEXT_LIMIT', 'NOT_CONFIGURED', 'NEEDS_REVIEW'].includes(run.ai_status) || run.reviewPolicyCurrent === false))) ? `<button class="button" id="retry-evaluation">Retry as a new evaluation attempt</button>` : ''}<p>${esc(report?.summary || run.failure_code || 'Evaluation in progress')}</p>${run.ai_status !== 'COMPLETED' ? `<p class="ai-notice"><strong>Semantic review ${esc(run.ai_status || 'pending')}</strong>. Objective check results remain separate; this submission has not completed AI review.</p>` : ''}${report?.aiTrace?.contextBudget ? `<p class="subtle">Review context: ${esc(String(report.aiTrace.contextBudget.finalContextBytes ?? report.aiTrace.contextBudget.contextBytes))} bytes; omitted evidence ${esc(String(report.aiTrace.contextBudget.omittedEvidenceIds?.length ?? 0))}, source excerpts ${esc(String(report.aiTrace.contextBudget.omittedSourcePaths?.length ?? 0))}. Omitted context remains unverified.</p>` : ''}<p class="ai-notice">AI interpretation is advisory inference. It does not replace authoritative requirements or execution evidence, and it cannot mark unexecuted behavior as verified.</p><p>Functional behavior is verified only by the listed trusted execution results. Only configured checks are shown; unperformed checks remain UNVERIFIED. Source patterns and advisory matches do not establish exploitability.</p></div><p><a class="button" href="/api/organization/evaluations/${encodeURIComponent(id)}/bundle">Download reproducibility bundle</a></p><div class="panel-head"><h3>Authoritative requirements</h3></div>${(run.attentionItems ?? []).length ? `<section class="inset"><h3>Needs attention</h3>${run.attentionItems.map((item) => `<article><strong>${esc(item.what)}</strong><p>${esc(item.why)}</p><p>Inspect: ${item.inspect.map((id) => `<a href="#${['timeline', 'ai-trace', 'solution-approach', 'engineering-review'].includes(id) ? id : 'evidence-' + encodeURIComponent(id)}">${esc(id)}</a>`).join(', ')}</p><p>${esc(item.action)}</p></article>`).join('')}</section>` : ''}${requirementsHtml}${planHtml}${repositoryIntelligenceHtml(runContext, report?.aiTrace)}${routingHtml}${groundingHtml}${expectedArtifactHtml}<div id="solution-approach">${window.JudgeApproach(report)}</div><div id="engineering-review">${engineeringHtml}</div>${regressionHtml}<div class="panel-head"><h3>Evidence ledger</h3></div>${evidence.map((item) => `<div class="evidence-item" id="evidence-${encodeURIComponent(String(item.id))}"><strong>${esc(item.status)} · ${esc(item.id)}</strong><p>${esc(item.claim)}</p>${item.path ? `<code>${esc(item.path)}</code>` : ''}${item.baselineStatus ? `<p>Baseline ${esc(item.baselineStatus)} → head ${esc(item.status)}</p>` : ''}</div>`).join('')}<div class="panel-head"><h3>Additional contributions</h3></div><p>Contribution records and decisions do not change evaluation results automatically.</p>${contributionsHtml}${contributionFormHtml}${contributionNoticeHtml}<div class="panel-head"><h3>Baseline and head check comparison</h3></div>${checkComparison(executions, run.baseline_sha, run.head_sha)}<div class="panel-head"><h3>Isolated execution</h3></div>${
           executionHtml ||
           '<div class="empty">No runtime results have been recorded. Isolated execution is disabled or unavailable.</div>'
         }<div class="panel-head"><h3>Protected artifacts</h3></div>${artifactHtml}${artifactCaptureHtml}${artifactCaptureNotice}<div class="panel-head"><h3>Evaluation history</h3></div><ol class="timeline" id="timeline">${(run.timeline || []).map((item) => `<li><strong>${esc(item.state)}</strong> ${esc(item.detail)}<small>${esc(item.created_at)}</small></li>`).join('')}</ol></section>`;

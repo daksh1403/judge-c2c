@@ -63,3 +63,19 @@ The organizer runner diagnostic must complete its synthetic baseline FAIL and su
 A private, bounded verification record binds organization, workspace, account/resource target hash, origin, App, installation and repository names to a 15-minute validity window. A failed or interrupted verification replaces any previous success with PENDING or FAILED. Output always reports `functionalEvaluation: UNVERIFIED`. Provider success and signed canary availability do not certify live hackathon capacity. The later retirement flow must reverify this exact replacement before acting on the old workspace.
 
 Keep the rehearsal connection active until replacement verification and an explicit authorized retirement complete. This setup command does not retire an organization.
+
+## Retire the old workspace after replacement verification
+
+The authenticated organizer console names the configured organization and offers its GitHub App registration flow. A replacement uses its own deployment and App; it never imports old repositories, teams, credentials or judging history.
+
+The verification command above prints a credential-free connection receipt. In the old organizer console, paste that JSON receipt into **Retire this workspace**, review the replacement organization and HTTPS origin, type the old organization name exactly, and acknowledge that you verified the replacement and authorize installation removal. Never paste the private `journal.json` or deployment configuration. The console rejects unknown receipt fields and expired verification. The acknowledgement records organizer authorization; it is not independent proof of resource isolation or participant functional behavior.
+
+For the stronger operator path, use the private replacement journal and read-only old deployment config to verify resource separation and reverify the replacement before contacting the old console:
+
+```sh
+npm run organization:retire -- --journal /absolute/private/replacement/journal.json --old-origin https://old.example.org --old-token-file /absolute/private/old-organizer-token --old-config /absolute/private/old-config.json --confirm-organization Exact-Old-Organization
+```
+
+The token file and old config must be regular mode-0600 files. The command refuses shared Worker, Workflow, database and artifact identities before sending workspace credentials. Retirement is a separate explicit operation; do not combine it with provisioning, deployment or verification flags.
+
+Once authorized, the old workspace enters RETIRING and fences new intake, mutations, retries and execution. An unavailable uninstall remains pending; the organizer console offers **Retry installation removal** using the same frozen replacement identity and retains the fence. A 202 uninstall response does not establish completion: RETIRED requires authoritative confirmation that the old installation is absent. Historical evaluation inputs, failed/superseded attempts, evidence and artifacts remain read-only. Organizers see the exact replacement link; other roles receive the read-only archive without retirement controls or replacement authorization details. Existing work already in flight cannot be recalled retroactively. Synthetic verification does not certify live event capacity or participant functional criteria.

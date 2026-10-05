@@ -25,7 +25,8 @@
     "acceptance:update": "node scripts/acceptance-report.mjs",
     "acceptance:check": "node scripts/acceptance-report.mjs --check",
     "organization:setup": "node scripts/organization-workspace.mjs",
-    "organization:verify": "node scripts/organization-workspace.mjs verify"
+    "organization:verify": "node scripts/organization-workspace.mjs verify",
+    "organization:retire": "node scripts/organization-workspace.mjs retire"
   },
   "dependencies": {
     "jose": "6.2.12",

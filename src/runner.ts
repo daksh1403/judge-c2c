@@ -420,7 +420,6 @@ export async function runObjective(
     const original = canonical(authenticated);
     const stored = redact(original);
     const result = runnerResultSchema.parse(JSON.parse(stored));
-    await assertCurrent();
     const requestSummary = canonical(await safeRunnerRequest(request));
     const canStore =
       cacheAllowed &&
@@ -443,9 +442,12 @@ export async function runObjective(
         attemptStatus,
       )
       .run();
+    // Dispatched execution cannot be recalled. Keep its authenticated, redacted
+    // result on the immutable attempt before fencing every subsequent action.
+    await assertCurrent();
     if (canStore) {
       await env.DB.prepare(
-        'INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) VALUES(?,?,?,?,?,?,?,?)',
+        "INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) SELECT ?,?,?,?,?,?,?,? FROM evaluations e JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE e.id=? AND e.state='CHECKING' AND s.latest_run_id=e.id AND s.head_sha=e.head_sha AND s.closed=0",
       )
         .bind(
           repositoryId,
@@ -456,6 +458,7 @@ export async function runObjective(
           resultHash,
           requestSummary,
           stored,
+          run.id,
         )
         .run();
     }

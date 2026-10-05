@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { Miniflare } from 'miniflare';
+import { migrate } from './database';
 import {
   canonical,
   digest,
@@ -60,6 +62,134 @@ const request: RunnerRequest = {
     },
   ],
 };
+
+it('retains an authenticated in-flight baseline result after retirement without executing the head or promoting cache', async () => {
+  const mf = new Miniflare({
+    modules: true,
+    script: 'export default{}',
+    d1Databases: ['DB'],
+    compatibilityDate: '2026-08-01',
+  });
+  let release!: () => void;
+  const paused = new Promise<void>((resolve) => (release = resolve));
+  try {
+    const db = (await mf.getD1Database('DB')) as unknown as D1Database;
+    await migrate(db);
+    const c = {
+      ...contract,
+      execution: {
+        ...contract.execution,
+        runner: { ...policy, cache: 'ALL' as const },
+      },
+    };
+    await db
+      .prepare(
+        'INSERT INTO repositories(id,full_name,installation_id,active_contract_hash) VALUES(?,?,1,?)',
+      )
+      .bind(c.repository.id, c.repository.fullName, request.contractHash)
+      .run();
+    await db
+      .prepare(
+        'INSERT INTO contracts(hash,repository_id,document) VALUES(?,?,?)',
+      )
+      .bind(request.contractHash, c.repository.id, canonical(c))
+      .run();
+    await db
+      .prepare(
+        "INSERT INTO evaluations(id,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,state) VALUES(?,?,1,?,?,?,?,?,'CHECKING')",
+      )
+      .bind(
+        request.runId,
+        c.repository.id,
+        request.commit,
+        c.baseline,
+        request.contractHash,
+        canonical(c),
+        '{}',
+      )
+      .run();
+    await db
+      .prepare(
+        "INSERT INTO submissions(repository_id,pr_number,head_sha,latest_run_id,github_updated_at) VALUES(?,1,?,?,'2026-10-04T00:00:00Z')",
+      )
+      .bind(c.repository.id, request.commit, request.runId)
+      .run();
+    vi.spyOn(GitHub, 'installation').mockResolvedValue(new GitHub());
+    vi.spyOn(GitHub.prototype, 'api').mockResolvedValue({
+      truncated: false,
+      tree: [{ path: 'server.mjs', type: 'blob', mode: '100644', size: 17 }],
+    });
+    vi.spyOn(GitHub.prototype, 'file').mockResolvedValue('export default 1;');
+    const execute = vi.fn(async (input: RunnerRequest) => {
+      await paused;
+      return result(input);
+    });
+    const env = {
+      DB: db,
+      ENVIRONMENT: 'review',
+      EVALUATION_DETAILS_KIND: 'organization',
+      RUNNER_ENABLED: 'true',
+      RUNNER: {
+        idFromName: () => 'fixture',
+        get: () => ({ evaluate: execute }),
+      },
+    } as unknown as Env;
+    const running = runObjective(
+      env,
+      {
+        id: request.runId,
+        head_sha: request.commit,
+        contract_hash: request.contractHash,
+      },
+      c,
+      [],
+    );
+    const rejected = expect(running).rejects.toThrow('RUNNER_SUPERSEDED');
+    await vi.waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+    // The retirement transaction marks the archive and supersedes active attempts.
+    await db.batch([
+      db.prepare(
+        "UPDATE organization_retirement SET state='RETIRING' WHERE id=1",
+      ),
+      db
+        .prepare("UPDATE evaluations SET state='SUPERSEDED' WHERE id=?")
+        .bind(request.runId),
+    ]);
+    release();
+    await rejected;
+    expect(execute).toHaveBeenCalledTimes(1);
+    const history = (
+      await db
+        .prepare(
+          'SELECT run_id,commit_sha,request_hash,result_hash,result,request FROM execution_results',
+        )
+        .all<{
+          run_id: string;
+          commit_sha: string;
+          request_hash: string;
+          result_hash: string;
+          result: string;
+          request: string;
+        }>()
+    ).results;
+    expect(history).toHaveLength(1);
+    expect(history[0]).toMatchObject({
+      run_id: request.runId,
+      commit_sha: c.baseline,
+    });
+    expect(history[0]!.result_hash).toBe(await digest(history[0]!.result));
+    expect(JSON.parse(history[0]!.result).requestHash).toBe(
+      history[0]!.request_hash,
+    );
+    expect(history[0]!.request).not.toContain('export default');
+    expect(
+      await db.prepare('SELECT count(*) n FROM execution_cache').first(),
+    ).toEqual({ n: 0 });
+  } finally {
+    release?.();
+    await mf.dispose();
+  }
+});
 async function result(input = request): Promise<RunnerResult> {
   return {
     requestHash: await digest(canonical(input)),
