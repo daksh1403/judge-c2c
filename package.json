@@ -23,7 +23,9 @@
     "runner:smoke": "node scripts/local-runner-smoke.mjs",
     "qa:docker": "node scripts/hackathon-docker-rehearsal.mjs",
     "acceptance:update": "node scripts/acceptance-report.mjs",
-    "acceptance:check": "node scripts/acceptance-report.mjs --check"
+    "acceptance:check": "node scripts/acceptance-report.mjs --check",
+    "organization:setup": "node scripts/organization-workspace.mjs",
+    "organization:verify": "node scripts/organization-workspace.mjs verify"
   },
   "dependencies": {
     "jose": "6.2.12",

@@ -40,11 +40,17 @@ function generate(overrides: Record<string, string | undefined> = {}) {
       [resolve('scripts/production-config.mjs')],
       { cwd: directory, env, encoding: 'utf8' },
     );
-    const path = join(directory, '.wrangler/production.json');
+    const path = join(
+      directory,
+      overrides.PRODUCTION_CONFIG_PATH ?? '.wrangler/production.json',
+    );
     return {
       status: result.status,
       stderr: result.stderr,
-      config: existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : null,
+      config:
+        result.status === 0 && existsSync(path)
+          ? JSON.parse(readFileSync(path, 'utf8'))
+          : null,
     };
   } finally {
     rmSync(directory, { recursive: true, force: true });
@@ -245,5 +251,65 @@ describe('production prerequisites and isolation', () => {
     expect(result.config.vars.RUNNER_ENDPOINT).toBe(
       'https://runner.example.org:8443',
     );
+  });
+});
+
+describe('arbitrary workspace configuration', () => {
+  it('uses separate workspace names and resolves source paths from a nested private config', () => {
+    for (const workspace of ['event-alpha', 'event-beta']) {
+      const result = generate({
+        PRODUCTION_WORKSPACE_NAME: workspace,
+        PRODUCTION_CONFIG_PATH: `.wrangler/workspaces/${workspace}/config.json`,
+      });
+      expect(result.status).toBe(0);
+      expect(result.config.name).toBe(`judge-c2c-${workspace}`);
+      expect(result.config.main).toBe('../../../src/index.ts');
+      expect(result.config.assets.directory).toBe('../../../public');
+      expect(
+        result.config.d1_databases.map(
+          (d: { database_name: string }) => d.database_name,
+        ),
+      ).toEqual([
+        `judge-c2c-${workspace}-evaluations`,
+        `judge-c2c-${workspace}-organization`,
+      ]);
+      expect(result.config.d1_databases[0].migrations_dir).toBe(
+        '../../../migrations',
+      );
+      expect(
+        result.config.workflows.map((w: { name: string }) => w.name),
+      ).toEqual([
+        `judge-c2c-${workspace}-evaluator`,
+        `judge-c2c-${workspace}-organization-evaluator`,
+      ]);
+    }
+  });
+  it('rejects reserved workspace names and unsafe output paths before writing', () => {
+    for (const workspace of [
+      'production',
+      'local',
+      'review',
+      'preview',
+      'test',
+      '../evil',
+      'Event',
+      'bad--name',
+    ]) {
+      expect(
+        generate({ PRODUCTION_WORKSPACE_NAME: workspace }).status,
+      ).not.toBe(0);
+    }
+    for (const output of [
+      'wrangler.jsonc',
+      '.wrangler/production.json',
+      '.wrangler/../public/config.json',
+    ]) {
+      expect(
+        generate({
+          PRODUCTION_WORKSPACE_NAME: 'event-alpha',
+          PRODUCTION_CONFIG_PATH: output,
+        }).status,
+      ).not.toBe(0);
+    }
   });
 });
