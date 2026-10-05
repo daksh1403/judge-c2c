@@ -6048,19 +6048,22 @@
             "docs/local-docker-runner.md",
             "docs/qa/current-production-prerequisites.md",
             "docs/qa/current-production-app-grants.json",
-            "docs/qa/current-production-original-rehearsal-validation.json"
+            "docs/qa/current-production-original-rehearsal-validation.json",
+            "docs/qa/current-production-pr8-retry.json",
+            "docs/qa/current-production-pr8-retry-decisions.json",
+            "docs/qa/current-production-runner-restored.json"
           ],
-          "note": "The owner-tunnel production profile executed the original payment submissions against frozen baseline/head in isolated guests. PRs 7/11 have trusted criteria PASS; PR9 retains protected-test failure. Protected execution/evidence/report downloads match stored SHA-256 and byte lengths. This verifies the supported trust boundary, not continuously available or event-scale execution; Docker is now stopped and PR8 retained RUNNER_UNAVAILABLE.",
+          "note": "The owner-tunnel production profile executed the original payment submissions against frozen baseline/head in isolated guests. PRs 7/11 have trusted criteria PASS; PR9 retains protected-test failure. Protected execution/evidence/report downloads match stored SHA-256 and byte lengths. This verifies the supported trust boundary, not continuously available or event-scale execution; After the owner restarted Docker, the signed runner canary passed and a new PR8 attempt correctly produced PARTIAL with retry-bounded FAIL; its prior RUNNER_UNAVAILABLE history is retained.",
           "verification": {
             "method": "LIVE_INTEGRATION",
-            "boundary": "One owner account and original frozen payment submissions in the deployed owner-tunnel production profile; AI failures, current Docker outage, event capacity and independent organizations are not certified."
+            "boundary": "One owner account and original frozen payment submissions in the deployed owner-tunnel production profile; AI failures, event capacity and independent organizations are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PASS",
-            "basis": "The owner-tunnel production profile executed the original payment submissions against frozen baseline/head in isolated guests. PRs 7/11 have trusted criteria PASS; PR9 retains protected-test failure. Protected execution/evidence/report downloads match stored SHA-256 and byte lengths. This verifies the supported trust boundary, not continuously available or event-scale execution; Docker is now stopped and PR8 retained RUNNER_UNAVAILABLE."
+            "basis": "The owner-tunnel production profile executed the original payment submissions against frozen baseline/head in isolated guests. PRs 7/11 have trusted criteria PASS; PR9 retains protected-test failure. Protected execution/evidence/report downloads match stored SHA-256 and byte lengths. This verifies the supported trust boundary, not continuously available or event-scale execution; After the owner restarted Docker, the signed runner canary passed and a new PR8 attempt correctly produced PARTIAL with retry-bounded FAIL; its prior RUNNER_UNAVAILABLE history is retained."
           }
         },
         {
@@ -10426,7 +10429,7 @@
             "src/workflow.ts",
             "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "Existing local two-isolate/24-contender runtime tests passed. Owner target is 100\u2013150 teams in one organization with a possible deadline burst; use 150 simultaneous submissions as a conservative target. No 150-submission deployed rehearsal, measured throughput/latency/provider budget or multi-host runner capacity is proven. Current Docker host is stopped and AI quota remains exhausted.",
+          "note": "Existing local two-isolate/24-contender runtime tests passed. Owner target is 100\u2013150 teams in one organization with a possible deadline burst; use 150 simultaneous submissions as a conservative target. No 150-submission deployed rehearsal, measured throughput/latency/provider budget or multi-host runner capacity is proven. The restored owner runner passes bounded canary/calibration checks; AI quota remains exhausted and no event-scale throughput is measured.",
           "verification": {
             "method": "LOCAL_EXECUTION",
             "boundary": "Two local Worker isolates and real durable engine; not deployed event-scale production capacity."
@@ -10436,7 +10439,7 @@
           "relatedPR": null,
           "lastValidationState": {
             "status": "PARTIAL",
-            "basis": "Existing local two-isolate/24-contender runtime tests passed. Owner target is 100\u2013150 teams in one organization with a possible deadline burst; use 150 simultaneous submissions as a conservative target. No 150-submission deployed rehearsal, measured throughput/latency/provider budget or multi-host runner capacity is proven. Current Docker host is stopped and AI quota remains exhausted."
+            "basis": "Existing local two-isolate/24-contender runtime tests passed. Owner target is 100\u2013150 teams in one organization with a possible deadline burst; use 150 simultaneous submissions as a conservative target. No 150-submission deployed rehearsal, measured throughput/latency/provider budget or multi-host runner capacity is proven. The restored owner runner passes bounded canary/calibration checks; AI quota remains exhausted and no event-scale throughput is measured."
           }
         },
         {
@@ -10650,7 +10653,7 @@
             "docs/local-docker-runner.md",
             "docs/qa/current-production-prerequisites.md"
           ],
-          "note": "The selected owner Mac/tunnel profile has previously executed real isolated production submissions, but Docker is currently stopped. The 100\u2013150-team single-organization event needs measured runner/provider throughput, warm-capacity and a bounded deadline-burst budget; these remain unproven.",
+          "note": "The selected owner Mac/tunnel profile has previously executed real isolated production submissions, and was restored after the owner restarted Docker; the signed canary and PR8 objective retry passed their expected calibration checks. The 100\u2013150-team single-organization event needs measured runner/provider throughput, warm-capacity and a bounded deadline-burst budget; these remain unproven.",
           "verification": {
             "method": "FIXTURE_TEST",
             "boundary": "Production configuration isolation fixtures and isolated review operation only; actual production runtime and resource/secret boundary verification require authorized provisioning/deployment."
@@ -10660,7 +10663,7 @@
           "relatedPR": null,
           "lastValidationState": {
             "status": "BLOCKED",
-            "basis": "The selected owner Mac/tunnel profile has previously executed real isolated production submissions, but Docker is currently stopped. The 100\u2013150-team single-organization event needs measured runner/provider throughput, warm-capacity and a bounded deadline-burst budget; these remain unproven."
+            "basis": "The selected owner Mac/tunnel profile has previously executed real isolated production submissions, and was restored after the owner restarted Docker; the signed canary and PR8 objective retry passed their expected calibration checks. The 100\u2013150-team single-organization event needs measured runner/provider throughput, warm-capacity and a bounded deadline-burst budget; these remain unproven."
           }
         },
         {
@@ -16195,19 +16198,22 @@
             "docs/qa/docker-evidence.json",
             "docs/qa/current-production-prerequisites.md",
             "docs/qa/current-production-app-grants.json",
-            "docs/qa/current-production-original-rehearsal-validation.json"
+            "docs/qa/current-production-original-rehearsal-validation.json",
+            "docs/qa/current-production-pr8-retry.json",
+            "docs/qa/current-production-pr8-retry-decisions.json",
+            "docs/qa/current-production-runner-restored.json"
           ],
-          "note": "Original payment PRs 7/11 ran production trusted probes with baseline FAIL to submission PASS; PR9 preserves mandatory protected-test violation. Persisted protected artifacts were downloaded and integrity checked. PR8 remains UNVERIFIED after RUNNER_UNAVAILABLE; failures and retries must retain history. AI is FAILED and not used to waive objective criteria. Safe execution is verified for this bounded owner-run rehearsal, not event capacity.",
+          "note": "Original payment PRs 7/11 ran production trusted probes with baseline FAIL to submission PASS; PR9 preserves mandatory protected-test violation. Persisted protected artifacts were downloaded and integrity checked. The original PR8 unavailable attempt stays UNVERIFIED; its new immutable retry produced PARTIAL with trusted retry-bounded FAIL. Acceptance was denied and a changes-requested decision persisted. AI is FAILED and not used to waive objective criteria. Safe execution is verified for this bounded owner-run rehearsal, not event capacity.",
           "verification": {
             "method": "LIVE_INTEGRATION",
-            "boundary": "One owner account and original frozen payment submissions in the deployed owner-tunnel production profile; AI failures, current Docker outage, event capacity and independent organizations are not certified."
+            "boundary": "One owner account and original frozen payment submissions in the deployed owner-tunnel production profile; AI failures, event capacity and independent organizations are not certified."
           },
           "assignedAgent": "evaluation-security-performance",
           "defectReference": null,
           "relatedPR": null,
           "lastValidationState": {
             "status": "PASS",
-            "basis": "Original payment PRs 7/11 ran production trusted probes with baseline FAIL to submission PASS; PR9 preserves mandatory protected-test violation. Persisted protected artifacts were downloaded and integrity checked. PR8 remains UNVERIFIED after RUNNER_UNAVAILABLE; failures and retries must retain history. AI is FAILED and not used to waive objective criteria. Safe execution is verified for this bounded owner-run rehearsal, not event capacity."
+            "basis": "Original payment PRs 7/11 ran production trusted probes with baseline FAIL to submission PASS; PR9 preserves mandatory protected-test violation. Persisted protected artifacts were downloaded and integrity checked. The original PR8 unavailable attempt stays UNVERIFIED; its new immutable retry produced PARTIAL with trusted retry-bounded FAIL. Acceptance was denied and a changes-requested decision persisted. AI is FAILED and not used to waive objective criteria. Safe execution is verified for this bounded owner-run rehearsal, not event capacity."
           }
         },
         {

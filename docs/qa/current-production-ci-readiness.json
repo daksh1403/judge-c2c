@@ -29,5 +29,7 @@
     "CLOUDFLARE_API_TOKEN environment secret absent",
     "CLOUDFLARE_PRODUCTION_ENABLED repository variable absent"
   ],
-  "mutations": []
+  "mutations": [
+    "After owner Docker restart, PRODUCTION_RUNNER_ENDPOINT updated to the replacement signed owner tunnel. No enablement or token changes."
+  ]
 }

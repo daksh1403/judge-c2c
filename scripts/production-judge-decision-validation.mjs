@@ -7,6 +7,17 @@ const evidence = JSON.parse(
     'utf8',
   ),
 );
+const retryOnly = process.env.REHEARSAL_PR8_RETRY === 'true';
+if (retryOnly) {
+  const retry = JSON.parse(
+    await readFile('docs/qa/current-production-pr8-retry.json', 'utf8'),
+  );
+  assert.equal(retry.status, 'PASS');
+  evidence.evaluations = [retry];
+}
+const outputStem = retryOnly
+  ? 'docs/qa/current-production-pr8-retry-decisions'
+  : 'docs/qa/current-production-judge-decisions';
 const origin = evidence.origin;
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
@@ -84,7 +95,7 @@ try {
       result: body,
     };
   }
-  for (const pr of [8, 9]) {
+  for (const pr of retryOnly ? [8] : [8, 9]) {
     const run = evidence.evaluations.find((r) => r.pr === pr);
     assert.ok(run);
     assert.ok(
@@ -103,27 +114,31 @@ try {
       await decide(
         run,
         'CHANGES_REQUESTED',
-        pr === 8
-          ? 'Pre-event rehearsal only: objective criteria remain UNVERIFIED because RUNNER_UNAVAILABLE. Retry as a new attempt after runner recovery; AI_OUTPUT_INVALID does not prove functionality.'
-          : 'Pre-event rehearsal only: protected server.test.mjs was changed. Trusted policy failure prevents acceptance even when functional probes pass. AI remains unverified.',
+        retryOnly
+          ? 'Pre-event rehearsal only: trusted execution proves retry-bounded FAIL while the other three criteria PASS. The mandatory attempt limit is missing; request changes. AI quota exhaustion remains UNVERIFIED and cannot waive this failure.'
+          : pr === 8
+            ? 'Pre-event rehearsal only: objective criteria remain UNVERIFIED because RUNNER_UNAVAILABLE. Retry as a new attempt after runner recovery; AI_OUTPUT_INVALID does not prove functionality.'
+            : 'Pre-event rehearsal only: protected server.test.mjs was changed. Trusted policy failure prevents acceptance even when functional probes pass. AI remains unverified.',
         201,
       ),
     );
   }
-  const run = evidence.evaluations.find((r) => r.pr === 7);
-  assert.ok(run);
-  assert.ok(run.requirements.every((r) => r.status === 'PASS'));
-  assert.ok(
-    !run.evidence.some((e) => e.kind === 'policy' && e.status === 'FAIL'),
-  );
-  output.decisions.push(
-    await decide(
-      run,
-      'ACCEPTED',
-      'Pre-event calibration only, no event credit: mandatory retry criteria have trusted execution PASS and protected tests are unchanged. Accept this objective scope; failed AI remains UNVERIFIED and requires separate manual contextual review.',
-      201,
-    ),
-  );
+  if (!retryOnly) {
+    const run = evidence.evaluations.find((r) => r.pr === 7);
+    assert.ok(run);
+    assert.ok(run.requirements.every((r) => r.status === 'PASS'));
+    assert.ok(
+      !run.evidence.some((e) => e.kind === 'policy' && e.status === 'FAIL'),
+    );
+    output.decisions.push(
+      await decide(
+        run,
+        'ACCEPTED',
+        'Pre-event calibration only, no event credit: mandatory retry criteria have trusted execution PASS and protected tests are unchanged. Accept this objective scope; failed AI remains UNVERIFIED and requires separate manual contextual review.',
+        201,
+      ),
+    );
+  }
   const reloaded = page.waitForResponse((r) =>
     /\/manage\/issues\/1371407339\/6$/.test(r.url()),
   );
@@ -137,7 +152,7 @@ try {
       ),
     );
   await page.screenshot({
-    path: 'docs/qa/current-production-judge-decisions.png',
+    path: outputStem + '.png',
     fullPage: true,
   });
   output.status = 'PASS';
@@ -146,10 +161,7 @@ try {
   output.failure = e.message;
   process.exitCode = 1;
 } finally {
-  await writeFile(
-    'docs/qa/current-production-judge-decisions.json',
-    JSON.stringify(output, null, 2) + '\n',
-  );
+  await writeFile(outputStem + '.json', JSON.stringify(output, null, 2) + '\n');
   await browser.close();
   console.log(
     JSON.stringify({
