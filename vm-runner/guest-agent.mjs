@@ -3,6 +3,7 @@
 import { readFileSync, mkdirSync, writeFileSync, chownSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawn } from 'node:child_process';
+import { createConnection } from 'node:net';
 const emit = (value) =>
   process.stdout.write('JUDGE_VM:' + JSON.stringify(value) + '\n');
 try {
@@ -79,7 +80,30 @@ try {
   child.stderr.on('data', (data) => append('stderr', data));
   child.on('error', () => emit({ error: 'COMMAND_UNAVAILABLE' }));
   child.on('spawn', () => {
-    if (job.mode === 'service') emit({ ready: true, runtime: process.version });
+    if (job.mode !== 'service') return;
+    // A process spawn is not HTTP readiness. Only the trusted agent reports
+    // readiness after the fixed guest port is listening; assertions stay on host.
+    const deadline = Date.now() + 8000;
+    const probe = () => {
+      if (child.exitCode !== null || Date.now() >= deadline) return;
+      const socket = createConnection({ host: '127.0.0.1', port: 9000 });
+      let settled = false;
+      const retry = () => {
+        if (settled) return;
+        settled = true;
+        socket.destroy();
+        setTimeout(probe, 100).unref();
+      };
+      socket.setTimeout(200, retry);
+      socket.once('error', retry);
+      socket.once('connect', () => {
+        if (settled) return;
+        settled = true;
+        socket.destroy();
+        emit({ ready: true, runtime: process.version });
+      });
+    };
+    probe();
   });
   child.on('close', (code) =>
     emit({

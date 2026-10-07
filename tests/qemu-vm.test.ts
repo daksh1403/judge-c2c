@@ -13,6 +13,7 @@ it('boots a read-only bounded guest without host mounts, external network or cre
     false,
   );
   expect(args).toContain('256');
+  expect(args.join(' ')).toContain('net.ifnames=0 biosdevname=0');
   expect(args).toContain(
     'file=/trusted/root.raw,format=raw,if=virtio,readonly=on',
   );

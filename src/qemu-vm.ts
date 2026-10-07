@@ -37,12 +37,16 @@ export function vmArguments(
     '256',
     '-smp',
     '1',
+    '-object',
+    'rng-random,id=judge-rng,filename=/dev/urandom',
+    '-device',
+    'virtio-rng-pci,rng=judge-rng,max-bytes=1024,period=1000',
     '-kernel',
     image.kernel,
     '-initrd',
     image.initrd,
     '-append',
-    'root=/dev/vda ro console=ttyS0 ' +
+    'root=/dev/vda ro net.ifnames=0 biosdevname=0 console=ttyS0 ' +
       (diagnostic ? '' : 'quiet loglevel=0 ') +
       'init=/opt/judge/init.sh panic=1',
     '-drive',

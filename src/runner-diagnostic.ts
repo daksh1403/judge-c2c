@@ -37,7 +37,7 @@ export async function runnerDiagnostic(env: Env) {
       commit: (label === 'baseline' ? '0' : '1').repeat(40),
       contractHash,
       policy,
-      timeoutSeconds: 15,
+      timeoutSeconds: env.RUNNER_BACKEND === 'actions-vm' ? 120 : 15,
       memoryMiB: 256,
       files: label === 'baseline' ? [] : [{ path: 'server.mjs', text: source }],
     };

@@ -8,6 +8,7 @@ mount -t tmpfs -o size=64m,nosuid,nodev,noexec,mode=1777 tmpfs /tmp
 mount -t tmpfs -o size=8m,nosuid,nodev,noexec,mode=0755 tmpfs /run
 modprobe qemu_fw_cfg
 modprobe virtio_net
+modprobe virtio_rng
 ip link set lo up
 ip link set eth0 up
 ip addr add 10.0.2.15/24 dev eth0
