@@ -1,3 +1,4 @@
+import { actionsEvaluate } from './actions-runner';
 import { routeExecution, frozenExecutionContext } from './execution-routing';
 import { z } from 'zod';
 import {
@@ -237,7 +238,12 @@ export async function runObjective(
 ) {
   if (!c.execution.runner) return evidence;
   const originalPolicy = c.execution.runner;
-  if ((!env.RUNNER && !env.RUNNER_ENDPOINT) || env.RUNNER_ENABLED !== 'true')
+  if (
+    (!env.RUNNER &&
+      !env.RUNNER_ENDPOINT &&
+      env.RUNNER_BACKEND !== 'actions-vm') ||
+    env.RUNNER_ENABLED !== 'true'
+  )
     return evidence.map((e) =>
       e.criterionId &&
       c.requirements.some((r) =>
@@ -323,7 +329,12 @@ export async function runObjective(
       files: await snapshot(github, c, commit),
     };
     const hash = await digest(canonical(request));
-    const adapter = env.RUNNER_ENDPOINT ? 'signed-tunnel' : 'durable-object';
+    const adapter =
+      env.RUNNER_BACKEND === 'actions-vm'
+        ? 'actions-vm'
+        : env.RUNNER_ENDPOINT
+          ? 'signed-tunnel'
+          : 'durable-object';
     const imageDigest = [policy.image, env.RUNNER_IMAGE_URI ?? ''].join('|');
     const key = await executionCacheKey(
       repositoryId,
@@ -411,9 +422,11 @@ export async function runObjective(
       env.RUNNER!.idFromName(run.id + '-' + commit + '-' + crypto.randomUUID()),
     ) as unknown as RunnerStub;
     const authenticated = validateRunnerResult(
-      env.RUNNER_ENDPOINT
-        ? await tunnelEvaluate(env, request)
-        : await stub.evaluate(request),
+      env.RUNNER_BACKEND === 'actions-vm'
+        ? await actionsEvaluate(env, request, false, assertCurrent)
+        : env.RUNNER_ENDPOINT
+          ? await tunnelEvaluate(env, request)
+          : await stub.evaluate(request),
       request,
       hash,
     );

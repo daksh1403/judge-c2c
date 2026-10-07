@@ -37,6 +37,7 @@ export const runnerPolicySchema = z
     cache: z.enum(['NONE', 'BASELINE', 'ALL']).optional(),
     image: z.union([
       z.literal('UNCONFIGURED'),
+      z.string().regex(/^qemu-vm@sha256:[a-f0-9]{64}$/),
       z.string().regex(/^docker-local@sha256:[a-f0-9]{64}$/),
       z
         .string()

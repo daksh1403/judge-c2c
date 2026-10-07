@@ -1,3 +1,4 @@
+import { providerHasKey } from './external-review';
 import { discoverAdditionalContributions } from './additional-contributions';
 import { enrichEngineeringReview } from './engineering-review';
 import { repositoryIndex } from './repository-intelligence';
@@ -231,7 +232,10 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         'objective',
         {
           retries: { limit: 8, delay: '15 seconds', backoff: 'constant' },
-          timeout: '4 minutes',
+          timeout:
+            this.env.RUNNER_BACKEND === 'actions-vm'
+              ? '30 minutes'
+              : '4 minutes',
         },
         async () => {
           const run = await this.requireCurrent(id);
@@ -287,11 +291,14 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
         async () => {
           if (
             !(await this.requireCurrent(id)) ||
-            this.env.AI_PROVIDER !== 'callmissed' ||
-            !this.env.CALLMISSED_API_KEY
+            (this.env.AI_PROVIDER ?? 'cloudflare') === 'cloudflare' ||
+            !providerHasKey(this.env)
           )
             return null;
-          const slot = await acquireReviewer(this.env.DB, 'callmissed');
+          const slot = await acquireReviewer(
+            this.env.DB,
+            this.env.AI_PROVIDER ?? 'cloudflare',
+          );
           if (!slot) throw new Error('REVIEWER_CAPACITY_BUSY');
           return slot;
         },

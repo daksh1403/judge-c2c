@@ -24,6 +24,7 @@ export async function migrate(
     '0022_stage_measurements.sql',
     '0023_dependency_audit_cache.sql',
     '0024_organization_retirement.sql',
+    '0025_actions_runner.sql',
   ],
 ) {
   for (const file of files) {

@@ -38,7 +38,7 @@ export function validateWorkspace(options) {
   const names = workspaceNames(o.workspace);
   if (!hex.test(o.accountId)) throw new Error('Invalid Cloudflare account ID');
   if (
-    !['cloudflare', 'callmissed'].includes(o.provider) ||
+    !['cloudflare', 'callmissed', 'gemini', 'groq'].includes(o.provider) ||
     typeof o.model !== 'string' ||
     o.model.length > 200 ||
     !/^[A-Za-z0-9@/._:-]+$/.test(o.model)
@@ -264,11 +264,11 @@ export async function provisionWorkspace(
 ) {
   const { target } = validateWorkspace(options);
   if (
-    target.provider === 'callmissed' &&
+    target.provider !== 'cloudflare' &&
     (!providerKey || providerKey.length < 16 || providerKey.length > 1000)
   )
     throw new Error(
-      'Callmissed requires an explicit fresh private provider-key file',
+      'External AI providers require an explicit fresh private provider-key file',
     );
   if (deploy) await adapters.approvedRuntime();
   // Authorize and validate the remote names before creating any private state.
@@ -289,8 +289,8 @@ export async function provisionWorkspace(
           'RUNNER_TUNNEL_KEY',
         ].map((k) => [k, randomBytes(32).toString('hex')]),
       );
-      if (target.provider === 'callmissed')
-        secrets.CALLMISSED_API_KEY = providerKey;
+      if (target.provider !== 'cloudflare')
+        secrets[target.provider.toUpperCase() + '_API_KEY'] = providerKey;
       journal = {
         version: 1,
         target,

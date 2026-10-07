@@ -1,3 +1,4 @@
+import { externalReview, providerHasKey } from './external-review';
 import { providerReviewSchema } from './provider-review-schema';
 import { reviewCost } from './review-cost';
 import { buildReviewContext, retrieveReviewContext } from './review-context';
@@ -205,7 +206,7 @@ export async function aiReview(
   const plan = buildEvaluationPlan(contract, context);
   const modelRouting = selectReviewModel(env, provider, plan);
   const model = modelRouting.model;
-  if (!model || (provider === 'callmissed' ? !env.CALLMISSED_API_KEY : !env.AI))
+  if (!model || !providerHasKey(env, provider))
     return {
       review: deterministicReport(contract, evidence),
       status: 'NOT_CONFIGURED',
@@ -352,43 +353,58 @@ export async function aiReview(
               attempt ? failureCode : undefined,
               responseSchema,
             )
-          : ((await env.AI!.run(
-              model as Parameters<Ai['run']>[0],
-              {
-                messages: [
-                  { role: 'system', content: AI_POLICY },
-                  {
-                    role: 'user',
-                    content: JSON.stringify({
-                      schema: reviewSchema.toJSONSchema(),
-                      untrustedContext: prompt,
-                      attempt,
-                      ...(attempt
-                        ? {
-                            trustedValidationFeedback: {
-                              code: failureCode,
-                              instruction: repairInstruction(failureCode),
-                            },
-                          }
-                        : {}),
-                    }),
+          : provider === 'gemini' || provider === 'groq'
+            ? await externalReview(
+                env,
+                provider,
+                model,
+                attempt
+                  ? AI_POLICY +
+                      '\nTrusted validation repair: ' +
+                      repairInstruction(failureCode)
+                  : AI_POLICY,
+                prompt,
+                attempt,
+                attempt ? failureCode : undefined,
+                responseSchema,
+              )
+            : ((await env.AI!.run(
+                model as Parameters<Ai['run']>[0],
+                {
+                  messages: [
+                    { role: 'system', content: AI_POLICY },
+                    {
+                      role: 'user',
+                      content: JSON.stringify({
+                        schema: reviewSchema.toJSONSchema(),
+                        untrustedContext: prompt,
+                        attempt,
+                        ...(attempt
+                          ? {
+                              trustedValidationFeedback: {
+                                code: failureCode,
+                                instruction: repairInstruction(failureCode),
+                              },
+                            }
+                          : {}),
+                      }),
+                    },
+                  ],
+                  max_tokens: 4096,
+                  response_format: {
+                    type: 'json_schema',
+                    json_schema: providerReviewSchema(
+                      contract,
+                      assembled.reviewEvidence,
+                    ),
                   },
-                ],
-                max_tokens: 4096,
-                response_format: {
-                  type: 'json_schema',
-                  json_schema: providerReviewSchema(
-                    contract,
-                    assembled.reviewEvidence,
-                  ),
-                },
-              } as never,
-            )) as {
-              response?: unknown;
-              usage?: unknown;
-              model?: string;
-              responseId?: string | null;
-            });
+                } as never,
+              )) as {
+                response?: unknown;
+                usage?: unknown;
+                model?: string;
+                responseId?: string | null;
+              });
       const data =
         typeof response.response === 'string'
           ? JSON.parse(response.response)
@@ -480,7 +496,7 @@ export async function aiReview(
           : error instanceof Error && validationErrors[error.message]
             ? validationErrors[error.message]!
             : error instanceof Error &&
-                /^CALLMISSED_[A-Z0-9_]+$/.test(error.message)
+                /^(CALLMISSED|GEMINI|GROQ)_[A-Z0-9_]+$/.test(error.message)
               ? error.message
               : provider === 'callmissed' &&
                   error instanceof Error &&
@@ -492,7 +508,11 @@ export async function aiReview(
                     ? 'AI_JSON_INVALID'
                     : 'AI_OUTPUT_INVALID';
       attemptFailures.push(failureCode);
-      if (failureCode === 'CLOUDFLARE_AI_QUOTA_EXHAUSTED') break;
+      if (
+        failureCode === 'CLOUDFLARE_AI_QUOTA_EXHAUSTED' ||
+        /^(GEMINI|GROQ)_HTTP_(401|403|429)$/.test(failureCode)
+      )
+        break;
       /* Bounded recovery. Invalid/provider output never becomes evidence. */
     }
   }
