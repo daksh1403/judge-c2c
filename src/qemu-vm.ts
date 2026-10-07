@@ -206,6 +206,14 @@ async function boot(
     clearTimeout(timer);
     if (!closed) child.kill('SIGKILL');
     await closedPromise;
+    if (diagnostic)
+      console.error(
+        JSON.stringify({
+          event: 'synthetic_vm_trace',
+          trace: redact(trace),
+          stderr: redact(stderrTrace),
+        }),
+      );
     await rm(dir, { recursive: true, force: true });
   };
   try {

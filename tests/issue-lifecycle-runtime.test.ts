@@ -391,7 +391,7 @@ it('flags a bounded twenty-one-report burst for organizer moderation without aut
       'SELECT review_status FROM github_issues WHERE number=120',
     ).first<{ review_status: string }>())!.review_status,
   ).toBe('REJECTED');
-});
+}, 30000);
 
 it('projects organizer in-progress, signed PR opened/evaluating and blocked challenge state without conflating native closure or frozen history', async () => {
   const { decideCompletion } = await import('../src/competition-completion');

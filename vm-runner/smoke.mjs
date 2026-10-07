@@ -40,6 +40,7 @@ const present = await evaluateVM(
   image,
   true,
 );
+console.log(JSON.stringify({ stage: 'reference', checks: present.checks }));
 assert.equal(present.checks.find((c) => c.id === 'ready').status, 'PASS');
 assert.equal(present.checks.find((c) => c.id === 'syntax').status, 'PASS');
 const security = `import {readFileSync,writeFileSync} from 'node:fs';import {createServer} from 'node:http';let rootReadOnly=false,secretAbsent=false,networkBlocked=false;try{writeFileSync('/opt/judge/escape','bad')}catch{rootReadOnly=true}secretAbsent=!process.env.GITHUB_TOKEN&&!process.env.GEMINI_API_KEY&&!process.env.GROQ_API_KEY;try{await fetch('http://169.254.169.254/',{signal:AbortSignal.timeout(500)})}catch{networkBlocked=true}createServer((req,res)=>{res.setHeader('content-type','application/json');res.end(JSON.stringify({rootReadOnly,secretAbsent,networkBlocked,uid:process.getuid()}));}).listen(9000,'0.0.0.0');`;
