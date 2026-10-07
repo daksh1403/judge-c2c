@@ -13,6 +13,6 @@ ip link set eth0 up
 ip addr add 10.0.2.15/24 dev eth0
 # No default route. QEMU additionally rejects outbound packets.
 chmod 0600 /dev/ttyS0
-/usr/local/bin/node /opt/judge/guest-agent.mjs > /dev/ttyS0 2>/dev/null
+/usr/local/bin/node /opt/judge/guest-agent.mjs > /dev/ttyS0 2>/dev/ttyS0
 sleep 120
 poweroff -f

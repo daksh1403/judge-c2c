@@ -20,6 +20,7 @@ export function vmArguments(
   input: string,
   port: number,
   kvm: boolean,
+  diagnostic = false,
 ) {
   return [
     '-nodefaults',
@@ -41,7 +42,9 @@ export function vmArguments(
     '-initrd',
     image.initrd,
     '-append',
-    'root=/dev/vda ro console=ttyS0 quiet loglevel=0 init=/opt/judge/init.sh panic=1',
+    'root=/dev/vda ro console=ttyS0 ' +
+      (diagnostic ? '' : 'quiet loglevel=0 ') +
+      'init=/opt/judge/init.sh panic=1',
     '-drive',
     `file=${image.disk},format=raw,if=virtio,readonly=on`,
     '-serial',
@@ -110,6 +113,7 @@ async function boot(
   image: VMImage,
   input: ReturnType<typeof guestInput>,
   budget: number,
+  diagnostic = false,
 ) {
   const dir = await mkdtemp(join(tmpdir(), 'judge-vm-'));
   const path = join(dir, 'input.json'),
@@ -126,13 +130,15 @@ async function boot(
       '--cpu=120',
       '--',
       'qemu-system-x86_64',
-      ...vmArguments(image, path, port, kvm),
+      ...vmArguments(image, path, port, kvm, diagnostic),
     ],
     {
       env: { PATH: process.env.PATH },
       stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
+  let trace = '',
+    stderrTrace = '';
   let partial = '',
     bytes = 0,
     closed = false;
@@ -160,6 +166,7 @@ async function boot(
     clearTimeout(timer);
   });
   child.stderr.on('data', (data) => {
+    if (diagnostic) stderrTrace = (stderrTrace + data.toString()).slice(-16000);
     bytes += data.length;
     if (bytes > 64000) {
       rejectReady(new Error('VM_OUTPUT_LIMIT'));
@@ -167,6 +174,7 @@ async function boot(
     }
   });
   child.stdout.on('data', (data) => {
+    if (diagnostic) trace = (trace + data.toString()).slice(-16000);
     bytes += data.length;
     if (bytes > 64000) {
       rejectReady(new Error('VM_OUTPUT_LIMIT'));
@@ -204,6 +212,14 @@ async function boot(
     const result = await ready;
     return { result, port, started, stop };
   } catch (error) {
+    if (diagnostic)
+      console.error(
+        JSON.stringify({
+          event: 'synthetic_vm_boot_failure',
+          trace: redact(trace),
+          stderr: redact(stderrTrace),
+        }),
+      );
     await stop();
     throw error;
   }
@@ -211,6 +227,7 @@ async function boot(
 export async function evaluateVM(
   raw: unknown,
   image: VMImage,
+  diagnostic = false,
 ): Promise<RunnerResult> {
   const request = runnerRequestSchema.parse(raw);
   const identity = await imageIdentity(image);
@@ -249,7 +266,12 @@ export async function evaluateVM(
   let guest: Awaited<ReturnType<typeof boot>> | undefined;
   try {
     if (implemented && !request.policy.dependencies) {
-      guest = await boot(image, guestInput(request), deadline - Date.now());
+      guest = await boot(
+        image,
+        guestInput(request),
+        deadline - Date.now(),
+        diagnostic,
+      );
       runtime = guest.result.runtime;
     }
     const port = guest?.port;
@@ -282,7 +304,14 @@ export async function evaluateVM(
             )
           : await benchmark(transport, spec, implemented, deadline),
       );
-  } catch {
+  } catch (error) {
+    if (diagnostic)
+      console.error(
+        JSON.stringify({
+          event: 'synthetic_vm_acceptance_failure',
+          code: error instanceof Error ? error.message : 'VM_FAILURE',
+        }),
+      );
     for (const spec of [
       ...request.policy.cases,
       ...(request.policy.benchmarks ?? []),
@@ -310,6 +339,7 @@ export async function evaluateVM(
         image,
         guestInput(request, command.argv),
         deadline - Date.now(),
+        diagnostic,
       );
       runtime = commandGuest.result.runtime;
       const result = commandGuest.result;

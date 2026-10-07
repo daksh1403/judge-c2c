@@ -13,7 +13,7 @@
 
 Local full checks passed all 530 tests, validated all 714 acceptance entries and built the Worker after the dependency update. Local and Cloudflare branch-preview browser suites each passed all 35 scenarios. Gemini/Groq fixture tests cover valid output, unknown citations, incomplete output, private key separation and rate-limit failure, but no live provider call has been established.
 
-The first Linux VM preparation run exposed a missing Debian archive keyring on Ubuntu; the second exposed the host-dependent MODULES=dep initramfs mode. These failures are retained in CI. The builder now installs the signing keyring and explicitly lists guest modules. Dependency CI also identified the pre-existing sharp high-severity advisory; the override is updated to patched 0.35.5 and the refreshed root audit is clean. Final CI/VM smoke results are recorded on PR #12.
+The first Linux VM preparation run exposed a missing Debian archive keyring on Ubuntu; the second exposed the host-dependent MODULES=dep initramfs mode. These failures are retained in CI. The builder now installs the signing keyring and explicitly lists guest modules. Dependency CI also identified the pre-existing sharp high-severity advisory; the override is updated to patched 0.35.5 and the refreshed root audit is clean. The first green VM CI status masked a failed assertion through tee; downloaded evidence exposed this. The wrapper now uses explicit Bash pipefail and stderr capture. The failed image is not a verified release. Final CI/VM smoke results are recorded on PR #12.
 
 ## Required before the event
 

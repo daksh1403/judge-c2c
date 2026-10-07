@@ -31,13 +31,14 @@ const base = {
   timeoutSeconds: 120,
   memoryMiB: 256,
 };
-const absent = await evaluateVM({ ...base, files: [] }, image);
+const absent = await evaluateVM({ ...base, files: [] }, image, true);
 assert.equal(absent.checks.find((c) => c.id === 'ready').status, 'FAIL');
 const source =
   "import {createServer} from 'node:http';createServer((req,res)=>{res.setHeader('content-type','application/json');res.end(JSON.stringify({ready:true}));}).listen(9000,'0.0.0.0');";
 const present = await evaluateVM(
   { ...base, files: [{ path: 'server.mjs', text: source }] },
   image,
+  true,
 );
 assert.equal(present.checks.find((c) => c.id === 'ready').status, 'PASS');
 assert.equal(present.checks.find((c) => c.id === 'syntax').status, 'PASS');
@@ -63,6 +64,7 @@ const hardened = await evaluateVM(
     },
   },
   image,
+  true,
 );
 assert.equal(hardened.checks[0].status, 'PASS');
 console.log(
