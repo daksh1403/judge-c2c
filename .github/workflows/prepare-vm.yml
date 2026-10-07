@@ -25,7 +25,7 @@ jobs:
           node-version: '24.14.0'
       - run: npm ci --ignore-scripts
       - name: Install trusted VM preparation tools
-        run: sudo apt-get update && sudo apt-get install -y debootstrap qemu-system-x86 e2fsprogs
+        run: sudo apt-get update && sudo apt-get install -y debootstrap debian-archive-keyring qemu-system-x86 e2fsprogs
       - name: Prepare guest without submission code
         run: mkdir -p vm-runner/images && sudo bash vm-runner/build-image.sh vm-runner/images
       - name: Exercise bounded synthetic isolation canary
