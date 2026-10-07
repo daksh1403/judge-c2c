@@ -27,7 +27,7 @@ chmod 0755 "$root/opt/judge/init.sh"
 cp runner/package.json runner/package-lock.json "$root/opt/judge/"
 # This installs only the trusted image's pinned lockfile, never participant packages.
 chroot "$root" /usr/local/bin/npm ci --prefix /opt/judge --ignore-scripts --omit=dev
-printf '%s\n' 'MODULES=dep' > "$root/etc/initramfs-tools/conf.d/judge"
+printf '%s\n' 'MODULES=list' > "$root/etc/initramfs-tools/conf.d/judge"
 printf '%s\n' ext4 virtio_blk virtio_pci virtio_net qemu_fw_cfg >> "$root/etc/initramfs-tools/modules"
 chroot "$root" update-initramfs -u -k all
 cp "$root"/boot/vmlinuz-* "$out/kernel"
