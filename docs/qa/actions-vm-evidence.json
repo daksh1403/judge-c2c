@@ -1,0 +1,32 @@
+{
+  "synthetic": true,
+  "identity": "qemu-vm@sha256:bffe6808899f23b08694a4d8e367ddcdc411856ca87135f3d2c5f67b44819e71",
+  "absent": "FAIL",
+  "reference": "PASS",
+  "nonrootReadOnlySecretMetadata": "PASS",
+  "scope": "Bounded canary; not full adversarial or 80-team capacity certification.",
+  "date": "2026-10-07",
+  "commit": "6696cbd59ec46aa616591435c2b85c7c2d7feb3d",
+  "run": "https://github.com/daksh1403/judge-c2c/actions/runs/37636409842",
+  "quality": "https://github.com/daksh1403/judge-c2c/actions/runs/37636409750",
+  "preview": "https://400fbc7f-judge-c2c.dakshx.workers.dev",
+  "productionActivated": false,
+  "liveProviderCalibration": "PENDING_PRIVATE_KEYS",
+  "fullAdversarialAnd80TeamCapacity": "UNVERIFIED",
+  "browser": {
+    "url": "https://400fbc7f-judge-c2c.dakshx.workers.dev",
+    "passed": 35,
+    "failed": 0
+  },
+  "localCheck": {
+    "passedTests": 530,
+    "acceptanceEntriesValidated": 714,
+    "workerDryRun": "PASS"
+  },
+  "retainedFailedRunIds": [
+    37624773680, 37625017704, 37627180357, 37630540229, 37632054866
+  ],
+  "imageDownloadCompositeDigestVerified": true,
+  "draftReleaseTag": "vm-node-v1-20261007",
+  "draftReleasePublication": "NOT_AUTHORIZED"
+}
