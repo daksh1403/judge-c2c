@@ -338,3 +338,25 @@ describe('arbitrary workspace configuration', () => {
     }
   });
 });
+
+it('generates explicit Actions VM configuration without a tunnel or copied secrets', () => {
+  const result = generate({
+    PRODUCTION_RUNNER_MODE: 'ACTIONS_VM',
+    PRODUCTION_RUNNER_ENDPOINT: undefined,
+    PRODUCTION_RUNNER_IMAGE: 'qemu-vm@sha256:' + 'a'.repeat(64),
+    PRODUCTION_RUNNER_REPOSITORY: 'daksh1403/judge-c2c',
+    PRODUCTION_RUNNER_REPOSITORY_ID: '1400414482',
+    PRODUCTION_RUNNER_REF: 'main',
+    PRODUCTION_RUNNER_SHA: 'b'.repeat(40),
+    PRODUCTION_RUNNER_INSTALLATION_ID: '123',
+    PRODUCTION_AI_PROVIDER: 'gemini',
+    PRODUCTION_AI_MODEL: 'gemini-2.5-flash',
+  });
+  expect(result.status).toBe(0);
+  expect(result.config.vars).toMatchObject({
+    RUNNER_BACKEND: 'actions-vm',
+    RUNNER_ACTIONS_REPOSITORY: 'daksh1403/judge-c2c',
+    GEMINI_MODEL: 'gemini-2.5-flash',
+  });
+  expect(result.config.vars.RUNNER_ENDPOINT).toBeUndefined();
+});

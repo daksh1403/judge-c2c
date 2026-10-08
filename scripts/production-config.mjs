@@ -111,7 +111,7 @@ export async function buildProductionConfig(
     return value;
   };
   const runnerMode = env.PRODUCTION_RUNNER_MODE || 'MANAGED';
-  if (!['MANAGED', 'OWNER_TUNNEL'].includes(runnerMode))
+  if (!['MANAGED', 'OWNER_TUNNEL', 'ACTIONS_VM'].includes(runnerMode))
     throw new Error('Invalid PRODUCTION_RUNNER_MODE');
   const resourceId = (key, pattern) => {
     const value = input(key);
@@ -149,7 +149,7 @@ export async function buildProductionConfig(
     throw new Error('Production DB and ORG_DB must be separate');
   const artifactKv = resourceId('PRODUCTION_ARTIFACT_KV_ID', /^[a-f0-9]{32}$/);
   const bucket =
-    runnerMode === 'OWNER_TUNNEL' && !env.PRODUCTION_ARTIFACT_BUCKET
+    runnerMode !== 'MANAGED' && !env.PRODUCTION_ARTIFACT_BUCKET
       ? null
       : input('PRODUCTION_ARTIFACT_BUCKET');
   if (
@@ -167,7 +167,7 @@ export async function buildProductionConfig(
   if (workersDev) {
     const subdomain = input('CLOUDFLARE_WORKERS_SUBDOMAIN');
     if (
-      runnerMode !== 'OWNER_TUNNEL' ||
+      runnerMode === 'MANAGED' ||
       !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(subdomain) ||
       publicUrl.hostname !== `${names.worker}.${subdomain}.workers.dev`
     )
@@ -192,20 +192,25 @@ export async function buildProductionConfig(
   )
     throw new Error('Invalid PRODUCTION_ORG_NAME');
   const provider = input('PRODUCTION_AI_PROVIDER');
-  if (!['cloudflare', 'callmissed'].includes(provider))
+  if (!['cloudflare', 'callmissed', 'gemini', 'groq'].includes(provider))
     throw new Error('Invalid PRODUCTION_AI_PROVIDER');
   const model = input('PRODUCTION_AI_MODEL');
   if (model.length > 200 || !/^[A-Za-z0-9@/._:-]+$/.test(model))
     throw new Error('Invalid PRODUCTION_AI_MODEL');
-  const runnerEndpoint = httpsOrigin('PRODUCTION_RUNNER_ENDPOINT');
+  const runnerEndpoint =
+    runnerMode === 'ACTIONS_VM'
+      ? null
+      : httpsOrigin('PRODUCTION_RUNNER_ENDPOINT');
   if (runnerEndpoint === origin)
     throw new Error('Production runner must use a separate isolated endpoint');
   const image = input('PRODUCTION_RUNNER_IMAGE');
   if (
     !(
-      runnerMode === 'OWNER_TUNNEL'
-        ? /^docker-local@sha256:[a-f0-9]{64}$/
-        : /^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/
+      runnerMode === 'ACTIONS_VM'
+        ? /^qemu-vm@sha256:[a-f0-9]{64}$/
+        : runnerMode === 'OWNER_TUNNEL'
+          ? /^docker-local@sha256:[a-f0-9]{64}$/
+          : /^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/
     ).test(image)
   )
     throw new Error('PRODUCTION_RUNNER_IMAGE must be digest pinned');
@@ -218,6 +223,32 @@ export async function buildProductionConfig(
     throw new Error(
       'OWNER_TUNNEL requires an HTTPS trycloudflare runner origin',
     );
+  let actionsVars = {};
+  if (runnerMode === 'ACTIONS_VM') {
+    const repository = input('PRODUCTION_RUNNER_REPOSITORY');
+    const repositoryId = input('PRODUCTION_RUNNER_REPOSITORY_ID');
+    const ref = input('PRODUCTION_RUNNER_REF');
+    const sha = input('PRODUCTION_RUNNER_SHA');
+    const installation = input('PRODUCTION_RUNNER_INSTALLATION_ID');
+    if (
+      !/^[\w.-]+\/[\w.-]+$/.test(repository) ||
+      !/^[1-9]\d*$/.test(repositoryId) ||
+      !/^[A-Za-z0-9][\w./-]{0,100}$/.test(ref) ||
+      ref.includes('..') ||
+      !/^[a-f0-9]{40}$/.test(sha) ||
+      !/^[1-9]\d*$/.test(installation)
+    )
+      throw new Error('Invalid Actions runner identity');
+    actionsVars = {
+      RUNNER_BACKEND: 'actions-vm',
+      RUNNER_ACTIONS_REPOSITORY: repository,
+      RUNNER_ACTIONS_REPOSITORY_ID: repositoryId,
+      RUNNER_ACTIONS_REF: ref,
+      RUNNER_ACTIONS_SHA: sha,
+      RUNNER_ACTIONS_ORIGIN: origin,
+      RUNNER_INSTALLATION_ID: installation,
+    };
+  }
   const config = {
     name: names.worker,
     main: sourcePath('src/index.ts'),
@@ -243,9 +274,11 @@ export async function buildProductionConfig(
       AI_PROVIDER: provider,
       ...(provider === 'cloudflare'
         ? { AI_MODEL: model }
-        : { CALLMISSED_MODEL: model }),
+        : { [provider.toUpperCase() + '_MODEL']: model }),
       RUNNER_ENABLED: 'true',
-      RUNNER_ENDPOINT: runnerEndpoint,
+      ...(runnerMode === 'ACTIONS_VM'
+        ? actionsVars
+        : { RUNNER_ENDPOINT: runnerEndpoint }),
       RUNNER_IMAGE_URI: image,
     },
     observability: { enabled: true },

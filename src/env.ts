@@ -1,4 +1,13 @@
 export interface Env {
+  RUNNER_BACKEND?: 'actions-vm';
+  RUNNER_ACTIONS_REPOSITORY?: string;
+  RUNNER_ACTIONS_REPOSITORY_ID?: string;
+  RUNNER_ACTIONS_REF?: string;
+  RUNNER_ACTIONS_SHA?: string;
+  RUNNER_ACTIONS_ORIGIN?: string;
+  RUNNER_APP_ID?: string;
+  RUNNER_APP_PRIVATE_KEY?: string;
+  RUNNER_INSTALLATION_ID?: string;
   RUNNER?: DurableObjectNamespace;
   RUNNER_ENABLED?: string;
   RUNNER_ENDPOINT?: string;
@@ -34,7 +43,15 @@ export interface Env {
   AI_MODEL?: string;
   AI_MODEL_LIGHT?: string;
   AI_MODEL_DEEP?: string;
-  AI_PROVIDER?: 'cloudflare' | 'callmissed';
+  AI_PROVIDER?: 'cloudflare' | 'callmissed' | 'gemini' | 'groq';
+  GEMINI_API_KEY?: string;
+  GEMINI_MODEL?: string;
+  GEMINI_MODEL_LIGHT?: string;
+  GEMINI_MODEL_DEEP?: string;
+  GROQ_API_KEY?: string;
+  GROQ_MODEL?: string;
+  GROQ_MODEL_LIGHT?: string;
+  GROQ_MODEL_DEEP?: string;
   CALLMISSED_API_KEY?: string;
   CALLMISSED_MODEL?: string;
   CALLMISSED_MODEL_LIGHT?: string;

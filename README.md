@@ -229,3 +229,6 @@ typecheck, format, coverage, security and dependency command kinds. Tools must e
 in the immutable image; unavailable tools remain unavailable, and participant command
 success never proves functional criteria. The profile does not install participant
 dependencies or grant guest networking.
+
+Container-free execution: [GitHub Actions/QEMU setup](docs/actions-vm-runner.md).
+Additional backend reviewers: [Gemini and Groq](docs/ai-providers.md). These adapters require explicit provisioning and live validation before event activation.

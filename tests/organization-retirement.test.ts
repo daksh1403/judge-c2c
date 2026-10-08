@@ -41,6 +41,7 @@ function req(path: string, method = 'GET', body?: unknown, session = cookie) {
   });
 }
 function payload() {
+  const now = Date.now();
   return {
     confirmation: 'Old-Org',
     attestation: true,
@@ -52,8 +53,8 @@ function payload() {
       appId: 43,
       installationId: 85,
       verificationReference: 'a'.repeat(32),
-      verifiedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 900000).toISOString(),
+      verifiedAt: new Date(now).toISOString(),
+      expiresAt: new Date(now + 900000).toISOString(),
     },
   };
 }

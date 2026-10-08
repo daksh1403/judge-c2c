@@ -38,7 +38,7 @@ export function validateWorkspace(options) {
   const names = workspaceNames(o.workspace);
   if (!hex.test(o.accountId)) throw new Error('Invalid Cloudflare account ID');
   if (
-    !['cloudflare', 'callmissed'].includes(o.provider) ||
+    !['cloudflare', 'callmissed', 'gemini', 'groq'].includes(o.provider) ||
     typeof o.model !== 'string' ||
     o.model.length > 200 ||
     !/^[A-Za-z0-9@/._:-]+$/.test(o.model)
@@ -67,13 +67,20 @@ export function validateWorkspace(options) {
       throw new Error('Invalid isolated HTTPS origin');
     return u;
   };
+  o.runnerMode ??= 'MANAGED';
+  if (
+    !['r2', 'kv'].includes(o.artifactStorage ?? 'r2') ||
+    (o.artifactStorage === 'kv' && o.runnerMode === 'MANAGED')
+  )
+    throw new Error('Invalid artifact storage for runner profile');
+  const actions = o.runnerMode === 'ACTIONS_VM';
   const publicUrl = origin(o.origin),
-    runner = origin(o.runnerEndpoint);
-  if (publicUrl.port || publicUrl.origin === runner.origin)
+    runner = actions ? null : origin(o.runnerEndpoint);
+  if (publicUrl.port || publicUrl.origin === runner?.origin)
     throw new Error('Workspace requires a separate origin and isolated runner');
   if (
     /(^|\.)workers\.dev$/.test(publicUrl.hostname) &&
-    (o.runnerMode !== 'OWNER_TUNNEL' ||
+    (!['OWNER_TUNNEL', 'ACTIONS_VM'].includes(o.runnerMode) ||
       typeof o.workersSubdomain !== 'string' ||
       !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(o.workersSubdomain) ||
       publicUrl.hostname !==
@@ -83,14 +90,28 @@ export function validateWorkspace(options) {
       'Workspace workers.dev origin must match its exact Worker and account subdomain in owner tunnel mode',
     );
   o.origin = publicUrl.origin;
-  o.runnerEndpoint = runner.origin;
-  o.runnerMode ??= 'MANAGED';
+  if (runner) o.runnerEndpoint = runner.origin;
   if (
-    !['MANAGED', 'OWNER_TUNNEL'].includes(o.runnerMode) ||
+    actions &&
+    (o.runnerEndpoint !== undefined ||
+      !/^[\w.-]+\/[\w.-]+$/.test(o.runnerRepository ?? '') ||
+      !/^[1-9]\d*$/.test(o.runnerRepositoryId ?? '') ||
+      !/^[A-Za-z0-9][\w./-]{0,100}$/.test(o.runnerRef ?? '') ||
+      o.runnerRef.includes('..') ||
+      !/^[a-f0-9]{40}$/.test(o.runnerSha ?? '') ||
+      !/^[1-9]\d*$/.test(o.runnerInstallationId ?? ''))
+  )
+    throw new Error(
+      'Invalid Actions runner identity; no tunnel endpoint is permitted',
+    );
+  if (
+    !['MANAGED', 'OWNER_TUNNEL', 'ACTIONS_VM'].includes(o.runnerMode) ||
     !(
-      o.runnerMode === 'MANAGED'
-        ? /^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/
-        : /^docker-local@sha256:[a-f0-9]{64}$/
+      actions
+        ? /^qemu-vm@sha256:[a-f0-9]{64}$/
+        : o.runnerMode === 'MANAGED'
+          ? /^registry\.cloudflare\.com\/[A-Za-z0-9/_-]+@sha256:[a-f0-9]{64}$/
+          : /^docker-local@sha256:[a-f0-9]{64}$/
     ).test(o.runnerImage) ||
     (o.runnerMode === 'OWNER_TUNNEL' &&
       !/^https:\/\/[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.trycloudflare\.com$/.test(
@@ -102,21 +123,23 @@ export function validateWorkspace(options) {
 }
 const fingerprint = (target) =>
   createHash('sha256').update(JSON.stringify(target)).digest('hex');
-const resourceList = (names) => [
+const resourceList = (names, target) => [
   { kind: 'worker', name: names.worker },
   { kind: 'workflow', name: names.evaluator },
   { kind: 'workflow', name: names.organizationEvaluator },
   { kind: 'database', name: names.database },
   { kind: 'database', name: names.organizationDatabase },
   { kind: 'kv', name: names.kv },
-  { kind: 'bucket', name: names.bucket },
+  ...(target.artifactStorage === 'kv'
+    ? []
+    : [{ kind: 'bucket', name: names.bucket }]),
 ];
 function validateInventory(resources, inventory, known, target, journal) {
   if (
     known.some(
       (r) =>
         r.origin === target.origin ||
-        r.origin === target.runnerEndpoint ||
+        (target.runnerEndpoint && r.origin === target.runnerEndpoint) ||
         resources.some((w) => r.name === w.name),
     )
   )
@@ -150,8 +173,10 @@ async function inspect(options, adapters, journal) {
   if (membership?.state !== 'active' || membership.role !== 'admin')
     throw new Error('Active GitHub organization admin membership required');
   const known = await adapters.knownResources(),
-    inventory = await adapters.inventory(target.accountId);
-  const resources = resourceList(names);
+    inventory = await adapters.inventory(target.accountId, {
+      includeR2: target.artifactStorage !== 'kv',
+    });
+  const resources = resourceList(names, target);
   validateInventory(resources, inventory, known, target, journal);
   return { target, names, actor: actor.login, resources };
 }
@@ -163,7 +188,18 @@ export async function planWorkspace(options, adapters) {
     actor: p.actor,
     origin: p.target.origin,
     resources: p.resources,
-    runner: { endpoint: p.target.runnerEndpoint, image: p.target.runnerImage },
+    runner:
+      p.target.runnerMode === 'ACTIONS_VM'
+        ? {
+            backend: 'actions-vm',
+            repository: p.target.runnerRepository,
+            repositoryId: p.target.runnerRepositoryId,
+            ref: p.target.runnerRef,
+            sha: p.target.runnerSha,
+            installationId: p.target.runnerInstallationId,
+            image: p.target.runnerImage,
+          }
+        : { endpoint: p.target.runnerEndpoint, image: p.target.runnerImage },
     provider: { name: p.target.provider, model: p.target.model },
     mode: 'PLAN',
     deployment:
@@ -246,7 +282,8 @@ function configEnvironment(target, names, resources) {
     PRODUCTION_DATABASE_ID: resources[names.database]?.id,
     PRODUCTION_ORG_DATABASE_ID: resources[names.organizationDatabase]?.id,
     PRODUCTION_ARTIFACT_KV_ID: resources[names.kv]?.id,
-    PRODUCTION_ARTIFACT_BUCKET: names.bucket,
+    PRODUCTION_ARTIFACT_BUCKET:
+      target.artifactStorage === 'kv' ? undefined : names.bucket,
     PUBLIC_ORIGIN: target.origin,
     PRODUCTION_ORG_PUBLIC_ORIGIN: target.origin,
     PRODUCTION_ORG_NAME: target.organization,
@@ -255,6 +292,11 @@ function configEnvironment(target, names, resources) {
     PRODUCTION_RUNNER_ENDPOINT: target.runnerEndpoint,
     PRODUCTION_RUNNER_IMAGE: target.runnerImage,
     PRODUCTION_RUNNER_MODE: target.runnerMode,
+    PRODUCTION_RUNNER_REPOSITORY: target.runnerRepository,
+    PRODUCTION_RUNNER_REPOSITORY_ID: target.runnerRepositoryId,
+    PRODUCTION_RUNNER_REF: target.runnerRef,
+    PRODUCTION_RUNNER_SHA: target.runnerSha,
+    PRODUCTION_RUNNER_INSTALLATION_ID: target.runnerInstallationId,
   };
 }
 export async function provisionWorkspace(
@@ -264,11 +306,11 @@ export async function provisionWorkspace(
 ) {
   const { target } = validateWorkspace(options);
   if (
-    target.provider === 'callmissed' &&
+    target.provider !== 'cloudflare' &&
     (!providerKey || providerKey.length < 16 || providerKey.length > 1000)
   )
     throw new Error(
-      'Callmissed requires an explicit fresh private provider-key file',
+      'External AI providers require an explicit fresh private provider-key file',
     );
   if (deploy) await adapters.approvedRuntime();
   // Authorize and validate the remote names before creating any private state.
@@ -286,11 +328,11 @@ export async function provisionWorkspace(
           'ORG_SECURITY_TOKEN',
           'ORG_VAULT_KEY',
           'ADMIN_TOKEN',
-          'RUNNER_TUNNEL_KEY',
+          ...(target.runnerMode === 'ACTIONS_VM' ? [] : ['RUNNER_TUNNEL_KEY']),
         ].map((k) => [k, randomBytes(32).toString('hex')]),
       );
-      if (target.provider === 'callmissed')
-        secrets.CALLMISSED_API_KEY = providerKey;
+      if (target.provider !== 'cloudflare')
+        secrets[target.provider.toUpperCase() + '_API_KEY'] = providerKey;
       journal = {
         version: 1,
         target,
@@ -339,6 +381,7 @@ export async function provisionWorkspace(
           resource.kind,
           resource.name,
           files.config,
+          { includeR2: target.artifactStorage !== 'kv' },
         );
         if (
           created?.name !== resource.name ||
@@ -378,7 +421,9 @@ export async function provisionWorkspace(
       await stage(`secret:${name}`, async () => {
         await adapters.secret(name, value, files.config);
         if (!journal.resources[p.names.worker]) {
-          const inventory = await adapters.inventory(target.accountId);
+          const inventory = await adapters.inventory(target.accountId, {
+            includeR2: target.artifactStorage !== 'kv',
+          });
           const matches = inventory.worker.filter(
             (r) => r.name === p.names.worker,
           );
@@ -521,7 +566,7 @@ export async function verifyWorkspace(
         target.origin,
         journal.secrets.ORG_ADMIN_TOKEN,
       );
-      // The authenticated Worker validates both runner HMAC response signatures before returning COMPLETED.
+      // The authenticated Worker validates runner HMAC or exact Actions OIDC identity before returning COMPLETED.
       if (
         diagnostic?.synthetic !== true ||
         diagnostic.status !== 'COMPLETED' ||
@@ -543,6 +588,7 @@ export async function verifyWorkspace(
       } catch {
         /* Provider unavailability is visible and cannot become functional evidence. */
       }
+      const verifiedAt = Date.now();
       const record = {
         reference: randomBytes(16).toString('hex'),
         connection: 'VERIFIED',
@@ -555,9 +601,12 @@ export async function verifyWorkspace(
         installationId: expected.installationId,
         repositories: expected.repositories,
         actor: actor.login,
-        at: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-        runner: 'SIGNED_SYNTHETIC_COMPLETED',
+        at: new Date(verifiedAt).toISOString(),
+        expiresAt: new Date(verifiedAt + 15 * 60 * 1000).toISOString(),
+        runner:
+          target.runnerMode === 'ACTIONS_VM'
+            ? 'OIDC_SYNTHETIC_COMPLETED'
+            : 'SIGNED_SYNTHETIC_COMPLETED',
         provider,
         functionalEvaluation: 'UNVERIFIED',
       };
@@ -886,7 +935,13 @@ export function createAdapters({
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
       redirect: 'error',
-      signal: AbortSignal.timeout(method === 'POST' ? 120000 : 30000),
+      signal: AbortSignal.timeout(
+        method === 'POST' && path === '/api/organization/runner-check'
+          ? 30 * 60000
+          : method === 'POST'
+            ? 120000
+            : 30000,
+      ),
     });
     if (!response.ok)
       throw new Error('Authenticated workspace API unavailable');
@@ -943,13 +998,13 @@ export function createAdapters({
       }
       return resources;
     },
-    inventory: async (expectedAccount) => {
+    inventory: async (expectedAccount, { includeR2 = true } = {}) => {
       if (expectedAccount !== accountId)
         throw new Error('Cloudflare account identity mismatch');
       const [database, kv, bucket, worker, workflow] = await Promise.all([
         list('d1/database'),
         list('storage/kv/namespaces'),
-        list('r2/buckets', 'buckets'),
+        includeR2 ? list('r2/buckets', 'buckets') : Promise.resolve([]),
         list('workers/scripts'),
         list('workflows'),
       ]);
@@ -961,7 +1016,7 @@ export function createAdapters({
         workflow: workflow.map((w) => ({ name: w.name, id: w.id ?? w.name })),
       };
     },
-    createResource: async (kind, name, config) => {
+    createResource: async (kind, name, config, { includeR2 = true } = {}) => {
       const args =
         kind === 'database'
           ? ['d1', 'create', name, '--update-config=false']
@@ -972,7 +1027,7 @@ export function createAdapters({
               : null;
       if (!args) throw new Error('Unsupported fresh resource type');
       await wrangler([...args, '--config', config]);
-      const inventory = await adapters.inventory(accountId),
+      const inventory = await adapters.inventory(accountId, { includeR2 }),
         matches = inventory[kind].filter((r) => r.name === name);
       if (matches.length !== 1)
         throw new Error('Fresh resource cannot be identified');
@@ -1076,10 +1131,16 @@ export async function main(
     'runner-endpoint',
     'runner-image',
     'runner-mode',
+    'runner-repository',
+    'runner-repository-id',
+    'runner-ref',
+    'runner-sha',
+    'runner-installation-id',
     'workers-subdomain',
     'provider',
     'model',
     'provider-key-file',
+    'artifact-storage',
     'app-id',
     'app-slug',
     'installation-id',
@@ -1180,7 +1241,17 @@ export async function main(
       values['workers-subdomain'] ?? env.CLOUDFLARE_WORKERS_SUBDOMAIN,
     runnerMode:
       values['runner-mode'] ?? env.PRODUCTION_RUNNER_MODE ?? 'MANAGED',
+    runnerRepository:
+      values['runner-repository'] ?? env.PRODUCTION_RUNNER_REPOSITORY,
+    runnerRepositoryId:
+      values['runner-repository-id'] ?? env.PRODUCTION_RUNNER_REPOSITORY_ID,
+    runnerRef: values['runner-ref'] ?? env.PRODUCTION_RUNNER_REF,
+    runnerSha: values['runner-sha'] ?? env.PRODUCTION_RUNNER_SHA,
+    runnerInstallationId:
+      values['runner-installation-id'] ?? env.PRODUCTION_RUNNER_INSTALLATION_ID,
     provider: values.provider ?? env.PRODUCTION_AI_PROVIDER,
+    artifactStorage:
+      values['artifact-storage'] ?? env.PRODUCTION_ARTIFACT_STORAGE,
     model: values.model ?? env.PRODUCTION_AI_MODEL,
   };
   if (verify)

@@ -1,3 +1,5 @@
+import { providerConfigured, providerHasKey } from './external-review';
+import { selectReviewModel } from './review-routing';
 import {
   retirementStatus,
   retireOrganization,
@@ -771,24 +773,29 @@ export async function organization(
       runner: {
         enabled:
           env.RUNNER_ENABLED === 'true' &&
-          !!(env.RUNNER || env.RUNNER_ENDPOINT),
+          !!(
+            env.RUNNER ||
+            env.RUNNER_ENDPOINT ||
+            env.RUNNER_BACKEND === 'actions-vm'
+          ),
         reason:
-          env.RUNNER_ENABLED === 'true' && (env.RUNNER || env.RUNNER_ENDPOINT)
-            ? env.RUNNER_ENDPOINT
-              ? 'Development Docker runner through authenticated tunnel. Availability depends on the organizer machine.'
-              : 'Available'
+          env.RUNNER_ENABLED === 'true' &&
+          (env.RUNNER ||
+            env.RUNNER_ENDPOINT ||
+            env.RUNNER_BACKEND === 'actions-vm')
+            ? env.RUNNER_BACKEND === 'actions-vm'
+              ? 'GitHub Actions with isolated QEMU guests. Queue and runtime verification required.'
+              : env.RUNNER_ENDPOINT
+                ? 'Development Docker runner through authenticated tunnel. Availability depends on the organizer machine.'
+                : 'Available'
             : 'Isolated execution deployment is disabled.',
       },
       ai: {
         provider: env.AI_PROVIDER ?? 'cloudflare',
-        model:
-          env.AI_PROVIDER === 'callmissed'
-            ? env.CALLMISSED_MODEL
-            : env.AI_MODEL,
-        enabled:
-          env.AI_PROVIDER === 'callmissed'
-            ? !!env.CALLMISSED_API_KEY && !!env.CALLMISSED_MODEL
-            : !!env.AI && !!env.AI_MODEL,
+        model: selectReviewModel(env, env.AI_PROVIDER ?? 'cloudflare', {
+          depth: 'STANDARD',
+        }).model,
+        enabled: providerConfigured(env),
       },
       app: row
         ? {
@@ -998,8 +1005,8 @@ export async function organization(
     };
     const evidence = objective(demoContract, context);
     const slot =
-      env.AI_PROVIDER === 'callmissed' && env.CALLMISSED_API_KEY
-        ? await acquireReviewer(env.ORG_DB, 'callmissed')
+      env.AI_PROVIDER !== 'cloudflare' && providerHasKey(env)
+        ? await acquireReviewer(env.ORG_DB, env.AI_PROVIDER ?? 'cloudflare')
         : undefined;
     if (slot === null) return json({ error: 'REVIEWER_CAPACITY_BUSY' }, 429);
     let reviewed;
