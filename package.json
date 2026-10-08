@@ -23,7 +23,12 @@
     "runner:smoke": "node scripts/local-runner-smoke.mjs",
     "qa:docker": "node scripts/hackathon-docker-rehearsal.mjs",
     "acceptance:update": "node scripts/acceptance-report.mjs",
-    "acceptance:check": "node scripts/acceptance-report.mjs --check"
+    "acceptance:check": "node scripts/acceptance-report.mjs --check",
+    "organization:setup": "node scripts/organization-workspace.mjs",
+    "organization:verify": "node scripts/organization-workspace.mjs verify",
+    "organization:retire": "node scripts/organization-workspace.mjs retire",
+    "runner:vm:bundle": "esbuild src/qemu-vm.ts --bundle --platform=node --format=esm --outfile=vm-runner/qemu-vm.mjs",
+    "runner:vm:smoke": "npm run runner:vm:bundle && node vm-runner/smoke.mjs"
   },
   "dependencies": {
     "jose": "6.2.12",
@@ -44,6 +49,6 @@
   },
   "overrides": {
     "undici": "7.29.1",
-    "sharp": "0.35.4"
+    "sharp": "0.35.5"
   }
 }

@@ -1,12 +1,19 @@
 # Local GitHub App test mode. Default development supports public PR reviews.
 PREVIEW_TESTING=false
 DEMO_MODE=false
+ORG_NAME=Doom-Forge
 ADMIN_TOKEN=replace-with-random-secret-at-least-32-characters
 GITHUB_WEBHOOK_SECRET=replace-with-a-separate-random-secret
 GITHUB_APP_ID=
 # PKCS8 PEM with escaped newlines; never commit real keys.
 GITHUB_APP_PRIVATE_KEY=
 # Backend only. Configure through Wrangler secrets; never expose in browser assets.
-AI_PROVIDER=callmissed
+AI_PROVIDER=gemini
 CALLMISSED_MODEL=kimi-k2.6
 CALLMISSED_API_KEY=
+
+# Select AI_PROVIDER=gemini or groq; keys are backend-only secrets.
+GEMINI_MODEL=gemini-3.1-flash-lite
+GEMINI_API_KEY=
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_API_KEY=

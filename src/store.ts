@@ -1,3 +1,4 @@
+import { organizationActive } from './organization-retirement';
 import { canTransition, type State, type Contract } from './domain';
 import type { Env } from './env';
 export interface Run {
@@ -43,6 +44,7 @@ export async function transition(
   return results[0]!.meta.changes > 0;
 }
 export async function isCurrent(env: Env, run: Run) {
+  if (!(await organizationActive(env))) return false;
   const s = await env.DB.prepare(
     'SELECT latest_run_id,closed FROM submissions WHERE repository_id=? AND pr_number=?',
   )
@@ -69,10 +71,12 @@ export async function isCurrent(env: Env, run: Run) {
   return !!eligible;
 }
 export async function dispatch(env: Env, runId: string) {
+  if (!(await organizationActive(env))) return;
   const run = await getRun(env, runId);
   if (!run || run.state !== 'QUEUED') return;
   // Status outages cannot prevent asynchronous evaluation dispatch.
   await (await import('./github-checks')).publish(env, run).catch(() => {});
+  if (!(await organizationActive(env))) return;
   try {
     await env.EVALUATOR.create({ id: runId, params: { runId } });
   } catch {
@@ -87,6 +91,7 @@ export async function dispatch(env: Env, runId: string) {
     .run();
 }
 export async function reconcile(env: Env) {
+  if (!(await organizationActive(env))) return;
   const rows = await env.DB.prepare(
     "SELECT o.run_id FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE o.dispatched_at IS NULL AND e.state='QUEUED' ORDER BY o.created_at DESC,o.run_id LIMIT 5",
   ).all<{ run_id: string }>();

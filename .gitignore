@@ -10,3 +10,7 @@ test-results/
 playwright-report/
 
 .DS_Store
+
+# Generated trusted VM bundle/images
+vm-runner/qemu-vm.mjs
+vm-runner/images/

@@ -4,6 +4,7 @@ import {
   readFileSync,
   rmSync,
   copyFileSync,
+  writeFileSync,
   existsSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,10 +25,19 @@ const inputs = {
   PRODUCTION_RUNNER_IMAGE:
     'registry.cloudflare.com/account/runner@sha256:' + 'a'.repeat(64),
 };
-function generate(overrides: Record<string, string | undefined> = {}) {
+function generate(
+  overrides: Record<string, string | undefined> = {},
+  protectedRunner?: string,
+) {
   const directory = mkdtempSync(join(tmpdir(), 'judge-production-config-'));
   try {
     copyFileSync('wrangler.jsonc', join(directory, 'wrangler.jsonc'));
+    if (protectedRunner) {
+      const path = join(directory, 'wrangler.jsonc');
+      const config = parse(readFileSync(path, 'utf8'));
+      config.vars = { ...config.vars, RUNNER_ENDPOINT: protectedRunner };
+      writeFileSync(path, JSON.stringify(config));
+    }
     const env = {
       PATH: process.env.PATH,
       ...inputs,
@@ -40,17 +50,38 @@ function generate(overrides: Record<string, string | undefined> = {}) {
       [resolve('scripts/production-config.mjs')],
       { cwd: directory, env, encoding: 'utf8' },
     );
-    const path = join(directory, '.wrangler/production.json');
+    const path = join(
+      directory,
+      overrides.PRODUCTION_CONFIG_PATH ?? '.wrangler/production.json',
+    );
     return {
       status: result.status,
       stderr: result.stderr,
-      config: existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : null,
+      config:
+        result.status === 0 && existsSync(path)
+          ? JSON.parse(readFileSync(path, 'utf8'))
+          : null,
     };
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
 }
 describe('production prerequisites and isolation', () => {
+  it('rejects protected runner reuse in direct workspace configuration', () => {
+    const endpoint = 'https://protected-runner.example.org';
+    const result = generate(
+      {
+        PRODUCTION_WORKSPACE_NAME: 'event-alpha',
+        PRODUCTION_ARTIFACT_BUCKET: 'judge-c2c-event-alpha-artifacts',
+        PRODUCTION_RUNNER_ENDPOINT: endpoint,
+      },
+      endpoint,
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain(
+      'PRODUCTION_RUNNER_ENDPOINT must be a separate HTTPS production origin',
+    );
+  });
   it('supports an explicit owner tunnel without granting native or foreign previews production access', () => {
     const owner = {
       PRODUCTION_RUNNER_MODE: 'OWNER_TUNNEL',
@@ -246,4 +277,86 @@ describe('production prerequisites and isolation', () => {
       'https://runner.example.org:8443',
     );
   });
+});
+
+describe('arbitrary workspace configuration', () => {
+  it('uses separate workspace names and resolves source paths from a nested private config', () => {
+    for (const workspace of ['event-alpha', 'event-beta']) {
+      const result = generate({
+        PRODUCTION_WORKSPACE_NAME: workspace,
+        PRODUCTION_CONFIG_PATH: `.wrangler/workspaces/${workspace}/config.json`,
+      });
+      expect(result.status).toBe(0);
+      expect(result.config.name).toBe(`judge-c2c-${workspace}`);
+      expect(result.config.main).toBe('../../../src/index.ts');
+      expect(result.config.assets.directory).toBe('../../../public');
+      expect(
+        result.config.d1_databases.map(
+          (d: { database_name: string }) => d.database_name,
+        ),
+      ).toEqual([
+        `judge-c2c-${workspace}-evaluations`,
+        `judge-c2c-${workspace}-organization`,
+      ]);
+      expect(result.config.d1_databases[0].migrations_dir).toBe(
+        '../../../migrations',
+      );
+      expect(
+        result.config.workflows.map((w: { name: string }) => w.name),
+      ).toEqual([
+        `judge-c2c-${workspace}-evaluator`,
+        `judge-c2c-${workspace}-organization-evaluator`,
+      ]);
+    }
+  });
+  it('rejects reserved workspace names and unsafe output paths before writing', () => {
+    for (const workspace of [
+      'production',
+      'local',
+      'review',
+      'preview',
+      'test',
+      '../evil',
+      'Event',
+      'bad--name',
+    ]) {
+      expect(
+        generate({ PRODUCTION_WORKSPACE_NAME: workspace }).status,
+      ).not.toBe(0);
+    }
+    for (const output of [
+      'wrangler.jsonc',
+      '.wrangler/production.json',
+      '.wrangler/../public/config.json',
+    ]) {
+      expect(
+        generate({
+          PRODUCTION_WORKSPACE_NAME: 'event-alpha',
+          PRODUCTION_CONFIG_PATH: output,
+        }).status,
+      ).not.toBe(0);
+    }
+  });
+});
+
+it('generates explicit Actions VM configuration without a tunnel or copied secrets', () => {
+  const result = generate({
+    PRODUCTION_RUNNER_MODE: 'ACTIONS_VM',
+    PRODUCTION_RUNNER_ENDPOINT: undefined,
+    PRODUCTION_RUNNER_IMAGE: 'qemu-vm@sha256:' + 'a'.repeat(64),
+    PRODUCTION_RUNNER_REPOSITORY: 'daksh1403/judge-c2c',
+    PRODUCTION_RUNNER_REPOSITORY_ID: '1400414482',
+    PRODUCTION_RUNNER_REF: 'main',
+    PRODUCTION_RUNNER_SHA: 'b'.repeat(40),
+    PRODUCTION_RUNNER_INSTALLATION_ID: '123',
+    PRODUCTION_AI_PROVIDER: 'gemini',
+    PRODUCTION_AI_MODEL: 'gemini-2.5-flash',
+  });
+  expect(result.status).toBe(0);
+  expect(result.config.vars).toMatchObject({
+    RUNNER_BACKEND: 'actions-vm',
+    RUNNER_ACTIONS_REPOSITORY: 'daksh1403/judge-c2c',
+    GEMINI_MODEL: 'gemini-2.5-flash',
+  });
+  expect(result.config.vars.RUNNER_ENDPOINT).toBeUndefined();
 });

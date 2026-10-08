@@ -1,3 +1,4 @@
+import { actionsEvaluate } from './actions-runner';
 import { routeExecution, frozenExecutionContext } from './execution-routing';
 import { z } from 'zod';
 import {
@@ -237,7 +238,12 @@ export async function runObjective(
 ) {
   if (!c.execution.runner) return evidence;
   const originalPolicy = c.execution.runner;
-  if ((!env.RUNNER && !env.RUNNER_ENDPOINT) || env.RUNNER_ENABLED !== 'true')
+  if (
+    (!env.RUNNER &&
+      !env.RUNNER_ENDPOINT &&
+      env.RUNNER_BACKEND !== 'actions-vm') ||
+    env.RUNNER_ENABLED !== 'true'
+  )
     return evidence.map((e) =>
       e.criterionId &&
       c.requirements.some((r) =>
@@ -323,7 +329,12 @@ export async function runObjective(
       files: await snapshot(github, c, commit),
     };
     const hash = await digest(canonical(request));
-    const adapter = env.RUNNER_ENDPOINT ? 'signed-tunnel' : 'durable-object';
+    const adapter =
+      env.RUNNER_BACKEND === 'actions-vm'
+        ? 'actions-vm'
+        : env.RUNNER_ENDPOINT
+          ? 'signed-tunnel'
+          : 'durable-object';
     const imageDigest = [policy.image, env.RUNNER_IMAGE_URI ?? ''].join('|');
     const key = await executionCacheKey(
       repositoryId,
@@ -411,16 +422,17 @@ export async function runObjective(
       env.RUNNER!.idFromName(run.id + '-' + commit + '-' + crypto.randomUUID()),
     ) as unknown as RunnerStub;
     const authenticated = validateRunnerResult(
-      env.RUNNER_ENDPOINT
-        ? await tunnelEvaluate(env, request)
-        : await stub.evaluate(request),
+      env.RUNNER_BACKEND === 'actions-vm'
+        ? await actionsEvaluate(env, request, false, assertCurrent)
+        : env.RUNNER_ENDPOINT
+          ? await tunnelEvaluate(env, request)
+          : await stub.evaluate(request),
       request,
       hash,
     );
     const original = canonical(authenticated);
     const stored = redact(original);
     const result = runnerResultSchema.parse(JSON.parse(stored));
-    await assertCurrent();
     const requestSummary = canonical(await safeRunnerRequest(request));
     const canStore =
       cacheAllowed &&
@@ -443,9 +455,12 @@ export async function runObjective(
         attemptStatus,
       )
       .run();
+    // Dispatched execution cannot be recalled. Keep its authenticated, redacted
+    // result on the immutable attempt before fencing every subsequent action.
+    await assertCurrent();
     if (canStore) {
       await env.DB.prepare(
-        'INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) VALUES(?,?,?,?,?,?,?,?)',
+        "INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) SELECT ?,?,?,?,?,?,?,? FROM evaluations e JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE e.id=? AND e.state='CHECKING' AND s.latest_run_id=e.id AND s.head_sha=e.head_sha AND s.closed=0",
       )
         .bind(
           repositoryId,
@@ -456,6 +471,7 @@ export async function runObjective(
           resultHash,
           requestSummary,
           stored,
+          run.id,
         )
         .run();
     }

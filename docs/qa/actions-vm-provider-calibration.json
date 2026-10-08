@@ -1,0 +1,312 @@
+{
+  "synthetic": true,
+  "scope": "Actual provider calls with organizer-authored source-only data; not deployed judging or event-capacity proof.",
+  "initialConnectivity": {
+    "synthetic": true,
+    "scope": "Direct adapter connectivity only; not deployed judging calibration.",
+    "date": "2026-10-07T17:50:55.151Z",
+    "results": [
+      {
+        "provider": "gemini",
+        "requestedModel": "gemini-2.5-flash",
+        "status": "UNAVAILABLE",
+        "error": "GEMINI_HTTP_404"
+      },
+      {
+        "provider": "groq",
+        "requestedModel": "llama-3.3-70b-versatile",
+        "status": "UNAVAILABLE",
+        "error": "GROQ_HTTP_404"
+      }
+    ]
+  },
+  "workingConnectivity": [
+    {
+      "provider": "gemini",
+      "requestedModel": "gemini-3.1-flash-lite",
+      "resolvedModel": "gemini-3.1-flash-lite",
+      "status": "PASS",
+      "usage": {
+        "prompt_tokens": 48,
+        "completion_tokens": 11,
+        "total_tokens": 59
+      }
+    },
+    {
+      "provider": "groq",
+      "requestedModel": "openai/gpt-oss-120b",
+      "resolvedModel": "openai/gpt-oss-120b",
+      "status": "PASS",
+      "usage": {
+        "queue_time": 0.505092211,
+        "prompt_tokens": 147,
+        "prompt_time": 0.006234434,
+        "completion_tokens": 91,
+        "completion_time": 0.190199441,
+        "total_tokens": 238,
+        "total_time": 0.196433875,
+        "completion_tokens_details": {
+          "reasoning_tokens": 73
+        }
+      }
+    }
+  ],
+  "reviewCalibration": {
+    "synthetic": true,
+    "scope": "Actual provider calls using organizer-authored source-only fixtures; not deployed execution or event certification.",
+    "date": "2026-10-07T18:01:35.543Z",
+    "results": [
+      {
+        "provider": "gemini",
+        "model": "gemini-3.1-flash-lite",
+        "cases": [
+          {
+            "case": "absent",
+            "reviewStatus": "COMPLETED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "FAIL"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "PASS"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1,
+            "usage": {
+              "prompt_tokens": 3020,
+              "completion_tokens": 866,
+              "total_tokens": 3886
+            }
+          },
+          {
+            "case": "reference",
+            "reviewStatus": "COMPLETED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "PASS"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "PASS"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1,
+            "usage": {
+              "prompt_tokens": 3020,
+              "completion_tokens": 990,
+              "total_tokens": 4010
+            }
+          },
+          {
+            "case": "protected-file",
+            "reviewStatus": "COMPLETED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "PASS"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "FAIL"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1,
+            "usage": {
+              "prompt_tokens": 3074,
+              "completion_tokens": 1047,
+              "total_tokens": 4121
+            }
+          }
+        ]
+      },
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-120b",
+        "cases": [
+          {
+            "case": "absent",
+            "reviewStatus": "COMPLETED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "FAIL"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "PASS"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1,
+            "usage": {
+              "queue_time": 0.481155996,
+              "prompt_tokens": 3058,
+              "prompt_time": 0.508656757,
+              "completion_tokens": 2084,
+              "completion_time": 4.374534522,
+              "total_tokens": 5142,
+              "total_time": 4.883191279,
+              "completion_tokens_details": {
+                "reasoning_tokens": 1455
+              }
+            }
+          },
+          {
+            "case": "reference",
+            "reviewStatus": "COMPLETED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "PASS"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "PASS"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1,
+            "usage": {
+              "queue_time": 0.395066268,
+              "prompt_tokens": 3058,
+              "prompt_time": 0.151276545,
+              "completion_tokens": 1685,
+              "completion_time": 3.550520582,
+              "total_tokens": 4743,
+              "total_time": 3.701797127,
+              "completion_tokens_details": {
+                "reasoning_tokens": 1017
+              }
+            }
+          },
+          {
+            "case": "protected-file",
+            "reviewStatus": "FAILED",
+            "assessments": [
+              {
+                "criterionId": "future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "past-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "criterionId": "docs-heading",
+                "status": "PASS"
+              }
+            ],
+            "objectivePolicy": [
+              {
+                "id": "policy-2",
+                "status": "FAIL"
+              },
+              {
+                "id": "criterion-future-time",
+                "status": "UNVERIFIED"
+              },
+              {
+                "id": "criterion-past-time",
+                "status": "UNVERIFIED"
+              }
+            ],
+            "attempts": 1
+          }
+        ]
+      }
+    ]
+  },
+  "secretProvisioning": "Both key names verified on existing production Worker; values excluded.",
+  "productionProviderSwitched": false
+}

@@ -1,3 +1,7 @@
+import {
+  organizationActive,
+  requireOrganizationActive,
+} from './organization-retirement';
 import type { Env } from './env';
 import { getRun, parseContract, type Run } from './store';
 import { GitHub } from './github';
@@ -67,6 +71,7 @@ export function checkBody(
   return body;
 }
 export async function publish(env: Env, input: Run) {
+  if (!(await organizationActive(env))) return;
   // Re-read run state before publishing; workflow progress stages are sequential.
   const run = await getRun(env, input.id);
   if (!run) return;
@@ -90,6 +95,7 @@ export async function publish(env: Env, input: Run) {
       checkId =
         existing.check_runs.find((x) => x.external_id === run.id)?.id ?? null;
     }
+    await requireOrganizationActive(env);
     const result = await github.api<{ id: number }>(
       `/repos/${c.repository.fullName}/check-runs${checkId ? '/' + checkId : ''}`,
       { method: checkId ? 'PATCH' : 'POST', body: JSON.stringify(body) },

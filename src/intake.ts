@@ -1,3 +1,4 @@
+import { organizationActive } from './organization-retirement';
 import { z } from 'zod';
 import {
   canonical,
@@ -63,6 +64,8 @@ export async function acceptPullRequest(
   delivery: string,
   payloadHash: string,
 ) {
+  if (!(await organizationActive(env)))
+    return Response.json({ error: 'ORGANIZATION_RETIRED' }, { status: 409 });
   const event = 'pull_request';
   const parsed = eventSchema.safeParse(raw);
   if (!parsed.success)

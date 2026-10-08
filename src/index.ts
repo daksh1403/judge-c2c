@@ -1,3 +1,4 @@
+import { actionsBroker } from './actions-runner';
 import { z } from 'zod';
 import type { Env } from './env';
 import { organization, maintainOrganization } from './organization';
@@ -34,6 +35,8 @@ export default {
                 { error: 'ORGANIZATION_NOT_CONFIGURED' },
                 { status: 503 },
               );
+      else if (url.pathname.startsWith('/api/runner/actions/'))
+        response = await actionsBroker(request, env);
       else if (url.pathname === '/health')
         response = Response.json({
           status: 'ok',

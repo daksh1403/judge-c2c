@@ -8,6 +8,8 @@ import { EvaluationWorkflow } from '../src/workflow';
 import { GitHub } from '../src/github';
 import * as review from '../src/evaluate';
 import { acquireReviewer, releaseReviewer } from '../src/reviewer-capacity';
+import * as capacity from '../src/reviewer-capacity';
+import * as store from '../src/store';
 import type { Env } from '../src/env';
 import type { WorkflowStep, WorkflowEvent } from 'cloudflare:workers';
 const id = 'c'.repeat(64),
@@ -17,6 +19,102 @@ const id = 'c'.repeat(64),
     passThroughOnException() {},
   } as unknown as ExecutionContext;
 afterEach(() => vi.restoreAllMocks());
+
+it.each(['renewal', 'transition'])(
+  'does not start AI when retirement intervenes during reviewer %s',
+  async (boundary) => {
+    const mf = new Miniflare({
+      modules: true,
+      script: 'export default{}',
+      d1Databases: ['DB'],
+      compatibilityDate: '2026-08-01',
+    });
+    try {
+      const db = (await mf.getD1Database('DB')) as unknown as D1Database;
+      await seed(db);
+      vi.spyOn(GitHub, 'installation').mockResolvedValue({
+        compare: async () => [],
+        file: async () => '## Scheduling',
+        api: async (path: string) =>
+          path.includes('/pulls/')
+            ? { title: 'Fixture', body: '', head: { sha: head }, state: 'open' }
+            : path.includes('check-runs?')
+              ? { check_runs: [] }
+              : path.includes('check-runs')
+                ? { id: 7 }
+                : { commits: [] },
+      } as unknown as GitHub);
+      const retire = async () => {
+        await db.batch([
+          db.prepare(
+            "UPDATE organization_retirement SET state='RETIRING' WHERE id=1",
+          ),
+          db
+            .prepare("UPDATE evaluations SET state='SUPERSEDED' WHERE id=?")
+            .bind(id),
+        ]);
+      };
+      if (boundary === 'renewal') {
+        const original = capacity.renewReviewer;
+        vi.spyOn(capacity, 'renewReviewer').mockImplementation(
+          async (...args) => {
+            await retire();
+            return original(...args);
+          },
+        );
+      } else {
+        const original = store.transition;
+        vi.spyOn(store, 'transition').mockImplementation(async (...args) => {
+          if (args[2] === 'CHECKING' && args[3] === 'REVIEWING') await retire();
+          return original(...args);
+        });
+      }
+      const ai = vi.spyOn(review, 'aiReview');
+      const env = {
+        DB: db,
+        ENVIRONMENT: 'local',
+        EVALUATION_DETAILS_KIND: 'organization',
+        AI_PROVIDER: 'callmissed',
+        CALLMISSED_API_KEY: 'fixture-key',
+      } as Env;
+      const step = {
+        do: async (
+          _name: string,
+          options: unknown,
+          callback?: () => unknown,
+        ) => (typeof options === 'function' ? options() : callback!()),
+      } as unknown as WorkflowStep;
+      await new EvaluationWorkflow(ctx, env).run(
+        { payload: { runId: id } } as WorkflowEvent<{ runId: string }>,
+        step,
+      );
+      expect(ai).not.toHaveBeenCalled();
+      expect(
+        await db
+          .prepare('SELECT state,report FROM evaluations WHERE id=?')
+          .bind(id)
+          .first(),
+      ).toEqual({ state: 'SUPERSEDED', report: null });
+      expect(
+        await db
+          .prepare(
+            "SELECT owner FROM reviewer_slots WHERE provider='callmissed'",
+          )
+          .first(),
+      ).toBeNull();
+      expect(
+        await db
+          .prepare(
+            "SELECT count(*) n FROM timeline WHERE run_id=? AND state='REVIEWING'",
+          )
+          .bind(id)
+          .first(),
+      ).toEqual({ n: 0 });
+    } finally {
+      await mf.dispose();
+    }
+  },
+);
 async function seed(db: D1Database) {
   await migrate(db);
   const hash = await digest(canonical(demoContract));

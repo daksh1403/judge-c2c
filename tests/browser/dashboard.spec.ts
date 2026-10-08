@@ -2019,14 +2019,16 @@ test('engineering support matrix separates trusted check facts, server assessmen
       id: 'diff-metadata',
       kind: 'diff',
       status: 'PASS',
-      claim: 'Exact baseline-to-head comparison: 1 changed file; metadata does not establish functionality.',
+      claim:
+        'Exact baseline-to-head comparison: 1 changed file; metadata does not establish functionality.',
     },
     {
       id: 'auth-source-context',
       kind: 'source',
       path: 'src/auth.ts',
       status: 'PASS',
-      claim: 'Source retrieved for contextual inspection only; presence is not functional proof.',
+      claim:
+        'Source retrieved for contextual inspection only; presence is not functional proof.',
     },
   ];
   const review = deterministicReport(contract, evidence);
@@ -2139,11 +2141,245 @@ test('engineering support matrix separates trusted check facts, server assessmen
   ).toBeVisible();
   await expect(authentication.locator('strong')).toContainText('UNVERIFIED');
   await expect(
-    authentication.getByText('No diff available for authentication regression analysis', { exact: false }),
+    authentication.getByText(
+      'No diff available for authentication regression analysis',
+      { exact: false },
+    ),
   ).toBeVisible();
   await expect(
     authentication.getByText('human inspection required', { exact: false }),
   ).toBeVisible();
-  await expect(authentication.getByText('SUPPORTED_FACT', { exact: false })).toHaveCount(0);
+  await expect(
+    authentication.getByText('SUPPORTED_FACT', { exact: false }),
+  ).toHaveCount(0);
   await expect(authentication.locator('a')).toHaveCount(0);
+});
+
+test('workspace transition receipt confirms exact organization and safely retries pending removal', async ({
+  page,
+}) => {
+  let state = 'ACTIVE';
+  let replacement: Record<string, unknown> | null = null;
+  let requests = 0;
+  await page.route('**/api/organization/**', async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/status'))
+      return route.fulfill({
+        json: {
+          authenticated: true,
+          role: 'organizer',
+          organization: 'Arbitrary-Event-Org',
+          app: null,
+          retirement: {
+            state,
+            replacement,
+            error: state === 'RETIRING' ? 'UNINSTALL_UNAVAILABLE' : null,
+          },
+        },
+      });
+    if (path.endsWith('/retire')) {
+      const body = route.request().postDataJSON();
+      expect(body.confirmation).toBe('Arbitrary-Event-Org');
+      expect(body.attestation).toBe(true);
+      if (replacement) expect(body.replacement).toEqual(replacement);
+      replacement = body.replacement;
+      requests++;
+      state = requests === 1 ? 'RETIRING' : 'RETIRED';
+      return route.fulfill({
+        status: state === 'RETIRING' ? 202 : 200,
+        json: { retirement: { state, replacement } },
+      });
+    }
+    if (path.endsWith('/overview'))
+      return route.fulfill({ json: { counts: {}, runs: [] } });
+    return route.fulfill({
+      status: 503,
+      json: { error: 'SYNTHETIC_UNAVAILABLE' },
+    });
+  });
+  await page.goto('/?organization=1');
+  await expect(
+    page.getByRole('heading', { name: 'Arbitrary-Event-Org · GitHub App' }),
+  ).toBeVisible();
+  const submit = page.getByRole('button', { name: 'Retire old workspace' });
+  await expect(submit).toBeDisabled();
+  const record = {
+    connection: 'VERIFIED',
+    organization: 'Replacement-Org',
+    workspace: 'replacement-workspace',
+    origin: 'https://replacement.example.org',
+    targetHash: 'a'.repeat(64),
+    appId: 43,
+    installationId: 85,
+    reference: 'b'.repeat(32),
+    at: new Date(Date.now() - 1000).toISOString(),
+    expiresAt: new Date(Date.now() + 600000).toISOString(),
+  };
+  await page.getByLabel('Credential-free connection receipt').fill(
+    JSON.stringify({
+      ...record,
+      secrets: { token: 'do-not-render-this-secret' },
+    }),
+  );
+  await expect(submit).toBeDisabled();
+  await expect(page.locator('#replacement-review')).not.toContainText(
+    'do-not-render-this-secret',
+  );
+  await page
+    .getByLabel('Credential-free connection receipt')
+    .fill(JSON.stringify(record));
+  await expect(page.locator('#replacement-review')).toContainText(
+    'Replacement-Org · https://replacement.example.org',
+  );
+  await page
+    .getByLabel('Type Arbitrary-Event-Org exactly')
+    .fill('arbitrary-event-org');
+  await page.getByLabel('I have verified the replacement workspace').check();
+  await expect(submit).toBeDisabled();
+  await page
+    .getByLabel('Type Arbitrary-Event-Org exactly')
+    .fill('Arbitrary-Event-Org');
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Arbitrary-Event-Org · Retirement pending',
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Register App on GitHub' }),
+  ).toHaveCount(0);
+  await page
+    .getByLabel('Type Arbitrary-Event-Org exactly')
+    .fill('Arbitrary-Event-Org');
+  await page.getByLabel('I have verified the replacement workspace').check();
+  await page
+    .getByRole('button', { name: 'Retry installation removal' })
+    .click();
+  await expect(
+    page.getByRole('heading', {
+      name: 'Arbitrary-Event-Org · Retired workspace',
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Open replacement Replacement-Org' }),
+  ).toHaveAttribute('href', 'https://replacement.example.org?organization=1');
+  await expect(page.locator('#content form')).toHaveCount(0);
+  expect(requests).toBe(2);
+});
+
+for (const role of ['judge', 'participant', 'security']) {
+  test(`workspace transition ${role} archive hides active and retirement controls`, async ({
+    page,
+  }) => {
+    await page.route('**/api/organization/**', (route) => {
+      const path = new URL(route.request().url()).pathname;
+      if (path.endsWith('/status'))
+        return route.fulfill({
+          json: {
+            authenticated: true,
+            role,
+            organization: 'Archived-Org',
+            identity: { name: 'Named reviewer' },
+            retirement: { state: 'RETIRED', archiveReadOnly: true },
+          },
+        });
+      if (path.endsWith('/participant'))
+        return route.fulfill({
+          json: {
+            team: { name: 'Historical team' },
+            submissions: [],
+            evaluations: [],
+          },
+        });
+      if (path.endsWith('/security-reports'))
+        return route.fulfill({ json: { reports: [] } });
+      return route.fulfill({ json: { counts: {}, runs: [] } });
+    });
+    await page.goto('/?organization=1');
+    await expect(
+      page.getByRole('heading', { name: 'Archived-Org · Retired workspace' }),
+    ).toBeVisible();
+    await expect(page.locator('#content form')).toHaveCount(0);
+    await expect(
+      page.getByRole('button', {
+        name: /Register App|Retire old|Retry installation|Sync installed|Test Docker|Test AI|Submit privately/,
+      }),
+    ).toHaveCount(0);
+  });
+}
+
+test('workspace transition organizer archive retains historical evidence without retries', async ({
+  page,
+}) => {
+  await page.route('**/api/organization/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/status'))
+      return route.fulfill({
+        json: {
+          authenticated: true,
+          role: 'organizer',
+          organization: 'Archived-Org',
+          retirement: { state: 'RETIRED', archiveReadOnly: true },
+        },
+      });
+    if (path.includes('/evaluations/'))
+      return route.fulfill({
+        json: { ...demoDetail, retryable: true, execution: [], artifacts: [] },
+      });
+    return route.fulfill({ json: { counts: {}, runs: [] } });
+  });
+  await page.goto('/?organization=1&evaluation=' + demoRun.id);
+  await expect(
+    page.getByRole('heading', { name: 'Evidence ledger' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Download reproducibility bundle' }),
+  ).toBeVisible();
+  await expect(page.locator('#content form')).toHaveCount(0);
+  await expect(
+    page.getByRole('button', {
+      name: /Retry|Recognize|Reject|Register App|Sync installed/,
+    }),
+  ).toHaveCount(0);
+});
+
+test('workspace transition arbitrary organization registration uses its exact GitHub target', async ({
+  page,
+}) => {
+  const organization = 'Arbitrary-Event-Org';
+  await page.route('**/api/organization/**', (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/status'))
+      return route.fulfill({
+        json: {
+          authenticated: true,
+          role: 'organizer',
+          organization,
+          app: null,
+        },
+      });
+    if (path.endsWith('/start'))
+      return route.fulfill({
+        json: {
+          action: `https://github.com/organizations/${organization}/settings/apps/new?state=synthetic`,
+          manifest: { name: 'Synthetic App' },
+        },
+      });
+    return route.fulfill({
+      status: 503,
+      json: { error: 'SYNTHETIC_UNAVAILABLE' },
+    });
+  });
+  await page.route('https://github.com/organizations/**', (route) =>
+    route.fulfill({
+      body: '<p>Synthetic registration boundary</p>',
+      contentType: 'text/html',
+    }),
+  );
+  await page.goto('/?organization=1');
+  await page.getByRole('button', { name: 'Register App on GitHub' }).click();
+  await expect(page).toHaveURL(
+    `https://github.com/organizations/${organization}/settings/apps/new?state=synthetic`,
+  );
 });

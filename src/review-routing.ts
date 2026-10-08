@@ -2,7 +2,7 @@ import type { Env } from './env';
 import type { EvaluationPlan } from './evaluation-plan';
 
 // Bounded server identifiers do not establish provider availability or capability.
-function validModel(value: string | undefined): value is string {
+function validModel(value: unknown): value is string {
   return (
     typeof value === 'string' &&
     /^[A-Za-z0-9@][A-Za-z0-9._/@:-]{0,199}$/.test(value)
@@ -10,15 +10,7 @@ function validModel(value: string | undefined): value is string {
 }
 
 export function selectReviewModel(
-  env: Pick<
-    Env,
-    | 'AI_MODEL'
-    | 'AI_MODEL_LIGHT'
-    | 'AI_MODEL_DEEP'
-    | 'CALLMISSED_MODEL'
-    | 'CALLMISSED_MODEL_LIGHT'
-    | 'CALLMISSED_MODEL_DEEP'
-  >,
+  env: Partial<Env>,
   provider: NonNullable<Env['AI_PROVIDER']>,
   plan: Pick<EvaluationPlan, 'depth'>,
 ): {
@@ -26,17 +18,17 @@ export function selectReviewModel(
   model: string | null;
   reason: string;
 } {
-  const baseField = provider === 'callmissed' ? 'CALLMISSED_MODEL' : 'AI_MODEL';
+  const prefix = {
+    cloudflare: 'AI',
+    callmissed: 'CALLMISSED',
+    gemini: 'GEMINI',
+    groq: 'GROQ',
+  }[provider];
+  const baseField = (prefix + '_MODEL') as keyof Env;
   const overrideField =
-    plan.depth === 'LIGHT'
-      ? provider === 'callmissed'
-        ? 'CALLMISSED_MODEL_LIGHT'
-        : 'AI_MODEL_LIGHT'
-      : plan.depth === 'DEEP'
-        ? provider === 'callmissed'
-          ? 'CALLMISSED_MODEL_DEEP'
-          : 'AI_MODEL_DEEP'
-        : null;
+    plan.depth === 'LIGHT' || plan.depth === 'DEEP'
+      ? ((prefix + '_MODEL_' + plan.depth) as keyof Env)
+      : null;
   const base = env[baseField],
     override = overrideField ? env[overrideField] : undefined;
   const version = 'server-model-routing-v1' as const;

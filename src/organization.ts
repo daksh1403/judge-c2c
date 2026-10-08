@@ -1,3 +1,10 @@
+import { providerConfigured, providerHasKey } from './external-review';
+import { selectReviewModel } from './review-routing';
+import {
+  retirementStatus,
+  retireOrganization,
+  requireOrganizationActive,
+} from './organization-retirement';
 import { operationalAlerts } from './operational-alerts';
 import {
   credentialIdentity,
@@ -132,9 +139,19 @@ async function appClient(env: Env) {
   return GitHub.application(await organizationEnv(env));
 }
 async function installedClient(env: Env, repositoryId?: number, write = false) {
+  await requireOrganizationActive({
+    ...env,
+    DB: env.ORG_DB!,
+    EVALUATION_DETAILS_KIND: 'organization',
+  });
   const row = await connection(env);
   if (!row?.installation_id) throw new Error('APP_NOT_INSTALLED');
   const app = await appClient(env);
+  await requireOrganizationActive({
+    ...env,
+    DB: env.ORG_DB!,
+    EVALUATION_DETAILS_KIND: 'organization',
+  });
   const token = await app.api<{ token: string }>(
     `/app/installations/${row.installation_id}/access_tokens`,
     {
@@ -166,6 +183,12 @@ function competitionServices(env: Env): CompetitionServices {
       return row.slug;
     },
     capabilities: async () => {
+      if ((await retirementStatus(env.ORG_DB!)).state !== 'ACTIVE')
+        return {
+          issuesWrite: false,
+          events: [],
+          reason: 'ORGANIZATION_RETIRED',
+        };
       const row = await connection(env);
       if (!row?.installation_id)
         return { issuesWrite: false, events: [], reason: 'APP_NOT_INSTALLED' };
@@ -539,6 +562,8 @@ export async function organization(
   if (url.pathname === '/webhooks/organization') {
     if (request.method !== 'POST')
       return json({ error: 'METHOD_NOT_ALLOWED' }, 405);
+    if ((await retirementStatus(env.ORG_DB)).state !== 'ACTIVE')
+      return json({ error: 'ORGANIZATION_RETIRED' }, 409);
     const row = await connection(env);
     if (!row) return json({ error: 'APP_NOT_CONNECTED' }, 503);
     const orgenv = await organizationEnv(env);
@@ -726,9 +751,21 @@ export async function organization(
         authenticated: true,
         role: session.role,
         identity,
+        retirement: {
+          state: (await retirementStatus(env.ORG_DB)).state,
+          archiveReadOnly: (await retirementStatus(env.ORG_DB)).archiveReadOnly,
+        },
       });
     const row = await connection(env);
     return json({
+      retirement:
+        session.role === 'organizer'
+          ? await retirementStatus(env.ORG_DB)
+          : {
+              state: (await retirementStatus(env.ORG_DB)).state,
+              archiveReadOnly: (await retirementStatus(env.ORG_DB))
+                .archiveReadOnly,
+            },
       identity,
       organization: env.ORG_NAME,
       authenticated: true,
@@ -736,24 +773,29 @@ export async function organization(
       runner: {
         enabled:
           env.RUNNER_ENABLED === 'true' &&
-          !!(env.RUNNER || env.RUNNER_ENDPOINT),
+          !!(
+            env.RUNNER ||
+            env.RUNNER_ENDPOINT ||
+            env.RUNNER_BACKEND === 'actions-vm'
+          ),
         reason:
-          env.RUNNER_ENABLED === 'true' && (env.RUNNER || env.RUNNER_ENDPOINT)
-            ? env.RUNNER_ENDPOINT
-              ? 'Development Docker runner through authenticated tunnel. Availability depends on the organizer machine.'
-              : 'Available'
+          env.RUNNER_ENABLED === 'true' &&
+          (env.RUNNER ||
+            env.RUNNER_ENDPOINT ||
+            env.RUNNER_BACKEND === 'actions-vm')
+            ? env.RUNNER_BACKEND === 'actions-vm'
+              ? 'GitHub Actions with isolated QEMU guests. Queue and runtime verification required.'
+              : env.RUNNER_ENDPOINT
+                ? 'Development Docker runner through authenticated tunnel. Availability depends on the organizer machine.'
+                : 'Available'
             : 'Isolated execution deployment is disabled.',
       },
       ai: {
         provider: env.AI_PROVIDER ?? 'cloudflare',
-        model:
-          env.AI_PROVIDER === 'callmissed'
-            ? env.CALLMISSED_MODEL
-            : env.AI_MODEL,
-        enabled:
-          env.AI_PROVIDER === 'callmissed'
-            ? !!env.CALLMISSED_API_KEY && !!env.CALLMISSED_MODEL
-            : !!env.AI && !!env.AI_MODEL,
+        model: selectReviewModel(env, env.AI_PROVIDER ?? 'cloudflare', {
+          depth: 'STANDARD',
+        }).model,
+        enabled: providerConfigured(env),
       },
       app: row
         ? {
@@ -767,6 +809,38 @@ export async function organization(
   }
   if (!session) return json({ error: 'UNAUTHORIZED' }, 401);
   const actor = session.role + ':' + (session.identity_id ?? session.hash);
+  if (
+    session.role === 'judge' &&
+    !(
+      request.method === 'GET' && url.pathname.startsWith('/api/organization/')
+    ) &&
+    url.pathname !== '/api/organization/logout'
+  )
+    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+  if (
+    url.pathname === '/api/organization/retire' &&
+    request.method === 'POST'
+  ) {
+    if (session.role !== 'organizer')
+      return json({ error: 'ORGANIZER_REQUIRED' }, 403);
+    const row = await connection(env);
+    if (!row) return json({ error: 'APP_NOT_CONNECTED' }, 409);
+    let body: unknown;
+    try {
+      body = await input(request, 4000);
+    } catch {
+      return json({ error: 'INVALID_RETIREMENT_REQUEST' }, 400);
+    }
+    return retireOrganization(env, body, actor, row, () => appClient(env));
+  }
+  if (
+    (await retirementStatus(env.ORG_DB)).state !== 'ACTIVE' &&
+    ((request.method !== 'GET' &&
+      url.pathname !== '/api/organization/logout') ||
+      url.pathname.startsWith('/auth/github/') ||
+      /\/repositories\/[0-9]+\/context$/.test(url.pathname))
+  )
+    return json({ error: 'ORGANIZATION_RETIRED' }, 409);
   if (
     url.pathname === '/api/organization/identities' ||
     url.pathname.startsWith('/api/organization/identities/')
@@ -789,14 +863,6 @@ export async function organization(
     return confidentialSecurity(request, env, actor);
   if (
     session.role === 'security' &&
-    url.pathname !== '/api/organization/logout'
-  )
-    return json({ error: 'ORGANIZER_REQUIRED' }, 403);
-  if (
-    session.role === 'judge' &&
-    !(
-      request.method === 'GET' && url.pathname.startsWith('/api/organization/')
-    ) &&
     url.pathname !== '/api/organization/logout'
   )
     return json({ error: 'ORGANIZER_REQUIRED' }, 403);
@@ -939,8 +1005,8 @@ export async function organization(
     };
     const evidence = objective(demoContract, context);
     const slot =
-      env.AI_PROVIDER === 'callmissed' && env.CALLMISSED_API_KEY
-        ? await acquireReviewer(env.ORG_DB, 'callmissed')
+      env.AI_PROVIDER !== 'cloudflare' && providerHasKey(env)
+        ? await acquireReviewer(env.ORG_DB, env.AI_PROVIDER ?? 'cloudflare')
         : undefined;
     if (slot === null) return json({ error: 'REVIEWER_CAPACITY_BUSY' }, 429);
     let reviewed;
@@ -1165,6 +1231,7 @@ export async function organization(
 
 export async function maintainOrganization(env: Env, ctx?: ExecutionContext) {
   if (!env.ORG_DB) return;
+  if ((await retirementStatus(env.ORG_DB)).state !== 'ACTIVE') return;
   await env.ORG_DB.batch([
     env.ORG_DB.prepare(
       'DELETE FROM console_identity_sessions WHERE expires_at<?',

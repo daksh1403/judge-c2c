@@ -1,3 +1,4 @@
+import { actionsEvaluate } from './actions-runner';
 import { canonical, digest } from './domain';
 import { tunnelEvaluate } from './runner-tunnel';
 import { validateRunnerResult, type RunnerRequest } from './runner';
@@ -5,7 +6,7 @@ import type { Env } from './env';
 export async function runnerDiagnostic(env: Env) {
   if (
     env.RUNNER_ENABLED !== 'true' ||
-    !env.RUNNER_ENDPOINT ||
+    (!env.RUNNER_ENDPOINT && env.RUNNER_BACKEND !== 'actions-vm') ||
     !env.RUNNER_IMAGE_URI
   )
     return { synthetic: true, status: 'NOT_CONFIGURED' };
@@ -36,12 +37,18 @@ export async function runnerDiagnostic(env: Env) {
       commit: (label === 'baseline' ? '0' : '1').repeat(40),
       contractHash,
       policy,
-      timeoutSeconds: 15,
+      timeoutSeconds: env.RUNNER_BACKEND === 'actions-vm' ? 120 : 15,
       memoryMiB: 256,
       files: label === 'baseline' ? [] : [{ path: 'server.mjs', text: source }],
     };
     const result = validateRunnerResult(
-      await tunnelEvaluate(env, request),
+      env.RUNNER_BACKEND === 'actions-vm'
+        ? await actionsEvaluate(
+            { ...env, DB: env.ORG_DB ?? env.DB },
+            request,
+            true,
+          )
+        : await tunnelEvaluate(env, request),
       request,
       await digest(canonical(request)),
     );
