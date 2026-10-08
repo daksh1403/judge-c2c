@@ -1,6 +1,6 @@
 # Prepare a fresh GitHub organization workspace
 
-Each deployment owns one organization, two empty databases, isolated artifact storage, independent App registration and fresh credentials. The existing production profile remains compatible. No event organization has been supplied yet; these commands are an operator interface, not evidence of a second live organization evaluation.
+Each deployment owns one organization, two empty databases, isolated artifact storage, independent App registration and fresh credentials. The selected event organization is now [Doom-Forge](doom-forge-activation.md). Live replacement setup remains pending; historical rehearsal connections are not Doom-Forge evaluation evidence.
 
 Use Node 22.12 or newer and `npm ci`. The CLI invokes the installed, pinned Wrangler version and authenticated `gh` / `gh api`. Authenticate `gh` as an active administrator of the actual event organization. Provide `CLOUDFLARE_ACCOUNT_ID` and a privately supplied `CLOUDFLARE_API_TOKEN` with read access to Workers, Workflows, D1, KV and R2; provisioning additionally requires resource write/migration/secret permissions. Planning requires all inventories to be readable and refuses incomplete or unavailable evidence. It does not enable billing or modify GitHub environments.
 
@@ -9,10 +9,14 @@ Supply the actual values through flags or these non-secret environment settings:
 - `PUBLIC_ORIGIN`: an independent HTTPS custom domain.
 - `PRODUCTION_RUNNER_ENDPOINT`: an isolated HTTPS runner origin.
 - `PRODUCTION_RUNNER_IMAGE`: a digest-pinned `registry.cloudflare.com/...@sha256:...` image.
-- `PRODUCTION_AI_PROVIDER`: `cloudflare` or `callmissed`.
+- `PRODUCTION_AI_PROVIDER`: `cloudflare`, `callmissed`, `gemini` or `groq`.
 - `PRODUCTION_AI_MODEL`: the selected provider model identifier.
 
 The optional `OWNER_TUNNEL` mode requires a digest-pinned `docker-local@sha256:...` image and an exact HTTPS `*.trycloudflare.com` runner origin. `--runner-mode OWNER_TUNNEL` (or `PRODUCTION_RUNNER_MODE`) selects it. This mode also permits the exact `https://judge-c2c-WORKSPACE.SUBDOMAIN.workers.dev` origin when `--workers-subdomain` (or `CLOUDFLARE_WORKERS_SUBDOMAIN`) matches the account subdomain. A native, review, current production, foreign-account or preview Worker hostname is refused.
+
+`--runner-mode ACTIONS_VM` uses a digest-pinned `qemu-vm@sha256:...` image without a runner endpoint. Supply `--runner-repository`, `--runner-repository-id`, `--runner-ref`, `--runner-sha` and `--runner-installation-id` (or corresponding `PRODUCTION_RUNNER_*` inputs). The exact isolated workspace Workers.dev origin is supported with `--workers-subdomain`. Provision `RUNNER_APP_ID` and `RUNNER_APP_PRIVATE_KEY` separately on the backend; this profile generates no tunnel secret. See [Actions VM setup](actions-vm-runner.md).
+
+`--artifact-storage kv` (or `PRODUCTION_ARTIFACT_STORAGE=kv`) selects the existing KV artifact adapter for Actions/owner profiles. It excludes R2 inventory, provisioning and bindings while retaining other inventory/isolation checks. Default `r2` and managed profiles still require R2. KV has platform size/quota limits.
 
 ## Plan and provision
 
@@ -58,7 +62,7 @@ npm run organization:verify -- --organization "$EVENT_ORGANIZATION" --workspace 
 
 Verification authenticates to the exact workspace origin using only its private organizer token and refuses redirects. It correlates authenticated status against GitHub's real organization installation inventory and App metadata obtained with `gh api`. It requires organization ownership, the expected App and installation, no suspension, and exactly the required `contents:read`, `pull_requests:read`, `issues:write` and `checks:write` permissions (optional `metadata:read`). It performs the workspace's installation-authenticated repository sync, then checks selected repository access and organization ownership. Repository inspection therefore uses the new App's credentials without requiring a GitHub App user token in `gh`.
 
-The organizer runner diagnostic must complete its synthetic baseline FAIL and submission PASS canaries. The Worker verifies runner HMAC response signatures before accepting either result. This proves signed transport availability for those canaries, not participant functional criteria or event throughput. Reviewer diagnostics report provider availability separately; failure remains `UNAVAILABLE` and cannot fabricate functional evaluation evidence.
+The organizer runner diagnostic must complete its synthetic baseline FAIL and submission PASS canaries. The Worker verifies runner HMAC signatures or exact pinned Actions OIDC identity before accepting results. The operator permits up to 30 minutes for the two bounded Actions jobs; ordinary API calls retain shorter timeouts. This proves signed transport availability for those canaries, not participant functional criteria or event throughput. Reviewer diagnostics report provider availability separately; failure remains `UNAVAILABLE` and cannot fabricate functional evaluation evidence.
 
 A private, bounded verification record binds organization, workspace, account/resource target hash, origin, App, installation and repository names to a 15-minute validity window. A failed or interrupted verification replaces any previous success with PENDING or FAILED. Output always reports `functionalEvaluation: UNVERIFIED`. Provider success and signed canary availability do not certify live hackathon capacity. The later retirement flow must reverify this exact replacement before acting on the old workspace.
 

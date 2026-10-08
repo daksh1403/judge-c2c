@@ -15,3 +15,7 @@ This validates file permissions and sends values to Wrangler on stdin, never com
 Set production generator inputs `PRODUCTION_AI_PROVIDER=gemini` and `PRODUCTION_AI_MODEL=<available-model>` (or groq). Live diagnostics and reference/failing/protected-file calibration must pass before using the provider for event review. API key possession does not guarantee a free allowance, model access or throughput for 80 teams. AI remains advisory; it cannot supply missing execution evidence.
 
 References: [Gemini JSON output](https://ai.google.dev/gemini-api/docs/structured-output), [Gemini GenerateContent](https://ai.google.dev/api/generate-content), [Groq JSON mode](https://console.groq.com/docs/structured-outputs), [Groq API](https://console.groq.com/docs/api-reference).
+
+## Actual provider checkpoint
+
+The owner's keys were moved from the example file to ignored mode-0600 storage and provisioned on the existing production Worker. Examples retain blank key fields. Actual adapter calls completed with Gemini `gemini-3.1-flash-lite` and Groq `openai/gpt-oss-120b`; the previous starter models returned HTTP 404. Gemini completed all three source-only synthetic review cases, preserving functional UNVERIFIED and protected-file FAIL. Groq completed two cases; its protected-file attempt failed and retained deterministic evidence. The live production provider has not been switched. See [recorded calibration](qa/actions-vm-provider-calibration.json). These are real provider calls over synthetic data, not deployed participant evaluation or 80-team throughput certification.

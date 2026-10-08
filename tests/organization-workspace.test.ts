@@ -121,6 +121,176 @@ async function temporary(run: (root: string) => Promise<void>) {
   }
 }
 describe('organization workspace setup', () => {
+  const actions = {
+    ...options,
+    runnerMode: 'ACTIONS_VM',
+    runnerEndpoint: undefined,
+    runnerImage: 'qemu-vm@sha256:' + 'b'.repeat(64),
+    runnerRepository: 'owner/judge',
+    runnerRepositoryId: '123',
+    runnerRef: 'main',
+    runnerSha: 'c'.repeat(40),
+    runnerInstallationId: '456',
+    workersSubdomain: 'owner-account',
+    origin: 'https://judge-c2c-event-alpha.owner-account.workers.dev',
+  };
+  it('plans Actions VM workspaces without a tunnel and pins the runner identity', async () => {
+    const a = adapters();
+    a.knownResources.mockResolvedValue([
+      { name: 'existing-protected-worker' },
+    ] as never);
+    const plan = await planWorkspace(actions, a);
+    expect(plan.runner).toMatchObject({
+      backend: 'actions-vm',
+      repository: actions.runnerRepository,
+      sha: actions.runnerSha,
+      image: actions.runnerImage,
+    });
+    expect(plan.runner).not.toHaveProperty('endpoint');
+  });
+  it('provisions an Actions workspace with isolated storage and no tunnel credential', async () =>
+    temporary(async (root) => {
+      const a = adapters();
+      await provisionWorkspace(actions, a, { root });
+      const directory = join(root, '.wrangler/workspaces/event-alpha');
+      const config = JSON.parse(
+        await readFile(join(directory, 'config.json'), 'utf8'),
+      );
+      const journal = JSON.parse(
+        await readFile(join(directory, 'journal.json'), 'utf8'),
+      );
+      expect(config.vars).toMatchObject({
+        RUNNER_BACKEND: 'actions-vm',
+        RUNNER_ACTIONS_REPOSITORY: actions.runnerRepository,
+        RUNNER_ACTIONS_SHA: actions.runnerSha,
+        RUNNER_INSTALLATION_ID: actions.runnerInstallationId,
+      });
+      expect(config.vars).not.toHaveProperty('RUNNER_ENDPOINT');
+      expect(journal.secrets).not.toHaveProperty('RUNNER_TUNNEL_KEY');
+      expect(a.deploy).not.toHaveBeenCalled();
+    }));
+  it('issues an Actions verification receipt with one exact validity window', async () =>
+    temporary(async (root) => {
+      const a = adapters();
+      await provisionWorkspace(actions, a, { root });
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1000);
+      try {
+        const receipt = await verifyWorkspace(
+          actions,
+          {
+            appId: 42,
+            appSlug: 'event-app',
+            installationId: 84,
+            repositories: [`${options.organization}/project`],
+          },
+          a,
+          { root },
+        );
+        expect(receipt.runner).toBe('OIDC_SYNTHETIC_COMPLETED');
+        expect(Date.parse(receipt.expiresAt) - Date.parse(receipt.at)).toBe(
+          900000,
+        );
+      } finally {
+        clock.mockRestore();
+      }
+    }));
+  it('plans and provisions KV-only Actions storage without creating an R2 bucket', async () =>
+    temporary(async (root) => {
+      const a = adapters();
+      const target = { ...actions, artifactStorage: 'kv' };
+      const plan = await planWorkspace(target, a);
+      expect(
+        plan.resources.some((r: { kind: string }) => r.kind === 'bucket'),
+      ).toBe(false);
+      await provisionWorkspace(target, a, { root });
+      expect(a.createResource.mock.calls.map(([kind]) => kind)).toEqual([
+        'database',
+        'database',
+        'kv',
+      ]);
+      const config = JSON.parse(
+        await readFile(
+          join(root, '.wrangler/workspaces/event-alpha/config.json'),
+          'utf8',
+        ),
+      );
+      expect(config).not.toHaveProperty('r2_buckets');
+      expect(config.kv_namespaces[0].binding).toBe('ARTIFACT_KV');
+    }));
+  it('omits R2 inventory requests only when that storage is explicitly excluded', async () => {
+    const request = vi.fn(async (url: string) => {
+      if (url.includes('r2/buckets')) throw new Error('R2_NOT_ENABLED');
+      return Response.json({ success: true, result: [] });
+    });
+    const a = createAdapters({
+      env: {
+        CLOUDFLARE_ACCOUNT_ID: options.accountId,
+        CLOUDFLARE_API_TOKEN: 'fixture-token',
+      },
+      request,
+    });
+    const inventory = await a.inventory(options.accountId, {
+      includeR2: false,
+    });
+    expect(inventory.bucket).toEqual([]);
+    expect(request.mock.calls.some(([url]) => url.includes('r2/buckets'))).toBe(
+      false,
+    );
+    await expect(a.inventory(options.accountId)).rejects.toThrow(
+      'R2_NOT_ENABLED',
+    );
+  });
+  it('allows the bounded Actions runner canary to finish beyond ordinary API timeouts', async () => {
+    const timeout = vi.spyOn(AbortSignal, 'timeout');
+    try {
+      const request = vi.fn(async (url: string) =>
+        url.endsWith('/login')
+          ? Response.json(
+              { authenticated: true },
+              {
+                headers: { 'set-cookie': 'judge_organizer=fixture; HttpOnly' },
+              },
+            )
+          : Response.json({ synthetic: true, status: 'COMPLETED' }),
+      );
+      const a = createAdapters({ request });
+      await a.runnerDiagnostic(
+        'https://event.example.org',
+        'private-fixture-token',
+      );
+      expect(timeout.mock.calls.map(([ms]) => ms)).toEqual([30000, 30 * 60000]);
+    } finally {
+      timeout.mockRestore();
+    }
+  });
+  it('refuses KV-only managed profiles and unknown storage modes before remote actions', async () => {
+    for (const target of [
+      { ...options, artifactStorage: 'kv' },
+      { ...actions, artifactStorage: 'unknown' },
+    ]) {
+      const a = adapters();
+      await expect(planWorkspace(target, a)).rejects.toThrow();
+      expect(a.githubIdentity).not.toHaveBeenCalled();
+    }
+  });
+  it.each([
+    { runnerSha: 'latest' },
+    { runnerRepositoryId: '0' },
+    { runnerRef: '../main' },
+    { runnerInstallationId: undefined },
+    { runnerEndpoint: 'https://runner.example.org' },
+    { origin: 'https://judge-c2c-production.owner-account.workers.dev' },
+  ])(
+    'rejects an invalid Actions workspace before remote writes: %j',
+    async (override) => {
+      const a = adapters();
+      await expect(
+        planWorkspace({ ...actions, ...override }, a),
+      ).rejects.toThrow();
+      expect(a.createResource).not.toHaveBeenCalled();
+      expect(a.githubIdentity).not.toHaveBeenCalled();
+    },
+  );
   it('plans two arbitrary organizations with distinct exact resources and no mutations', async () => {
     const a = adapters();
     const first = await planWorkspace(options, a);

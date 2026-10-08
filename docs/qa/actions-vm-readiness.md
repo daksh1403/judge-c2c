@@ -25,3 +25,11 @@ The first Linux VM preparation run exposed a missing Debian archive keyring on U
 6. Deployed hostile-input/resource/escape/network/protocol drills and an 80-team simultaneous-submission rehearsal with queue/latency/provider budgets, outage recovery and retained history. A bounded synthetic smoke or browser fixture cannot certify these.
 
 The existing production Docker/Cloudflare-AI configuration was not silently switched. Until the Actions setup and live provider calibration are verified, the new backend is implemented but not an activated live evaluation service.
+
+## 2026-10-08 workspace preparation
+
+The owner selected Doom-Forge; authenticated GitHub inspection confirmed owner/admin membership and access to Bot-Backend. The workspace operator now supports Actions VM identities without a tunnel, explicitly selected KV-only artifact storage without R2 activation, exact 15-minute verification receipts and a bounded 30-minute runner diagnostic client. Default R2/managed isolation requirements are retained. Local example configuration names Doom-Forge and defaults to the exercised Gemini model.
+
+Fresh local npm run check passed 543 tests, all 714 acceptance entries and Worker dry run. All 35 local browser scenarios passed without retries. This verifies the configuration/operator interface; Doom-Forge is not live yet. The existing production connection/provider remain unchanged.
+
+Both owner keys were moved into private ignored storage and provisioned on the existing production Worker. Real provider calls over synthetic source-only fixtures are recorded in actions-vm-provider-calibration.json, including original HTTP 404 models and the failed Groq protected-file case. Gemini completed three cases, preserving functional UNVERIFIED and protected-file FAIL. All tested VM release assets are uploaded in the draft. See doom-forge-activation.md for the ordered remaining tasks.

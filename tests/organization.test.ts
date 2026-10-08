@@ -622,6 +622,9 @@ describe('protected organization setup', () => {
     expect((await hook('deleted', 'suspend-once')).status).toBe(409);
   });
   it('protects and throttles synthetic reviewer diagnostics', async () => {
+    // Keep all three calls in the same rate-limit bucket across minute boundaries.
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(now);
     const first = await organization(
       request('/api/organization/reviewer-check', 'POST', {}),
       env,
