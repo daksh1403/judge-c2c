@@ -8,5 +8,7 @@ export default defineConfig({
       ),
     },
   },
-  test: { include: ['tests/**/*.test.ts'] },
+  // Each runtime suite starts workerd/D1. Bound the number of these processes
+  // instead of making timing-sensitive tests compete with every CPU core.
+  test: { include: ['tests/**/*.test.ts'], maxWorkers: 4 },
 });

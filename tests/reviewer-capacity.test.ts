@@ -42,7 +42,7 @@ it('expires crashed ownership and fences stale cleanup', async () => {
   await releaseReviewer(db, recovered!);
 });
 
-it('fences a 24-request provider burst across two real Worker isolates sharing D1, including crash recovery', async () => {
+it('fences an 80-request provider burst across two real Worker isolates sharing D1, including crash recovery', async () => {
   const { buildSync } = await import('esbuild');
   const script = buildSync({
     stdin: {
@@ -80,7 +80,7 @@ export default {async fetch(request,env){const input=await request.json();const 
         })
       ).json();
     const contenders = (await Promise.all(
-      Array.from({ length: 24 }, (_, index) =>
+      Array.from({ length: 80 }, (_, index) =>
         invoke(index % 2, '/acquire', { now: 1000 }),
       ),
     )) as ({ owner: string; provider: string } | null)[];

@@ -93,7 +93,7 @@ export async function dispatch(env: Env, runId: string) {
 export async function reconcile(env: Env) {
   if (!(await organizationActive(env))) return;
   const rows = await env.DB.prepare(
-    "SELECT o.run_id FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE o.dispatched_at IS NULL AND e.state='QUEUED' ORDER BY o.created_at DESC,o.run_id LIMIT 5",
+    "SELECT o.run_id FROM outbox o JOIN evaluations e ON e.id=o.run_id WHERE o.dispatched_at IS NULL AND e.state='QUEUED' ORDER BY o.created_at,o.run_id LIMIT 5",
   ).all<{ run_id: string }>();
   await Promise.allSettled(rows.results.map((r) => dispatch(env, r.run_id)));
   const failed = await env.DB.prepare(
