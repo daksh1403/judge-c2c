@@ -1,4 +1,6 @@
 export interface Env {
+  // Internal shared coordination database; not a participant-accessible binding.
+  CAPACITY_DB?: D1Database;
   RUNNER_BACKEND?: 'actions-vm';
   RUNNER_ACTIONS_REPOSITORY?: string;
   RUNNER_ACTIONS_REPOSITORY_ID?: string;

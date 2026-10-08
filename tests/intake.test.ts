@@ -662,7 +662,7 @@ it('retains twelve submissions and authoritative latest heads during a signed 48
   }
 }, 30000);
 
-it('dispatches only the latest five queued items per recovery sweep, skips obsolete work, and exposes authoritative queue counts', async () => {
+it('fairly dispatches the oldest five current queued items per recovery sweep, skips obsolete work, and exposes authoritative queue counts', async () => {
   const { competitionOverview } = await import('../src/competition-overview');
   const { acquireReviewer, releaseReviewer } =
     await import('../src/reviewer-capacity');
@@ -748,7 +748,7 @@ it('dispatches only the latest five queued items per recovery sweep, skips obsol
     await reconcile(env);
     expect(dispatched).toHaveLength(5);
     expect(new Set(dispatched)).toEqual(
-      new Set([202, 203, 204, 205, 206].map((pr) => expected.get(pr)!)),
+      new Set([200, 201, 202, 203, 204].map((pr) => expected.get(pr)!)),
     );
     expect(dispatched).not.toContain(expected.get(207));
     expect(

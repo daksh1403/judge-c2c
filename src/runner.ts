@@ -1,4 +1,9 @@
-import { actionsEvaluate } from './actions-runner';
+import { actionsEvaluate, frozenActionsInput } from './actions-runner';
+import {
+  acquirePreparation,
+  releaseReviewer,
+  renewReviewer,
+} from './reviewer-capacity';
 import { routeExecution, frozenExecutionContext } from './execution-routing';
 import { z } from 'zod';
 import {
@@ -167,6 +172,7 @@ export async function snapshot(
   github: GitHub,
   c: Contract,
   commit: string,
+  assertCurrent: () => Promise<void> = async () => {},
 ): Promise<SourceFile[]> {
   const tree = await github.api<{
     truncated: boolean;
@@ -185,6 +191,7 @@ export async function snapshot(
       throw new Error('RUNNER_UNSAFE_TREE');
     if ((item.size ?? 0) > c.execution.maxFileBytes)
       throw new Error('RUNNER_FILE_LIMIT');
+    await assertCurrent();
     const text = await github.file(
       c.repository.fullName,
       commit,
@@ -235,6 +242,7 @@ export async function runObjective(
   run: { id: string; head_sha: string; contract_hash: string },
   c: Contract,
   evidence: Evidence[],
+  options: { deferActions?: boolean } = {},
 ) {
   if (!c.execution.runner) return evidence;
   const originalPolicy = c.execution.runner;
@@ -283,7 +291,7 @@ export async function runObjective(
   }
   const routing = routeExecution(c, originalPolicy, context);
   const policy = routing.policy;
-  const github = await GitHub.installation(env, c);
+  let github: GitHub | undefined;
   const results: RunnerResult[] = [];
   const repositoryId = c.repository.id;
   const cachePolicy = policy.cache ?? 'NONE';
@@ -317,194 +325,257 @@ export async function runObjective(
     )
       throw new Error('RUNNER_SUPERSEDED');
   };
-  for (const commit of [c.baseline, run.head_sha]) {
-    await assertCurrent();
-    const request: RunnerRequest = {
-      runId: run.id,
-      commit,
-      contractHash: run.contract_hash,
-      policy,
-      timeoutSeconds: c.execution.timeoutSeconds,
-      memoryMiB: 256,
-      files: await snapshot(github, c, commit),
-    };
-    const hash = await digest(canonical(request));
-    const adapter =
-      env.RUNNER_BACKEND === 'actions-vm'
-        ? 'actions-vm'
-        : env.RUNNER_ENDPOINT
-          ? 'signed-tunnel'
-          : 'durable-object';
-    const imageDigest = [policy.image, env.RUNNER_IMAGE_URI ?? ''].join('|');
-    const key = await executionCacheKey(
-      repositoryId,
-      request,
-      adapter,
-      env.ENVIRONMENT,
-      imageDigest,
-    );
-    const mayRead =
-      cacheAllowed && (cachePolicy === 'ALL' || commit === c.baseline);
-    if (mayRead) {
-      const cached = await env.DB.prepare(
-        'SELECT ec.repository_id,ec.cache_key,ec.origin_run_id,ec.origin_execution_id,ec.request_hash,ec.result_hash,ec.request,ec.result,origin.repository_id AS verified_repository_id,er.run_id AS verified_origin_run_id,er.request_hash AS verified_request_hash,er.result_hash AS verified_result_hash,er.request AS verified_request,er.result AS verified_result,er.created_at AS verified_origin_created_at FROM execution_cache ec JOIN evaluations origin ON origin.id=ec.origin_run_id AND origin.repository_id=ec.repository_id JOIN execution_results er ON er.id=ec.origin_execution_id AND er.run_id=ec.origin_run_id WHERE ec.repository_id=? AND ec.cache_key=?',
-      )
-        .bind(repositoryId, key)
-        .first<{
-          repository_id: number;
-          cache_key: string;
-          origin_run_id: string;
-          origin_execution_id: string;
-          request_hash: string;
-          result_hash: string;
-          request: string;
-          result: string;
-          verified_repository_id: number;
-          verified_origin_run_id: string;
-          verified_request_hash: string;
-          verified_result_hash: string;
-          verified_request: string;
-          verified_result: string;
-          verified_origin_created_at: string;
-        }>();
-      if (cached) {
-        const reused = await verifiedCacheEntry(
-          cached,
-          key,
-          request,
-          validateRunnerResult,
-        );
-        if (
-          reused &&
-          /^[0-9a-f-]{36}$/i.test(cached.origin_execution_id) &&
-          /^[a-f0-9]{64}$/.test(cached.origin_run_id) &&
-          cached.verified_repository_id === repositoryId &&
-          cached.origin_run_id === cached.verified_origin_run_id &&
-          JSON.parse(cached.request).runId === cached.origin_run_id &&
-          cached.request_hash === cached.verified_request_hash &&
-          cached.result_hash === cached.verified_result_hash &&
-          cached.request === cached.verified_request &&
-          cached.result === cached.verified_result
-        ) {
-          await assertCurrent();
-          await env.DB.prepare(
-            'INSERT INTO execution_results(id,run_id,commit_sha,request_hash,result_hash,result,request,origin_run_id,origin_execution_id,cache_key,cache_status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
-          )
-            .bind(
-              crypto.randomUUID(),
-              run.id,
-              commit,
-              cached.request_hash,
-              cached.result_hash,
-              cached.result,
-              cached.request,
-              cached.origin_run_id,
-              cached.origin_execution_id,
-              key,
-              'HIT',
-              cached.verified_origin_created_at,
+  let sourceSlot: Awaited<ReturnType<typeof acquirePreparation>> = null;
+  try {
+    for (const commit of [c.baseline, run.head_sha]) {
+      await assertCurrent();
+      const descriptor: Omit<RunnerRequest, 'files'> = {
+        runId: run.id,
+        commit,
+        contractHash: run.contract_hash,
+        policy,
+        timeoutSeconds: c.execution.timeoutSeconds,
+        memoryMiB: 256,
+      };
+      const frozenInput =
+        options.deferActions && env.RUNNER_BACKEND === 'actions-vm'
+          ? await frozenActionsInput(env, descriptor)
+          : null;
+      if (options.deferActions && !frozenInput && !sourceSlot) {
+        sourceSlot = await acquirePreparation(env.CAPACITY_DB ?? env.DB);
+        if (!sourceSlot) throw new Error('RUNNER_BUSY');
+      }
+      const request: RunnerRequest = frozenInput ?? {
+        ...descriptor,
+        files: await snapshot(
+          (github ??= await GitHub.installation(env, c)),
+          c,
+          commit,
+          async () => {
+            await assertCurrent();
+            if (
+              sourceSlot &&
+              !(await renewReviewer(env.CAPACITY_DB ?? env.DB, sourceSlot))
             )
-            .run();
-          results.push(reused);
+              throw new Error('PREPARATION_LEASE_EXPIRED');
+          },
+        ),
+      };
+      const hash = await digest(canonical(request));
+      const adapter =
+        env.RUNNER_BACKEND === 'actions-vm'
+          ? 'actions-vm'
+          : env.RUNNER_ENDPOINT
+            ? 'signed-tunnel'
+            : 'durable-object';
+      const imageDigest = [policy.image, env.RUNNER_IMAGE_URI ?? ''].join('|');
+      const key = await executionCacheKey(
+        repositoryId,
+        request,
+        adapter,
+        env.ENVIRONMENT,
+        imageDigest,
+      );
+      // Durable polling resumes this same evaluation, not a new retry run. Reuse
+      // its already authenticated completed baseline without executing or storing
+      // it again while the submission attempt is still queued.
+      if (options.deferActions && frozenInput) {
+        const previous = await env.DB.prepare(
+          'SELECT id,result,result_hash,cache_status,cache_key FROM execution_results WHERE run_id=? AND commit_sha=? AND request_hash=? ORDER BY rowid DESC LIMIT 1',
+        )
+          .bind(run.id, commit, hash)
+          .first<{
+            id: string;
+            result: string;
+            result_hash: string;
+            cache_status: 'BYPASS' | 'MISS' | 'HIT';
+            cache_key: string;
+          }>();
+        if (previous) {
+          if ((await digest(previous.result)) !== previous.result_hash)
+            throw new Error('RUNNER_RESULT_INTEGRITY');
+          results.push(
+            validateRunnerResult(JSON.parse(previous.result), request, hash),
+          );
           provenance.push({
-            cacheStatus: 'HIT',
-            originRunId: cached.origin_run_id,
-            originExecutionId: cached.origin_execution_id,
-            cacheKey: key,
+            cacheStatus: previous.cache_status,
+            originRunId: run.id,
+            originExecutionId: previous.id,
+            cacheKey: previous.cache_key,
           });
           continue;
         }
       }
-    }
-    await assertCurrent();
-    // Each adapter restores a fresh guest snapshot for every baseline/head attempt.
-    const stub = env.RUNNER?.get(
-      env.RUNNER!.idFromName(run.id + '-' + commit + '-' + crypto.randomUUID()),
-    ) as unknown as RunnerStub;
-    const authenticated = validateRunnerResult(
-      env.RUNNER_BACKEND === 'actions-vm'
-        ? await actionsEvaluate(env, request, false, assertCurrent)
-        : env.RUNNER_ENDPOINT
-          ? await tunnelEvaluate(env, request)
-          : await stub.evaluate(request),
-      request,
-      hash,
-    );
-    const original = canonical(authenticated);
-    const stored = redact(original);
-    const result = runnerResultSchema.parse(JSON.parse(stored));
-    const requestSummary = canonical(await safeRunnerRequest(request));
-    const canStore =
-      cacheAllowed &&
-      cacheableResult(authenticated, stored, request.timeoutSeconds);
-    const attemptStatus = canStore ? 'MISS' : 'BYPASS';
-    const executionId = crypto.randomUUID();
-    const resultHash = await digest(stored);
-    await env.DB.prepare(
-      'INSERT INTO execution_results(id,run_id,commit_sha,request_hash,result_hash,result,request,cache_key,cache_status) VALUES(?,?,?,?,?,?,?,?,?)',
-    )
-      .bind(
-        executionId,
-        run.id,
-        commit,
+      const mayRead =
+        cacheAllowed && (cachePolicy === 'ALL' || commit === c.baseline);
+      if (mayRead) {
+        const cached = await env.DB.prepare(
+          'SELECT ec.repository_id,ec.cache_key,ec.origin_run_id,ec.origin_execution_id,ec.request_hash,ec.result_hash,ec.request,ec.result,origin.repository_id AS verified_repository_id,er.run_id AS verified_origin_run_id,er.request_hash AS verified_request_hash,er.result_hash AS verified_result_hash,er.request AS verified_request,er.result AS verified_result,er.created_at AS verified_origin_created_at FROM execution_cache ec JOIN evaluations origin ON origin.id=ec.origin_run_id AND origin.repository_id=ec.repository_id JOIN execution_results er ON er.id=ec.origin_execution_id AND er.run_id=ec.origin_run_id WHERE ec.repository_id=? AND ec.cache_key=?',
+        )
+          .bind(repositoryId, key)
+          .first<{
+            repository_id: number;
+            cache_key: string;
+            origin_run_id: string;
+            origin_execution_id: string;
+            request_hash: string;
+            result_hash: string;
+            request: string;
+            result: string;
+            verified_repository_id: number;
+            verified_origin_run_id: string;
+            verified_request_hash: string;
+            verified_result_hash: string;
+            verified_request: string;
+            verified_result: string;
+            verified_origin_created_at: string;
+          }>();
+        if (cached) {
+          const reused = await verifiedCacheEntry(
+            cached,
+            key,
+            request,
+            validateRunnerResult,
+          );
+          if (
+            reused &&
+            /^[0-9a-f-]{36}$/i.test(cached.origin_execution_id) &&
+            /^[a-f0-9]{64}$/.test(cached.origin_run_id) &&
+            cached.verified_repository_id === repositoryId &&
+            cached.origin_run_id === cached.verified_origin_run_id &&
+            JSON.parse(cached.request).runId === cached.origin_run_id &&
+            cached.request_hash === cached.verified_request_hash &&
+            cached.result_hash === cached.verified_result_hash &&
+            cached.request === cached.verified_request &&
+            cached.result === cached.verified_result
+          ) {
+            await assertCurrent();
+            await env.DB.prepare(
+              'INSERT INTO execution_results(id,run_id,commit_sha,request_hash,result_hash,result,request,origin_run_id,origin_execution_id,cache_key,cache_status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
+            )
+              .bind(
+                crypto.randomUUID(),
+                run.id,
+                commit,
+                cached.request_hash,
+                cached.result_hash,
+                cached.result,
+                cached.request,
+                cached.origin_run_id,
+                cached.origin_execution_id,
+                key,
+                'HIT',
+                cached.verified_origin_created_at,
+              )
+              .run();
+            results.push(reused);
+            provenance.push({
+              cacheStatus: 'HIT',
+              originRunId: cached.origin_run_id,
+              originExecutionId: cached.origin_execution_id,
+              cacheKey: key,
+            });
+            continue;
+          }
+        }
+      }
+      await assertCurrent();
+      // Each adapter restores a fresh guest snapshot for every baseline/head attempt.
+      const stub = env.RUNNER?.get(
+        env.RUNNER!.idFromName(
+          run.id + '-' + commit + '-' + crypto.randomUUID(),
+        ),
+      ) as unknown as RunnerStub;
+      const authenticated = validateRunnerResult(
+        env.RUNNER_BACKEND === 'actions-vm'
+          ? await actionsEvaluate(env, request, false, assertCurrent, {
+              defer: options.deferActions,
+            })
+          : env.RUNNER_ENDPOINT
+            ? await tunnelEvaluate(env, request)
+            : await stub.evaluate(request),
+        request,
         hash,
-        resultHash,
-        stored,
-        requestSummary,
-        key,
-        attemptStatus,
-      )
-      .run();
-    // Dispatched execution cannot be recalled. Keep its authenticated, redacted
-    // result on the immutable attempt before fencing every subsequent action.
-    await assertCurrent();
-    if (canStore) {
+      );
+      const original = canonical(authenticated);
+      const stored = redact(original);
+      const result = runnerResultSchema.parse(JSON.parse(stored));
+      const requestSummary = canonical(await safeRunnerRequest(request));
+      const canStore =
+        cacheAllowed &&
+        cacheableResult(authenticated, stored, request.timeoutSeconds);
+      const attemptStatus = canStore ? 'MISS' : 'BYPASS';
+      const executionId = crypto.randomUUID();
+      const resultHash = await digest(stored);
       await env.DB.prepare(
-        "INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) SELECT ?,?,?,?,?,?,?,? FROM evaluations e JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE e.id=? AND e.state='CHECKING' AND s.latest_run_id=e.id AND s.head_sha=e.head_sha AND s.closed=0",
+        'INSERT INTO execution_results(id,run_id,commit_sha,request_hash,result_hash,result,request,cache_key,cache_status) VALUES(?,?,?,?,?,?,?,?,?)',
       )
         .bind(
-          repositoryId,
-          key,
-          run.id,
           executionId,
+          run.id,
+          commit,
           hash,
           resultHash,
-          requestSummary,
           stored,
-          run.id,
+          requestSummary,
+          key,
+          attemptStatus,
         )
         .run();
+      // Dispatched execution cannot be recalled. Keep its authenticated, redacted
+      // result on the immutable attempt before fencing every subsequent action.
+      await assertCurrent();
+      if (canStore) {
+        await env.DB.prepare(
+          "INSERT OR IGNORE INTO execution_cache(repository_id,cache_key,origin_run_id,origin_execution_id,request_hash,result_hash,request,result) SELECT ?,?,?,?,?,?,?,? FROM evaluations e JOIN submissions s ON s.repository_id=e.repository_id AND s.pr_number=e.pr_number WHERE e.id=? AND e.state='CHECKING' AND s.latest_run_id=e.id AND s.head_sha=e.head_sha AND s.closed=0",
+        )
+          .bind(
+            repositoryId,
+            key,
+            run.id,
+            executionId,
+            hash,
+            resultHash,
+            requestSummary,
+            stored,
+            run.id,
+          )
+          .run();
+      }
+      results.push(result);
+      provenance.push({
+        cacheStatus: attemptStatus,
+        originRunId: run.id,
+        originExecutionId: executionId,
+        cacheKey: key,
+      });
     }
-    results.push(result);
-    provenance.push({
-      cacheStatus: attemptStatus,
-      originRunId: run.id,
-      originExecutionId: executionId,
-      cacheKey: key,
-    });
+    const replacement = executionEvidence(c, results[0]!, results[1]!).map(
+      (item) => ({
+        ...item,
+        claim: `${item.claim} Execution provenance: baseline ${provenance[0]?.cacheStatus ?? 'BYPASS'} from run ${provenance[0]?.originRunId ?? run.id}, execution ${provenance[0]?.originExecutionId ?? 'unavailable'}, cache ${provenance[0]?.cacheKey ?? 'unavailable'}; submission ${provenance[1]?.cacheStatus ?? 'BYPASS'} from run ${provenance[1]?.originRunId ?? run.id}, execution ${provenance[1]?.originExecutionId ?? 'unavailable'}, cache ${provenance[1]?.cacheKey ?? 'unavailable'}.`,
+      }),
+    );
+    const all = [
+      ...evidence.filter((e) => !replacement.some((r) => r.id === e.id)),
+      ...replacement,
+      ...routing.evidence,
+    ];
+    for (const check of results[1]!.checks.filter(
+      (x) => x.kind !== 'acceptance',
+    )) {
+      const before = results[0]!.checks.find((x) => x.id === check.id);
+      all.push({
+        id: 'execution-' + check.id,
+        kind: 'execution',
+        status: check.status,
+        baselineStatus: before?.status,
+        claim: `${check.kind}: ${check.detail} Baseline ${before?.status ?? 'UNVERIFIED'} → submission ${check.status}. ${check.kind === 'benchmark' ? 'Trusted, environment-specific HTTP benchmark.' : 'Repository commands are supplemental evidence.'}`,
+      });
+    }
+    return all;
+  } finally {
+    if (sourceSlot)
+      await releaseReviewer(env.CAPACITY_DB ?? env.DB, sourceSlot);
   }
-  const replacement = executionEvidence(c, results[0]!, results[1]!).map(
-    (item) => ({
-      ...item,
-      claim: `${item.claim} Execution provenance: baseline ${provenance[0]?.cacheStatus ?? 'BYPASS'} from run ${provenance[0]?.originRunId ?? run.id}, execution ${provenance[0]?.originExecutionId ?? 'unavailable'}, cache ${provenance[0]?.cacheKey ?? 'unavailable'}; submission ${provenance[1]?.cacheStatus ?? 'BYPASS'} from run ${provenance[1]?.originRunId ?? run.id}, execution ${provenance[1]?.originExecutionId ?? 'unavailable'}, cache ${provenance[1]?.cacheKey ?? 'unavailable'}.`,
-    }),
-  );
-  const all = [
-    ...evidence.filter((e) => !replacement.some((r) => r.id === e.id)),
-    ...replacement,
-    ...routing.evidence,
-  ];
-  for (const check of results[1]!.checks.filter(
-    (x) => x.kind !== 'acceptance',
-  )) {
-    const before = results[0]!.checks.find((x) => x.id === check.id);
-    all.push({
-      id: 'execution-' + check.id,
-      kind: 'execution',
-      status: check.status,
-      baselineStatus: before?.status,
-      claim: `${check.kind}: ${check.detail} Baseline ${before?.status ?? 'UNVERIFIED'} → submission ${check.status}. ${check.kind === 'benchmark' ? 'Trusted, environment-specific HTTP benchmark.' : 'Repository commands are supplemental evidence.'}`,
-    });
-  }
-  return all;
 }

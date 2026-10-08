@@ -20,6 +20,182 @@ const id = 'c'.repeat(64),
   } as unknown as ExecutionContext;
 afterEach(() => vi.restoreAllMocks());
 
+it('keeps a submission waiting beyond the old four-minute reviewer budget without losing evidence', async () => {
+  const mf = new Miniflare({
+    modules: true,
+    script: 'export default{}',
+    d1Databases: ['DB'],
+    compatibilityDate: '2026-08-01',
+  });
+  try {
+    const db = (await mf.getD1Database('DB')) as unknown as D1Database;
+    await seed(db);
+    vi.spyOn(GitHub, 'installation').mockResolvedValue({
+      compare: async () => [],
+      file: async () => '## Scheduling',
+      api: async (path: string) =>
+        path.includes('/pulls/')
+          ? { title: 'Fixture', body: '', head: { sha: head }, state: 'open' }
+          : path.includes('check-runs?')
+            ? { check_runs: [] }
+            : path.includes('check-runs')
+              ? { id: 7 }
+              : { commits: [] },
+    } as unknown as GitHub);
+    const occupied = await acquireReviewer(db, 'gemini');
+    let sleeps = 0;
+    const pause = async () => {
+      if (++sleeps === 18) await releaseReviewer(db, occupied!);
+    };
+    const step = {
+      sleep: pause,
+      do: async (_name: string, options: any, callback?: () => unknown) => {
+        const work = typeof options === 'function' ? options : callback!;
+        const limit =
+          typeof options === 'function' ? 0 : (options.retries?.limit ?? 0);
+        for (let retry = 0; ; retry++) {
+          try {
+            return await work();
+          } catch (error) {
+            if (retry >= limit) throw error;
+            await pause();
+          }
+        }
+      },
+    } as unknown as WorkflowStep;
+    const original = review.aiReview;
+    const ai = vi
+      .spyOn(review, 'aiReview')
+      .mockImplementation((env, ...args) =>
+        original({ ...env, GEMINI_API_KEY: undefined }, ...args),
+      );
+    await new EvaluationWorkflow(ctx, {
+      DB: db,
+      ENVIRONMENT: 'local',
+      AI_PROVIDER: 'gemini',
+      GEMINI_API_KEY: 'fixture-key',
+    } as Env).run(
+      { payload: { runId: id } } as WorkflowEvent<{ runId: string }>,
+      step,
+    );
+    expect(
+      await db
+        .prepare('SELECT state,failure_code FROM evaluations WHERE id=?')
+        .bind(id)
+        .first(),
+    ).toEqual({ state: 'COMPLETED', failure_code: null });
+    expect(sleeps).toBe(18);
+    expect(ai).toHaveBeenCalledTimes(1);
+    const final = await db
+      .prepare('SELECT evidence FROM evaluations WHERE id=?')
+      .bind(id)
+      .first<{ evidence: string }>();
+    expect(
+      JSON.parse(final!.evidence).some(
+        (item: { kind: string; status: string }) =>
+          item.kind === 'execution' && item.status === 'PASS',
+      ),
+    ).toBe(false);
+    expect(
+      await db
+        .prepare("SELECT owner FROM reviewer_slots WHERE provider='gemini'")
+        .first(),
+    ).toBeNull();
+  } finally {
+    await mf.dispose();
+  }
+});
+
+it.each([false, true])(
+  'handles provider rate limits with bounded backoff and retained history (persistent=%s)',
+  async (persistent) => {
+    const { sqliteD1 } = await import('./fixtures/sqlite-d1');
+    const fixture = sqliteD1();
+    let now = Date.now();
+    try {
+      const db = fixture.db;
+      await seed(db);
+      vi.spyOn(Date, 'now').mockImplementation(() => now);
+      vi.spyOn(GitHub, 'installation').mockResolvedValue({
+        compare: async () => [],
+        file: async () => '## Scheduling',
+        api: async (path: string) =>
+          path.includes('/pulls/')
+            ? {
+                title: 'Synthetic',
+                body: '',
+                head: { sha: head },
+                state: 'open',
+              }
+            : path.includes('check-runs?')
+              ? { check_runs: [] }
+              : path.includes('check-runs')
+                ? { id: 7 }
+                : { commits: [] },
+      } as unknown as GitHub);
+      const original = review.aiReview;
+      let calls = 0;
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response('', { status: 429 }),
+      );
+      const ai = vi
+        .spyOn(review, 'aiReview')
+        .mockImplementation(async (env, ...args) => {
+          return original(
+            ++calls === 1 || persistent
+              ? { ...env, GEMINI_MODEL: 'synthetic' }
+              : { ...env, GEMINI_API_KEY: undefined },
+            ...args,
+          );
+        });
+      const step = {
+        do: async (
+          _name: string,
+          options: unknown,
+          callback?: () => unknown,
+        ) => (typeof options === 'function' ? options() : callback!()),
+        sleep: async (_name: string, duration: string) => {
+          now += Number(duration.split(' ')[0]) * 1000;
+        },
+      } as unknown as WorkflowStep;
+      await new EvaluationWorkflow(ctx, {
+        DB: db,
+        ENVIRONMENT: 'local',
+        AI_PROVIDER: 'gemini',
+        GEMINI_API_KEY: 'synthetic-no-network',
+      } as Env).run(
+        { payload: { runId: id } } as WorkflowEvent<{ runId: string }>,
+        step,
+      );
+      expect(ai).toHaveBeenCalledTimes(persistent ? 6 : 2);
+      expect(
+        await db
+          .prepare('SELECT state,failure_code FROM evaluations WHERE id=?')
+          .bind(id)
+          .first(),
+      ).toEqual({ state: 'COMPLETED', failure_code: null });
+      const attempts = (
+        await db
+          .prepare(
+            "SELECT changes FROM audit WHERE action='reviewer.attempt' AND entity=? ORDER BY id",
+          )
+          .bind(id)
+          .all<{ changes: string }>()
+      ).results.map((row) => JSON.parse(row.changes));
+      expect(attempts).toHaveLength(persistent ? 6 : 2);
+      expect(attempts[0].trace.attemptFailures).toContain('GEMINI_HTTP_429');
+      expect(attempts[1].id).not.toBe(attempts[0].id);
+      expect(
+        await db
+          .prepare("SELECT owner FROM reviewer_slots WHERE provider='gemini'")
+          .first(),
+      ).toBeNull();
+    } finally {
+      fixture.close();
+    }
+  },
+);
+
 it.each(['renewal', 'transition'])(
   'does not start AI when retirement intervenes during reviewer %s',
   async (boundary) => {
@@ -58,7 +234,7 @@ it.each(['renewal', 'transition'])(
         const original = capacity.renewReviewer;
         vi.spyOn(capacity, 'renewReviewer').mockImplementation(
           async (...args) => {
-            await retire();
+            if (args[1].provider === 'callmissed') await retire();
             return original(...args);
           },
         );
@@ -153,6 +329,157 @@ async function seed(db: D1Database) {
     .bind(head, id, '2026-10-04T00:00:00Z', 'team-runtime', 'VALID')
     .run();
 }
+
+it('drains 80 synthetic teams with bounded GitHub preparation and one AI call at a time', async () => {
+  const { sqliteD1 } = await import('./fixtures/sqlite-d1');
+  const fixture = sqliteD1();
+  try {
+    const db = fixture.db;
+    await seed(db);
+    const base = await db
+      .prepare('SELECT * FROM evaluations WHERE id=?')
+      .bind(id)
+      .first<Record<string, string>>();
+    const ids = [
+      id,
+      ...Array.from({ length: 79 }, (_, i) =>
+        (i + 1).toString(16).padStart(64, '0'),
+      ),
+    ];
+    const statements: D1PreparedStatement[] = [];
+    for (let i = 1; i < ids.length; i++) {
+      const team = `team-capacity-${i}`;
+      statements.push(
+        db
+          .prepare("INSERT INTO teams(id,name,status) VALUES(?,?,'ACTIVE')")
+          .bind(team, `Synthetic team ${i + 1}`),
+        db
+          .prepare(
+            "INSERT INTO evaluations(id,repository_id,pr_number,head_sha,baseline_sha,contract_hash,contract_snapshot,assignment_snapshot,state) VALUES(?,1,?,?,?,?,?,?,'QUEUED')",
+          )
+          .bind(
+            ids[i],
+            24 + i,
+            head,
+            demoContract.baseline,
+            base!.contract_hash,
+            base!.contract_snapshot,
+            canonical({ team_id: team }),
+          ),
+        db
+          .prepare(
+            "INSERT INTO submissions(repository_id,pr_number,head_sha,latest_run_id,github_updated_at,team_id,status) VALUES(1,?,?,?,'2026-10-08T00:00:00Z',?,'VALID')",
+          )
+          .bind(24 + i, head, ids[i], team),
+      );
+    }
+    await db.batch(statements);
+    let activeFiles = 0,
+      maximumFiles = 0,
+      activeReviews = 0,
+      maximumReviews = 0;
+    const pause = () => new Promise((resolve) => setTimeout(resolve, 5));
+    vi.spyOn(GitHub, 'installation').mockResolvedValue({
+      compare: async () => [],
+      file: async () => {
+        maximumFiles = Math.max(maximumFiles, ++activeFiles);
+        await new Promise((resolve) => setTimeout(resolve, 40));
+        activeFiles--;
+        return '## Scheduling';
+      },
+      api: async (path: string) =>
+        path.includes('/pulls/')
+          ? {
+              title: 'Synthetic capacity fixture',
+              body: '',
+              head: { sha: head },
+              state: 'open',
+            }
+          : path.includes('check-runs?')
+            ? { check_runs: [] }
+            : path.includes('check-runs')
+              ? { id: 7 }
+              : { commits: [] },
+    } as unknown as GitHub);
+    const original = review.aiReview;
+    const ai = vi
+      .spyOn(review, 'aiReview')
+      .mockImplementation(async (env, ...args) => {
+        maximumReviews = Math.max(maximumReviews, ++activeReviews);
+        try {
+          await pause();
+          return await original({ ...env, GEMINI_API_KEY: undefined }, ...args);
+        } finally {
+          activeReviews--;
+        }
+      });
+    const env = {
+      DB: db,
+      ENVIRONMENT: 'local',
+      AI_PROVIDER: 'gemini',
+      GEMINI_API_KEY: 'synthetic-no-network',
+    } as Env;
+    const steps = ids.map(
+      () =>
+        ({
+          sleep: pause,
+          do: async (_name: string, options: any, callback?: () => unknown) => {
+            const work = typeof options === 'function' ? options : callback!;
+            const limit =
+              typeof options === 'function' ? 0 : (options.retries?.limit ?? 0);
+            for (let retry = 0; ; retry++) {
+              try {
+                return await work();
+              } catch (error) {
+                if (retry >= limit) throw error;
+                await pause();
+              }
+            }
+          },
+        }) as unknown as WorkflowStep,
+    );
+    await Promise.all(
+      ids.map((runId, i) =>
+        new EvaluationWorkflow(ctx, env).run(
+          { payload: { runId } } as WorkflowEvent<{ runId: string }>,
+          steps[i]!,
+        ),
+      ),
+    );
+    expect(
+      await db
+        .prepare('SELECT state,COUNT(*) AS n FROM evaluations GROUP BY state')
+        .all(),
+    ).toMatchObject({ results: [{ state: 'COMPLETED', n: 80 }] });
+    expect(
+      await db
+        .prepare(
+          "SELECT COUNT(*) AS n FROM evaluations WHERE publication_status='PUBLISHED' AND failure_code IS NULL",
+        )
+        .first(),
+    ).toEqual({ n: 80 });
+    expect(ai).toHaveBeenCalledTimes(80);
+    expect(maximumReviews).toBe(1);
+    expect(maximumFiles).toBeLessThanOrEqual(32);
+    expect(
+      await db.prepare('SELECT COUNT(*) AS n FROM reviewer_slots').first(),
+    ).toEqual({ n: 0 });
+    const evidence = await db
+      .prepare('SELECT evidence FROM evaluations')
+      .all<{ evidence: string }>();
+    expect(
+      evidence.results.every(
+        (row) =>
+          !JSON.parse(row.evidence).some(
+            (item: { kind: string; status: string }) =>
+              item.kind === 'execution' && item.status === 'PASS',
+          ),
+      ),
+    ).toBe(true);
+  } finally {
+    fixture.close();
+  }
+}, 60000);
 it('executes production prepare backoff and recovery in the real Miniflare Workflow engine', async () => {
   const script = buildSync({
     stdin: {
@@ -230,6 +557,105 @@ it('executes production prepare backoff and recovery in the real Miniflare Workf
     await runtime.dispose();
   }
 }, 65000);
+
+it('durably sleeps for reviewer capacity and cancels an obsolete head before any provider call', async () => {
+  const script = buildSync({
+    stdin: {
+      resolveDir: process.cwd(),
+      contents: `
+import {EvaluationWorkflow} from './src/workflow.ts';
+import {GitHub} from './src/github.ts';
+export {EvaluationWorkflow};
+let providerCalls=0;
+const nativeFetch=globalThis.fetch;
+globalThis.fetch=(input,options)=>String(input).startsWith('https://api.groq.com/')?(providerCalls++,Promise.reject(Error('UNEXPECTED_PROVIDER_CALL'))):nativeFetch(input,options);
+GitHub.installation=async()=>({compare:async()=>[],file:async()=> '## Scheduling',api:async(path)=>path.includes('/pulls/')?{title:'Synthetic',body:'',head:{sha:'${head}'},state:'open'}:path.includes('check-runs?')?{check_runs:[]}:path.includes('check-runs')?{id:7}:{commits:[]}});
+export default {async fetch(request,env){
+ const path=new URL(request.url).pathname;
+ if(path==='/create')return Response.json(await(await env.EVALUATOR.create({id:'${id}',params:{runId:'${id}'}})).status());
+ if(path==='/supersede'){
+  await env.DB.prepare('UPDATE submissions SET latest_run_id=?,head_sha=? WHERE repository_id=1 AND pr_number=24').bind('${'d'.repeat(64)}','${'e'.repeat(40)}').run();
+  await env.DB.prepare("DELETE FROM reviewer_slots WHERE provider='groq'").run();
+ }
+ return Response.json({...(await(await env.EVALUATOR.get('${id}')).status()),providerCalls});
+}};`,
+    },
+    bundle: true,
+    write: false,
+    format: 'esm',
+    platform: 'neutral',
+    external: ['cloudflare:workers', 'node:*'],
+  }).outputFiles[0]!.text;
+  const runtime = new Miniflare({
+    modules: true,
+    script,
+    compatibilityDate: '2026-08-01',
+    compatibilityFlags: ['nodejs_compat'],
+    d1Databases: ['DB'],
+    workflows: {
+      EVALUATOR: {
+        name: 'reviewer-wait-runtime',
+        className: 'EvaluationWorkflow',
+      },
+    },
+    bindings: {
+      ENVIRONMENT: 'local',
+      AI_PROVIDER: 'groq',
+      GROQ_API_KEY: 'synthetic-not-a-real-key',
+    },
+  });
+  try {
+    const db = (await runtime.getD1Database('DB')) as unknown as D1Database;
+    await seed(db);
+    await acquireReviewer(db, 'groq');
+    await runtime.dispatchFetch('https://fixture.test/create');
+    await vi.waitFor(
+      async () => {
+        expect(
+          await db
+            .prepare(
+              "SELECT COUNT(*) AS n FROM timeline WHERE run_id=? AND detail LIKE 'Waiting for AI reviewer capacity%'",
+            )
+            .bind(id)
+            .first(),
+        ).toEqual({ n: 1 });
+        expect(
+          (
+            (await (
+              await runtime.dispatchFetch('https://fixture.test/status')
+            ).json()) as { status: string }
+          ).status,
+        ).toMatch(/^(waiting|running)$/);
+      },
+      { timeout: 10000, interval: 100 },
+    );
+    const waitingAt = Date.now();
+    await runtime.dispatchFetch('https://fixture.test/supersede');
+    await vi.waitFor(
+      async () => {
+        expect(
+          await db
+            .prepare(
+              'SELECT state,report,failure_code FROM evaluations WHERE id=?',
+            )
+            .bind(id)
+            .first(),
+        ).toEqual({ state: 'SUPERSEDED', report: null, failure_code: null });
+      },
+      { timeout: 38000, interval: 200 },
+    );
+    expect(Date.now() - waitingAt).toBeGreaterThanOrEqual(28500);
+    expect(
+      (
+        (await (
+          await runtime.dispatchFetch('https://fixture.test/status')
+        ).json()) as { providerCalls: number }
+      ).providerCalls,
+    ).toBe(0);
+  } finally {
+    await runtime.dispose();
+  }
+}, 55000);
 it('releases an acquired AI lease when newer authoritative work supersedes the run before reasoning', async () => {
   const mf = new Miniflare({
     modules: true,
@@ -261,17 +687,12 @@ it('releases an acquired AI lease when newer authoritative work supersedes the r
       CALLMISSED_API_KEY: 'fixture-key',
     } as Env;
     let observedLease = false;
-    const step = {
-      do: async (name: string, options: unknown, callback?: () => unknown) => {
-        const value = await (typeof options === 'function'
-          ? options()
-          : callback!());
-        if (name === 'reviewer-capacity') {
-          observedLease = !!(await db
-            .prepare(
-              "SELECT owner FROM reviewer_slots WHERE provider='callmissed'",
-            )
-            .first());
+    const acquire = capacity.acquireReviewer;
+    vi.spyOn(capacity, 'acquireReviewer').mockImplementation(
+      async (...args) => {
+        const slot = await acquire(...args);
+        if (slot) {
+          observedLease = true;
           await db
             .prepare(
               'UPDATE submissions SET latest_run_id=?,head_sha=? WHERE repository_id=1 AND pr_number=24',
@@ -279,6 +700,14 @@ it('releases an acquired AI lease when newer authoritative work supersedes the r
             .bind('d'.repeat(64), 'e'.repeat(40))
             .run();
         }
+        return slot;
+      },
+    );
+    const step = {
+      do: async (_name: string, options: unknown, callback?: () => unknown) => {
+        const value = await (typeof options === 'function'
+          ? options()
+          : callback!());
         return value;
       },
     } as unknown as WorkflowStep;

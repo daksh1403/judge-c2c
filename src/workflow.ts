@@ -9,6 +9,8 @@ import {
 import { captureRunArtifacts } from './artifact-store';
 import {
   acquireReviewer,
+  acquirePreparation,
+  coolDownReviewer,
   releaseReviewer,
   renewReviewer,
 } from './reviewer-capacity';
@@ -42,178 +44,209 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
   async run(event: WorkflowEvent<{ runId: string }>, step: WorkflowStep) {
     const id = event.payload.runId;
     try {
-      const context = await step.do(
-        'prepare',
-        {
-          retries: { limit: 3, delay: '10 seconds', backoff: 'exponential' },
-          timeout: '3 minutes',
-        },
-        async () => {
-          const run = await this.requireCurrent(id);
-          if (!run) return null;
-          await transition(this.env, id, 'QUEUED', 'FETCHING');
-          const c = parseContract(run);
-          const github = await GitHub.installation(this.env, c);
-          const pr = await github.api<{
-            title: string;
-            body: string | null;
-            head: { sha: string };
-            state: string;
-          }>(`/repos/${c.repository.fullName}/pulls/${run.pr_number}`);
-          if (pr.head.sha !== run.head_sha || pr.state !== 'open') {
-            await this.supersede(run);
-            return null;
-          }
-          // A status outage must not prevent objective evidence collection.
-          await publish(this.env, (await getRun(this.env, id))!).catch(
-            () => {},
-          );
-          const files = await github.compare(c, run.head_sha);
-          const commitContext = await github.api<{
-            commits?: { sha: string; commit: { message: string } }[];
-          }>(
-            `/repos/${c.repository.fullName}/compare/${c.baseline}...${run.head_sha}?per_page=100`,
-          );
-          const commits = commitContext.commits ?? [];
-          // Native PR head was verified separately. Commit context is bounded and may be partial.
-          const paths = [
-            ...new Set([
-              ...files
-                .filter(
-                  (f) =>
-                    !/lock|generated|\.min\.|\.(png|jpg|pdf|zip)$/.test(
-                      f.filename,
+      let context: Context | null = null;
+      let preparationFinished = false;
+      for (let attempt = 0; attempt < 240; attempt++) {
+        const prepared = await step.do(
+          attempt === 0 ? 'prepare' : `prepare-${attempt}`,
+          {
+            retries: { limit: 3, delay: '10 seconds', backoff: 'exponential' },
+            timeout: '3 minutes',
+          },
+          async () => {
+            const run = await this.requireCurrent(id);
+            if (!run) return null;
+            const slot = await acquirePreparation(
+              this.env.CAPACITY_DB ?? this.env.DB,
+            );
+            if (!slot) return 'CONTEXT_BUSY' as const;
+            try {
+              await transition(this.env, id, 'QUEUED', 'FETCHING');
+              const c = parseContract(run);
+              const github = await GitHub.installation(this.env, c);
+              const pr = await github.api<{
+                title: string;
+                body: string | null;
+                head: { sha: string };
+                state: string;
+              }>(`/repos/${c.repository.fullName}/pulls/${run.pr_number}`);
+              if (pr.head.sha !== run.head_sha || pr.state !== 'open') {
+                await this.supersede(run);
+                return null;
+              }
+              // A status outage must not prevent objective evidence collection.
+              await publish(this.env, (await getRun(this.env, id))!).catch(
+                () => {},
+              );
+              const files = await github.compare(c, run.head_sha);
+              const commitContext = await github.api<{
+                commits?: { sha: string; commit: { message: string } }[];
+              }>(
+                `/repos/${c.repository.fullName}/compare/${c.baseline}...${run.head_sha}?per_page=100`,
+              );
+              const commits = commitContext.commits ?? [];
+              // Native PR head was verified separately. Commit context is bounded and may be partial.
+              const paths = [
+                ...new Set([
+                  ...files
+                    .filter(
+                      (f) =>
+                        !/lock|generated|\.min\.|\.(png|jpg|pdf|zip)$/.test(
+                          f.filename,
+                        ),
+                    )
+                    .slice(0, 8)
+                    .map((f) => f.filename),
+                  ...(c.analysis?.dependencyAudit === 'OSV_NPM_V1'
+                    ? ['package.json', 'package-lock.json']
+                    : []),
+                  ...c.requirements.flatMap((r) =>
+                    r.criteria.flatMap((a) =>
+                      a.verification.type === 'file_contains'
+                        ? [a.verification.path]
+                        : [],
                     ),
+                  ),
+                ]),
+              ];
+              if (paths.length > 30) throw new Error('CONTEXT_LIMIT');
+              const sources: Context['sources'] = {};
+              // Limit parallel GitHub requests and cumulative context size.
+              for (let i = 0; i < paths.length; i += 4) {
+                if (
+                  !(await renewReviewer(
+                    this.env.CAPACITY_DB ?? this.env.DB,
+                    slot,
+                  ))
                 )
-                .slice(0, 8)
-                .map((f) => f.filename),
-              ...(c.analysis?.dependencyAudit === 'OSV_NPM_V1'
-                ? ['package.json', 'package-lock.json']
-                : []),
-              ...c.requirements.flatMap((r) =>
-                r.criteria.flatMap((a) =>
-                  a.verification.type === 'file_contains'
-                    ? [a.verification.path]
-                    : [],
-                ),
-              ),
-            ]),
-          ];
-          if (paths.length > 30) throw new Error('CONTEXT_LIMIT');
-          const sources: Context['sources'] = {};
-          // Limit parallel GitHub requests and cumulative context size.
-          for (let i = 0; i < paths.length; i += 4)
-            await Promise.all(
-              paths.slice(i, i + 4).map(async (path) => {
-                const [baseline, head] = await Promise.all([
-                  github.file(
-                    c.repository.fullName,
-                    c.baseline,
-                    path,
-                    c.execution.maxFileBytes,
-                  ),
-                  github.file(
-                    c.repository.fullName,
-                    run.head_sha,
-                    path,
-                    c.execution.maxFileBytes,
-                  ),
-                ]);
-                sources[path] = { baseline, head };
-              }),
-            );
-          const result: Context = {
-            files: files.map((f) => ({
-              ...f,
-              patch: f.patch ? redact(f.patch).slice(0, 5000) : undefined,
-              patchTruncated:
-                f.patchTruncated || (!!f.patch && f.patch.length > 5000),
-            })),
-            sources,
-            pullRequest: {
-              title: redact(pr.title ?? '').slice(0, 1000),
-              description: redact(pr.body ?? '').slice(0, 6000),
-              head: run.head_sha,
-            },
-            commits: commits.map((commit) => ({
-              sha: commit.sha,
-              message: redact(commit.commit.message).slice(0, 500),
-            })),
-            risk: classifyRisk(files),
-            environment: c.execution.environment,
-            toolVersion: 'judge-c2c-0.1.1',
-          };
-          const indexed = await repositoryIndex(
-            this.env.DB,
-            c.repository.id,
-            c.baseline,
-            run.head_sha,
-            result,
-          );
-          result.repositoryIntelligence = indexed.index;
-          result.repositoryIndexCache = indexed.cache;
-          const size = canonical(result).length;
-          if (size > 750_000) throw new Error('CONTEXT_LIMIT');
-          // Never persist raw source credentials. Source assertions run on the in-memory data;
-          // stored context is redacted and includes raw hashes for audit without secret values.
-          const evidence = objective(c, result);
-          if (c.analysis?.dependencyAudit === 'OSV_NPM_V1') {
-            const scanStarted = Date.now();
-            evidence.push(
-              ...(await cachedDependencyAudit(
-                this.env.DB,
-                {
-                  repositoryId: c.repository.id,
-                  runId: id,
-                  baseline: c.baseline,
-                  head: run.head_sha,
-                  contractHash: run.contract_hash,
-                  cache: c.execution.runner?.cache ?? 'NONE',
-                },
-                {
-                  manifest: sources['package.json']?.baseline ?? null,
-                  lock: sources['package-lock.json']?.baseline ?? null,
-                },
-                {
-                  manifest: sources['package.json']?.head ?? null,
-                  lock: sources['package-lock.json']?.head ?? null,
-                },
-              )),
-            );
-            await recordRunMeasurement(
-              this.env.DB,
-              id,
-              'check.scan.durationMs',
-              Date.now() - scanStarted,
-            ).catch(() => undefined);
-          }
-          const stored = redact(
-            canonical({
-              ...result,
-              sources: Object.fromEntries(
+                  throw new Error('PREPARATION_LEASE_EXPIRED');
                 await Promise.all(
-                  Object.entries(sources).map(async ([path, s]) => [
-                    path,
+                  paths.slice(i, i + 4).map(async (path) => {
+                    const [baseline, head] = await Promise.all([
+                      github.file(
+                        c.repository.fullName,
+                        c.baseline,
+                        path,
+                        c.execution.maxFileBytes,
+                      ),
+                      github.file(
+                        c.repository.fullName,
+                        run.head_sha,
+                        path,
+                        c.execution.maxFileBytes,
+                      ),
+                    ]);
+                    sources[path] = { baseline, head };
+                  }),
+                );
+              }
+              const result: Context = {
+                files: files.map((f) => ({
+                  ...f,
+                  patch: f.patch ? redact(f.patch).slice(0, 5000) : undefined,
+                  patchTruncated:
+                    f.patchTruncated || (!!f.patch && f.patch.length > 5000),
+                })),
+                sources,
+                pullRequest: {
+                  title: redact(pr.title ?? '').slice(0, 1000),
+                  description: redact(pr.body ?? '').slice(0, 6000),
+                  head: run.head_sha,
+                },
+                commits: commits.map((commit) => ({
+                  sha: commit.sha,
+                  message: redact(commit.commit.message).slice(0, 500),
+                })),
+                risk: classifyRisk(files),
+                environment: c.execution.environment,
+                toolVersion: 'judge-c2c-0.1.1',
+              };
+              const indexed = await repositoryIndex(
+                this.env.DB,
+                c.repository.id,
+                c.baseline,
+                run.head_sha,
+                result,
+              );
+              result.repositoryIntelligence = indexed.index;
+              result.repositoryIndexCache = indexed.cache;
+              const size = canonical(result).length;
+              if (size > 750_000) throw new Error('CONTEXT_LIMIT');
+              // Never persist raw source credentials. Source assertions run on the in-memory data;
+              // stored context is redacted and includes raw hashes for audit without secret values.
+              const evidence = objective(c, result);
+              if (c.analysis?.dependencyAudit === 'OSV_NPM_V1') {
+                const scanStarted = Date.now();
+                evidence.push(
+                  ...(await cachedDependencyAudit(
+                    this.env.DB,
                     {
-                      baseline: s.baseline === null ? null : redact(s.baseline),
-                      head: s.head === null ? null : redact(s.head),
-                      baselineHash:
-                        s.baseline === null ? null : await digest(s.baseline),
-                      headHash: s.head === null ? null : await digest(s.head),
+                      repositoryId: c.repository.id,
+                      runId: id,
+                      baseline: c.baseline,
+                      head: run.head_sha,
+                      contractHash: run.contract_hash,
+                      cache: c.execution.runner?.cache ?? 'NONE',
                     },
-                  ]),
-                ),
-              ),
-            }),
-          );
-          await this.env.DB.prepare(
-            "UPDATE evaluations SET context=?,evidence=? WHERE id=? AND state='FETCHING'",
-          )
-            .bind(stored, redact(canonical(evidence)), id)
-            .run();
-          return JSON.parse(stored) as Context;
-        },
-      );
+                    {
+                      manifest: sources['package.json']?.baseline ?? null,
+                      lock: sources['package-lock.json']?.baseline ?? null,
+                    },
+                    {
+                      manifest: sources['package.json']?.head ?? null,
+                      lock: sources['package-lock.json']?.head ?? null,
+                    },
+                  )),
+                );
+                await recordRunMeasurement(
+                  this.env.DB,
+                  id,
+                  'check.scan.durationMs',
+                  Date.now() - scanStarted,
+                ).catch(() => undefined);
+              }
+              const stored = redact(
+                canonical({
+                  ...result,
+                  sources: Object.fromEntries(
+                    await Promise.all(
+                      Object.entries(sources).map(async ([path, s]) => [
+                        path,
+                        {
+                          baseline:
+                            s.baseline === null ? null : redact(s.baseline),
+                          head: s.head === null ? null : redact(s.head),
+                          baselineHash:
+                            s.baseline === null
+                              ? null
+                              : await digest(s.baseline),
+                          headHash:
+                            s.head === null ? null : await digest(s.head),
+                        },
+                      ]),
+                    ),
+                  ),
+                }),
+              );
+              await this.env.DB.prepare(
+                "UPDATE evaluations SET context=?,evidence=? WHERE id=? AND state='FETCHING'",
+              )
+                .bind(stored, redact(canonical(evidence)), id)
+                .run();
+              return JSON.parse(stored) as Context;
+            } finally {
+              await releaseReviewer(this.env.CAPACITY_DB ?? this.env.DB, slot);
+            }
+          },
+        );
+        if (prepared !== 'CONTEXT_BUSY') {
+          context = prepared;
+          preparationFinished = true;
+          break;
+        }
+        await step.sleep(`preparation-wait-${attempt}`, '30 seconds');
+      }
+      if (!preparationFinished) throw new Error('PREPARATION_QUEUE_TIMEOUT');
       if (!context) {
         await step.do(
           'publish-superseded',
@@ -231,10 +264,17 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
       await step.do(
         'objective',
         {
-          retries: { limit: 8, delay: '15 seconds', backoff: 'constant' },
+          retries: {
+            limit: this.env.RUNNER_BACKEND === 'actions-vm' ? 600 : 8,
+            delay:
+              this.env.RUNNER_BACKEND === 'actions-vm'
+                ? '30 seconds'
+                : '15 seconds',
+            backoff: 'constant',
+          },
           timeout:
             this.env.RUNNER_BACKEND === 'actions-vm'
-              ? '30 minutes'
+              ? '10 minutes'
               : '4 minutes',
         },
         async () => {
@@ -250,12 +290,28 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           const contract = parseContract(run);
           let evidence = JSON.parse(run.evidence!) as Evidence[];
           try {
-            evidence = await runObjective(this.env, run, contract, evidence);
+            evidence = await runObjective(this.env, run, contract, evidence, {
+              deferActions: this.env.RUNNER_BACKEND === 'actions-vm',
+            });
           } catch (error) {
             // Capacity is backpressure, not missing verification. Durable retries
             // re-check current head/eligibility before spending more compute.
-            if (error instanceof Error && error.message === 'RUNNER_BUSY')
+            if (
+              error instanceof Error &&
+              ['RUNNER_BUSY', 'RUNNER_PENDING', 'GITHUB_RATE_LIMITED'].includes(
+                error.message,
+              )
+            ) {
+              await this.env.DB.prepare(
+                'INSERT OR IGNORE INTO timeline(run_id,state,detail) SELECT id,state,? FROM evaluations WHERE id=?',
+              )
+                .bind(
+                  'Waiting for isolated execution capacity; frozen inputs and completed baseline evidence are retained.',
+                  id,
+                )
+                .run();
               throw error;
+            }
             const code =
               error instanceof Error && /^[A-Z_0-9]+$/.test(error.message)
                 ? error.message
@@ -285,78 +341,158 @@ export class EvaluationWorkflow extends WorkflowEntrypoint<
           }
         },
       );
-      const reviewerSlot = await step.do(
-        'reviewer-capacity',
-        { retries: { limit: 16, delay: '15 seconds', backoff: 'constant' } },
-        async () => {
-          if (
-            !(await this.requireCurrent(id)) ||
-            (this.env.AI_PROVIDER ?? 'cloudflare') === 'cloudflare' ||
-            !providerHasKey(this.env)
-          )
-            return null;
-          const slot = await acquireReviewer(
-            this.env.DB,
-            this.env.AI_PROVIDER ?? 'cloudflare',
-          );
-          if (!slot) throw new Error('REVIEWER_CAPACITY_BUSY');
-          return slot;
-        },
-      );
-      await step.do(
-        'reasoning',
-        {
-          retries: { limit: 0, delay: '1 second' },
-          timeout: '3 minutes',
-        },
-        async () => {
-          try {
-            const run = await this.requireCurrent(id);
-            if (!run) return;
+      // Sleep outside step.do so waiting does not occupy active Workflow capacity.
+      // Never durably cache an ephemeral lease across steps: acquire, use and
+      // release it within the same bounded reasoning step, including on resume.
+      let reasoningFinished = false;
+      let providerRetries = 0;
+      for (let attempt = 0; attempt < 600; attempt++) {
+        const waiting = await step.do(
+          attempt === 0 ? 'reasoning' : `reasoning-${attempt}`,
+          {
+            retries: { limit: 0, delay: '1 second' },
+            timeout: '3 minutes',
+          },
+          async () => {
+            if (!(await this.requireCurrent(id))) return false;
+            const reviewerSlot =
+              (this.env.AI_PROVIDER ?? 'cloudflare') !== 'cloudflare' &&
+              providerHasKey(this.env)
+                ? await acquireReviewer(
+                    this.env.CAPACITY_DB ?? this.env.DB,
+                    this.env.AI_PROVIDER ?? 'cloudflare',
+                  )
+                : null;
             if (
-              reviewerSlot &&
-              !(await renewReviewer(this.env.DB, reviewerSlot))
-            )
-              throw new Error('REVIEWER_LEASE_EXPIRED');
-            if (!(await this.requireCurrent(id))) return;
-            if (!(await transition(this.env, id, 'CHECKING', 'REVIEWING')))
-              return;
-            if (!(await this.requireCurrent(id))) return;
-            const evidence = JSON.parse(run.evidence!) as Evidence[];
-            const result = await aiReview(
-              this.env,
-              parseContract(run),
-              context,
-              evidence,
-            );
-            await this.env.DB.prepare(
-              "UPDATE evaluations SET report=?,ai_status=? WHERE id=? AND state='REVIEWING'",
-            )
-              .bind(
-                redact(
-                  canonical({
-                    ...result.review,
-                    ...enrichEngineeringReview(
-                      parseContract(run),
-                      evidence,
-                      result.review,
-                      result.status === 'COMPLETED'
-                        ? 'AI_ASSESSMENT'
-                        : 'DETERMINISTIC_POLICY',
-                      context,
-                    ),
-                    aiTrace: result.trace,
-                  }),
-                ),
-                result.status,
-                id,
+              (this.env.AI_PROVIDER ?? 'cloudflare') !== 'cloudflare' &&
+              providerHasKey(this.env) &&
+              !reviewerSlot
+            ) {
+              if (attempt === 0)
+                await this.env.DB.prepare(
+                  'INSERT OR IGNORE INTO timeline(run_id,state,detail) SELECT id,state,? FROM evaluations WHERE id=?',
+                )
+                  .bind(
+                    'Waiting for AI reviewer capacity; submission and earlier evidence are retained.',
+                    id,
+                  )
+                  .run();
+              return true;
+            }
+            let coolingDown = false;
+            try {
+              const run = await this.requireCurrent(id);
+              if (!run) return;
+              if (
+                reviewerSlot &&
+                !(await renewReviewer(
+                  this.env.CAPACITY_DB ?? this.env.DB,
+                  reviewerSlot,
+                ))
               )
-              .run();
-          } finally {
-            if (reviewerSlot) await releaseReviewer(this.env.DB, reviewerSlot);
-          }
-        },
-      );
+                throw new Error('REVIEWER_LEASE_EXPIRED');
+              if (!(await this.requireCurrent(id))) return;
+              if (
+                run.state !== 'REVIEWING' &&
+                !(await transition(this.env, id, 'CHECKING', 'REVIEWING'))
+              )
+                return;
+              if (!(await this.requireCurrent(id))) return;
+              const evidence = JSON.parse(run.evidence!) as Evidence[];
+              const result = await aiReview(
+                this.env,
+                parseContract(run),
+                context,
+                evidence,
+              );
+              await this.env.DB.prepare(
+                'INSERT INTO audit(action,entity,actor,changes) VALUES(?,?,?,?)',
+              )
+                .bind(
+                  'reviewer.attempt',
+                  id,
+                  'system',
+                  redact(
+                    canonical({
+                      id: crypto.randomUUID(),
+                      status: result.status,
+                      review: result.review,
+                      trace: result.trace,
+                    }),
+                  ),
+                )
+                .run();
+              await this.env.DB.prepare(
+                "UPDATE evaluations SET report=?,ai_status=? WHERE id=? AND state='REVIEWING'",
+              )
+                .bind(
+                  redact(
+                    canonical({
+                      ...result.review,
+                      ...enrichEngineeringReview(
+                        parseContract(run),
+                        evidence,
+                        result.review,
+                        result.status === 'COMPLETED'
+                          ? 'AI_ASSESSMENT'
+                          : 'DETERMINISTIC_POLICY',
+                        context,
+                      ),
+                      aiTrace: result.trace,
+                    }),
+                  ),
+                  result.status,
+                  id,
+                )
+                .run();
+              const failure =
+                result.trace.failureCode ??
+                result.trace.attemptFailures?.at(-1) ??
+                '';
+              if (
+                result.status === 'FAILED' &&
+                providerRetries < 5 &&
+                /^(GEMINI|GROQ|CALLMISSED)_(HTTP_(429|5\d\d)|TIMEOUT|UNAVAILABLE)$/.test(
+                  failure,
+                )
+              ) {
+                if (reviewerSlot)
+                  coolingDown = await coolDownReviewer(
+                    this.env.CAPACITY_DB ?? this.env.DB,
+                    reviewerSlot,
+                    Math.min(300000, 60000 * 2 ** providerRetries),
+                  );
+                await this.env.DB.prepare(
+                  'INSERT OR IGNORE INTO timeline(run_id,state,detail) SELECT id,state,? FROM evaluations WHERE id=?',
+                )
+                  .bind(
+                    `AI provider temporarily unavailable (${failure}); attempt ${providerRetries + 1} retained and a bounded retry is scheduled.`,
+                    id,
+                  )
+                  .run();
+                return 'PROVIDER_BUSY' as const;
+              }
+            } finally {
+              if (reviewerSlot && !coolingDown)
+                await releaseReviewer(
+                  this.env.CAPACITY_DB ?? this.env.DB,
+                  reviewerSlot,
+                );
+            }
+            return false;
+          },
+        );
+        if (!waiting) {
+          reasoningFinished = true;
+          break;
+        }
+        if (waiting === 'PROVIDER_BUSY') providerRetries++;
+        await step.sleep(
+          `reviewer-wait-${attempt}`,
+          `${waiting === 'PROVIDER_BUSY' ? Math.min(300, 30 * 2 ** (providerRetries - 1)) : 30} seconds`,
+        );
+      }
+      if (!reasoningFinished) throw new Error('REVIEWER_QUEUE_TIMEOUT');
       await step.do('synthesize', async () => {
         const run = await this.requireCurrent(id);
         if (!run) return;

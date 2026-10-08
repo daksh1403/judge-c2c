@@ -4,6 +4,7 @@ import { pathSchema, sha, type Contract } from './domain';
 import { boundedBody } from './security';
 import type { Env } from './env';
 import { observe } from './operational-telemetry';
+import { githubBackoffActive, recordGitHubBackoff } from './reviewer-capacity';
 export type ChangedFile = {
   filename: string;
   previous_filename?: string;
@@ -17,6 +18,7 @@ export class GitHub {
   constructor(
     private token?: string,
     private db?: D1Database,
+    private capacityDB?: D1Database,
   ) {}
   static async application(env: Env) {
     if (!env.GITHUB_APP_ID || !env.GITHUB_APP_PRIVATE_KEY)
@@ -32,7 +34,7 @@ export class GitHub {
       .setIssuedAt(now - 60)
       .setExpirationTime(now + 540)
       .sign(key);
-    return new GitHub(jwt, env.DB);
+    return new GitHub(jwt, env.DB, env.CAPACITY_DB ?? env.DB);
   }
   static async installation(env: Env, contract: Contract) {
     await requireOrganizationActive(env);
@@ -53,7 +55,7 @@ export class GitHub {
         }),
       },
     );
-    return new GitHub(response.token, env.DB);
+    return new GitHub(response.token, env.DB, env.CAPACITY_DB ?? env.DB);
   }
   async api<T>(path: string, init: RequestInit = {}): Promise<T> {
     if (!path.startsWith('/') || path.startsWith('//'))
@@ -62,6 +64,11 @@ export class GitHub {
     let failed = false;
     let rateLimited = false;
     try {
+      const coordinator = this.capacityDB;
+      if (coordinator && (await githubBackoffActive(coordinator))) {
+        rateLimited = true;
+        throw new Error('GITHUB_RATE_LIMITED');
+      }
       const response = await fetch('https://api.github.com' + path, {
         ...init,
         redirect: 'manual',
@@ -78,6 +85,10 @@ export class GitHub {
         response.status === 429 ||
         (response.status === 403 && response.headers.has('retry-after')) ||
         response.headers.get('x-ratelimit-remaining') === '0';
+      if (rateLimited && coordinator)
+        await recordGitHubBackoff(coordinator, response.headers);
+      if (!response.ok && rateLimited && coordinator)
+        throw new Error('GITHUB_RATE_LIMITED');
       if (!response.ok) throw new Error(`GITHUB_HTTP_${response.status}`);
       if (response.status === 204) return undefined as T;
       const bytes = await boundedBody(

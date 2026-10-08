@@ -17,7 +17,9 @@ permissions:
 jobs:
   evaluate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    # Includes trusted package/image setup. The claimed attempt retains its
+    # independent 12-minute deadline and the guest its frozen execution budget.
+    timeout-minutes: 20
     # No Actions concurrency group: every attempt retains its own queued job.
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

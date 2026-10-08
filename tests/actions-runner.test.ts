@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { assertRunnerIdentity, actionsConfig } from '../src/actions-runner';
+import {
+  assertRunnerIdentity,
+  actionsConfig,
+  actionsEvaluate,
+} from '../src/actions-runner';
 import type { Env } from '../src/env';
+import type { GitHub as GitHubClient } from '../src/github';
+import { readFileSync } from 'node:fs';
 const env = {
   RUNNER_ACTIONS_REPOSITORY: 'owner/public-runner',
   RUNNER_ACTIONS_REPOSITORY_ID: '123',
@@ -9,6 +15,12 @@ const env = {
   RUNNER_ACTIONS_ORIGIN: 'https://judge.example.com',
   RUNNER_IMAGE_URI: 'qemu-vm@sha256:' + 'b'.repeat(64),
 } as Env;
+
+it('leaves time for trusted setup as well as a maximum-duration participant VM', () => {
+  const workflow = readFileSync('.github/workflows/evaluate.yml', 'utf8');
+  const timeout = Number(workflow.match(/timeout-minutes: (\d+)/)?.[1]);
+  expect(timeout).toBeGreaterThanOrEqual(15);
+});
 const claims = {
   repository: 'owner/public-runner',
   repository_id: '123',
@@ -51,6 +63,111 @@ describe('Actions execution trust identity', () => {
       actionsConfig({ ...env, RUNNER_IMAGE_URI: 'UNCONFIGURED' }),
     ).toThrow();
   });
+});
+
+it('durably polls a queued Actions attempt without redispatch, then accepts a late claim with a separate execution deadline', async () => {
+  const { Miniflare } = await import('miniflare');
+  const { migrate } = await import('./database');
+  const { actionsBroker } = await import('../src/actions-runner');
+  const { GitHub } = await import('../src/github');
+  const { vi } = await import('vitest');
+  const mf = new Miniflare({
+    modules: true,
+    script: 'export default{}',
+    d1Databases: ['DB'],
+    compatibilityDate: '2026-08-01',
+  });
+  let now = Date.now();
+  try {
+    const db = (await mf.getD1Database('DB')) as unknown as D1Database;
+    await migrate(db);
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    let dispatches = 0;
+    vi.spyOn(GitHub, 'application').mockResolvedValue({
+      api: async () => ({ token: 'fixture' }),
+    } as unknown as GitHubClient);
+    vi.spyOn(GitHub.prototype, 'api').mockImplementation(async (path) => {
+      if (path.includes('/dispatches')) {
+        dispatches++;
+        now += 20 * 60_000;
+        return undefined;
+      }
+      if (path.includes('/branches/'))
+        return { commit: { sha: env.RUNNER_ACTIONS_SHA } };
+      return { id: Number(env.RUNNER_ACTIONS_REPOSITORY_ID), private: false };
+    });
+    const input = {
+      runId: 'c'.repeat(64),
+      commit: 'd'.repeat(40),
+      contractHash: 'e'.repeat(64),
+      policy: {
+        version: 'node-http-v1',
+        image: env.RUNNER_IMAGE_URI,
+        entrypoint: 'server.mjs',
+        commands: [],
+        cases: [
+          {
+            id: 'ready',
+            path: '/ready',
+            method: 'GET',
+            expectedStatus: 200,
+            expectedBody: {},
+          },
+        ],
+      },
+      timeoutSeconds: 60,
+      memoryMiB: 256,
+      files: [],
+    } as const;
+    const runtime = {
+      ...env,
+      DB: db,
+      RUNNER_ENABLED: 'true',
+      RUNNER_BACKEND: 'actions-vm',
+      RUNNER_APP_ID: '1',
+      RUNNER_APP_PRIVATE_KEY: 'fixture',
+      RUNNER_INSTALLATION_ID: '1',
+    } as Env;
+    const evaluate = () =>
+      actionsEvaluate(runtime, input as any, true, async () => {}, {
+        defer: true,
+      });
+    await expect(evaluate()).rejects.toThrow('RUNNER_PENDING');
+    expect(dispatches).toBe(1);
+    const job = await db
+      .prepare('SELECT id,expires_at FROM actions_runner_jobs')
+      .first<{ id: string; expires_at: number }>();
+    now += 20 * 60_000;
+    await expect(evaluate()).rejects.toThrow('RUNNER_PENDING');
+    expect(dispatches).toBe(1);
+    const claim = new Request(
+      `https://judge.example.com/api/runner/actions/${job!.id}/claim`,
+      { method: 'POST', headers: { authorization: 'Bearer fixture' } },
+    );
+    expect(
+      (
+        await actionsBroker(claim, runtime, async () => ({
+          runId: '456',
+          runAttempt: '1',
+        }))
+      ).status,
+    ).toBe(200);
+    now += 13 * 60_000;
+    expect(
+      (
+        await actionsBroker(claim, runtime, async () => ({
+          runId: '456',
+          runAttempt: '1',
+        }))
+      ).status,
+    ).toBe(410);
+    expect(
+      await db.prepare('SELECT COUNT(*) AS n FROM actions_runner_jobs').first(),
+    ).toEqual({ n: 1 });
+  } finally {
+    vi.restoreAllMocks();
+    await mf.dispose();
+  }
 });
 
 it('fences claims, completed replay, expiration and immutable inputs in real D1', async () => {

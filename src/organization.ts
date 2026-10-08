@@ -123,6 +123,7 @@ export async function organizationEnv(env: Env): Promise<Env> {
   return {
     ...env,
     DB: env.ORG_DB!,
+    CAPACITY_DB: env.CAPACITY_DB ?? env.DB,
     EVALUATOR: env.ORG_EVALUATOR!,
     ENVIRONMENT: env.ENVIRONMENT,
     DEMO_MODE: 'false',
@@ -166,7 +167,7 @@ async function installedClient(env: Env, repositoryId?: number, write = false) {
       }),
     },
   );
-  return new GitHub(token.token, env.ORG_DB);
+  return new GitHub(token.token, env.ORG_DB, env.CAPACITY_DB ?? env.DB);
 }
 function competitionServices(env: Env): CompetitionServices {
   return {
@@ -1006,14 +1007,17 @@ export async function organization(
     const evidence = objective(demoContract, context);
     const slot =
       env.AI_PROVIDER !== 'cloudflare' && providerHasKey(env)
-        ? await acquireReviewer(env.ORG_DB, env.AI_PROVIDER ?? 'cloudflare')
+        ? await acquireReviewer(
+            env.CAPACITY_DB ?? env.DB,
+            env.AI_PROVIDER ?? 'cloudflare',
+          )
         : undefined;
     if (slot === null) return json({ error: 'REVIEWER_CAPACITY_BUSY' }, 429);
     let reviewed;
     try {
       reviewed = await aiReview(env, demoContract, context, evidence);
     } finally {
-      if (slot) await releaseReviewer(env.ORG_DB, slot);
+      if (slot) await releaseReviewer(env.CAPACITY_DB ?? env.DB, slot);
     }
     await env.ORG_DB.prepare('INSERT INTO audit(action,entity) VALUES(?,?)')
       .bind('reviewer.diagnostic', reviewed.status)
